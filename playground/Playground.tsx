@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { TOOLS } from "../app/tools";
 import { OmniRenderer } from "../renderer";
+import { SourceView } from "./SourceView";
 import { usePlayground, type PlaygroundDeps, type RunStatus } from "./usePlayground";
 
 export const EXAMPLE_PROMPTS = [
@@ -145,7 +146,7 @@ export function Playground(deps: PlaygroundDeps) {
       <div className="pg-panels">
         <section className="pg-panel" aria-label="Omni-IR source">
           <h2 className="pg-panel-title">Source</h2>
-          <pre className="pg-source">{state.source}</pre>
+          <SourceView source={state.source} issues={state.issues} nodeLines={state.nodeLines} streaming={streaming} />
         </section>
         <section className="pg-panel pg-preview" aria-label="Rendered screen">
           <h2 className="pg-panel-title">Preview</h2>

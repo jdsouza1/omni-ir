@@ -51,7 +51,8 @@ async function setup() {
   return { ...scripted, user: userEvent.setup(), status: () => screen.getByRole("status").textContent ?? "" };
 }
 
-const sourceText = () => screen.getByLabelText("Omni-IR source").querySelector("pre")?.textContent ?? "";
+const sourceText = () =>
+  [...screen.getByLabelText("Omni-IR source").querySelectorAll(".pg-line-text")].map((el) => el.textContent).join("\n");
 
 const DONE: GenerateOutcome = { status: "done", stopReason: "end_turn", model: "mock", ms: 12 };
 
