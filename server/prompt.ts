@@ -5,7 +5,8 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { z } from "zod";
 import { TOOLS } from "../app/tools";
-import { COMPONENTS, COMPONENT_TYPES, type ToolRegistry } from "../engine/schema";
+import { describeComponent, describeValue, type JsonSchema } from "../engine/describe";
+import { COMPONENT_TYPES, type ToolRegistry } from "../engine/schema";
 
 export interface PromptOptions {
   tools?: ToolRegistry;
@@ -53,7 +54,7 @@ Write \`root = …\` first and its parts after it; referring to an id before its
 - Use only the components and tools listed here. If a request needs something that isn't available, build the closest screen you can with what is.
 
 ## Components
-${COMPONENT_TYPES.map(describeComponent).join("\n\n")}
+${COMPONENT_TYPES.map(componentBlock).join("\n\n")}
 
 McpMutation(target, tool, params?)
   target: id of the Button it governs
@@ -77,62 +78,13 @@ export function examplesIn(prompt: string): string[] {
 
 // ---------------------------------------------------------------------------
 
-interface JsonSchema {
-  type?: string;
-  const?: unknown;
-  enum?: unknown[];
-  anyOf?: JsonSchema[];
-  items?: JsonSchema;
-  properties?: Record<string, JsonSchema>;
-  required?: string[];
-  maxLength?: number;
-  minLength?: number;
-  pattern?: string;
-  format?: string;
-  minimum?: number;
-  maximum?: number;
-  exclusiveMinimum?: number;
-}
-
-function describeComponent(type: (typeof COMPONENT_TYPES)[number]): string {
-  const spec = COMPONENTS[type];
-  const schema = z.toJSONSchema(spec.props) as JsonSchema;
-  const props = Object.entries(schema.properties ?? {});
-  const required = new Set(schema.required ?? []);
-  const positional = spec.positional as readonly string[];
-  const named = props.map(([name]) => name).filter((name) => !positional.includes(name));
-  const signature = [...positional, ...named].map((name) => (required.has(name) ? name : `${name}?`)).join(", ");
-  const lines = props.map(([name, def]) => `  ${name}: ${describeValue(def)}`);
-  return [`${type}(${signature})`, ...lines].join("\n");
+function componentBlock(type: (typeof COMPONENT_TYPES)[number]): string {
+  const shape = describeComponent(type);
+  return [shape.signature, ...shape.props.map((p) => `  ${p.name}: ${p.summary}`)].join("\n");
 }
 
 function describeTool(name: string, schema: z.ZodType): string {
   const json = z.toJSONSchema(schema) as JsonSchema;
   const params = Object.entries(json.properties ?? {}).map(([param, def]) => `${param}: ${describeValue(def, true)}`);
   return `- ${name}: params {${params.join("; ")}}`;
-}
-
-function describeValue(def: JsonSchema, detailed = false): string {
-  if (def.anyOf) return def.anyOf.map((d) => describeValue(d, detailed)).join(" | ");
-  if (def.const !== undefined) return JSON.stringify(def.const);
-  if (def.enum) return def.enum.map((v) => JSON.stringify(v)).join(" | ");
-  if (def.type === "object" && def.properties?.kind?.const === "state") return "$state";
-  if (def.type === "object" && def.properties?.kind?.const === "ref") return "id";
-  if (def.type === "array") return `[${describeValue(def.items ?? {}, detailed)}, …]`;
-  if (def.type === "string") {
-    if (def.format === "email") return "email address";
-    if (!detailed) return def.pattern === "^[A-Z]{3}$" ? "3-letter currency code" : "text";
-    const limits = [def.minLength ? `min ${def.minLength}` : "", def.maxLength ? `max ${def.maxLength}` : "", def.pattern ? `matching /${def.pattern}/` : ""]
-      .filter(Boolean)
-      .join(", ");
-    return limits ? `text (${limits})` : "text";
-  }
-  if (def.type === "number" || def.type === "integer") {
-    const kind = def.type === "integer" ? "whole number" : "number";
-    if (def.exclusiveMinimum !== undefined) return `${kind} > ${def.exclusiveMinimum}`;
-    if (def.minimum !== undefined && def.maximum !== undefined) return `${kind} ${def.minimum}-${def.maximum}`;
-    return kind;
-  }
-  if (def.type === "boolean") return "true | false";
-  return "value";
 }

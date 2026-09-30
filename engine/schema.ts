@@ -4,8 +4,26 @@
 import { z } from "zod";
 import type { Issue, RawStatement, RawValue } from "./types";
 
-export const MAX_TEXT = 2000;
-export const MAX_CHILDREN = 200;
+/** Size limits of the protocol (SPEC.md, generated "limits" section). */
+export const LIMITS = {
+  /** Longest line, in UTF-16 code units; enforced by the line buffer. */
+  lineLength: 16 * 1024,
+  /** Longest text value. */
+  text: 2000,
+  /** Most children in one list. */
+  children: 200,
+  /** Longest component id. */
+  idLength: 64,
+  /** Longest $state key, including the $. */
+  stateKeyLength: 65,
+  /** Longest tool name. */
+  toolNameLength: 128,
+  /** Longest action name. */
+  actionNameLength: 64,
+} as const;
+
+export const MAX_TEXT = LIMITS.text;
+export const MAX_CHILDREN = LIMITS.children;
 export const ROOT_ID = "root";
 
 // Literal keywords, plus names that would touch Object.prototype if used as keys.
@@ -17,13 +35,13 @@ const RESERVED = new Set(["true", "false", "null", "__proto__", "constructor", "
 
 export const Identifier = z
   .string()
-  .max(64)
+  .max(LIMITS.idLength)
   .regex(/^[A-Za-z_][A-Za-z0-9_]*$/, "not a valid identifier")
   .refine((s) => !RESERVED.has(s), "reserved word");
 
 export const StateKey = z
   .string()
-  .max(65)
+  .max(LIMITS.stateKeyLength)
   .regex(/^\$[A-Za-z_][A-Za-z0-9_]*$/, "not a valid state key");
 
 export const Primitive = z.union([z.string().max(MAX_TEXT), z.number().finite(), z.boolean(), z.null()]);
@@ -38,10 +56,10 @@ export type NodeRef = z.infer<typeof NodeRef>;
 const Text = z.string().max(MAX_TEXT);
 const TextOrState = z.union([Text, StateRef]);
 const Children = z.array(NodeRef).max(MAX_CHILDREN);
-const ActionName = z.string().regex(/^[a-z][A-Za-z0-9_]*$/, "not a valid action name").max(64);
+const ActionName = z.string().regex(/^[a-z][A-Za-z0-9_]*$/, "not a valid action name").max(LIMITS.actionNameLength);
 const ToolName = z
   .string()
-  .max(128)
+  .max(LIMITS.toolNameLength)
   .regex(/^[a-z][A-Za-z0-9_]*(\.[a-z][A-Za-z0-9_]*)+$/, "tool must look like namespace.action");
 
 // ---------------------------------------------------------------------------

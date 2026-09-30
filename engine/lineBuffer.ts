@@ -1,7 +1,9 @@
 // R2: turns arbitrary network chunks into complete lines.
 // Only complete lines leave this class; the unfinished remainder waits for more input.
 
-export const DEFAULT_MAX_LINE_LENGTH = 16 * 1024;
+import { LIMITS } from "./schema";
+
+export const DEFAULT_MAX_LINE_LENGTH = LIMITS.lineLength;
 
 export type LineEvent =
   | { kind: "line"; text: string; line: number }
