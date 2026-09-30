@@ -1,7 +1,9 @@
-// Streaming parser: chunks → lines → statements → validated AST in the store.
-// (Stub: implemented after the tests.)
-import type { ToolRegistry } from "./schema";
-import type { OmniDocument, OmniStore } from "./store";
+// Streaming parser: chunks → lines (R2) → raw statements (R4) → schema validation → store.
+// A bad line is reported and skipped; it never stops the stream.
+import { LineBuffer, type LineEvent } from "./lineBuffer";
+import { validateDocument, validateStatement, type Statement, type ToolRegistry } from "./schema";
+import { createStore, type OmniDocument, type OmniStore } from "./store";
+import { parseLine } from "./tokenizer";
 import type { Issue } from "./types";
 
 export type ParserEvent =
@@ -27,13 +29,89 @@ export interface OmniParser {
   getSnapshot(): OmniDocument;
 }
 
-export function createParser(_options: ParserOptions): OmniParser {
-  throw new Error("not implemented");
+export function createParser(options: ParserOptions): OmniParser {
+  const store = options.store ?? createStore();
+  const ctx = { tools: options.tools };
+  const buffer = new LineBuffer(options.maxLineLength === undefined ? {} : { maxLineLength: options.maxLineLength });
+  const accepted: Statement[] = [];
+  const lineOf = new Map<string, number>();
+  const listeners = new Set<(event: ParserEvent) => void>();
+  let endIssues: Issue[] | null = null;
+
+  const emit = (event: ParserEvent) => {
+    for (const listener of listeners) listener(event);
+  };
+  const reject = (issues: Issue[], line: number) => {
+    for (const issue of issues) emit({ type: "error", issue: { ...issue, line } });
+  };
+
+  function handle(event: LineEvent) {
+    const { line } = event;
+    if (event.kind === "overflow") {
+      reject([{ code: "line_too_long", message: `line is longer than the limit (${event.length} characters seen)` }], line);
+      return;
+    }
+
+    const parsed = parseLine(event.text);
+    if (parsed.kind === "empty") return;
+    if (parsed.kind === "error") return reject(parsed.issues, line);
+    for (const warning of parsed.warnings) emit({ type: "warning", issue: { ...warning, line } });
+
+    const result = validateStatement(parsed.statement, ctx);
+    if (!result.ok) return reject(result.issues, line);
+    const statement = result.statement;
+
+    // The accepted statements are always consistent, so any new issue is caused by this line.
+    // Checking the whole list each time is O(n) per line, which is fine for UI-sized documents.
+    const conflicts = validateDocument([...accepted, statement], { complete: false });
+    if (conflicts.length > 0) return reject(conflicts, line);
+
+    accepted.push(statement);
+    const id = statement.kind === "state" ? statement.key : statement.id;
+    lineOf.set(id, line);
+    const { pending, resolved } = store.apply(statement);
+    emit({ type: "node", id, line });
+    for (const ref of resolved) emit({ type: "resolved", id: ref, line });
+    for (const ref of pending) emit({ type: "pending", id: ref, line });
+  }
+
+  return {
+    store,
+
+    write(chunk) {
+      if (endIssues !== null) throw new Error("OmniParser: write() after end()");
+      for (const event of buffer.push(chunk)) handle(event);
+    },
+
+    end() {
+      if (endIssues !== null) return endIssues;
+      for (const event of buffer.end()) handle(event);
+      const issues = validateDocument(accepted, { complete: true }).map((issue) => {
+        const line = issue.id === undefined ? undefined : lineOf.get(issue.id);
+        return line === undefined ? issue : { ...issue, line };
+      });
+      endIssues = issues;
+      store.finish();
+      for (const issue of issues) emit({ type: "error", issue });
+      emit({ type: "end", issues });
+      return issues;
+    },
+
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+
+    getSnapshot: () => store.getSnapshot(),
+  };
 }
 
+/** Parse a whole async stream (e.g. an SSE body or LLM token stream) and end it. */
 export async function parseStream(
-  _source: AsyncIterable<string | Uint8Array>,
-  _options: ParserOptions,
+  source: AsyncIterable<string | Uint8Array>,
+  options: ParserOptions,
 ): Promise<{ parser: OmniParser; issues: Issue[] }> {
-  throw new Error("not implemented");
+  const parser = createParser(options);
+  for await (const chunk of source) parser.write(chunk);
+  return { parser, issues: parser.end() };
 }

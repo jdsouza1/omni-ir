@@ -1,5 +1,7 @@
-// Reactive document store for useSyncExternalStore. (Stub: implemented after the tests.)
-import type { MutationStatement, OmniNode, Primitive, Statement } from "./schema";
+// Reactive document store, shaped for React's useSyncExternalStore.
+// Every change produces a new snapshot object, but node objects are shared between snapshots:
+// only the node a new line defines is a new object (R3), so memoized components can skip the rest.
+import { stateKeysOf, type MutationStatement, type OmniNode, type Primitive, type Statement } from "./schema";
 
 export interface OmniDocument {
   /** Components by id. Only the object for a newly arrived node is ever replaced (R3). */
@@ -25,11 +27,83 @@ export interface ApplyResult {
 export interface OmniStore {
   getSnapshot(): OmniDocument;
   subscribe(listener: () => void): () => void;
+  /** Add an already-validated statement. Called by the parser only. */
   apply(statement: Statement): ApplyResult;
+  /** End of stream: every still-pending reference becomes missing. */
   finish(): void;
+  /** Local state edit from an Input (R1). The key must already be declared by the stream. */
   setState(key: string, value: Primitive): void;
 }
 
+const EMPTY: OmniDocument = {
+  nodes: new Map(),
+  mutations: new Map(),
+  state: {},
+  pending: new Set(),
+  missing: new Set(),
+  complete: false,
+};
+
 export function createStore(): OmniStore {
-  throw new Error("not implemented");
+  let doc = EMPTY;
+  const listeners = new Set<() => void>();
+
+  function commit(next: OmniDocument) {
+    doc = next;
+    for (const listener of listeners) listener();
+  }
+
+  return {
+    getSnapshot: () => doc,
+
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+
+    apply(statement) {
+      let { nodes, mutations, state } = doc;
+      const pending = new Set(doc.pending);
+      const result: ApplyResult = { pending: [], resolved: [] };
+
+      const define = (id: string) => {
+        if (pending.delete(id)) result.resolved.push(id);
+      };
+
+      if (statement.kind === "state") {
+        state = { ...state, [statement.key]: statement.value };
+        define(statement.key);
+      } else if (statement.kind === "node") {
+        nodes = new Map(nodes).set(statement.id, statement);
+        define(statement.id);
+      } else {
+        mutations = new Map(mutations).set(statement.target, statement);
+      }
+
+      if (statement.kind !== "state") {
+        const refs = [...(statement.kind === "node" ? statement.children : []), ...stateKeysOf(statement)];
+        for (const ref of refs) {
+          const known = ref.startsWith("$") ? Object.hasOwn(state, ref) : nodes.has(ref);
+          if (!known && !pending.has(ref)) {
+            pending.add(ref);
+            result.pending.push(ref);
+          }
+        }
+      }
+
+      commit({ ...doc, nodes, mutations, state, pending });
+      return result;
+    },
+
+    finish() {
+      if (doc.complete) return;
+      commit({ ...doc, pending: new Set(), missing: new Set(doc.pending), complete: true });
+    },
+
+    setState(key, value) {
+      if (!Object.hasOwn(doc.state, key)) throw new Error(`OmniStore: state ${key} is not declared`);
+      if (Object.is(doc.state[key], value)) return;
+      commit({ ...doc, state: { ...doc.state, [key]: value } });
+    },
+  };
 }

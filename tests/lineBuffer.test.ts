@@ -54,10 +54,10 @@ describe("LineBuffer (R2)", () => {
 
   it("drops an over-long line and resumes after the next newline", () => {
     const buf = new LineBuffer({ maxLineLength: 10 });
-    const events = [...buf.push("x".repeat(6)), ...buf.push("x".repeat(6)), ...buf.push("yyy\nok = Divider()\n")];
+    const events = [...buf.push("x".repeat(6)), ...buf.push("x".repeat(6)), ...buf.push("yyy\nd = X()\n")];
     expect(events).toEqual([
       { kind: "overflow", line: 1, length: 12 },
-      { kind: "line", text: "ok = Divider()", line: 2 },
+      { kind: "line", text: "d = X()", line: 2 },
     ]);
   });
 

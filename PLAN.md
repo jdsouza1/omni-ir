@@ -95,13 +95,13 @@ These are the rules for how the stream behaves at runtime. Tasks 3–5 must foll
   - `tokenizer.test.ts` (R4): every case listed under R4
   - `parser.test.ts`: single line; forward reference stays pending, then resolves (R5); nested component call rejected as "not flat"; malformed line gives an error and streaming continues; schema-invalid line; state and McpMutation lines; Input with a pending state reference; McpMutation with a tool not in the registry gives an `unknown tool` error (R6); an unknown escape gives a `warning`, not an error, and the node is still added (R4)
 - [x] 3.2 Confirm they fail; record the failing run in the commit
-- [ ] 3.3 `engine/lineBuffer.ts` (R2)
-- [ ] 3.4 `engine/tokenizer.ts`: regex for the line start + character-by-character tokenizer + small parser for the tokens (R4). Decode `\"` `\\` `\n`; keep other escapes as literal text and return a warning; an unterminated string is an error
-- [ ] 3.5 Validate each statement with Zod: valid ones go into the AST, invalid ones become error events
-- [ ] 3.6 AST = map from id to node + root id + pending references; resolve pending references as nodes arrive (R5)
-- [ ] 3.7 API: `createParser({ tools })` returns `{ write, end, subscribe, getSnapshot }`; plus `parseStream(asyncIterable, { tools })`. Event kinds: `node`, `pending`, `resolved`, `warning`, `error`, `end`
-- [ ] 3.8 `/engine/store.ts`: store compatible with `useSyncExternalStore`, with **structural sharing** (R3) and `setState` for Input (R1)
-- [ ] 3.9 When the stream ends, run the whole-document check and mark remaining pending references as **missing** in the snapshot (R5), so the renderer can show fallbacks
+- [x] 3.3 `engine/lineBuffer.ts` (R2)
+- [x] 3.4 `engine/tokenizer.ts`: regex for the line start + character-by-character tokenizer + small parser for the tokens (R4). Decode `\"` `\\` `\n`; keep other escapes as literal text and return a warning; an unterminated string is an error
+- [x] 3.5 Validate each statement with Zod: valid ones go into the AST, invalid ones become error events
+- [x] 3.6 AST = map from id to node + root id + pending references; resolve pending references as nodes arrive (R5)
+- [x] 3.7 API: `createParser({ tools })` returns `{ write, end, subscribe, getSnapshot }`; plus `parseStream(asyncIterable, { tools })`. Event kinds: `node`, `pending`, `resolved`, `warning`, `error`, `end`
+- [x] 3.8 `/engine/store.ts`: store compatible with `useSyncExternalStore`, with **structural sharing** (R3) and `setState` for Input (R1)
+- [x] 3.9 When the stream ends, run the whole-document check and mark remaining pending references as **missing** in the snapshot (R5), so the renderer can show fallbacks
 - **Checkpoint:** all tests pass; chunk sizes of 1 byte, 7 bytes and the whole file give the same AST; after an unrelated line arrives, every other node's object is still the same object (`===`)
 
 ## Task 4: Trusted Catalog (`/catalog`)
