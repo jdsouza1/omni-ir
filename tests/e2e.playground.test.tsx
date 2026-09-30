@@ -95,6 +95,17 @@ describe("playground end to end", () => {
     expect(server!.logs.filter((l) => l.event === "generate")).toHaveLength(2);
   });
 
+  it("demo: missing child marks the line that referenced it, not a separate list", async () => {
+    const user = await open();
+    await runExample(user, "demo: missing child");
+    const flagged = [...document.querySelectorAll<HTMLElement>('.pg-line[data-severity="error"]')];
+    expect(flagged).toHaveLength(1);
+    expect(flagged[0]!.textContent).toContain("root = Card([title, receipt, amount, actions])");
+    expect(flagged[0]!.textContent).toContain('"root" references "receipt", which never arrived');
+    expect(document.querySelector(".pg-doc-issues")).toBeNull();
+    expect(document.querySelector('[data-fallback-reason="missing"]')?.getAttribute("data-node-id")).toBe("receipt");
+  });
+
   it("demo: cut off explains itself and marks the missing parts", async () => {
     const user = await open();
     await runExample(user, "demo: cut off");

@@ -115,6 +115,8 @@ describe("validateDocument", () => {
     const doc = statements(call("root", "Card", [arr(ref("later"))]));
     expect(validateDocument(doc, { complete: false })).toEqual([]);
     expect(codes(validateDocument(doc, { complete: true }))).toEqual(["dangling_ref"]);
+    // The issue belongs to the node holding the reference, which has a line; the missing id never did.
+    expect(validateDocument(doc, { complete: true })[0]).toMatchObject({ id: "root", message: expect.stringContaining('"later"') });
   });
 
   it.each<[string, RawStatement[], IssueCode, boolean]>([

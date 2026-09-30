@@ -186,6 +186,20 @@ describe("createParser: end of stream", () => {
     expect(issues.map((i) => i.code)).toEqual(expect.arrayContaining(["dangling_ref", "missing_state"]));
   });
 
+  it("reports a missing child on the line that referenced it", () => {
+    const { parser } = setup();
+    feed(parser, ['title = Heading("Hi")', "root = Card([title, ghost])"]);
+    const issue = parser.end().find((i) => i.code === "dangling_ref");
+    expect(issue).toMatchObject({ code: "dangling_ref", id: "root", line: 2 });
+    expect(issue!.message).toContain('"ghost"');
+  });
+
+  it("reports missing state on the line that used it", () => {
+    const { parser } = setup();
+    feed(parser, ["root = Stack([note])", 'note = Input($never, label="x")']);
+    expect(parser.end().find((i) => i.code === "missing_state")).toMatchObject({ id: "note", line: 2 });
+  });
+
   it("reports an ungoverned mutating Button", () => {
     const { parser } = setup();
     feed(parser, ["root = Stack([b])", 'b = Button("Pay", action="pay")']);

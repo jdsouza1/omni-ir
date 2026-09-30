@@ -437,7 +437,8 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
   for (const node of nodes) {
     for (const child of node.children) {
       if (!byId.has(child)) {
-        issues.push({ code: "dangling_ref", message: `"${node.id}" references "${child}", which never arrived`, id: child });
+        // Reported against the node holding the reference: it has a line, the missing id never did.
+        issues.push({ code: "dangling_ref", message: `"${node.id}" references "${child}", which never arrived`, id: node.id });
       }
     }
   }
