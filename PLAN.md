@@ -68,7 +68,7 @@ These are the rules for how the stream behaves at runtime. Tasks 3–5 must foll
 ### R7. Isolating crashes in catalog components
 - Each node the renderer creates is wrapped as `<NodeErrorBoundary key={id}>` → `memo(Node)`. The key is on the outer boundary so R3's key stability still holds.
 - If a catalog component throws while rendering, only that node shows `<NodeFallback reason="crashed">`. Siblings and parents stay interactive, and an `error` event with the node id is emitted.
-- The boundary resets when that node's AST object changes (e.g. a pending child resolves). Otherwise a node that crashed once would stay broken after data that fixes it arrives.
+- The boundary resets when that node's object **or any state value it reads** changes (e.g. an Input corrects a value the node crashed on). Node objects never change after they arrive (redefinition is an error), so resetting on the node object alone would never happen. Without a reset, a node that crashed once would stay broken after data that fixes it arrives.
 - React error boundaries don't catch errors thrown in event handlers, so the catalog's handlers (click, typing) are wrapped in the same `try/catch` + `error` event that a crash uses. That way a failing handler doesn't escape uncaught.
 
 ## Task 1: Project setup
@@ -105,13 +105,13 @@ These are the rules for how the stream behaves at runtime. Tasks 3–5 must foll
 - **Checkpoint:** all tests pass; chunk sizes of 1 byte, 7 bytes and the whole file give the same AST; after an unrelated line arrives, every other node's object is still the same object (`===`)
 
 ## Task 4: Trusted Catalog (`/catalog`)
-- [ ] 4.1 v1 components, including `Input` (R1); the catalog owns all styling
-- [ ] 4.2 `catalog.ts` lookup table, typed so every schema type must have an entry
-- [ ] 4.3 `<OmniRenderer store tools onMutation onEvent>`: renders recursively from the root; each child is `<NodeErrorBoundary key={id}>` → `memo(Node)` (R3, R7); Skeleton for pending references; **`<NodeFallback reason="missing">` for references marked missing** after `end()` (R5)
-- [ ] 4.3a `renderer/NodeFallback.tsx` (renderer-owned, not in the catalog): reasons `missing` and `crashed`; similar size to a Skeleton; says "Component failed to load"; `data-fallback-reason` attribute for tests
-- [ ] 4.3b `renderer/NodeErrorBoundary.tsx`: class-based error boundary (React 19 still requires a class for this); resets when the node's object changes; emits an `error` event with the node id (R7)
-- [ ] 4.4 `<McpMutationBoundary>`: on click, (1) check the tool is in the registry, (2) fill in state references, (3) validate params with that tool's schema, (4) only then call `onMutation({tool, params})`. If any check fails, the button gets an error state (`data-mcp-error`, disabled) and an `error` event is emitted. Adds `data-mcp-tool`; unwrapped mutating Buttons render disabled (R5, R6)
-- [ ] 4.5 Input writes to the store only and never reaches `onMutation` (R1). Handlers are wrapped in `try/catch` that report errors (R7)
+- [x] 4.1 v1 components, including `Input` (R1); the catalog owns all styling
+- [x] 4.2 `catalog.ts` lookup table, typed so every schema type must have an entry
+- [x] 4.3 `<OmniRenderer store tools onMutation onEvent>`: renders recursively from the root; each child is `<NodeErrorBoundary key={id}>` → `memo(Node)` (R3, R7); Skeleton for pending references; **`<NodeFallback reason="missing">` for references marked missing** after `end()` (R5)
+- [x] 4.3a `renderer/NodeFallback.tsx` (renderer-owned, not in the catalog): reasons `missing` and `crashed`; similar size to a Skeleton; says "Component failed to load"; `data-fallback-reason` attribute for tests
+- [x] 4.3b `renderer/NodeErrorBoundary.tsx`: class-based error boundary (React 19 still requires a class for this); resets when the node's object or the state values it reads change; emits an `error` event with the node id (R7)
+- [x] 4.4 `<McpMutationBoundary>`: on click, (1) check the tool is in the registry, (2) fill in state references, (3) validate params with that tool's schema, (4) only then call `onMutation({tool, params})`. If any check fails, the button gets an error state (`data-mcp-error`, disabled) and an `error` event is emitted. Adds `data-mcp-tool`; unwrapped mutating Buttons render disabled (R5, R6)
+- [x] 4.5 Input writes to the store only and never reaches `onMutation` (R1). Handlers are wrapped in `try/catch` that report errors (R7)
 - **Checkpoint:** component tests pass:
   - clicking a wrapped Button calls `onMutation` exactly once; an unwrapped one is disabled
   - typing into an Input updates a `Text` bound to the same state

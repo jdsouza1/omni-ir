@@ -1,0 +1,51 @@
+/* Trusted Catalog styles. The stream can only choose among these classes through enum props. */
+.omni-stack { display: flex; }
+.omni-stack--row { flex-direction: row; flex-wrap: wrap; }
+.omni-stack--column { flex-direction: column; }
+.omni-gap--none { gap: 0; }
+.omni-gap--sm { gap: 0.5rem; }
+.omni-gap--md { gap: 1rem; }
+.omni-gap--lg { gap: 1.5rem; }
+.omni-align--start { align-items: flex-start; }
+.omni-align--center { align-items: center; }
+.omni-align--end { align-items: flex-end; }
+.omni-align--stretch { align-items: stretch; }
+
+.omni-card { border: 1px solid #d9dce1; border-radius: 12px; padding: 1.25rem; background: #fff; max-width: 32rem; }
+.omni-card__title { font-weight: 600; margin-bottom: 0.75rem; }
+.omni-card__body { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.omni-heading { margin: 0; line-height: 1.25; }
+.omni-heading--1 { font-size: 1.5rem; }
+.omni-heading--2 { font-size: 1.25rem; }
+.omni-heading--3 { font-size: 1.05rem; }
+
+.omni-text { margin: 0; }
+.omni-text--muted { color: #5b616e; }
+.omni-text--strong { font-weight: 600; font-size: 1.5rem; }
+
+.omni-input { display: flex; flex-direction: column; gap: 0.25rem; }
+.omni-input__label { font-size: 0.875rem; color: #3c4048; }
+.omni-input__field { font: inherit; padding: 0.5rem 0.625rem; border: 1px solid #c3c7ce; border-radius: 8px; }
+
+.omni-button-wrap { display: inline-flex; flex-direction: column; gap: 0.25rem; }
+.omni-button { font: inherit; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid transparent; cursor: pointer; }
+.omni-button--primary { background: #1f5eff; color: #fff; }
+.omni-button--secondary { background: #fff; color: #1f2329; border-color: #c3c7ce; }
+.omni-button--danger { background: #c62828; color: #fff; }
+.omni-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.omni-button[data-mcp-error] { outline: 2px solid #c62828; }
+.omni-button__error { font-size: 0.8rem; color: #c62828; }
+
+.omni-divider { border: 0; border-top: 1px solid #e3e5e8; margin: 0.25rem 0; width: 100%; }
+
+.omni-badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 999px; font-size: 0.8rem; background: #eef0f3; }
+.omni-badge--success { background: #e3f4e6; color: #1b5e20; }
+.omni-badge--warning { background: #fff4d6; color: #7a5200; }
+.omni-badge--danger { background: #fde4e4; color: #8e1c1c; }
+
+.omni-skeleton { display: flex; flex-direction: column; gap: 0.375rem; min-height: 1.25rem; }
+.omni-skeleton__line { display: block; height: 0.875rem; border-radius: 4px; background: linear-gradient(90deg, #eceef1, #f6f7f9, #eceef1); background-size: 200% 100%; animation: omni-shimmer 1.2s infinite linear; }
+@keyframes omni-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+.omni-fallback { min-height: 1.25rem; padding: 0.375rem 0.625rem; border: 1px dashed #c3c7ce; border-radius: 6px; font-size: 0.8rem; color: #5b616e; }
