@@ -13,7 +13,9 @@
     "test": "npm run guard && vitest run",
     "test:watch": "vitest",
     "guard": "node scripts/guard.mjs",
-    "demo": "tsx scripts/demo.tsx"
+    "demo": "tsx scripts/demo.tsx",
+    "server": "tsx watch server/index.ts",
+    "server:start": "tsx server/index.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",

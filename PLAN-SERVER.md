@@ -100,12 +100,12 @@ The server feeds the same text into a server-side parser and logs error and warn
 - **Checkpoint:** tests pass; every fixture renders with no errors
 
 ### Task C: `/api/generate`, test-first
-- [ ] C.1 Failing tests (real HTTP on `app.listen(0)` + `fetch`, with `MockModel` at instant speed):
+- [x] C.1 Failing tests (real HTTP on `app.listen(0)` + `fetch`, with `MockModel` at instant speed):
   - chunks with `\n`, `"` and multi-byte characters arrive exactly
   - `done`; cut off; model error mid-stream; timeout
   - disconnect aborts the model
   - body validation (400); rate limit (429); heartbeat
-- [ ] C.2 Implement `server/app.ts` + `server/index.ts`
+- [x] C.2 Implement `server/app.ts` + `server/index.ts`
 - **Checkpoint:** all server tests pass offline
 
 ### Task D: `/api/mutate`, test-first
