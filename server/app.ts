@@ -4,6 +4,7 @@
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import { z } from "zod";
 import { TOOLS } from "../app/tools";
+import { createParser } from "../engine/parser";
 import type { ToolRegistry } from "../engine/schema";
 import type { ServerConfig } from "./config";
 import { ModelError, type Model } from "./models/types";
@@ -103,6 +104,15 @@ export function createApp({
       }
     });
 
+    // Observer: parses the same text server-side purely to log how well the model followed the
+    // protocol. It never changes what is forwarded; the browser's parser is the one that matters.
+    const observer = createParser({ tools });
+    const parse = { errors: {} as Record<string, number>, warnings: {} as Record<string, number> };
+    observer.subscribe((e) => {
+      if (e.type === "error") parse.errors[e.issue.code] = (parse.errors[e.issue.code] ?? 0) + 1;
+      if (e.type === "warning") parse.warnings[e.issue.code] = (parse.warnings[e.issue.code] ?? 0) + 1;
+    });
+
     const entry: Record<string, unknown> = { event: "generate", model: model.kind, promptChars: body.data.prompt.length };
     try {
       const result = await model.generate(body.data.prompt, {
@@ -111,6 +121,7 @@ export function createApp({
           chunks++;
           chars += text.length;
           send("chunk", { text });
+          observer.write(text);
         },
       });
       send("done", { stopReason: result.stopReason, model: result.model, ms: now() - started });
@@ -133,7 +144,8 @@ export function createApp({
       clearInterval(heartbeat);
       clearTimeout(timeout);
       if (!res.writableEnded) res.end();
-      log({ ...entry, ms: now() - started, chunks, chars });
+      observer.end();
+      log({ ...entry, ms: now() - started, chunks, chars, parse: { ...parse, components: observer.getSnapshot().nodes.size } });
     }
   });
 

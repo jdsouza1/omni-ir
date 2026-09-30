@@ -15,7 +15,9 @@
     "guard": "node scripts/guard.mjs",
     "demo": "tsx scripts/demo.tsx",
     "server": "tsx watch server/index.ts",
-    "server:start": "tsx server/index.ts"
+    "server:start": "tsx server/index.ts",
+    "validate": "tsx scripts/validate.tsx",
+    "prompt:print": "tsx scripts/prompt-print.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",

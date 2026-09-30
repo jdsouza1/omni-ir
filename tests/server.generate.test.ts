@@ -155,6 +155,18 @@ describe("POST /api/generate: request validation and limits", () => {
     expect((await server.generate({ prompt: "d" })).status).toBe(200);
   });
 
+  it("logs a parse-quality summary of what the model wrote, without changing the stream", async () => {
+    server = await startServer({ model: new MockModel({ speed: "instant" }) });
+    const clean = await readSse(await server.generate({ prompt: "a payment confirmation" }));
+    const bad = await readSse(await server.generate({ prompt: "demo: unknown tool" }));
+    expect(textOf(bad.events)).toBe(fixture("variants/unknown-tool.omni")); // forwarded unchanged
+
+    const [first, second] = server.logs.filter((l) => l.event === "generate");
+    expect(first!.parse).toEqual({ errors: {}, warnings: {}, components: 10 });
+    expect(second!.parse).toMatchObject({ errors: { unknown_tool: 1, ungoverned_mutation: 1 } });
+    expect(textOf(clean.events)).toBe(fixture("payment-confirmation.omni"));
+  });
+
   it("never logs prompt text", async () => {
     server = await startServer({ model: new MockModel({ speed: "instant" }) });
     await readSse(await server.generate({ prompt: "my secret project codename ZEBRA" }));

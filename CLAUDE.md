@@ -17,3 +17,25 @@ To provide a secure, ultra-fast, cross-platform standard where an LLM generates 
 2. **Strict Native Catalog:** The React renderer must use a predefined dictionary of components. Do not invent UI components on the fly.
 3. **MCP-UI Governance:** Every interactive component that mutates backend state must be wrapped in an `McpMutation` node.
 4. **Testing First:** Write a failing test for the parser before implementing the regex matching.
+
+## COST (Never Break This)
+Nothing may call a paid API by default. Tests, demos and checks use mock data (`MockModel`, fake SDK clients). The Claude adapter runs only when `OMNI_MODEL=claude` is set explicitly, and is capped per day. Never run it, or anything else that spends money, without the owner's explicit go-ahead.
+
+## Where things are
+- **The syntax is the flat grammar in PLAN.md** ("Syntax decisions" plus runtime rules R1–R7). It is the only Omni-IR syntax; indented `screen / show / ask` examples (e.g. on the landing page) are not Omni-IR.
+- `engine/` — line buffer, tokenizer, parser, store; `engine/schema.ts` is the single authority on components, props, flat syntax and document rules.
+- `catalog/` — the Trusted Catalog (React components, `omni.css`); `renderer/` — `OmniRenderer`, error boundaries, fallbacks, `McpMutationBoundary`.
+- `app/tools.ts` — the tool registry shared by browser, server, tests and demo. Adding a tool needs a param schema here **and** a handler in `server/tools/handlers.ts` (a test enforces this).
+- `server/` — Express: `POST /api/generate` (SSE), `POST /api/mutate` (re-validates every action), `GET /api/health`. `server/models/` holds `MockModel` (default) and `ClaudeModel` (opt-in). `server/prompt.ts` generates the system prompt from the schema.
+- `client/` — browser helpers `generate()` and `createMutationHandler()`.
+- `fixtures/` — the mock model's screens; `fixtures/variants/` — failure cases (`demo: …` prompts).
+- PLAN.md (Phase 1–2, done) and PLAN-SERVER.md (Step 1) are the plans and decision records.
+
+## Commands
+- `npm test` — raw-HTML guard + all tests (no network). `npm run typecheck`.
+- `npm run server` — Express on :8787 with the free mock model.
+- `npm run demo` (local fixture) · `npm run demo -- --server "contact support"` (from the running server).
+- `npm run prompt:print` — the system prompt; `npm run validate -- reply.omni` — check model output (free manual prompt check).
+
+## License
+Apache-2.0.

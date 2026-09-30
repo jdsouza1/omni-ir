@@ -120,12 +120,12 @@ The server feeds the same text into a server-side parser and logs error and warn
 - **Checkpoint:** end-to-end tests pass offline
 
 ### Task F: Prompt, Claude adapter (off), tools
-- [ ] F.1 `server/prompt.ts` + its tests (S2)
-- [ ] F.2 `ClaudeModel` + unit tests with a stubbed SDK client: forwards text only; maps stop reasons and typed SDK errors; aborts; daily cap blocks after N. **No network calls.**
-- [ ] F.3 `npm run prompt:print` and `npm run validate`
-- [ ] F.4 Server-side parse observer + request log
-- [ ] F.5 `npm run demo` gains a `--server` mode that streams from the running mock server
-- [ ] F.6 Update `CLAUDE.md`: how to run the server, mock vs Claude, where the prompt lives
+- [x] F.1 `server/prompt.ts` + its tests (S2)
+- [x] F.2 `ClaudeModel` + unit tests with a stubbed SDK client: forwards text only; maps stop reasons and typed SDK errors; aborts; daily cap blocks after N. **No network calls.**
+- [x] F.3 `npm run prompt:print` and `npm run validate`
+- [x] F.4 Server-side parse observer + request log
+- [x] F.5 `npm run demo` gains a `--server` mode that streams from the running mock server
+- [x] F.6 Update `CLAUDE.md`: how to run the server, mock vs Claude, where the prompt lives
 - **Checkpoint:** full suite passes offline; `npm run server` + `demo --server` shows a streamed screen with no API key set
 
 ## Not in this step
@@ -136,3 +136,7 @@ The server feeds the same text into a server-side parser and logs error and warn
 
 ## Resolved
 - **License:** Apache-2.0 (LICENSE added, package.json updated).
+
+## Notes from the build
+- The generated system prompt is ~5,200 characters (~1,300 tokens). Prompt caching only applies above a model-specific minimum prefix length (512–4,096 tokens), so with a prompt this small the `cache_control` marker may have no effect. It's harmless either way; if `ClaudeModel` is ever used, check `usage.cacheReadTokens` in the logs.
+- The server logs a parse summary per generation (`parse.errors` / `parse.warnings` by code, and the component count), which is the measure of how well a real model follows the protocol.
