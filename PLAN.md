@@ -40,7 +40,7 @@ These are the rules for how the stream behaves at runtime. Tasks 3–5 must foll
 ### R3. Stable React keys (no remount flicker)
 - The renderer always uses the node's IR id as the React `key`. Ids are unique (syntax #8), so keys stay the same across every update during streaming.
 - The schema rejects the same id appearing twice in one children list. It also enforces that each node has only one parent (the AST is a tree, not a graph where one node sits in several places).
-- **Structural sharing:** when a line arrives, the store replaces only that node's object and its parent's object; every other node keeps the same object. Each node component is wrapped in `React.memo`, so unchanged nodes don't re-render.
+- **Structural sharing:** when a line arrives, the store replaces only that node's object; every other node keeps the same object. Each child slot subscribes to the store for its own id only, and each node component is wrapped in `React.memo`, so neither unchanged nodes nor the parent re-render when a child arrives.
 - The one allowed remount is a Skeleton being replaced by the real component. The key stays the same; only the component type changes.
 
 ### R4. String tokenizer (commas and parentheses inside text)
@@ -90,11 +90,11 @@ These are the rules for how the stream behaves at runtime. Tasks 3–5 must foll
 - **Checkpoint:** about 10 valid and about 20 invalid fixtures behave as expected, including an Input bound to a number, a node with two parents, `tool="system.delete_account"` (not in the registry), and `NodeFallback` used as a component type
 
 ## Task 3: Streaming parser (`/engine/parser.ts`), test-first
-- [ ] 3.1 **Write failing tests first**, in three files:
+- [x] 3.1 **Write failing tests first**, in three files:
   - `lineBuffer.test.ts` (R2): split mid-line; several lines per chunk; `\r\n`; UTF-8 character split across byte chunks; last line flushed without `\n`; line over 16 KB dropped and parsing resumes
   - `tokenizer.test.ts` (R4): every case listed under R4
   - `parser.test.ts`: single line; forward reference stays pending, then resolves (R5); nested component call rejected as "not flat"; malformed line gives an error and streaming continues; schema-invalid line; state and McpMutation lines; Input with a pending state reference; McpMutation with a tool not in the registry gives an `unknown tool` error (R6); an unknown escape gives a `warning`, not an error, and the node is still added (R4)
-- [ ] 3.2 Confirm they fail; record the failing run in the commit
+- [x] 3.2 Confirm they fail; record the failing run in the commit
 - [ ] 3.3 `engine/lineBuffer.ts` (R2)
 - [ ] 3.4 `engine/tokenizer.ts`: regex for the line start + character-by-character tokenizer + small parser for the tokens (R4). Decode `\"` `\\` `\n`; keep other escapes as literal text and return a warning; an unterminated string is an error
 - [ ] 3.5 Validate each statement with Zod: valid ones go into the AST, invalid ones become error events
