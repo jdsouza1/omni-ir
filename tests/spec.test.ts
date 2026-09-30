@@ -1,4 +1,6 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { TOOLS } from "../app/tools";
+import { createParser } from "../engine/parser";
 import { COMPONENT_TYPES } from "../engine/schema";
 import { ISSUE_CODES } from "../engine/types";
 import { applySections, renderSections } from "../scripts/spec";
@@ -16,6 +18,23 @@ describe("SPEC.md", () => {
       expect(spec).toContain(`\`${code}\``);
       expect(info.meaning.length).toBeGreaterThan(10);
     }
+  });
+
+  it("only points at test files that exist", () => {
+    const referenced = [...spec.matchAll(/`(tests\/[\w.]+)`/g)].map((m) => m[1]!);
+    expect(referenced.length).toBeGreaterThan(3);
+    for (const path of referenced) expect(existsSync(path), path).toBe(true);
+  });
+
+  it("has an overview example that parses with no issues", () => {
+    const example = /## 1\. Overview[\s\S]*?```\n([\s\S]*?)```/.exec(spec)![1]!;
+    const parser = createParser({ tools: TOOLS });
+    const issues: string[] = [];
+    parser.subscribe((e) => (e.type === "error" || e.type === "warning") && issues.push(e.issue.code));
+    parser.write(example);
+    parser.end();
+    expect(issues).toEqual([]);
+    expect(parser.getSnapshot().nodes.size).toBeGreaterThan(3);
   });
 
   it("only changes text between generated markers", () => {

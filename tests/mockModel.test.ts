@@ -130,10 +130,21 @@ describe("MockModel streaming", () => {
     expect(performance.now() - started).toBeLessThan(100);
   });
 
-  it("takes realistic time at realistic speed", async () => {
+  it("pauses like a model before the first text at realistic speed", async () => {
+    // Measures only the first chunk, then cancels: a full realistic stream takes seconds, which made
+    // this test time out under the load of the full suite.
+    const controller = new AbortController();
     const started = performance.now();
-    await collect(new MockModel({ speed: "realistic", seed: 2 }), "sign in");
-    expect(performance.now() - started).toBeGreaterThan(200);
+    let firstAt = 0;
+    const run = new MockModel({ speed: "realistic", seed: 2 }).generate("sign in", {
+      signal: controller.signal,
+      onText: () => {
+        firstAt ||= performance.now() - started;
+        controller.abort();
+      },
+    });
+    await expect(run).rejects.toMatchObject({ code: "aborted" });
+    expect(firstAt).toBeGreaterThan(300);
   });
 });
 

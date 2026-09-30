@@ -61,6 +61,16 @@ describe("LineBuffer (R2)", () => {
     ]);
   });
 
+  it("doesn't count the line ending toward the limit, including the \\r of \\r\\n", () => {
+    const buf = new LineBuffer({ maxLineLength: 5 });
+    expect(buf.push("abcde\r\n")).toEqual([{ kind: "line", text: "abcde", line: 1 }]);
+    expect(buf.push("abcde\r")).toEqual([]); // still waiting for the \n, not an overflow
+    expect(buf.push("\nabcdef\n")).toEqual([
+      { kind: "line", text: "abcde", line: 2 },
+      { kind: "overflow", line: 3, length: 6 },
+    ]);
+  });
+
   it("reports an over-long line only once however many chunks it spans", () => {
     const buf = new LineBuffer({ maxLineLength: 4 });
     const events = [...buf.push("aaaaa"), ...buf.push("bbbbb"), ...buf.push("ccccc\n")];

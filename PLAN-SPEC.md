@@ -34,26 +34,26 @@ Status: **APPROVED 2026-09-30.** Decided: (1) MUST / SHOULD / MAY with short pla
 - **Checkpoint:** changing a component's allowed values in the schema makes the test fail until `npm run spec` is run
 
 ### Task B: Stream, grammar and document meaning (sections 1–5)
-- [ ] B.1 Sections 1–3 (introduction, terms, stream)
-- [ ] B.2 Section 4: the grammar in EBNF, checked line by line against `engine/tokenizer.ts`, with examples of valid and invalid lines
-- [ ] B.3 Section 5: document rules, each with the issue code a violation produces
+- [x] B.1 Sections 1–3 (introduction, terms, stream)
+- [x] B.2 Section 4: the grammar in EBNF, checked line by line against `engine/tokenizer.ts`, with examples of valid and invalid lines
+- [x] B.3 Section 5: document rules, each with the issue code a violation produces
 - **Checkpoint:** every rule in sections 3–5 names its conformance case or existing test
 
 ### Task C: Validation and errors (section 7)
-- [ ] C.1 Prose for line-level versus end-of-stream checks, and which line each issue is reported on
-- [ ] C.2 Generated issue-code table with a one-line meaning for each code (descriptions kept next to the codes in `engine/types.ts`, so they're generated too)
+- [x] C.1 Prose for line-level versus end-of-stream checks, and which line each issue is reported on
+- [x] C.2 Generated issue-code table with a one-line meaning for each code (descriptions kept next to the codes in `engine/types.ts`, so they're generated too)
 - **Checkpoint:** a test fails if an issue code has no description
 
 ### Task D: Renderer, actions, security (sections 8, 9, 11)
-- [ ] D.1 Renderer requirements from R1–R7
-- [ ] D.2 Actions: registry, params, the three checks, and the authorization requirement
-- [ ] D.3 Security considerations
+- [x] D.1 Renderer requirements from R1–R7
+- [x] D.2 Actions: registry, params, the three checks, and the authorization requirement
+- [x] D.3 Security considerations
 - **Checkpoint:** each requirement links to the test that proves the reference renderer meets it
 
 ### Task E: Transport, versioning, examples (sections 10, 12, 13)
-- [ ] E.1 SSE event format and `/api/mutate`, marked informative
-- [ ] E.2 Versioning rules and generated limits
-- [ ] E.3 Examples appendix, generated from fixtures (payment, sign-in, a failure case with its expected issues)
+- [x] E.1 SSE event format and `/api/mutate`, marked informative
+- [x] E.2 Versioning rules and generated limits
+- [x] E.3 Examples appendix, generated from fixtures (payment, sign-in, a failure case with its expected issues)
 - **Checkpoint:** every example in SPEC.md is validated by the test in A.3
 
 ### Task F: Conformance suite (see Q2)
@@ -75,3 +75,10 @@ Status: **APPROVED 2026-09-30.** Decided: (1) MUST / SHOULD / MAY with short pla
 1. **Tone:** formal requirement words (MUST / SHOULD / MAY, as in internet standards) with short plain sentences? *(Recommended: yes. Other implementers need to know exactly what's required.)*
 2. **Conformance suite (Task F):** include it now? *(Recommended: yes. It's the most useful piece for the iOS and Android renderers, and it turns the spec's rules into something testable.)*
 3. **Transport:** keep the SSE and `/api/mutate` section informative rather than required? *(Recommended: informative. Other apps may use WebSockets or anything else; the Omni-IR text is what must be compatible.)*
+
+## Review findings (B–E, 2026-09-30)
+Checked every rule in sections 3–10 against the code and by running the parser:
+- Fixed in the spec: McpMutation `tool` is named-only (was listed as positional); finite numbers only ([4.9]); invalid UTF-8 becomes U+FFFD ([3.1]); spaces allowed at line start/end ([4.2]).
+- Fixed in the code (test-first): the line-length limit now excludes the `\r` of `\r\n`, as the spec says.
+- Fixed a flaky test: the mock model's realistic-speed test timed out under full-suite load.
+- **Open decision:** `root = McpMutation(…)` produces no error (listed under "Known gaps" in SPEC.md). Option: report a new `root_not_component` error at end of stream.

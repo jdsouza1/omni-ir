@@ -38,7 +38,7 @@ payIt = McpMutation(pay, tool="payments.confirm", params={amount: $amount, note:
 
 ## 3. The stream
 
-- **[3.1]** A stream is UTF-8 text. A parser MUST decode it correctly when a multi-byte character is split across network chunks.
+- **[3.1]** A stream is UTF-8 text. A parser MUST decode it correctly when a multi-byte character is split across network chunks. A parser SHOULD replace an invalid byte sequence with U+FFFD (`�`) and carry on, rather than stop.
 - **[3.2]** A line ends at a line feed (`\n`). A carriage return (`\r`) immediately before it is removed, so `\r\n` endings behave the same as `\n`.
 - **[3.3]** The result MUST NOT depend on how the stream was split into chunks. Parsing the same text in one chunk, byte by byte, or in any other pieces MUST give the same document and the same issues.
 - **[3.4]** When the stream ends, a final line without a line ending MUST still be processed.
@@ -49,7 +49,7 @@ payIt = McpMutation(pay, tool="payments.confirm", params={amount: $amount, note:
 
 ## 4. Grammar
 
-The grammar below is in EBNF. Spaces and tabs MAY appear between any two tokens and are otherwise ignored.
+The grammar below is in EBNF. Spaces and tabs MAY appear at the start and end of a line and between any two tokens, and are otherwise ignored.
 
 ```ebnf
 line          = statement , [ comment ] ;
@@ -68,8 +68,10 @@ list          = "[" , [ value , { "," , value } , [ "," ] ] , "]" ;
 object        = "{" , [ entry , { "," , entry } , [ "," ] ] , "}" ;
 entry         = ( identifier | string ) , ":" , value ;
 
-id = name = prop-name = identifier ;
-identifier    = letter-or-underscore , { letter-or-underscore | digit } ;
+id            = identifier ;
+name          = identifier ;                              (* a component name, e.g. Text *)
+prop-name     = identifier ;
+identifier    = letter-or-underscore , { letter-or-underscore | digit } ;   (* ASCII letters and digits *)
 state-key     = "$" , identifier ;
 number        = [ "-" ] , ( digits , [ "." , { digit } ] | "." , digits ) , [ ( "e" | "E" ) , [ "+" | "-" ] , digits ] ;
 string        = '"' , { character | escape } , '"' ;
@@ -77,14 +79,14 @@ escape        = "\" , any character ;
 ```
 
 - **[4.1]** A statement is either `id = Component(arguments)` or `$key = value`. The `=` MUST NOT be followed by a second `=`.
-- **[4.2]** Spaces and tabs between tokens don't change the meaning of a line.
+- **[4.2]** Spaces and tabs at the start or end of a line, or between tokens, don't change its meaning.
 - **[4.3]** Positional arguments MUST come before named ones. A positional argument after a named one is a `syntax` error. A trailing comma is allowed in argument lists, lists and objects.
 - **[4.4]** The right side of a component statement MUST be exactly one call. Anything else (a bare value, or extra text after the closing parenthesis other than a comment) is a `syntax` error.
 - **[4.5]** Strings use double quotes. Inside a string, `\"` is a double quote, `\\` is a backslash and `\n` is a line break. Single-quoted strings are a `syntax` error.
 - **[4.6]** Any other backslash sequence, such as `\d`, is kept as literal text (the backslash and the character) and reported as an `unknown_escape` warning. The line is still accepted.
 - **[4.7]** A string without its closing quote is an `unterminated_string` error. A string whose last character before the end of the line is an escaped quote (`\"`) is unterminated.
 - **[4.8]** Inside a string every character is text: `#`, `$`, `,`, `(`, `)`, `[`, `]`, `{`, `}` and `=` have no special meaning. Outside a string, `#` starts a comment that runs to the end of the line.
-- **[4.9]** A number MUST NOT be followed directly by a letter, digit or underscore (`1abc` is a `syntax` error). Numbers are decimal and MAY use an exponent.
+- **[4.9]** A number MUST NOT be followed directly by a letter, digit or underscore (`1abc` is a `syntax` error). Numbers are decimal and MAY use an exponent. A number too large to represent as a finite 64-bit float, such as `1e999`, is an `invalid_props` error wherever it's used.
 - **[4.10]** An id MUST be an identifier (`1abc = …` is a `syntax` error) and MUST NOT be one of the reserved words `true`, `false`, `null`, `__proto__`, `constructor` or `prototype` (an `invalid_props` error). In a value, `true`, `false` and `null` are literals, not ids.
 - **[4.11]** Lists and objects follow the grammar above. Where each kind of value is allowed is set by the catalog (section 6): lists of ids only for children, objects only for McpMutation params.
 - **[4.12]** A call inside another statement's values, such as `root = Card([Heading("Hi")])`, is a `not_flat` error. Every component MUST be defined on its own line and referred to by id.
@@ -237,7 +239,7 @@ McpMutation(target, tool, params?)
 | Prop | Position | Required | Values |
 |---|---|---|---|
 | `target` | 1 | yes | id of a Button with an `action` |
-| `tool` | 2 | yes | a tool name in the app's registry, shaped like `namespace.action` (lowercase first letters) |
+| `tool` | named only | yes | a tool name in the app's registry, matching `/^[a-z][A-Za-z0-9_]*(\.[a-z][A-Za-z0-9_]*)+$/` (for example `payments.confirm`) |
 | `params` | named only | no | `{key: value or $state, …}` ([5.16]) |
 
 An McpMutation isn't displayed. It only approves one action for its Button.
@@ -417,6 +419,10 @@ Issues reported:
 
 - line 6: `ungoverned_mutation` ("confirm" has an action but is not wrapped by an McpMutation)
 <!-- /generated:examples -->
+
+## Known gaps
+
+- **`root` that isn't a component.** [5.1] requires the top component to have the id `root`, but a stream where `root` is an McpMutation (`root = McpMutation(…)`) currently produces no error; the reference renderer shows a fallback in its place. A future version should report it.
 
 ## Not yet specified
 

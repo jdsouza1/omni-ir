@@ -55,11 +55,12 @@ export class LineBuffer {
       if (this.discarding) {
         this.discarding = false;
       } else {
-        const line = this.partial + piece;
+        // The limit excludes the line ending, so measure after removing a \r from \r\n.
+        const line = stripCR(this.partial + piece);
         if (line.length > this.maxLineLength) {
           events.push({ kind: "overflow", line: this.lineNumber, length: line.length });
         } else {
-          events.push({ kind: "line", text: stripCR(line), line: this.lineNumber });
+          events.push({ kind: "line", text: line, line: this.lineNumber });
         }
       }
       this.partial = "";
@@ -70,8 +71,10 @@ export class LineBuffer {
 
     if (!this.discarding) {
       this.partial += text.slice(start);
-      if (this.partial.length > this.maxLineLength) {
-        events.push({ kind: "overflow", line: this.lineNumber, length: this.partial.length });
+      // A trailing \r may be the first half of a \r\n ending, so it doesn't count yet.
+      const measured = this.partial.endsWith("\r") ? this.partial.length - 1 : this.partial.length;
+      if (measured > this.maxLineLength) {
+        events.push({ kind: "overflow", line: this.lineNumber, length: measured });
         this.partial = "";
         this.discarding = true;
       }
