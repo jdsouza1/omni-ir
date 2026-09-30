@@ -22,6 +22,9 @@ const FIXTURE_FOR: Record<string, string> = {
   "edit my profile": "profile-settings",
   "where is my order?": "order-status",
   "contact support": "support-contact",
+  "book a stay": "landing/booking",
+  "my shopping bag": "landing/checkout",
+  "a trip assistant": "landing/assistant",
 };
 
 const status = () => screen.getByRole("status").textContent ?? "";

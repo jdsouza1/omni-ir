@@ -7,7 +7,10 @@ import { renderOmni } from "./renderHelpers";
 
 afterEach(cleanup);
 
-const screens = readdirSync("fixtures").filter((f) => f.endsWith(".omni"));
+const screens = [
+  ...readdirSync("fixtures").filter((f) => f.endsWith(".omni")),
+  ...readdirSync("fixtures/landing").map((f) => `landing/${f}`), // the landing page examples
+];
 
 describe.each(screens)("%s renders", (name) => {
   it("with no placeholders, fallbacks or renderer errors, and every action governed by a registered tool", () => {

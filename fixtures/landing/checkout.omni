@@ -1,0 +1,7 @@
+root = Card([title, shirt, tote, total, pay])
+title = Heading("Your bag")
+shirt = Text("Linen overshirt · Sand, M · $128.00")
+tote = Text("Canvas tote · Natural · $86.00")
+total = Text(214, format="currency", currency="USD")
+pay = Button("Pay securely", action="pay")
+payNow = McpMutation(pay, tool="payments.confirm", params={amount: 214, note: ""})

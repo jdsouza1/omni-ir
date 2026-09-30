@@ -24,4 +24,11 @@ export const TOOLS: ToolRegistry = {
     subject: z.string().trim().min(1).max(120),
     message: z.string().trim().min(1).max(2000),
   }),
+  // Used by the landing page examples (fixtures/landing/).
+  "bookings.reserve": z.strictObject({
+    dates: z.string().trim().min(1).max(60),
+  }),
+  "assistant.ask": z.strictObject({
+    question: z.string().trim().min(1).max(500),
+  }),
 };

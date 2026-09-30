@@ -12,6 +12,9 @@ export const EXAMPLE_PROMPTS = [
   "edit my profile",
   "where is my order?",
   "contact support",
+  "book a stay",
+  "my shopping bag",
+  "a trip assistant",
 ];
 
 export const ERROR_DEMOS = [

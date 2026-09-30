@@ -21,6 +21,10 @@ const SCREENS: { id: string; keywords: string[] }[] = [
   { id: "profile-settings", keywords: ["profile", "settings", "account", "preferences"] },
   { id: "order-status", keywords: ["order", "orders", "track", "tracking", "shipping", "delivery", "shipment", "package"] },
   { id: "support-contact", keywords: ["support", "help", "contact", "ticket"] },
+  // The landing page examples.
+  { id: "landing/booking", keywords: ["book", "booking", "stay", "reserve", "reservation", "cabin"] },
+  { id: "landing/checkout", keywords: ["bag", "cart", "basket"] },
+  { id: "landing/assistant", keywords: ["assistant", "chat", "ask", "question", "trip"] },
 ];
 const FALLBACK = "demo-mode";
 

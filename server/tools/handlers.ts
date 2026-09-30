@@ -18,4 +18,7 @@ export const STUB_HANDLERS: Readonly<Record<string, ToolHandler>> = {
   "profile.update": async ({ displayName, bio }) => ({ stub: true, saved: true, profile: { displayName, bio } }),
   "orders.requestReturn": async ({ orderId }) => ({ stub: true, returnId: id("ret"), orderId, status: "requested" }),
   "support.createTicket": async () => ({ stub: true, ticketId: id("tkt"), status: "open" }),
+  "bookings.reserve": async ({ dates }) => ({ stub: true, bookingId: id("bkg"), dates, status: "held" }),
+  // A real handler would ask a model; the stub answers without one, so it costs nothing.
+  "assistant.ask": async () => ({ stub: true, answer: "This is a stub answer. Connect a real handler to answer questions." }),
 };

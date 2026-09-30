@@ -1,0 +1,7 @@
+root = Card([title, place, dates, reserve])
+title = Heading("Cabin in the Pines")
+place = Text("Big Sur, California · ★ 4.96", tone="muted")
+$dates = "Oct 14 – Oct 17"
+dates = Input($dates, label="Dates")
+reserve = Button("Reserve · $642", action="reserve")
+book = McpMutation(reserve, tool="bookings.reserve", params={dates: $dates})

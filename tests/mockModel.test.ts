@@ -51,6 +51,9 @@ describe("MockModel routing", () => {
     ["track my delivery", "order-status"],
     ["contact support", "support-contact"],
     ["I need help", "support-contact"],
+    ["book a stay", "landing/booking"],
+    ["my shopping bag", "landing/checkout"],
+    ["a trip assistant", "landing/assistant"],
     ["a weather dashboard", "demo-mode"],
     ["", "demo-mode"],
   ])("%j → %s", (prompt, screen) => {

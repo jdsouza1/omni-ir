@@ -1,0 +1,8 @@
+root = Card([title, asked, answer, question, send])
+title = Heading("Trip helper")
+asked = Text("You: Any quiet beaches near Lisbon?")
+answer = Text("Try Praia da Ursa. A short hike keeps the crowds away.", tone="muted")
+$question = ""
+question = Input($question, label="Ask a question", placeholder="Ask anything…")
+send = Button("Send", action="ask")
+ask = McpMutation(send, tool="assistant.ask", params={question: $question})

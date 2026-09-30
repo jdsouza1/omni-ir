@@ -77,6 +77,8 @@ McpMutation(target, tool, params?)
 - profile.update: params {displayName: text (min 1, max 60); bio: text (max 160)}
 - orders.requestReturn: params {orderId: text (matching /^[A-Z0-9-]{4,32}$/)}
 - support.createTicket: params {subject: text (min 1, max 120); message: text (min 1, max 2000)}
+- bookings.reserve: params {dates: text (min 1, max 60)}
+- assistant.ask: params {question: text (min 1, max 500)}
 
 ## Examples
 <example>
