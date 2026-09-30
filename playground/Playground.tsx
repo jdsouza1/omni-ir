@@ -1,6 +1,7 @@
 // The Omni-IR playground page. State lives in usePlayground; this file is presentation only, so the
 // UX design (Task G) can restyle or rearrange it without touching behaviour.
 import { useEffect, useId, useState } from "react";
+import { ActionsPanel, EventLog } from "./Panels";
 import { Preview } from "./Preview";
 import { SourceView } from "./SourceView";
 import { usePlayground, type PlaygroundDeps, type RunStatus } from "./usePlayground";
@@ -180,6 +181,11 @@ export function Playground(deps: PlaygroundDeps) {
             revision={state.source}
           />
         </section>
+      </div>
+
+      <div className="pg-panels">
+        <ActionsPanel actions={state.actions} />
+        <EventLog log={state.log} />
       </div>
     </main>
   );

@@ -73,3 +73,19 @@ button, input, textarea { font: inherit; }
 .pg-doc-issues ul { margin: 0; padding-left: 1.25rem; }
 .pg-caption { margin: 0.5rem 0 0; min-height: 1.25em; font-size: 0.8rem; color: var(--pg-muted); }
 [data-pg-highlight] { outline: 2px solid var(--pg-accent); outline-offset: 3px; border-radius: 6px; }
+
+.pg-actions, .pg-log-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.85rem; }
+.pg-action { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 0.5rem; align-items: baseline; }
+.pg-action-status { font-size: 0.75rem; padding: 0.05rem 0.5rem; border-radius: 999px; background: #eceef2; white-space: nowrap; }
+.pg-action[data-status="ok"] .pg-action-status { background: #e3f4e6; color: #1b5e20; }
+.pg-action[data-status="refused"] .pg-action-status, .pg-action[data-status="blocked"] .pg-action-status { background: var(--pg-error-soft); color: var(--pg-error); }
+.pg-action-node { font-family: var(--pg-mono); }
+.pg-action-detail { color: var(--pg-muted); overflow-wrap: anywhere; }
+.pg-log summary { cursor: pointer; margin: 0; }
+.pg-log[open] summary { margin-bottom: 0.75rem; }
+.pg-log-list { max-height: 18rem; overflow: auto; font-family: var(--pg-mono); font-size: 0.8rem; }
+.pg-log-entry { display: grid; grid-template-columns: 4.5rem 5rem minmax(0, 1fr); gap: 0.5rem; }
+.pg-log-ms { color: #9aa1ad; text-align: right; }
+.pg-log-entry[data-tone="error"] { color: var(--pg-error); }
+.pg-log-entry[data-tone="warning"] { color: var(--pg-warning); }
+.pg-log-text { overflow-wrap: anywhere; }
