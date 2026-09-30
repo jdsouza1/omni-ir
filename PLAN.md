@@ -80,13 +80,13 @@ These are the rules for how the stream behaves at runtime. Tasks 3–5 must foll
 - **Checkpoint:** `npm run typecheck` and `npm test` pass; the guard catches a planted `innerHTML`
 
 ## Task 2: Zod schema (`/engine/schema.ts`)
-- [ ] 2.1 Value schemas: literals, arrays, node references, state references. **No nested component calls** (flat rule)
-- [ ] 2.2 Node schema `{ id, type, args, props, children }`; `type` is a fixed list of catalog names (now including `Input`)
-- [ ] 2.3 Props schema per component, keyed by `type`; no `style`/`className`/`html`; unknown keys rejected. `Input` requires a string state reference as its first argument (R1)
-- [ ] 2.4 State schema: `$key` = primitive value
-- [ ] 2.5 McpMutation schema `{ id, target, tool, params }`; `tool` looks like `namespace.action` **and must be a key in the tool registry** (R6); `params` values may be state references. Define a `ToolRegistry` type: tool name → Zod schema for its params
-- [ ] 2.6 Whole-document check: governance; no duplicate ids; no dangling references; no cycles; **each node has one parent; no duplicate child in one list** (R3)
-- [ ] 2.7 Export the TypeScript types generated from the schemas as the only shared types
+- [x] 2.1 Value schemas: literals, arrays, node references, state references. **No nested component calls** (flat rule)
+- [x] 2.2 Node schema `{ id, type, args, props, children }`; `type` is a fixed list of catalog names (now including `Input`)
+- [x] 2.3 Props schema per component, keyed by `type`; no `style`/`className`/`html`; unknown keys rejected. `Input` requires a string state reference as its first argument (R1)
+- [x] 2.4 State schema: `$key` = primitive value
+- [x] 2.5 McpMutation schema `{ id, target, tool, params }`; `tool` looks like `namespace.action` **and must be a key in the tool registry** (R6); `params` values may be state references. Define a `ToolRegistry` type: tool name → Zod schema for its params
+- [x] 2.6 Whole-document check: governance; no duplicate ids; no dangling references; no cycles; **each node has one parent; no duplicate child in one list** (R3)
+- [x] 2.7 Export the TypeScript types generated from the schemas as the only shared types
 - **Checkpoint:** about 10 valid and about 20 invalid fixtures behave as expected, including an Input bound to a number, a node with two parents, `tool="system.delete_account"` (not in the registry), and `NodeFallback` used as a component type
 
 ## Task 3: Streaming parser (`/engine/parser.ts`), test-first
