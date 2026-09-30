@@ -9,7 +9,9 @@ afterEach(cleanup);
 
 const screens = [
   ...readdirSync("fixtures").filter((f) => f.endsWith(".omni")),
-  ...readdirSync("fixtures/landing").map((f) => `landing/${f}`), // the landing page examples
+  ...readdirSync("fixtures/landing")
+    .filter((f) => f.endsWith(".omni"))
+    .map((f) => `landing/${f}`), // the landing page examples
 ];
 
 describe.each(screens)("%s renders", (name) => {
