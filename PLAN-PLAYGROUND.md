@@ -41,7 +41,7 @@ Status: **Tasks A–F APPROVED 2026-09-30** with temporary styling (simple two-p
 ## Task checklist (refined once the design arrives)
 - [x] A. Vite + React setup, `/api` proxy, `npm run playground`, guard/typecheck coverage
 - [x] B. `data-node-id` on every catalog component root (+ test)
-- [ ] C. Playground state (prompt/paste modes, streaming status, cancel/retry) with tests
+- [x] C. Playground state (prompt/paste modes, streaming status, cancel/retry) with tests
 - [ ] D. Source view with line numbers, streaming growth and error markers, with tests
 - [ ] E. Source ↔ preview highlighting (hover and keyboard focus), with tests
 - [ ] F. Actions panel and event log, with tests
