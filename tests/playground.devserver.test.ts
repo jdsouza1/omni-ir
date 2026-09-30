@@ -7,6 +7,7 @@ let base: string;
 beforeAll(async () => {
   vite = await createServer({
     configFile: "playground/vite.config.ts",
+    configLoader: "runner", // same as npm run playground
     server: { port: 0, host: "127.0.0.1" },
     logLevel: "silent",
     clearScreen: false,

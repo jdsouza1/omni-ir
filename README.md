@@ -1,0 +1,97 @@
+# Omni-IR
+
+**A line-oriented streaming protocol for generative UI.** An AI model describes a screen in short, flat lines of Omni-IR; a trusted client parses each line as it streams in and renders it with its own components. The model never writes HTML, CSS or code, and can only trigger backend actions the app has explicitly allowed.
+
+> **Status: early (v0.1).** The parser, schema, React renderer, streaming server and playground work and are tested. The spec is still defined by this repo's code and plans rather than a standalone document. Web only for now.
+
+```
+root = Card([title, amount, note, actions])
+title = Heading("Confirm payment")
+$amount = 42.50
+amount = Text($amount, format="currency", currency="USD")
+$note = ""
+note = Input($note, label="Note for merchant (optional)")
+actions = Stack([confirm, cancel], direction="row")
+confirm = Button("Pay now", action="pay")
+confirmPay = McpMutation(confirm, tool="payments.confirm", params={amount: $amount, note: $note})
+cancel = Button("Cancel", variant="secondary")
+```
+
+`root` comes first, so the card appears immediately and its parts fill in as their lines arrive. `confirm` has an `action`, so it only becomes clickable once its `McpMutation` line names a permitted tool. `cancel` has none, so it can never reach the server.
+
+## Quick start
+
+Requires Node.js 22.22+ or 24.15+.
+
+```bash
+npm install
+npm run playground
+```
+
+Open http://localhost:5173, then pick an example or describe a screen. The playground uses a **mock model** that streams pre-written screens, so it needs no API key and costs nothing. Try the `demo: …` prompts to see how errors are handled.
+
+| Command | What it does |
+|---|---|
+| `npm test` | Raw-HTML guard and all tests (no network) |
+| `npm run typecheck` | TypeScript, strict |
+| `npm run playground` | The Interactive Playground with the API, on :5173 |
+| `npm run server` | The API server alone, on :8787 |
+| `npm run demo` | Stream a fixture in the terminal; `-- --server "prompt"` streams from the running server |
+| `npm run validate -- file.omni` | Check Omni-IR (e.g. a model's reply): errors by line, then the rendered HTML |
+| `npm run prompt:print` | Print the system prompt a real model would get |
+
+## How it works
+
+```
+model text ──► /api/generate (SSE) ──► line buffer ──► tokenizer ──► schema ──► store ──► React renderer
+                                        (bytes→lines)   (text→AST)  (Zod rules) (snapshots) (Trusted Catalog)
+button click ──► McpMutationBoundary ──► /api/mutate ──► server re-validates ──► tool handler
+```
+
+- **Streaming:** network chunks are split into complete lines (multi-byte characters and `\r\n` handled), and each line is parsed as soon as it arrives. A reference to a line that hasn't arrived yet renders as a placeholder; if it never arrives, it becomes a small "failed to load" box instead of collapsing the layout.
+- **Bad lines never stop the stream:** an invalid line is reported with its line number and skipped.
+- **Stable rendering:** every component is keyed by its Omni-IR id, and only the component whose line just arrived re-renders.
+
+## Security model
+
+- **No code, markup or styling from the model.** The grammar is flat assignments only, and all text is rendered as text. A build-time guard fails on `innerHTML`, `dangerouslySetInnerHTML`, `eval` or `new Function`.
+- **A fixed component catalog.** The schema rejects unknown components and unknown or free-form props (`style`, `className`, HTML attributes). Every visual option is a fixed set of values.
+- **Governed actions.** A button that changes backend state must be wrapped by an `McpMutation` naming a tool from the app's registry. Until then it is disabled.
+- **Checked three times:** the parser rejects unknown tools, the browser validates params against the tool's schema before sending, and the server re-validates both before running anything. The server doesn't trust the browser.
+- **Contained failures.** A component that crashes shows a fallback; the rest of the screen keeps working.
+- Stub action handlers mark where a real backend must add **authorization** (is this user allowed to do this?). Validation proves a request is well-formed, not that it's permitted.
+
+## Components (v0.1)
+
+`Stack`, `Card`, `Heading`, `Text`, `Input`, `Button`, `Divider`, `Badge`, `Skeleton`, plus `McpMutation` for governed actions. `npm run prompt:print` shows every prop and allowed value, generated from the schema.
+
+## Using a real model (optional, costs money)
+
+The server includes a Claude adapter that is **off by default**. It runs only if you set `OMNI_MODEL=claude` and provide Anthropic API credentials, and each request is billed by Anthropic. A daily cap (`OMNI_DAILY_CAP`, default 50) limits generations. Everything else in this repo, including CI, uses the free mock model.
+
+To check how well a model follows the protocol without paying for API calls, paste the output of `npm run prompt:print` into a Claude.ai chat, save its replies to files, and run `npm run validate` on them.
+
+## Project layout
+
+| Folder | Contents |
+|---|---|
+| `engine/` | Line buffer, tokenizer, parser, store; `schema.ts` is the single authority on the protocol |
+| `catalog/`, `renderer/` | The Trusted Catalog components and `OmniRenderer` |
+| `server/`, `client/` | Express SSE server, mock and Claude models, browser helpers |
+| `playground/` | The Interactive Playground |
+| `app/tools.ts` | The tool registry shared by browser and server |
+| `fixtures/` | Example screens and failure cases |
+
+The grammar and runtime rules (R1–R7) are in [PLAN.md](PLAN.md); later steps are in [PLAN-SERVER.md](PLAN-SERVER.md) and [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md).
+
+## Roadmap
+
+- Playground visual design (in progress)
+- A standalone spec document
+- More components (images, lists, date pickers)
+- Publishing the schema and React catalog as packages
+- iOS and Android renderers
+
+## License
+
+[Apache-2.0](LICENSE)
