@@ -51,6 +51,16 @@ describe("catalog rendering", () => {
     expect(screen.getByText("$42.50")).toBeTruthy();
   });
 
+  it("formats a date-only Text as that calendar day in any time zone", () => {
+    renderOmni({ lines: ['root = Text("2026-09-30", format="date")'] });
+    expect(screen.getByText("Sep 30, 2026")).toBeTruthy();
+  });
+
+  it("shows an unparseable date as the raw text instead of crashing", () => {
+    renderOmni({ lines: ['root = Text("next Tuesday", format="date")'] });
+    expect(screen.getByText("next Tuesday")).toBeTruthy();
+  });
+
   it("renders markup in strings as plain text, never as HTML", () => {
     const { container } = renderOmni({ lines: ['root = Text("<b onclick=alert(1)>hi</b>")'] });
     expect(container.querySelector("b")).toBeNull();

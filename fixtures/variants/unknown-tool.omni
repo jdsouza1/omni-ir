@@ -1,0 +1,8 @@
+# Variant: the model asks for a tool the client never registered. The line is rejected,
+# so Confirm is never governed and stays disabled.
+root = Card([title, actions])
+title = Heading("Confirm payment")
+actions = Stack([confirm, cancel], direction="row")
+confirm = Button("Pay now", action="pay")
+confirmPay = McpMutation(confirm, tool="system.delete_account")
+cancel = Button("Cancel", variant="secondary")

@@ -1,0 +1,4 @@
+# Variant: the model forgot to escape a backslash. "\d" is kept as literal text with a warning.
+root = Card([title, merchant])
+title = Heading("Receipt saved")
+merchant = Text("Path: C:\data")

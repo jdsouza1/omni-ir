@@ -116,7 +116,11 @@ function formatText(props: CatalogProps<"Text">["props"], locale: string): strin
   }
   if (format === "date" && typeof text === "string") {
     const date = new Date(text);
-    return Number.isNaN(date.getTime()) ? text : new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(date);
+    if (Number.isNaN(date.getTime())) return text;
+    // A date-only string ("2026-09-30") is parsed as UTC midnight; format it in UTC so it
+    // doesn't shift to the previous day in time zones west of UTC.
+    const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(text);
+    return new Intl.DateTimeFormat(locale, { dateStyle: "medium", ...(dateOnly ? { timeZone: "UTC" } : {}) }).format(date);
   }
   return display(text);
 }

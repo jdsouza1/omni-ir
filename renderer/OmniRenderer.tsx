@@ -56,7 +56,8 @@ function slotOf(doc: OmniDocument, id: string): Slot {
 /** One child position. It subscribes to its own id only (R3), so siblings and parents stay untouched. */
 function NodeSlot({ id }: { id: string }) {
   const { store } = useOmni();
-  const slot = useSyncExternalStore(store.subscribe, () => slotOf(store.getSnapshot(), id));
+  const getSlot = () => slotOf(store.getSnapshot(), id);
+  const slot = useSyncExternalStore(store.subscribe, getSlot, getSlot);
   if (slot === "pending") return <SkeletonLines lines={1} pendingId={id} />;
   if (slot === "missing") return <NodeFallback id={id} reason="missing" />;
   return <ResolvedSlot node={slot} />;

@@ -43,14 +43,16 @@ export function useOmni(): OmniContextValue {
 export function useStateValues(keys: readonly string[]): readonly Primitive[] {
   const { store } = useOmni();
   const cache = useRef<readonly Primitive[]>([]);
-  return useSyncExternalStore(store.subscribe, () => {
+  const get = () => {
     const state = store.getSnapshot().state;
     const next = keys.map((key) => state[key] ?? null);
     const prev = cache.current;
     if (prev.length === next.length && prev.every((v, i) => Object.is(v, next[i]))) return prev;
     cache.current = next;
     return next;
-  });
+  };
+  // Same getter on the server, so the tree can also be rendered with renderToString.
+  return useSyncExternalStore(store.subscribe, get, get);
 }
 
 /** Run a catalog handler; a throw is reported instead of escaping (R7). */

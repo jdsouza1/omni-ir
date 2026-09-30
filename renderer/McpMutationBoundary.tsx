@@ -19,7 +19,8 @@ function isStateRef(value: unknown): value is StateRef {
 export function McpMutationBoundary({ id, children }: Props) {
   const ctx = useOmni();
   const { store, tools } = ctx;
-  const mutation = useSyncExternalStore(store.subscribe, () => store.getSnapshot().mutations.get(id));
+  const getMutation = () => store.getSnapshot().mutations.get(id);
+  const mutation = useSyncExternalStore(store.subscribe, getMutation, getMutation);
   const paramKeys = mutation ? Object.values(mutation.params).filter(isStateRef).map((ref) => ref.key) : [];
   const paramValues = useStateValues(paramKeys);
   // A blocked press stays blocked until one of the values it used changes.

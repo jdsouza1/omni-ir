@@ -122,17 +122,17 @@ These are the rules for how the stream behaves at runtime. Tasks 3–5 must foll
   - **missing fallback:** after `end()` with a dangling child, the slot shows `NodeFallback reason="missing"` and the parent's other children keep their positions
 
 ## Task 5: Payment confirmation end-to-end
-- [ ] 5.1 `fixtures/payment-confirmation.omni`: `root` comes first (so Skeletons are needed). A Card with heading, merchant, amount, date, a **note Input** bound to `$note`, divider, Confirm (McpMutation `payments.confirm`, `params={amount: $amount, note: $note}`) and a local Cancel. At least one text argument contains `,` and `()`
-- [ ] 5.2 `tests/mockStream.ts`: async generator sending **random-sized byte chunks** (cut in the middle of lines and in the middle of multi-byte characters) with delays
-- [ ] 5.3 `tests/e2e.payment.test.tsx`:
+- [x] 5.1 `fixtures/payment-confirmation.omni`: `root` comes first (so Skeletons are needed). A Card with heading, merchant, amount, date, a **note Input** bound to `$note`, divider, Confirm (McpMutation `payments.confirm`, `params={amount: $amount, note: $note}`) and a local Cancel. At least one text argument contains `,` and `()`
+- [x] 5.2 `tests/mockStream.ts`: async generator sending **random-sized byte chunks** (cut in the middle of lines and in the middle of multi-byte characters) with delays
+- [x] 5.3 `tests/e2e.payment.test.tsx`:
   - midway: Skeletons are showing for pending ids, and Confirm is disabled if its McpMutation line hasn't arrived
   - at the end: no Skeletons remain; amount and merchant are shown; Confirm has `data-mcp-tool`
   - type into the note, click Confirm, and `onMutation` receives `{tool: "payments.confirm", params: {amount: 42.5, note: "<typed text>"}}`; Cancel never calls it
   - the mount counter shows no remounts; there are no errors
-- [ ] 5.4 Invalid variants, each its own fixture:
+- [x] 5.4 Invalid variants, each its own fixture:
   - McpMutation line removed → governance error; Confirm stays disabled
   - `tool="system.delete_account"` → `unknown tool` error; Confirm stays disabled; `onMutation` never called
   - a child that never arrives → dangling-reference error; `NodeFallback reason="missing"` in its place; the rest of the Card works
   - the merchant `Text` has `Path: C:\data` → one `warning`, node still rendered with the literal backslash
-- [ ] 5.5 `npm run demo`: prints parser events (`node`, `pending`, `resolved`, `warning`, `error`, `end`) and the final `renderToString` HTML
+- [x] 5.5 `npm run demo`: prints parser events (`node`, `pending`, `resolved`, `warning`, `error`, `end`) and the final `renderToString` HTML
 - **Checkpoint:** `npm test` all green; the demo shows the Skeleton-to-real sequence and the MCP-wrapped Confirm button

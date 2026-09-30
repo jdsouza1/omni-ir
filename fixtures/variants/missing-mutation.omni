@@ -1,0 +1,8 @@
+# Variant: the McpMutation line never arrives. Confirm must stay disabled (governance error).
+root = Card([title, amount, actions])
+title = Heading("Confirm payment")
+$amount = 42.50
+amount = Text($amount, format="currency", currency="USD")
+actions = Stack([confirm, cancel], direction="row")
+confirm = Button("Pay now", action="pay")
+cancel = Button("Cancel", variant="secondary")

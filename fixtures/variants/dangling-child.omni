@@ -1,0 +1,10 @@
+# Variant: root references "receipt", which never arrives. It becomes a "missing" fallback
+# and the rest of the card keeps working.
+root = Card([title, receipt, amount, actions])
+title = Heading("Confirm payment")
+$amount = 42.50
+amount = Text($amount, format="currency", currency="USD")
+actions = Stack([confirm, cancel], direction="row")
+confirm = Button("Pay now", action="pay")
+confirmPay = McpMutation(confirm, tool="payments.confirm", params={amount: $amount, note: ""})
+cancel = Button("Cancel", variant="secondary")
