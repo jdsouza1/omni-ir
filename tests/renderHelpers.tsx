@@ -19,10 +19,21 @@ export interface Harness {
   container: HTMLElement;
 }
 
-export function renderOmni(options: { lines?: string[]; catalog?: Catalog; tools?: ToolRegistry; parser?: OmniParser } = {}): Harness {
+export function renderOmni(
+  options: {
+    lines?: string[];
+    catalog?: Catalog;
+    tools?: ToolRegistry;
+    parser?: OmniParser;
+    /** Real onMutation implementation (e.g. the client's /api/mutate handler); still wrapped in a spy. */
+    onMutation?: (call: MutationCall) => void | Promise<void>;
+  } = {},
+): Harness {
   const tools = options.tools ?? TOOLS;
   const parser = options.parser ?? createParser({ tools });
-  const onMutation = vi.fn<(call: MutationCall) => void>();
+  const onMutation = options.onMutation
+    ? (vi.fn(options.onMutation) as unknown as Harness["onMutation"])
+    : vi.fn<(call: MutationCall) => void>();
   const events: RendererEvent[] = [];
   const onEvent = (e: RendererEvent) => events.push(e);
   if (options.lines) parser.write(options.lines.join("\n") + "\n");

@@ -114,9 +114,9 @@ The server feeds the same text into a server-side parser and logs error and warn
 - **Checkpoint:** tests pass; posting directly with curl is still re-validated
 
 ### Task E: Browser client helper
-- [ ] E.1 `client/generate.ts`: POST + streaming SSE reader → `parser.write()`; `done`/`error` → `parser.end()`
-- [ ] E.2 `client/mutate.ts`: default `onMutation` → `/api/mutate`; 403/422 → renderer error events
-- [ ] E.3 End-to-end tests (browser helper → Express → `MockModel` → parser → renderer): a streamed screen renders; Cancel aborts both sides; cut-off shows fallbacks; Pay → `/api/mutate` → receipt
+- [x] E.1 `client/generate.ts`: POST + streaming SSE reader → `parser.write()`; `done`/`error` → `parser.end()`
+- [x] E.2 `client/mutate.ts`: default `onMutation` → `/api/mutate`; 403/422 → renderer error events
+- [x] E.3 End-to-end tests (browser helper → Express → `MockModel` → parser → renderer): a streamed screen renders; Cancel aborts both sides; cut-off shows fallbacks; Pay → `/api/mutate` → receipt
 - **Checkpoint:** end-to-end tests pass offline
 
 ### Task F: Prompt, Claude adapter (off), tools
