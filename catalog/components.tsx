@@ -2,10 +2,11 @@
 // stream can add classes, styles or markup. Text is always rendered as a React text node.
 import type { CatalogProps } from "./types";
 
-export function Stack({ props, children }: CatalogProps<"Stack">) {
+export function Stack({ id, props, children }: CatalogProps<"Stack">) {
   const direction = props.direction ?? "column";
   return (
     <div
+      data-node-id={id}
       className={`omni-stack omni-stack--${direction} omni-gap--${props.gap ?? "md"} omni-align--${props.align ?? "stretch"}`}
     >
       {children}
@@ -13,34 +14,34 @@ export function Stack({ props, children }: CatalogProps<"Stack">) {
   );
 }
 
-export function Card({ props, children }: CatalogProps<"Card">) {
+export function Card({ id, props, children }: CatalogProps<"Card">) {
   return (
-    <section className="omni-card">
+    <section data-node-id={id} className="omni-card">
       {props.title !== undefined && <header className="omni-card__title">{display(props.title)}</header>}
       <div className="omni-card__body">{children}</div>
     </section>
   );
 }
 
-export function Heading({ props }: CatalogProps<"Heading">) {
+export function Heading({ id, props }: CatalogProps<"Heading">) {
   const text = display(props.text);
   switch (props.level ?? 2) {
     case 1:
-      return <h1 className="omni-heading omni-heading--1">{text}</h1>;
+      return <h1 data-node-id={id} className="omni-heading omni-heading--1">{text}</h1>;
     case 2:
-      return <h2 className="omni-heading omni-heading--2">{text}</h2>;
+      return <h2 data-node-id={id} className="omni-heading omni-heading--2">{text}</h2>;
     case 3:
-      return <h3 className="omni-heading omni-heading--3">{text}</h3>;
+      return <h3 data-node-id={id} className="omni-heading omni-heading--3">{text}</h3>;
   }
 }
 
-export function Text({ props, locale }: CatalogProps<"Text">) {
-  return <p className={`omni-text omni-text--${props.tone ?? "default"}`}>{formatText(props, locale)}</p>;
+export function Text({ id, props, locale }: CatalogProps<"Text">) {
+  return <p data-node-id={id} className={`omni-text omni-text--${props.tone ?? "default"}`}>{formatText(props, locale)}</p>;
 }
 
-export function Input({ props, value, onChange }: CatalogProps<"Input">) {
+export function Input({ id, props, value, onChange }: CatalogProps<"Input">) {
   return (
-    <label className="omni-input">
+    <label data-node-id={id} className="omni-input">
       <span className="omni-input__label">{props.label}</span>
       <input
         className="omni-input__field"
@@ -55,13 +56,12 @@ export function Input({ props, value, onChange }: CatalogProps<"Input">) {
 
 export function Button({ id, props, onPress, disabled, error, mcpTool }: CatalogProps<"Button">) {
   return (
-    <span className="omni-button-wrap">
+    <span data-node-id={id} className="omni-button-wrap">
       <button
         type="button"
         className={`omni-button omni-button--${props.variant ?? "primary"}`}
         disabled={disabled}
         onClick={onPress}
-        data-node-id={id}
         data-mcp-tool={mcpTool}
         data-mcp-error={error === undefined ? undefined : "true"}
         aria-invalid={error === undefined ? undefined : true}
@@ -77,21 +77,21 @@ export function Button({ id, props, onPress, disabled, error, mcpTool }: Catalog
   );
 }
 
-export function Divider(_: CatalogProps<"Divider">) {
-  return <hr className="omni-divider" />;
+export function Divider({ id }: CatalogProps<"Divider">) {
+  return <hr data-node-id={id} className="omni-divider" />;
 }
 
-export function Badge({ props }: CatalogProps<"Badge">) {
-  return <span className={`omni-badge omni-badge--${props.tone ?? "neutral"}`}>{display(props.text)}</span>;
+export function Badge({ id, props }: CatalogProps<"Badge">) {
+  return <span data-node-id={id} className={`omni-badge omni-badge--${props.tone ?? "neutral"}`}>{display(props.text)}</span>;
 }
 
-export function Skeleton({ props }: CatalogProps<"Skeleton">) {
-  return <SkeletonLines lines={props.lines ?? 1} />;
+export function Skeleton({ id, props }: CatalogProps<"Skeleton">) {
+  return <SkeletonLines lines={props.lines ?? 1} nodeId={id} />;
 }
 
-export function SkeletonLines({ lines, pendingId }: { lines: number; pendingId?: string }) {
+export function SkeletonLines({ lines, pendingId, nodeId }: { lines: number; pendingId?: string; nodeId?: string }) {
   return (
-    <div className="omni-skeleton" aria-busy="true" aria-label="Loading" data-pending-id={pendingId}>
+    <div className="omni-skeleton" aria-busy="true" aria-label="Loading" data-pending-id={pendingId} data-node-id={nodeId}>
       {Array.from({ length: lines }, (_, i) => (
         <span key={i} className="omni-skeleton__line" />
       ))}
