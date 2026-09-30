@@ -1,8 +1,7 @@
 // The Omni-IR playground page. State lives in usePlayground; this file is presentation only, so the
 // UX design (Task G) can restyle or rearrange it without touching behaviour.
 import { useEffect, useId, useState } from "react";
-import { TOOLS } from "../app/tools";
-import { OmniRenderer } from "../renderer";
+import { Preview } from "./Preview";
 import { SourceView } from "./SourceView";
 import { usePlayground, type PlaygroundDeps, type RunStatus } from "./usePlayground";
 
@@ -34,6 +33,7 @@ export function Playground(deps: PlaygroundDeps) {
   const [prompt, setPrompt] = useState("");
   const [pasted, setPasted] = useState(PASTE_STARTER);
   const [apiModel, setApiModel] = useState<string | null>(null);
+  const [highlighted, setHighlighted] = useState<string | null>(null);
   const streaming = state.status.kind === "streaming";
   const promptId = useId();
   const pasteId = useId();
@@ -48,6 +48,12 @@ export function Playground(deps: PlaygroundDeps) {
       live = false;
     };
   }, [deps.baseUrl, deps.fetch]);
+
+  // A new run starts with nothing highlighted.
+  useEffect(() => setHighlighted(null), [state.runId]);
+
+  const highlightedNode = highlighted ? state.parser?.getSnapshot().nodes.get(highlighted) : undefined;
+  const highlightedLine = highlighted ? state.nodeLines[highlighted] : undefined;
 
   const start = (text: string) => {
     setPrompt(text);
@@ -146,21 +152,33 @@ export function Playground(deps: PlaygroundDeps) {
       <div className="pg-panels">
         <section className="pg-panel" aria-label="Omni-IR source">
           <h2 className="pg-panel-title">Source</h2>
-          <SourceView source={state.source} issues={state.issues} nodeLines={state.nodeLines} streaming={streaming} />
+          <SourceView
+            source={state.source}
+            issues={state.issues}
+            nodeLines={state.nodeLines}
+            streaming={streaming}
+            highlightedId={highlighted}
+            onHighlight={setHighlighted}
+          />
+          <p className="pg-caption">
+            {highlightedNode && highlightedLine !== undefined
+              ? `Line ${highlightedLine} builds ${highlightedNode.type} "${highlighted}"`
+              : state.source
+                ? "Hover or focus a line to see what it builds."
+                : ""}
+          </p>
         </section>
         <section className="pg-panel pg-preview" aria-label="Rendered screen">
           <h2 className="pg-panel-title">Preview</h2>
-          {state.parser ? (
-            <OmniRenderer
-              key={state.runId}
-              store={state.parser.store}
-              tools={TOOLS}
-              onMutation={pg.onMutation}
-              onEvent={pg.onRendererEvent}
-            />
-          ) : (
-            <p className="pg-muted">The rendered screen appears here as it streams.</p>
-          )}
+          <Preview
+            runId={state.runId}
+            store={state.parser?.store ?? null}
+            onMutation={pg.onMutation}
+            onEvent={pg.onRendererEvent}
+            highlightedId={highlighted}
+            onHighlight={setHighlighted}
+            revision={state.source}
+          />
         </section>
       </div>
     </main>

@@ -43,7 +43,7 @@ Status: **Tasks A–F APPROVED 2026-09-30** with temporary styling (simple two-p
 - [x] B. `data-node-id` on every catalog component root (+ test)
 - [x] C. Playground state (prompt/paste modes, streaming status, cancel/retry) with tests
 - [x] D. Source view with line numbers, streaming growth and error markers, with tests
-- [ ] E. Source ↔ preview highlighting (hover and keyboard focus), with tests
+- [x] E. Source ↔ preview highlighting (hover and keyboard focus), with tests
 - [ ] F. Actions panel and event log, with tests
 - [ ] G. Apply the design (layout, styles, phone layout, light/dark)
 - [ ] H. End-to-end tests + manual check in the built-in browser; update CLAUDE.md
