@@ -1,0 +1,20 @@
+/* Temporary playground styling until the UX design arrives (Task G). Catalog styles live in catalog/omni.css. */
+:root {
+  --pg-bg: #f8f9fb;
+  --pg-surface: #ffffff;
+  --pg-border: #e4e7ec;
+  --pg-text: #151a24;
+  --pg-muted: #5b616e;
+  --pg-accent: #4f46e5;
+  --pg-accent-soft: #eef0ff;
+  --pg-error: #c62828;
+  --pg-warning: #8a5a00;
+  --pg-radius: 14px;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--pg-text);
+  background: var(--pg-bg);
+}
+body { margin: 0; }
+.pg { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.pg-title { font-size: 1.5rem; margin: 0 0 0.25rem; }
+.pg-muted { color: var(--pg-muted); margin: 0; }

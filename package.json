@@ -17,7 +17,9 @@
     "server": "tsx watch server/index.ts",
     "server:start": "tsx server/index.ts",
     "validate": "tsx scripts/validate.tsx",
-    "prompt:print": "tsx scripts/prompt-print.ts"
+    "prompt:print": "tsx scripts/prompt-print.ts",
+    "playground": "vite --config playground/vite.config.ts",
+    "playground:build": "vite build --config playground/vite.config.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",
@@ -37,6 +39,7 @@
     "jsdom": "^30.1.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
+    "vite": "^8.3.1",
     "vitest": "^5.0.3"
   }
 }

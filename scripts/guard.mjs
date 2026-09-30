@@ -3,7 +3,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
-const ROOTS = process.argv.slice(2).length ? process.argv.slice(2) : ["app", "engine", "catalog", "renderer", "server", "client"];
+const ROOTS = process.argv.slice(2).length ? process.argv.slice(2) : ["app", "engine", "catalog", "renderer", "server", "client", "playground"];
 const BANNED = [
   { name: "dangerouslySetInnerHTML", re: /dangerouslySetInnerHTML/ },
   { name: "innerHTML", re: /\binnerHTML\b/ },
