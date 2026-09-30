@@ -5,8 +5,8 @@ import { readFileSync } from "node:fs";
 import { renderToString } from "react-dom/server";
 import { createParser, type ParserEvent } from "../engine/parser";
 import { OmniRenderer } from "../renderer";
-import { TOOLS } from "../tests/helpers";
-import { mockStream } from "../tests/mockStream";
+import { TOOLS } from "../app/tools";
+import { mockStream } from "../app/mockStream";
 
 const path = process.argv[2] ?? "fixtures/payment-confirmation.omni";
 const source = readFileSync(path, "utf8");

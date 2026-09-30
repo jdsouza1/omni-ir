@@ -5,8 +5,8 @@ import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { createParser, type ParserEvent } from "../engine/parser";
-import { TOOLS } from "./helpers";
-import { chunkBytes, mockStream } from "./mockStream";
+import { TOOLS } from "../app/tools";
+import { chunkBytes, mockStream } from "../app/mockStream";
 import { countingCatalog, renderOmni } from "./renderHelpers";
 
 afterEach(cleanup);

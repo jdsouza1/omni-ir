@@ -6,7 +6,7 @@ import { createParser, type OmniParser } from "../engine/parser";
 import type { ToolRegistry } from "../engine/schema";
 import { OmniRenderer } from "../renderer";
 import type { MutationCall, RendererEvent } from "../renderer/context";
-import { TOOLS } from "./helpers";
+import { TOOLS } from "../app/tools";
 
 export interface Harness {
   parser: OmniParser;

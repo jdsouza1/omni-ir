@@ -16,5 +16,5 @@
     "noEmit": true,
     "types": ["node", "vitest/globals"]
   },
-  "include": ["engine", "catalog", "renderer", "tests", "scripts", "vitest.config.ts"]
+  "include": ["app", "engine", "catalog", "renderer", "server", "client", "tests", "scripts", "vitest.config.ts"]
 }

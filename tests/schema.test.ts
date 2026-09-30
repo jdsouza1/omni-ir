@@ -1,6 +1,7 @@
 import { validateDocument, validateStatement, type Statement } from "../engine/schema";
 import type { IssueCode, RawStatement } from "../engine/types";
-import { TOOLS, arr, bool, call, nested, nul, num, obj, ref, st, state, str } from "./helpers";
+import { TOOLS } from "../app/tools";
+import { arr, bool, call, nested, nul, num, obj, ref, st, state, str } from "./helpers";
 
 const ctx = { tools: TOOLS };
 

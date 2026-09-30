@@ -1,7 +1,7 @@
 import { createParser, parseStream, type OmniParser, type ParserEvent } from "../engine/parser";
 import type { OmniDocument } from "../engine/store";
 import type { IssueCode } from "../engine/types";
-import { TOOLS } from "./helpers";
+import { TOOLS } from "../app/tools";
 
 function setup() {
   const parser = createParser({ tools: TOOLS });

@@ -1,13 +1,4 @@
-import { z } from "zod";
-import type { ToolRegistry } from "../engine/schema";
 import type { RawStatement, RawValue } from "../engine/types";
-
-export const TOOLS: ToolRegistry = {
-  "payments.confirm": z.strictObject({
-    amount: z.number().positive(),
-    note: z.string().max(500),
-  }),
-};
 
 // Small builders so raw-statement fixtures read like the syntax they stand for.
 export const str = (value: string): RawValue => ({ kind: "string", value });
