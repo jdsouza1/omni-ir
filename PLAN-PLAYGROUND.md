@@ -2,7 +2,7 @@
 
 Goal: the page behind the landing page's "Try the playground". Type a prompt (or paste Omni-IR), watch the Omni-IR lines stream in next to the live rendered screen, hover a line to see what it builds, click buttons and see what the server did. **Costs nothing:** it runs locally against the mock-model server.
 
-Status: **Tasks A–F APPROVED 2026-09-30** with temporary styling (simple two-panel layout, landing-page indigo accent). **Task G waits for the UX design.** Rendered screens keep the catalog's neutral look for now (D3 decided).
+Status: **Tasks A–F and H DONE 2026-09-30** with temporary styling (simple two-panel layout, landing-page indigo accent). **Task G waits for the UX design.** Rendered screens keep the catalog's neutral look for now (D3 decided).
 
 ## What stays fixed regardless of the design
 
@@ -39,11 +39,11 @@ Status: **Tasks A–F APPROVED 2026-09-30** with temporary styling (simple two-p
 - **D4. Interactions and states:** empty state, streaming animation, error and cut-off states, anything else the design specifies.
 
 ## Task checklist (refined once the design arrives)
-- [x] A. Vite + React setup, `/api` proxy, `npm run playground`, guard/typecheck coverage
+- [x] A. Vite + React setup, `/api` mounted in-process, `npm run playground`, guard/typecheck coverage
 - [x] B. `data-node-id` on every catalog component root (+ test)
 - [x] C. Playground state (prompt/paste modes, streaming status, cancel/retry) with tests
 - [x] D. Source view with line numbers, streaming growth and error markers, with tests
 - [x] E. Source ↔ preview highlighting (hover and keyboard focus), with tests
 - [x] F. Actions panel and event log, with tests
 - [ ] G. Apply the design (layout, styles, phone layout, light/dark)
-- [ ] H. End-to-end tests + manual check in the built-in browser; update CLAUDE.md
+- [x] H. End-to-end tests + manual check in the built-in browser; update CLAUDE.md

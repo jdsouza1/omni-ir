@@ -28,12 +28,14 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - `app/tools.ts` — the tool registry shared by browser, server, tests and demo. Adding a tool needs a param schema here **and** a handler in `server/tools/handlers.ts` (a test enforces this).
 - `server/` — Express: `POST /api/generate` (SSE), `POST /api/mutate` (re-validates every action), `GET /api/health`. `server/models/` holds `MockModel` (default) and `ClaudeModel` (opt-in). `server/prompt.ts` generates the system prompt from the schema.
 - `client/` — browser helpers `generate()` and `createMutationHandler()`.
+- `playground/` — the Interactive Playground (Vite + React). The Express app runs inside the Vite dev server for `/api/*`. State is in `usePlayground.ts`; `Playground.tsx`, `SourceView.tsx`, `Preview.tsx` and `Panels.tsx` are presentation only; `playground.css` is **temporary styling** until the UX design is applied (PLAN-PLAYGROUND.md Task G). Rendered screens keep the catalog's own neutral styles.
 - `fixtures/` — the mock model's screens; `fixtures/variants/` — failure cases (`demo: …` prompts).
-- PLAN.md (Phase 1–2, done) and PLAN-SERVER.md (Step 1) are the plans and decision records.
+- PLAN.md (Phase 1–2, done), PLAN-SERVER.md (Step 1, done) and PLAN-PLAYGROUND.md (Step 2; A–F and H done, G waits for the design) are the plans and decision records.
 
 ## Commands
 - `npm test` — raw-HTML guard + all tests (no network). `npm run typecheck`.
 - `npm run server` — Express on :8787 with the free mock model.
+- `npm run playground` — the playground on :5173 (mock model, no key). `npm run playground:build` → `dist/playground`.
 - `npm run demo` (local fixture) · `npm run demo -- --server "contact support"` (from the running server).
 - `npm run prompt:print` — the system prompt; `npm run validate -- reply.omni` — check model output (free manual prompt check).
 
