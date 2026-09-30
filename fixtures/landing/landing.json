@@ -1,0 +1,48 @@
+{
+  "$comment": "The landing page's example tabs. Each fixture line gets the card part it builds (for hover highlighting) and a plain-language explanation. Run `npm run landing:examples` after changing a fixture or this file.",
+  "tabs": [
+    {
+      "key": "stay",
+      "label": "Booking",
+      "file": "booking.omni",
+      "lines": [
+        { "part": "root", "explain": "The whole screen is one card. Its four parts are listed here and arrive on the lines below." },
+        { "part": "title", "explain": "The listing name, shown as a heading." },
+        { "part": "place", "explain": "Location and rating as quieter text. Tone comes from a fixed list; the model can’t write its own styles." },
+        { "part": "dates", "explain": "A piece of state holding the dates, with a starting value." },
+        { "part": "dates", "explain": "A labelled field the guest can edit. Typing updates $dates." },
+        { "part": "reserve", "explain": "The Reserve button. It has an action, so it stays disabled until the next line approves it." },
+        { "part": "reserve", "explain": "Links the button to one tool the app allows and sends the current dates. The app checks the tool and details before anything runs." }
+      ]
+    },
+    {
+      "key": "checkout",
+      "label": "Checkout",
+      "file": "checkout.omni",
+      "lines": [
+        { "part": "root", "explain": "One card for the bag, listing its five parts." },
+        { "part": "title", "explain": "The screen’s heading." },
+        { "part": "shirt", "explain": "Each item is a line of text. There’s no list component yet, so items are written out one by one." },
+        { "part": "tote", "explain": "The second item." },
+        { "part": "total", "explain": "The total, formatted as dollars by the app. Omni-IR has no formulas, so the number is given, never calculated." },
+        { "part": "pay", "explain": "The Pay button. It stays disabled until the next line approves it." },
+        { "part": "pay", "explain": "Allows exactly one action, payments.confirm, with the amount to charge. The server checks it again before running it." }
+      ]
+    },
+    {
+      "key": "chat",
+      "label": "Assistant",
+      "file": "assistant.omni",
+      "lines": [
+        { "part": "root", "explain": "One card for the conversation and the question box." },
+        { "part": "title", "explain": "The screen’s heading." },
+        { "part": "asked", "explain": "The question already asked, as plain text." },
+        { "part": "answer", "explain": "The answer. Chat bubbles aren’t in the catalog yet, so the conversation is plain text." },
+        { "part": "question", "explain": "State for the next question, starting empty." },
+        { "part": "question", "explain": "A labelled text box. Typing updates $question." },
+        { "part": "send", "explain": "The Send button. It stays disabled until the next line approves it." },
+        { "part": "send", "explain": "Sends the typed question to the one tool the app allows for this." }
+      ]
+    }
+  ]
+}

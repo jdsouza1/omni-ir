@@ -19,7 +19,8 @@
     "validate": "tsx scripts/validate.tsx",
     "prompt:print": "tsx scripts/prompt-print.ts",
     "playground": "vite --config playground/vite.config.ts --configLoader runner",
-    "playground:build": "vite build --config playground/vite.config.ts --configLoader runner"
+    "playground:build": "vite build --config playground/vite.config.ts --configLoader runner",
+    "landing:examples": "tsx scripts/landing-examples.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",

@@ -38,6 +38,7 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - `npm run playground` — the playground on :5173 (mock model, no key). `npm run playground:build` → `dist/playground`.
 - `npm run demo` (local fixture) · `npm run demo -- --server "contact support"` (from the running server).
 - `npm run prompt:print` — the system prompt; `npm run validate -- reply.omni` — check model output (free manual prompt check).
+- `npm run landing:examples -- page.html out.html` — regenerate the landing page artifact's example tabs from `fixtures/landing/` (explanations in `landing.json`). Get `page.html` with the Artifact tool's read action; publish `out.html` back to the same URL.
 - CI: `.github/workflows/ci.yml` runs `npm ci`, typecheck, `npm test` and `playground:build` on Node 22 and 24 (mock model only, no secrets). Node 22.22+ / 24.15+ required.
 - Vite runs with `--configLoader runner` (in the npm scripts and the dev-server test); without it Vite warns about extensionless imports in the config. On Windows, `timeout`/stopping a background task can leave `node.exe` servers running: check and stop leftovers before `npm ci`.
 
