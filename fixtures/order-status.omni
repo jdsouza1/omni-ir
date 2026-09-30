@@ -1,0 +1,13 @@
+# Omni-IR: order status with a governed return request.
+root = Card([header, order, carrier, eta, sep, actions])
+header = Stack([title, status], direction="row", gap="sm", align="center")
+title = Heading("Order #A1B2-7731")
+status = Badge("Shipped", tone="success")
+order = Text("2 items: Ceramic pour-over set, Filters (100 pack)")
+carrier = Text("Carrier: Parcelwise, tracking 1Z-88-4410", tone="muted")
+eta = Text("2026-10-03", format="date")
+sep = Divider()
+actions = Stack([returnItem, help], direction="row", gap="sm")
+returnItem = Button("Request a return", action="requestReturn", variant="secondary")
+requestReturn = McpMutation(returnItem, tool="orders.requestReturn", params={orderId: "A1B2-7731"})
+help = Button("Contact support", variant="secondary")

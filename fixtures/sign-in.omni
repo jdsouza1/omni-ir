@@ -1,0 +1,10 @@
+# Omni-IR: sign in with an emailed link (no password field: the catalog has no masked input).
+root = Card([title, intro, email, actions, fine])
+title = Heading("Sign in", level=1)
+intro = Text("We'll email you a one-time link. No password needed.", tone="muted")
+$email = ""
+email = Input($email, label="Email address", placeholder="you@example.com")
+actions = Stack([send], direction="row")
+send = Button("Email me a link", action="sendLink")
+sendLink = McpMutation(send, tool="auth.sendMagicLink", params={email: $email})
+fine = Text("The link expires after 15 minutes.", tone="muted")

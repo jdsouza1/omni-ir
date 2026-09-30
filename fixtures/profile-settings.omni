@@ -1,0 +1,14 @@
+# Omni-IR: profile settings with two editable fields and a governed Save.
+root = Card([header, name, bio, sep, actions])
+header = Stack([title, verified], direction="row", gap="sm", align="center")
+title = Heading("Profile settings")
+verified = Badge("Verified", tone="success")
+$displayName = "Ada Lovelace"
+name = Input($displayName, label="Display name")
+$bio = "Mathematician; first to publish an algorithm (1843)."
+bio = Input($bio, label="Bio (max 160 characters)")
+sep = Divider()
+actions = Stack([save, discard], direction="row", gap="sm")
+save = Button("Save changes", action="saveProfile")
+saveProfile = McpMutation(save, tool="profile.update", params={displayName: $displayName, bio: $bio})
+discard = Button("Discard", variant="secondary")

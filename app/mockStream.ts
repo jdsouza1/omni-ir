@@ -11,7 +11,7 @@ export interface MockStreamOptions {
 }
 
 /** Small deterministic PRNG (mulberry32). */
-function random(seed: number): () => number {
+export function random(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -20,6 +20,23 @@ function random(seed: number): () => number {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+/**
+ * Split text into random-sized string chunks, like a model's text deltas.
+ * Splits by code point, so a character (including emoji) is never cut in half.
+ */
+export function chunkText(text: string, options: MockStreamOptions = {}): string[] {
+  const { seed = 1, minChunk = 1, maxChunk = 12 } = options;
+  const rand = random(seed);
+  const chars = Array.from(text);
+  const chunks: string[] = [];
+  for (let i = 0; i < chars.length; ) {
+    const size = minChunk + Math.floor(rand() * (maxChunk - minChunk + 1));
+    chunks.push(chars.slice(i, i + size).join(""));
+    i += size;
+  }
+  return chunks;
 }
 
 /** Split text into random-sized byte chunks. */

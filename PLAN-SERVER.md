@@ -94,9 +94,9 @@ The server feeds the same text into a server-side parser and logs error and warn
 - **Checkpoint:** 161 existing tests pass; typecheck clean; demo no longer imports from `tests/`
 
 ### Task B: Fixtures and `MockModel`, test-first
-- [ ] B.1 New fixtures using only the current catalog: login form, profile settings, order status, support contact, demo-mode screen. A test checks every fixture parses with zero issues.
-- [ ] B.2 Failing tests: keyword routing; unmatched prompt → demo-mode screen; `demo:` prompts replay each variant; abort stops the stream within 100 ms; instant speed for tests
-- [ ] B.3 Implement `server/models/types.ts` + `MockModel`
+- [x] B.1 New fixtures using only the current catalog: login form, profile settings, order status, support contact, demo-mode screen. A test checks every fixture parses with zero issues.
+- [x] B.2 Failing tests: keyword routing; unmatched prompt → demo-mode screen; `demo:` prompts replay each variant; abort stops the stream within 100 ms; instant speed for tests
+- [x] B.3 Implement `server/models/types.ts` + `MockModel`
 - **Checkpoint:** tests pass; every fixture renders with no errors
 
 ### Task C: `/api/generate`, test-first

@@ -9,4 +9,19 @@ export const TOOLS: ToolRegistry = {
     amount: z.number().positive(),
     note: z.string().max(500),
   }),
+  // Sign-in is by emailed link: the catalog has no password input, by design.
+  "auth.sendMagicLink": z.strictObject({
+    email: z.email(),
+  }),
+  "profile.update": z.strictObject({
+    displayName: z.string().trim().min(1).max(60),
+    bio: z.string().max(160),
+  }),
+  "orders.requestReturn": z.strictObject({
+    orderId: z.string().regex(/^[A-Z0-9-]{4,32}$/),
+  }),
+  "support.createTicket": z.strictObject({
+    subject: z.string().trim().min(1).max(120),
+    message: z.string().trim().min(1).max(2000),
+  }),
 };
