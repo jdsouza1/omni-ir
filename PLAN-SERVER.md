@@ -109,8 +109,8 @@ The server feeds the same text into a server-side parser and logs error and warn
 - **Checkpoint:** all server tests pass offline
 
 ### Task D: `/api/mutate`, test-first
-- [ ] D.1 Failing tests: valid → 200 + receipt; unknown tool → 403; 600-character note → 422; `__proto__` key → 422
-- [ ] D.2 Implement with the shared registry and stub handlers
+- [x] D.1 Failing tests: valid → 200 + receipt; unknown tool → 403; 600-character note → 422; `__proto__` key → 422
+- [x] D.2 Implement with the shared registry and stub handlers
 - **Checkpoint:** tests pass; posting directly with curl is still re-validated
 
 ### Task E: Browser client helper

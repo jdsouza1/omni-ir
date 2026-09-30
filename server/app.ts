@@ -3,12 +3,19 @@
 // browser's parser and schema, the trusted zone.
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import { z } from "zod";
+import { TOOLS } from "../app/tools";
+import type { ToolRegistry } from "../engine/schema";
 import type { ServerConfig } from "./config";
 import { ModelError, type Model } from "./models/types";
+import { STUB_HANDLERS, type ToolHandler } from "./tools/handlers";
 
 export interface AppOptions {
   config: ServerConfig;
   model: Model;
+  /** Tools the server will run; defaults to the shared registry. */
+  tools?: ToolRegistry;
+  /** Handler per tool; defaults to the stubs. */
+  handlers?: Readonly<Record<string, ToolHandler>>;
   /** Heartbeat interval for SSE streams (default 15 s). */
   heartbeatMs?: number;
   /** Structured log sink; never receives prompt text. */
@@ -19,15 +26,36 @@ export interface AppOptions {
 
 const GenerateBody = z.strictObject({ prompt: z.string().trim().min(1).max(2000) });
 
+// `params` is checked as a plain object here and by the tool's own schema below. (z.record is not
+// used: it silently drops a "__proto__" key instead of rejecting it.)
+const MutateBody = z.strictObject({
+  tool: z.string().min(1).max(128),
+  params: z.custom<Record<string, unknown>>(
+    (v) => typeof v === "object" && v !== null && !Array.isArray(v),
+    "params must be an object",
+  ),
+});
+const RESERVED_KEYS = ["__proto__", "constructor", "prototype"];
+
 const RATE_WINDOW_MS = 60_000;
 
-export function createApp({ config, model, heartbeatMs = 15_000, log = defaultLog, now = Date.now }: AppOptions): Express {
+export function createApp({
+  config,
+  model,
+  tools = TOOLS,
+  handlers = STUB_HANDLERS,
+  heartbeatMs = 15_000,
+  log = defaultLog,
+  now = Date.now,
+}: AppOptions): Express {
   const app = express();
   app.disable("x-powered-by");
   app.use(cors(config.corsOrigin));
   app.use(express.json({ limit: "16kb" }));
 
   const allow = rateLimiter(config.rateLimitPerMinute, now);
+  // Mutations are cheap for the server but may hit real services later; allow more, still bounded.
+  const allowMutate = rateLimiter(config.rateLimitPerMinute * 3, now);
 
   app.get("/api/health", (_req, res) => {
     res.json({ ok: true, model: model.kind });
@@ -106,6 +134,48 @@ export function createApp({ config, model, heartbeatMs = 15_000, log = defaultLo
       clearTimeout(timeout);
       if (!res.writableEnded) res.end();
       log({ ...entry, ms: now() - started, chunks, chars });
+    }
+  });
+
+  // Governed actions from McpMutationBoundary. The server re-checks the tool and params itself:
+  // the browser's checks can be bypassed by anyone who posts here directly.
+  app.post("/api/mutate", async (req, res) => {
+    const body = MutateBody.safeParse(req.body);
+    if (!body.success) {
+      return sendError(res, 400, "invalid_request", body.error.issues.map((i) => `${i.path.join(".") || "body"}: ${i.message}`).join("; "));
+    }
+    const { tool, params } = body.data;
+    const entry = { event: "mutate", tool: tool.slice(0, 128) };
+
+    // Rate limit first, so probing for tool names is throttled too.
+    if (!allowMutate(req.ip ?? "unknown").ok) {
+      log({ ...entry, outcome: "rate_limited" });
+      return sendError(res, 429, "rate_limited", "Too many requests; try again shortly.", true);
+    }
+    const schema = Object.hasOwn(tools, tool) ? tools[tool] : undefined;
+    const handler = Object.hasOwn(handlers, tool) ? handlers[tool] : undefined;
+    if (schema === undefined || handler === undefined) {
+      log({ ...entry, outcome: "unknown_tool" });
+      return sendError(res, 403, "unknown_tool", `"${tool}" is not a permitted action.`);
+    }
+
+    const reserved = RESERVED_KEYS.filter((key) => Object.hasOwn(params, key));
+    const parsed = reserved.length === 0 ? schema.safeParse(params) : null;
+    if (parsed === null || !parsed.success) {
+      const issues = parsed
+        ? parsed.error.issues.map((i) => ({ path: i.path.join("."), message: i.message }))
+        : reserved.map((key) => ({ path: key, message: "reserved key" }));
+      log({ ...entry, outcome: "invalid_params", paths: issues.map((i) => i.path) });
+      return res.status(422).json({ error: { code: "invalid_params", message: "The action's details are not valid.", retryable: false, issues } });
+    }
+
+    try {
+      const result = await handler(parsed.data as Record<string, unknown>);
+      log({ ...entry, outcome: "ok" });
+      return res.json({ ok: true, tool, result });
+    } catch (err) {
+      log({ ...entry, outcome: "tool_failed", error: err instanceof Error ? err.message : String(err) });
+      return sendError(res, 500, "tool_failed", "The action could not be completed.", true);
     }
   });
 
