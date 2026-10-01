@@ -2,7 +2,7 @@
 
 Goal: render Omni-IR natively on Android phones and tablets with Jetpack Compose, following the same rules as the web and iOS renderers: the stream only chooses components from the fixed catalog, the renderer owns all styling, and backend actions go through McpMutation governance. This is roadmap Phase 3's second item.
 
-Status: **APPROVED 2026-10-01** with the recommendations: review in the browser (the owner has an Android phone but prefers the browser); Android 8.0 (API 26); Material 3 from the host app's theme; a JDK installed on the owner's PC; publishing decided later with `v0.2.0`.
+Status: **DONE 2026-10-01** (owner reviewed the emulator screenshots and recording, then approved the merge). **APPROVED 2026-10-01** with the recommendations: review in the browser (the owner has an Android phone but prefers the browser); Android 8.0 (API 26); Material 3 from the host app's theme; a JDK installed on the owner's PC; publishing decided later with `v0.2.0`.
 
 ## Approach (recommended)
 
@@ -65,8 +65,16 @@ The same shape as the iOS renderer, which worked well:
 - [x] E.3 A review page with the screenshots and recording
 
 **F. Docs**
-- [ ] F.1 SPEC.md (three reference renderers), README, CLAUDE.md, ROADMAP, `android/README.md`
-- [ ] F.2 Release notes: how Android joins `v0.2.0`. Nothing is published or tagged without your go-ahead
+- [x] F.1 SPEC.md (three reference renderers), README, CLAUDE.md, ROADMAP, `android/README.md`
+- [x] F.2 Release notes: how Android joins `v0.2.0`. Nothing is published or tagged without your go-ahead
+
+## Decisions made while building (2026-10-01)
+- **Three modules, not two:** the renderer's logic is its own plain-Kotlin module, `omni-ir-runtime`, so it is tested on any computer; `omni-ir-compose` only draws it. The client uses the JDK's HTTP and a small JSON helper, so the runtime needs nothing beyond coroutines.
+- **UTF-8 decoding follows the WHATWG algorithm exactly** rather than Java's decoder, so invalid bytes become the same U+FFFD characters as in the browser.
+- **Screenshots come from the real emulator** instead of Paparazzi: fewer moving parts and real device rendering, the same approach as iOS.
+- **Compose 2026.09 needs compileSdk 37**; the apps still target API 36 and support API 26+.
+- **The demo's pictures** are Android vector drawables generated from `app/assets.ts` by a small SVG converter, so all three platforms show the same pictures.
+- **Release notes (F.2):** the modules aren't published yet. Publishing to Maven Central needs a free Sonatype account and a signing key; it would join the `v0.2.0` release (npm, Swift and Android together) only with the owner's go-ahead. Until then, apps include the modules from this repo (android/README.md).
 
 ## What I needed from you
 Answered 2026-10-01: "go with the recommendations"; review in the browser.

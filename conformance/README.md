@@ -6,7 +6,7 @@ Language-neutral test cases for any Omni-IR parser, such as a Swift or Kotlin im
 - `cases/catalog.json`: one case per component, generated from `schema.json`, checking every prop's accepted and rejected values.
 - `schema.json`: the catalog as language-neutral data (components, positional arguments, props as JSON Schema, limits, reserved words, rules across props, issue codes), exported from the TypeScript schema with `npm run schema:export`. Generate your implementation's catalog from it.
 - `build.ts`: the source the JSON files are generated from (`npm run conformance:build`). Edit cases here, not in the JSON.
-- This repo's TypeScript parser runs the suite in `tests/conformance.test.ts`.
+- Three implementations in this repo run the whole suite: TypeScript (`tests/conformance.test.ts`), Swift (`swift/Tests/OmniIRCoreTests`) and Kotlin (`android/omni-ir-core/src/test`).
 
 ## Case format
 

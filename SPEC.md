@@ -362,7 +362,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 
 ## 8. Renderer requirements
 
-These rules apply to anything that displays an Omni-IR screen. There are two reference renderers: React (`@omni-ir/react`) and SwiftUI (`OmniIRSwiftUI`, in `swift/`). The React renderer's tests are listed after each group; the SwiftUI renderer's are in `swift/Tests/` and the iOS demo's UI tests.
+These rules apply to anything that displays an Omni-IR screen. There are three reference renderers: React (`@omni-ir/react`), SwiftUI (`OmniIRSwiftUI`, in `swift/`) and Jetpack Compose (`omni-ir-compose`, in `android/`). The React renderer's tests are listed after each group; the SwiftUI renderer's are in `swift/Tests/` and the iOS demo's UI tests, and the Compose renderer's in `android/*/src/test` and the Android demo's emulator tests.
 
 **Content and styling**
 - A renderer MUST display strings only as text. It MUST NOT interpret any value as markup, a style, a script or a URL to load.
@@ -390,8 +390,8 @@ These rules apply to anything that displays an Omni-IR screen. There are two ref
 **Failures**
 - A failure in one component MUST NOT break the rest of the screen.
 - Where the platform can catch a component that fails while rendering (as React's error boundaries do), the renderer MUST replace only that component with a fallback, and SHOULD retry it when its data changes.
-- Where the platform can't catch it (as in SwiftUI, where a failing view stops the app), the renderer MUST make rendering a component unable to fail: it shows only props that passed validation, and never stops on a value from the stream.
-- *Tested by:* `tests/renderer.test.tsx` (React). The SwiftUI views take only validated props and contain no forced unwraps.
+- Where the platform can't catch it (as in SwiftUI and Jetpack Compose, where a failing view stops the app), the renderer MUST make rendering a component unable to fail: it shows only props that passed validation, and never stops on a value from the stream.
+- *Tested by:* `tests/renderer.test.tsx` (React). The SwiftUI and Compose views take only validated props and contain no forced unwraps (`!`, `try!`, `as!` in Swift; `!!` in Kotlin), which `tests/nativeCatalogs.test.ts` enforces.
 
 ## 9. Actions
 

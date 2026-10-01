@@ -27,7 +27,11 @@ npm install @omni-ir/core @omni-ir/react
 
 [`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) parses and validates a stream; [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) renders it with the Trusted Catalog. Their READMEs have examples.
 
-**iPhone, iPad and Mac (SwiftUI):** add the package `https://github.com/jdsouza1/omni-ir` with Swift Package Manager and use `OmniIRSwiftUI` (iOS 17+, macOS 14+). It passes the same conformance suite as the TypeScript parser. See [swift/README.md](swift/README.md).
+**iPhone, iPad and Mac (SwiftUI):** add the package `https://github.com/jdsouza1/omni-ir` with Swift Package Manager and use `OmniIRSwiftUI` (iOS 17+, macOS 14+). See [swift/README.md](swift/README.md).
+
+**Android (Jetpack Compose):** `omni-ir-compose` in [`android/`](android/README.md) (Android 8.0+). It isn't published to Maven yet; until it is, include the modules from this repo.
+
+All three parsers (TypeScript, Swift and Kotlin) pass the same [conformance suite](conformance/README.md), so a stream behaves identically everywhere.
 
 ## Try it locally
 
@@ -94,15 +98,16 @@ To check how well a model follows the protocol without paying for API calls, pas
 | `playground/` | The Interactive Playground |
 | `app/` | The tool registry and image asset registry shared by browser and server |
 | `Package.swift`, `swift/` | The Swift package: `OmniIRCore` (parser) and `OmniIRSwiftUI` (renderer and client), plus the iOS demo app |
+| `android/` | Kotlin: `omni-ir-core` (parser), `omni-ir-runtime` (store, governance, client), `omni-ir-compose` (Compose catalog), plus the Android demo app |
 | `fixtures/` | Example screens and failure cases |
 
-The format is specified in [SPEC.md](SPEC.md). Design decisions and build history are in [PLAN.md](PLAN.md), [PLAN-SERVER.md](PLAN-SERVER.md), [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md), [PLAN-SPEC.md](PLAN-SPEC.md), [PLAN-COMPONENTS.md](PLAN-COMPONENTS.md) and [PLAN-NPM.md](PLAN-NPM.md).
+The format is specified in [SPEC.md](SPEC.md). Design decisions and build history are in [PLAN.md](PLAN.md), [PLAN-SERVER.md](PLAN-SERVER.md), [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md), [PLAN-SPEC.md](PLAN-SPEC.md), [PLAN-COMPONENTS.md](PLAN-COMPONENTS.md), [PLAN-NPM.md](PLAN-NPM.md), [PLAN-IOS.md](PLAN-IOS.md) and [PLAN-ANDROID.md](PLAN-ANDROID.md).
 
 ## Roadmap
 
 What is done and what is planned, with dates: [docs/ROADMAP.md](docs/ROADMAP.md).
 
-- Android (Compose) renderer
+- Bi-directional AST sync tooling
 
 ## License
 
