@@ -15,6 +15,7 @@ let package = Package(
     .target(name: "OmniIRCore", path: "swift/Sources/OmniIRCore"),
     .target(name: "OmniIRSwiftUI", dependencies: ["OmniIRCore"], path: "swift/Sources/OmniIRSwiftUI"),
     .testTarget(name: "OmniIRCoreTests", dependencies: ["OmniIRCore"], path: "swift/Tests/OmniIRCoreTests"),
+    .testTarget(name: "OmniIRSwiftUITests", dependencies: ["OmniIRSwiftUI"], path: "swift/Tests/OmniIRSwiftUITests"),
   ],
   swiftLanguageModes: [.v6]
 )

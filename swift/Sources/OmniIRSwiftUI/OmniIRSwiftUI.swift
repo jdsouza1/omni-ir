@@ -1,5 +1,3 @@
-// The SwiftUI renderer (iOS plan, task D). SwiftUI exists only on Apple platforms, so on Linux and
-// Windows this library builds empty and only OmniIRCore is used.
-#if canImport(SwiftUI)
+// OmniIRSwiftUI: the Trusted Catalog for SwiftUI. Model/ holds the renderer's logic (Foundation only,
+// tested on every platform); Views/ holds the SwiftUI views, which build only on Apple platforms.
 @_exported import OmniIRCore
-#endif

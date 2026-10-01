@@ -5,7 +5,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "wip/**"]
   pull_request:
 
 permissions:
@@ -55,3 +55,6 @@ jobs:
       - run: swift --version
       - run: swift build --build-tests
       - run: swift test
+      - name: Build for iOS (simulator)
+        if: runner.os == 'macOS'
+        run: xcodebuild build -scheme OmniIR-Package -destination 'generic/platform=iOS Simulator' -quiet
