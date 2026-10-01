@@ -49,7 +49,7 @@ jobs:
       - name: Record a screen streaming in and a governed action
         run: |
           mkdir -p review
-          xcrun simctl io "$UDID" recordVideo --codec h264 --force review/streaming.mp4 &
+          xcrun simctl io "$UDID" recordVideo --codec h264 --force review/streaming.mov &
           recorder=$!
           sleep 2
           xcodebuild test-without-building -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo \
@@ -57,6 +57,8 @@ jobs:
             -resultBundlePath build/Streaming.xcresult -quiet
           status=$?
           kill -INT "$recorder"; wait "$recorder" || true
+          # A standard 720p MP4 plays in every browser (the simulator records QuickTime).
+          avconvert --source review/streaming.mov --output review/streaming.mp4 --preset Preset1280x720 --replace && rm review/streaming.mov
           exit $status
         shell: bash {0}
 
