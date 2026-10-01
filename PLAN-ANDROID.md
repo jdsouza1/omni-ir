@@ -41,12 +41,12 @@ The same shape as the iOS renderer, which worked well:
 - [x] A.1 Gradle project in `android/` (Kotlin, wrapper committed); `npm run kotlin:schema` writes `Schema.generated.kt` from `conformance/schema.json`, with a staleness test
 - [x] A.2 Conformance runner in Kotlin (JUnit): every case, whole and in 1-, 5- and 13-byte chunks, issues as distinct `{line, code}` pairs. Confirm it fails before any parser code exists. *Done 2026-10-01: Gradle 9.8 wrapper, Kotlin 2.4.20, JDK 21 on the owner's PC; all 63 cases fail against the stub parser.*
 
-**B. omni-ir-core** *(checkpoint: all 63 conformance cases pass)*
-- [ ] B.1 Line buffer with streaming UTF-8 (split characters wait, invalid bytes become U+FFFD, a leading byte order mark is dropped), lengths in UTF-16 units
-- [ ] B.2 Tokenizer with the TypeScript grammar, JavaScript's whitespace and number rules, lenient escapes
-- [ ] B.3 Validation from the generated catalog, plus reserved words, the Rating max rule, assets and tools
-- [ ] B.4 Document rules, document updates, local state edits, parser events; parser tests beyond the suite
-- [ ] B.5 CI: core tests on Linux
+**B. omni-ir-core** *(checkpoint: all 63 conformance cases pass)* *Reached 2026-10-01 on the first run, whole and in 1-, 5- and 13-byte chunks; a deliberately broken rule makes its case fail. UTF-8 decoding follows the WHATWG algorithm exactly rather than Java's decoder.*
+- [x] B.1 Line buffer with streaming UTF-8 (split characters wait, invalid bytes become U+FFFD, a leading byte order mark is dropped), lengths in UTF-16 units
+- [x] B.2 Tokenizer with the TypeScript grammar, JavaScript's whitespace and number rules, lenient escapes
+- [x] B.3 Validation from the generated catalog, plus reserved words, the Rating max rule, assets and tools
+- [x] B.4 Document rules, document updates, local state edits, parser events; parser tests beyond the suite
+- [x] B.5 CI: core tests on Linux
 
 **C. omni-ir-compose: model** *(tested on the JVM)*
 - [ ] C.1 `OmniStore` (Compose state), slots, `$state` resolution, governance (blocked until a value changes), handler failures

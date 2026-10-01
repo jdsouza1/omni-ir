@@ -25,5 +25,5 @@ val hasAndroidSdk = System.getenv("ANDROID_HOME") != null ||
   System.getenv("ANDROID_SDK_ROOT") != null ||
   file("local.properties").let { it.exists() && it.readText().contains("sdk.dir") }
 if (hasAndroidSdk) {
-  include(":omni-ir-compose", ":demo")
+  listOf("omni-ir-compose", "demo").filter { file(it).isDirectory }.forEach { include(":$it") }
 }
