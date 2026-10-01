@@ -585,6 +585,61 @@
           "$b": "2026-10-14"
         }
       }
+    },
+    {
+      "id": "rating-max",
+      "rules": [
+        "5.9"
+      ],
+      "description": "A Rating's number must not be more than max, which is 5 when absent (schema.json crossPropRules). A $state value is not checked.",
+      "input": "root = Stack([a, b, c])\n$score = 9\na = Rating(4.96)\nb = Rating(8, max=10)\nc = Rating($score)\nd = Rating(6)\ne = Rating(11, max=10)\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a",
+              "b",
+              "c"
+            ]
+          },
+          "a": {
+            "type": "Rating",
+            "props": {
+              "value": 4.96
+            },
+            "children": []
+          },
+          "b": {
+            "type": "Rating",
+            "props": {
+              "value": 8,
+              "max": 10
+            },
+            "children": []
+          },
+          "c": {
+            "type": "Rating",
+            "props": {
+              "value": {
+                "state": "$score"
+              }
+            },
+            "children": []
+          }
+        }
+      }
     }
   ]
 }

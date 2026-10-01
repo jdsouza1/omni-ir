@@ -17,8 +17,9 @@ function canonical(doc: OmniDocument, issues: { line: number | null; code: strin
   const value = (v: unknown): unknown =>
     v !== null && typeof v === "object" && (v as { kind?: string }).kind === "state" ? { state: (v as { key: string }).key } : v;
   const props = (p: object) => Object.fromEntries(Object.entries(p).map(([k, v]) => [k, value(v)]));
+  const distinct = [...new Map(issues.map((i) => [`${i.line}:${i.code}`, i])).values()];
   return {
-    issues: [...issues].sort((a, b) => (a.line ?? Infinity) - (b.line ?? Infinity) || a.code.localeCompare(b.code)),
+    issues: distinct.sort((a, b) => (a.line ?? Infinity) - (b.line ?? Infinity) || a.code.localeCompare(b.code)),
     nodes: Object.fromEntries([...doc.nodes].map(([id, n]) => [id, { type: n.type, props: props(n.props), children: [...n.children] }])),
     state: { ...doc.state },
     mutations: Object.fromEntries(

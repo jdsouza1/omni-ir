@@ -42,8 +42,8 @@ Plus a small **demo app** that streams the repo's fixtures offline (no server, n
 ## Task checklist
 
 **A. Language-neutral schema**
-- [ ] A.1 `npm run schema:export` writes `conformance/schema.json` from the TypeScript schema; a test fails if it's stale
-- [ ] A.2 Catalog conformance cases generated from `schema.json`: for every component and prop, an accepted line and rejected lines (wrong type, unknown value, too long, missing required), so another implementation is checked prop by prop, not only on document rules
+- [x] A.1 `npm run schema:export` writes `conformance/schema.json` from the TypeScript schema; a test fails if it's stale
+- [x] A.2 Catalog conformance cases generated from `schema.json`: for every component and prop, an accepted line and rejected lines (wrong type, unknown value, too long, missing required), so another implementation is checked prop by prop, not only on document rules. *Done: 15 generated cases plus a hand-written one for the Rating rule (63 cases in all). Issues are now compared as distinct `{line, code}` pairs, because how many messages an implementation reports for one bad value is its own choice (Zod reports some values twice).*
 
 **B. Swift package, tests first** *(checkpoint: failing tests)*
 - [ ] B.1 `Package.swift` at the root, `swift/Sources/OmniIRCore`, `swift/Tests/OmniIRCoreTests`; Swift 6 language mode with strict concurrency

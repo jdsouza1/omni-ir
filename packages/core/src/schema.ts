@@ -27,7 +27,8 @@ export const MAX_CHILDREN = LIMITS.children;
 export const ROOT_ID = "root";
 
 // Literal keywords, plus names that would touch Object.prototype if used as keys.
-const RESERVED = new Set(["true", "false", "null", "__proto__", "constructor", "prototype"]);
+export const RESERVED_WORDS = ["true", "false", "null", "__proto__", "constructor", "prototype"] as const;
+const RESERVED = new Set<string>(RESERVED_WORDS);
 
 // ---------------------------------------------------------------------------
 // Values
@@ -198,6 +199,16 @@ const MutationProps = z.strictObject({
   params: z.record(Identifier, z.union([Primitive, StateRef])).optional(),
 });
 const MUTATION_POSITIONAL = ["target"] as const;
+/** McpMutation's arguments, in the same shape as a COMPONENTS entry (for schema exports). */
+export const MCP_MUTATION = { positional: MUTATION_POSITIONAL, props: MutationProps } as const;
+
+/**
+ * Rules that span more than one prop, which a JSON description of the props can't express.
+ * Keep this in step with the `.refine` calls above; other implementations code these by hand.
+ */
+export const CROSS_PROP_RULES = [
+  { component: "Rating", rule: "When value is a number, it must not be more than max (5 when max is absent).", code: "invalid_props" },
+] as const;
 
 // ---------------------------------------------------------------------------
 // Validated statements (the only shapes the parser and renderer see)

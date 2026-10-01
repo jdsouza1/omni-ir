@@ -39,7 +39,7 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - `npm run server` — Express on :8787 with the free mock model.
 - `npm run playground` — the playground on :5173 (mock model, no key). `npm run playground:build` → `dist/playground`.
 - `npm run demo` (local fixture) · `npm run demo -- --server "contact support"` (from the running server).
-- `npm run spec` (or `-- --check`) — regenerate SPEC.md's generated sections. `npm run conformance:build` — write `conformance/cases/*.json` from `conformance/build.ts`.
+- `npm run spec` (or `-- --check`) — regenerate SPEC.md's generated sections. `npm run schema:export` (or `-- --check`) — write `conformance/schema.json`, the language-neutral catalog other renderers generate from. `npm run conformance:build` — write `conformance/cases/*.json` from `conformance/build.ts` (the `catalog` cases are generated from `schema.json`, so export first).
 - `npm run prompt:print` — the system prompt; `npm run validate -- reply.omni` — check model output (free manual prompt check).
 - `npm run landing:examples -- page.html out.html` — regenerate the landing page artifact's example tabs from `fixtures/landing/` (explanations in `landing.json`). Get `page.html` with the Artifact tool's read action; publish `out.html` back to the same URL.
 - `npm run build:packages` → `packages/*/dist`; `npm run pack:check` — what npm would publish (dry run); `npm run install:test` — install the packed tarballs into a fresh project and render, type-check and Vite-build there (downloads free packages from npm).

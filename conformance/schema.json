@@ -1,0 +1,1000 @@
+{
+  "$comment": "Generated from packages/core/src/schema.ts by `npm run schema:export`; do not edit. In props, a value written `$key` is {kind: \"state\", key: \"$key\"}, a bare identifier is {kind: \"ref\", id}, and a children list is an array of refs. See conformance/README.md.",
+  "version": "0.1.0",
+  "rootId": "root",
+  "limits": {
+    "lineLength": 16384,
+    "text": 2000,
+    "children": 200,
+    "idLength": 64,
+    "stateKeyLength": 65,
+    "toolNameLength": 128,
+    "actionNameLength": 64
+  },
+  "reservedWords": [
+    "true",
+    "false",
+    "null",
+    "__proto__",
+    "constructor",
+    "prototype"
+  ],
+  "components": {
+    "Stack": {
+      "positional": [
+        "children"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "children": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "ref"
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                }
+              },
+              "required": [
+                "kind",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "row",
+              "column"
+            ]
+          },
+          "gap": {
+            "type": "string",
+            "enum": [
+              "none",
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "align": {
+            "type": "string",
+            "enum": [
+              "start",
+              "center",
+              "end",
+              "stretch"
+            ]
+          }
+        },
+        "required": [
+          "children"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Card": {
+      "positional": [
+        "children"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "children": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "ref"
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                }
+              },
+              "required": [
+                "kind",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "children"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Heading": {
+      "positional": [
+        "text"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "number",
+                "const": 1
+              },
+              {
+                "type": "number",
+                "const": 2
+              },
+              {
+                "type": "number",
+                "const": 3
+              }
+            ]
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Text": {
+      "positional": [
+        "text"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "plain",
+              "currency",
+              "date"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "default",
+              "muted",
+              "strong"
+            ]
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Input": {
+      "positional": [
+        "value"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "state"
+              },
+              "key": {
+                "type": "string",
+                "maxLength": 65,
+                "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+              }
+            },
+            "required": [
+              "kind",
+              "key"
+            ],
+            "additionalProperties": false
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "placeholder": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Button": {
+      "positional": [
+        "label"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "label": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "action": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[a-z][A-Za-z0-9_]*$"
+          },
+          "variant": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "secondary",
+              "danger"
+            ]
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Divider": {
+      "positional": [],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    "Badge": {
+      "positional": [
+        "text"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "neutral",
+              "success",
+              "warning",
+              "danger"
+            ]
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Skeleton": {
+      "positional": [],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "lines": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 6
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "Image": {
+      "positional": [
+        "asset"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "asset": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "alt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "ratio": {
+            "type": "string",
+            "enum": [
+              "1:1",
+              "4:3",
+              "3:2",
+              "16:9"
+            ]
+          }
+        },
+        "required": [
+          "asset",
+          "alt"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Rating": {
+      "positional": [
+        "value"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "max": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "DateInput": {
+      "positional": [
+        "value"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "state"
+              },
+              "key": {
+                "type": "string",
+                "maxLength": 65,
+                "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+              }
+            },
+            "required": [
+              "kind",
+              "key"
+            ],
+            "additionalProperties": false
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "min": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "max": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "List": {
+      "positional": [
+        "children"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "children": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "ref"
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                }
+              },
+              "required": [
+                "kind",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "children"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "ListItem": {
+      "positional": [
+        "title"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "trailing": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "image": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Message": {
+      "positional": [
+        "text"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "from": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ]
+          }
+        },
+        "required": [
+          "text",
+          "from"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "mcpMutation": {
+    "positional": [
+      "target"
+    ],
+    "props": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "ref"
+            },
+            "id": {
+              "type": "string",
+              "maxLength": 64,
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "tool": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-z][A-Za-z0-9_]*(\\.[a-z][A-Za-z0-9_]*)+$"
+        },
+        "params": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+          },
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "maxLength": 2000
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "target",
+        "tool"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "crossPropRules": [
+    {
+      "component": "Rating",
+      "rule": "When value is a number, it must not be more than max (5 when max is absent).",
+      "code": "invalid_props"
+    }
+  ],
+  "issueCodes": {
+    "syntax": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "The line doesn't follow the grammar."
+    },
+    "unterminated_string": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "A string has no closing double quote."
+    },
+    "line_too_long": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "The line is longer than the line length limit."
+    },
+    "not_flat": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "A component call appears inside another statement's arguments."
+    },
+    "unknown_component": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "The component isn't in the catalog."
+    },
+    "invalid_props": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "An argument or value breaks the component's rules: wrong type, unknown prop, value not allowed, too long or repeated."
+    },
+    "unknown_tool": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "An McpMutation names a tool that isn't in the app's tool registry."
+    },
+    "duplicate_id": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "An id or $state key is assigned a second time. The first assignment stays."
+    },
+    "duplicate_child": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "The same id appears twice in one children list."
+    },
+    "multiple_parents": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "A component is listed as a child of a second component."
+    },
+    "cycle": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "A component would contain itself through its children."
+    },
+    "root_as_child": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "root is listed as a child."
+    },
+    "child_not_component": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "A children list names an McpMutation."
+    },
+    "unknown_asset": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "An Image or ListItem names a picture that isn't in the app's asset registry."
+    },
+    "input_state_type": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "An Input is bound to state that doesn't hold text, or a DateInput to state that isn't a YYYY-MM-DD date or empty."
+    },
+    "list_mismatch": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "A List contains something other than ListItems, or a ListItem is outside a List."
+    },
+    "duplicate_mutation": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "A button that already has an McpMutation gets a second one."
+    },
+    "dangling_ref": {
+      "severity": "error",
+      "stage": "end",
+      "meaning": "A referenced component or McpMutation target never arrived."
+    },
+    "missing_state": {
+      "severity": "error",
+      "stage": "end",
+      "meaning": "A $state key is used but never declared."
+    },
+    "missing_root": {
+      "severity": "error",
+      "stage": "end",
+      "meaning": "No root line arrived."
+    },
+    "root_not_component": {
+      "severity": "error",
+      "stage": "end",
+      "meaning": "root is defined, but as an McpMutation instead of a component."
+    },
+    "ungoverned_mutation": {
+      "severity": "error",
+      "stage": "end",
+      "meaning": "A button with an action has no McpMutation."
+    },
+    "mutation_target_not_interactive": {
+      "severity": "error",
+      "stage": "end",
+      "meaning": "An McpMutation targets a component that has no action."
+    },
+    "mutation_blocked": {
+      "severity": "error",
+      "stage": "renderer",
+      "meaning": "When pressed, the action's tool or params failed the registry's checks, so nothing was sent."
+    },
+    "node_crashed": {
+      "severity": "error",
+      "stage": "renderer",
+      "meaning": "A component failed while rendering. Only its own slot shows a fallback."
+    },
+    "handler_failed": {
+      "severity": "error",
+      "stage": "renderer",
+      "meaning": "An action's handler failed or the server refused it."
+    },
+    "unknown_escape": {
+      "severity": "warning",
+      "stage": "line",
+      "meaning": "A backslash sequence other than \\\", \\\\ or \\n was kept as literal text. The line is still accepted."
+    }
+  }
+}

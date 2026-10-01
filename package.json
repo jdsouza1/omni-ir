@@ -29,7 +29,8 @@
     "conformance:build": "tsx conformance/build.ts",
     "build:packages": "node scripts/build-packages.mjs",
     "pack:check": "node scripts/pack-check.mjs",
-    "install:test": "node scripts/install-test.mjs"
+    "install:test": "node scripts/install-test.mjs",
+    "schema:export": "tsx scripts/schema-export.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",

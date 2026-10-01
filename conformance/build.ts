@@ -1,10 +1,11 @@
 // The Omni-IR conformance cases, written here so Omni-IR text can be quoted literally (String.raw).
 // `npm run conformance:build` writes them to conformance/cases/*.json, the language-neutral files other
 // implementations use. Expected results are written by hand from SPEC.md, never copied from this
-// implementation's output.
+// implementation's output. The `catalog` cases are generated from conformance/schema.json (see catalog.ts).
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { catalogCases } from "./catalog";
 
 export type InputPart = string | { repeat: string; times: number };
 export interface ExpectedIssue {
@@ -433,7 +434,31 @@ export const CASES: Record<string, ConformanceCase[]> = {
         state: { $a: "", $b: "2026-10-14" },
       },
     },
+    {
+      id: "rating-max",
+      rules: ["5.9"],
+      description: "A Rating's number must not be more than max, which is 5 when absent (schema.json crossPropRules). A $state value is not checked.",
+      input: lines(
+        "root = Stack([a, b, c])",
+        "$score = 9",
+        "a = Rating(4.96)",
+        "b = Rating(8, max=10)",
+        "c = Rating($score)",
+        "d = Rating(6)",
+        "e = Rating(11, max=10)",
+      ),
+      expect: {
+        issues: [i(6, "invalid_props"), i(7, "invalid_props")],
+        nodes: {
+          root: node("Stack", {}, ["a", "b", "c"]),
+          a: node("Rating", { value: 4.96 }),
+          b: node("Rating", { value: 8, max: 10 }),
+          c: node("Rating", { value: st("$score") }),
+        },
+      },
+    },
   ],
+  catalog: catalogCases(),
 };
 
 /** The JSON files, by name. */

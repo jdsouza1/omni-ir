@@ -2,7 +2,9 @@
 
 Language-neutral test cases for any Omni-IR parser, such as a Swift or Kotlin implementation. Each case is a stream and its expected result, written by hand from [SPEC.md](../SPEC.md). An implementation conforms to sections 3–7 of the spec when it passes every case.
 
-- `cases/stream.json`, `cases/grammar.json`, `cases/document.json`: the cases. **Read these.**
+- `cases/stream.json`, `cases/grammar.json`, `cases/document.json`: the cases, written by hand. **Read these.**
+- `cases/catalog.json`: one case per component, generated from `schema.json`, checking every prop's accepted and rejected values.
+- `schema.json`: the catalog as language-neutral data (components, positional arguments, props as JSON Schema, limits, reserved words, rules across props, issue codes), exported from the TypeScript schema with `npm run schema:export`. Generate your implementation's catalog from it.
 - `build.ts`: the source the JSON files are generated from (`npm run conformance:build`). Edit cases here, not in the JSON.
 - This repo's TypeScript parser runs the suite in `tests/conformance.test.ts`.
 
@@ -31,9 +33,9 @@ Language-neutral test cases for any Omni-IR parser, such as a Swift or Kotlin im
 
 1. Create a parser with the case's tool registry and asset registry.
 2. Feed it `input`, then end the stream.
-3. Collect every **error and warning** as `{line, code}`, where `line` is `null` for issues without a line (such as `missing_root`). Messages aren't compared.
+3. Collect every **error and warning** as `{line, code}`, where `line` is `null` for issues without a line (such as `missing_root`), and drop duplicate pairs: an implementation may report one problem with several messages (for example, a value that breaks two constraints). Messages aren't compared.
 4. Build the result in the canonical form below and compare:
-   - `issues` is **always** compared, ignoring order.
+   - `issues` is **always** compared, as a set of distinct `{line, code}` pairs.
    - `nodes`, `state`, `mutations` and `missing` are compared **only when the case includes them**, and then exactly.
 5. Run every case again with the input fed as UTF-8 bytes in chunks of 1, 5 and 13 bytes. The result MUST be identical each time ([3.3]).
 
