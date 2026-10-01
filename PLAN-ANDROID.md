@@ -54,15 +54,15 @@ The same shape as the iOS renderer, which worked well:
 - [x] C.3 Server client: event-stream decoding (tested everywhere) and the HTTP calls for `/api/generate` and `/api/mutate`
 
 **D. omni-ir-compose: views** *(checkpoint: you review screenshots and a recording)*
-- [ ] D.1 The 15 catalog components with Material 3, light and dark, font scaling, TalkBack labels (Rating reads "Rated 4.96 out of 5"; Message says who sent it)
-- [ ] D.2 `OmniView`: one composable per node id, placeholders and fallbacks; rows that don't fit stack vertically
-- [ ] D.3 Input and DateInput edit state locally; images only from the app's picture registry; governed buttons
-- [ ] D.4 Test that keeps `!!` out of the sources; Paparazzi screenshot tests
+- [x] D.1 The 15 catalog components with Material 3, light and dark, font scaling, TalkBack labels (Rating reads "Rated 4.96 out of 5"; Message says who sent it)
+- [x] D.2 `OmniView`: one composable per node id, placeholders and fallbacks; rows that don't fit stack vertically
+- [x] D.3 Input and DateInput edit state locally; images only from the app's picture registry; governed buttons
+- [x] D.4 Test that keeps `!!` out of the sources; screenshot tests *(screenshots come from the real emulator instead of Paparazzi: fewer moving parts, real device rendering, and the same approach as iOS)*
 
 **E. Demo app and CI**
-- [ ] E.1 Demo app: fixtures offline, or a live server (`npm run server`, mock model)
-- [ ] E.2 Emulator UI tests on Linux CI, including end to end against the Express server, with a screen recording; an installable debug APK
-- [ ] E.3 A review page with the screenshots and recording
+- [x] E.1 Demo app: fixtures offline, or a live server (`npm run server`, mock model)
+- [x] E.2 Emulator UI tests on Linux CI, including end to end against the Express server, with a screen recording; an installable debug APK
+- [x] E.3 A review page with the screenshots and recording
 
 **F. Docs**
 - [ ] F.1 SPEC.md (three reference renderers), README, CLAUDE.md, ROADMAP, `android/README.md`
