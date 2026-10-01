@@ -1,5 +1,5 @@
 // The Swift and Kotlin parsers validate props from catalogs generated from conformance/schema.json;
-// from conformance/schema.json; it must never fall behind the TypeScript schema.
+// they must never fall behind the TypeScript schema.
 import { readFileSync } from "node:fs";
 import { COMPONENT_TYPES, ISSUE_CODES } from "@omni-ir/core";
 import { renderSwiftSchema, SWIFT_SCHEMA_PATH } from "../scripts/swift-schema";

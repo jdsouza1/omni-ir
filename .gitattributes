@@ -1,1 +1,4 @@
 * text=auto eol=lf
+# Gradle wrapper scripts: Windows batch files need CRLF, the Unix script needs LF.
+*.bat text eol=crlf
+android/gradlew text eol=lf
