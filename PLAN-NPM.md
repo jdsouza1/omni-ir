@@ -2,7 +2,7 @@
 
 Goal: let other projects install Omni-IR: the protocol core (parser and schema) and the React catalog. These are the roadmap's "Publish Zod Validation Schemas" and "Launch React Catalog SDK". Publishing public packages on npm is free.
 
-Status: **A–F DONE 2026-09-30; G (first release) waits for the owner's go-ahead.** The owner's npm account (`jdsouza1`, two-factor authentication on) and the free `omni-ir` organisation exist. Decided: names `@omni-ir/core` and `@omni-ir/react`; publish after Step 4 (new components); the owner creates the `omni-ir` npm organisation now to reserve the name. Nothing is published without the owner's explicit go-ahead.
+Status: **DONE 2026-09-30.** `@omni-ir/core@0.1.0` and `@omni-ir/react@0.1.0` are on npm; tag `v0.1.0` ran the release workflow end to end (approved, all checks passed, publishing skipped because 0.1.0 was already out). The owner's npm account (`jdsouza1`, two-factor authentication on) and the free `omni-ir` organisation exist. Decided: names `@omni-ir/core` and `@omni-ir/react`; publish after Step 4 (new components); the owner creates the `omni-ir` npm organisation now to reserve the name. Nothing is published without the owner's explicit go-ahead.
 
 ## Proposed packages
 
@@ -25,7 +25,7 @@ The server, playground, fixtures and tests stay in the repo and aren't published
 - [x] **D. Contents check:** `npm pack --dry-run` in CI, failing if tests, fixtures or source maps with local paths would be published.
 - [x] **E. Install test:** install the packed tarballs into a fresh Vite + React project and render a screen, in CI.
 - [x] **F. Release workflow:** a GitHub Actions workflow that publishes when you push a version tag, using npm **trusted publishing**, so no npm token is stored anywhere.
-- [ ] **G. First release, only with your go-ahead:** tag `v0.1.0` and publish.
+- [x] **G. First release, only with your go-ahead:** tag `v0.1.0` and publish.
 
 ## Decisions made while building (2026-09-30)
 - **`react-dom` is not a peer dependency.** The package never imports it (rendering to the page is the app's job), so requiring it would only get in the way of other React renderers.
@@ -37,8 +37,8 @@ The server, playground, fixtures and tests stay in the repo and aren't published
 ## G. First release: steps (only with your go-ahead)
 1. ~~Decide whether the npm account's email may be public.~~ Done 2026-09-30: the npm account uses a dedicated project email.
 2. ~~Publish 0.1.0 by hand.~~ Done 2026-09-30: `@omni-ir/core@0.1.0` and `@omni-ir/react@0.1.0` are live on npm, published by the owner, and verified by installing from the public registry.
-3. On npmjs.com, for each package: Settings → Trusted Publisher → GitHub Actions: user `jdsouza1`, repository `omni-ir`, workflow `release.yml`, environment `npm-publish`. Then set "Publishing access" to require two-factor authentication and disallow tokens.
-4. On GitHub: Settings → Environments → `npm-publish` → add yourself as a required reviewer.
+3. ~~Trusted publisher and publishing access.~~ Done 2026-09-30. On npmjs.com, for each package: Settings → Trusted Publisher → GitHub Actions: user `jdsouza1`, repository `omni-ir`, workflow `release.yml`, environment `npm-publish`. Then set "Publishing access" to require two-factor authentication and disallow tokens.
+4. ~~Approval gate.~~ Done 2026-09-30. On GitHub: Settings → Environments → `npm-publish` → add yourself as a required reviewer.
 5. Later releases: bump both versions, commit, push a `v<version>` tag, approve the run.
 
 ## What I needed from you (answered)

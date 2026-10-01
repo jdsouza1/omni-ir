@@ -8,12 +8,14 @@ Updated 2026-09-30. Planned dates for the remaining work are kept from the origi
 |---|---|---|
 | 1 · Core spec | Syntax spec v0.1 draft | [SPEC.md](../SPEC.md) |
 | 1 · Core spec | Zod validation schemas | `packages/core/src/schema.ts` |
+| 1 · Core spec | Zod schemas and parser published on npm as [`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) 0.1.0 | `packages/core/` |
 | 1 · Core spec | Conformance suite (47 cases) | [conformance/](../conformance/README.md) |
 | 2 · Web reference | Streaming parser in TypeScript, written test-first | `packages/core/` |
 | 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `packages/react/` |
 | 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |
 | 2 · Web reference | Interactive Playground (all but the visual design) | `playground/` |
 | 2 · Web reference | Images, ratings, date fields, lists and chat messages | `packages/react/`, `app/assets.ts` |
+| 2 · Web reference | React Catalog SDK published on npm as [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) 0.1.0, with approved, token-free releases | `packages/react/`, `.github/workflows/release.yml` |
 
 ## Planned
 
@@ -26,11 +28,7 @@ gantt
     tickInterval 2month
     todayMarker off
 
-    section Phase 1 · Core spec
-    Publish Zod schemas as an npm package :p1, 2026-11-15, 2026-12-31
-
     section Phase 2 · Web reference
-    Publish React Catalog SDK on npm :p2, 2027-01-15, 2027-03-15
     Playground visual design :p3, 2027-02-01, 2027-04-01
 
     section Phase 3 · Cross-platform

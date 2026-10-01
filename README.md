@@ -19,7 +19,15 @@ cancel = Button("Cancel", variant="secondary")
 
 `root` comes first, so the card appears immediately and its parts fill in as their lines arrive. `confirm` has an `action`, so it only becomes clickable once its `McpMutation` line names a permitted tool. `cancel` has none, so it can never reach the server.
 
-## Quick start
+## Use it in your app
+
+```bash
+npm install @omni-ir/core @omni-ir/react
+```
+
+[`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) parses and validates a stream; [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) renders it with the Trusted Catalog. Their READMEs have examples.
+
+## Try it locally
 
 Requires Node.js 22.22+ or 24.15+.
 
@@ -92,7 +100,6 @@ The format is specified in [SPEC.md](SPEC.md). Design decisions and build histor
 What is done and what is planned, with dates: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 - Playground visual design (in progress)
-- Publishing `@omni-ir/core` and `@omni-ir/react` on npm (packages ready, first release pending)
 - iOS and Android renderers
 
 ## License
