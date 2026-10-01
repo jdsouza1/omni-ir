@@ -1,5 +1,6 @@
 // Shared terminal helpers for the demo and validate scripts.
 import { renderToString } from "react-dom/server";
+import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import type { OmniParser, ParserEvent } from "../engine/parser";
 import { OmniRenderer } from "../renderer";
@@ -37,7 +38,7 @@ export function eventPrinter(started: number) {
 
 /** Server-render the parser's current document, indented one tag per line. */
 export function renderHtml(parser: OmniParser): string {
-  return prettyHtml(renderToString(<OmniRenderer store={parser.store} tools={TOOLS} onMutation={() => {}} />));
+  return prettyHtml(renderToString(<OmniRenderer store={parser.store} tools={TOOLS} assets={ASSETS} onMutation={() => {}} />));
 }
 
 function prettyHtml(html: string): string {

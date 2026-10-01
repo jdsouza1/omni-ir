@@ -426,6 +426,165 @@
           }
         }
       }
+    },
+    {
+      "id": "image-assets",
+      "rules": [
+        "5.17",
+        "7.2"
+      ],
+      "description": "Images name registry pictures. A URL is not an asset name; an unregistered name is unknown_asset.",
+      "assets": [
+        "cabin-pines",
+        "tote"
+      ],
+      "input": "root = Stack([photo, items])\nphoto = Image(\"cabin-pines\", alt=\"A cabin\", ratio=\"16:9\")\nx = Image(\"https://tracker.example/pixel.gif\", alt=\"x\")\ny = Image(\"not-registered\", alt=\"y\")\nitems = List([tote])\ntote = ListItem(\"Tote\", trailing=\"$86.00\", image=\"tote\")\nz = ListItem(\"Shirt\", image=\"shirt\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 3,
+            "code": "invalid_props"
+          },
+          {
+            "line": 4,
+            "code": "unknown_asset"
+          },
+          {
+            "line": 7,
+            "code": "unknown_asset"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "photo",
+              "items"
+            ]
+          },
+          "photo": {
+            "type": "Image",
+            "props": {
+              "asset": "cabin-pines",
+              "alt": "A cabin",
+              "ratio": "16:9"
+            },
+            "children": []
+          },
+          "items": {
+            "type": "List",
+            "props": {},
+            "children": [
+              "tote"
+            ]
+          },
+          "tote": {
+            "type": "ListItem",
+            "props": {
+              "title": "Tote",
+              "trailing": "$86.00",
+              "image": "tote"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "image-no-registry",
+      "rules": [
+        "5.17"
+      ],
+      "description": "With an empty asset registry, every Image is rejected.",
+      "input": "root = Image(\"cabin-pines\", alt=\"A cabin\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "unknown_asset"
+          },
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ],
+        "nodes": {}
+      }
+    },
+    {
+      "id": "list-children",
+      "rules": [
+        "5.18"
+      ],
+      "description": "A List may hold only ListItems, whichever line arrives first.",
+      "input": "root = Stack([a, b])\na = List([t])\nt = Text(\"not an item\")\nu = Text(\"early\")\nb = List([u])\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 3,
+            "code": "list_mismatch"
+          },
+          {
+            "line": 5,
+            "code": "list_mismatch"
+          },
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 2,
+            "code": "dangling_ref"
+          }
+        ]
+      }
+    },
+    {
+      "id": "list-item-parent",
+      "rules": [
+        "5.18"
+      ],
+      "description": "A ListItem must sit inside a List.",
+      "input": "root = Stack([i])\ni = ListItem(\"Tote\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "list_mismatch"
+          },
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          }
+        ]
+      }
+    },
+    {
+      "id": "date-input-state",
+      "rules": [
+        "5.7",
+        "5.11",
+        "5.19"
+      ],
+      "description": "A DateInput's state holds a YYYY-MM-DD date or the empty string. The rejected $c line has no effect, so c's state is never declared.",
+      "input": "root = Stack([a, b, c])\n$a = \"\"\na = DateInput($a, label=\"A\", min=\"2026-10-01\")\n$b = \"2026-10-14\"\nb = DateInput($b, label=\"B\")\nc = DateInput($c, label=\"C\")\n$c = \"next Tuesday\"\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 6,
+            "code": "missing_state"
+          },
+          {
+            "line": 7,
+            "code": "input_state_type"
+          }
+        ],
+        "state": {
+          "$a": "",
+          "$b": "2026-10-14"
+        }
+      }
     }
   ]
 }

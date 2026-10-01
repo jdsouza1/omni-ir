@@ -2,6 +2,7 @@
 // rendered component reports its IR id (the innermost one); the highlighted id gets an outline.
 // Only a data attribute is toggled on the rendered element; its content is never touched.
 import { useEffect, useRef } from "react";
+import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import type { OmniStore } from "../engine/store";
 import { OmniRenderer } from "../renderer";
@@ -44,7 +45,7 @@ export function Preview({ runId, store, onMutation, onEvent, highlightedId, onHi
       onFocus={(e) => onHighlight(idAt(e.target))}
       onBlur={() => onHighlight(null)}
     >
-      <OmniRenderer key={runId} store={store} tools={TOOLS} onMutation={onMutation} onEvent={onEvent} />
+      <OmniRenderer key={runId} store={store} tools={TOOLS} assets={ASSETS} onMutation={onMutation} onEvent={onEvent} />
     </div>
   );
 }

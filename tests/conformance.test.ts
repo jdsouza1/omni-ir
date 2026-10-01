@@ -30,7 +30,8 @@ function canonical(doc: OmniDocument, issues: { line: number | null; code: strin
 
 function run(c: ConformanceCase, chunkSize: number | null) {
   const tools = Object.fromEntries((c.tools ?? ["payments.confirm"]).map((name) => [name, z.any()]));
-  const parser = createParser({ tools });
+  const assets = Object.fromEntries((c.assets ?? []).map((name) => [name, {}]));
+  const parser = createParser({ tools, assets });
   const issues: { line: number | null; code: string }[] = [];
   parser.subscribe((e) => {
     if (e.type === "error" || e.type === "warning") issues.push({ line: e.issue.line ?? null, code: e.issue.code });

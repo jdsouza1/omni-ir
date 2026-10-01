@@ -6,6 +6,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { describeComponent } from "../engine/describe";
 import { createParser } from "../engine/parser";
@@ -70,7 +71,7 @@ export function renderSections(projectDir = "."): Record<string, string> {
       .filter((l) => !l.startsWith("#"))
       .join("\n")
       .trim();
-    const parser = createParser({ tools: TOOLS });
+    const parser = createParser({ tools: TOOLS, assets: ASSETS });
     const found: string[] = [];
     parser.subscribe((e) => {
       if (e.type === "error" || e.type === "warning") found.push(`- line ${e.issue.line ?? "(none)"}: \`${e.issue.code}\` (${e.issue.message})`);

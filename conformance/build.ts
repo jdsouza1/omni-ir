@@ -20,6 +20,8 @@ export interface ConformanceCase {
   input: string | InputPart[];
   /** Tool names in the registry; defaults to ["payments.confirm"]. Params are not checked by the parser. */
   tools?: string[];
+  /** Picture names in the asset registry; defaults to none. Renderers map names to pictures; the parser needs only the names. */
+  assets?: string[];
   expect: {
     /** Every issue reported, in any order. Always compared. */
     issues: ExpectedIssue[];
@@ -366,6 +368,69 @@ export const CASES: Record<string, ConformanceCase[]> = {
       expect: {
         issues: [i(2, "invalid_props"), i(3, "invalid_props"), i(4, "invalid_props")],
         mutations: { root: { id: "d", tool: "payments.confirm", params: { note: "" } } },
+      },
+    },
+    {
+      id: "image-assets",
+      rules: ["5.17", "7.2"],
+      description: "Images name registry pictures. A URL is not an asset name; an unregistered name is unknown_asset.",
+      assets: ["cabin-pines", "tote"],
+      input: lines(
+        "root = Stack([photo, items])",
+        'photo = Image("cabin-pines", alt="A cabin", ratio="16:9")',
+        'x = Image("https://tracker.example/pixel.gif", alt="x")',
+        'y = Image("not-registered", alt="y")',
+        "items = List([tote])",
+        'tote = ListItem("Tote", trailing="$86.00", image="tote")',
+        'z = ListItem("Shirt", image="shirt")',
+      ),
+      expect: {
+        issues: [i(3, "invalid_props"), i(4, "unknown_asset"), i(7, "unknown_asset")],
+        nodes: {
+          root: node("Stack", {}, ["photo", "items"]),
+          photo: node("Image", { asset: "cabin-pines", alt: "A cabin", ratio: "16:9" }),
+          items: node("List", {}, ["tote"]),
+          tote: node("ListItem", { title: "Tote", trailing: "$86.00", image: "tote" }),
+        },
+      },
+    },
+    {
+      id: "image-no-registry",
+      rules: ["5.17"],
+      description: "With an empty asset registry, every Image is rejected.",
+      input: lines('root = Image("cabin-pines", alt="A cabin")'),
+      expect: { issues: [i(1, "unknown_asset"), i(null, "missing_root")], nodes: {} },
+    },
+    {
+      id: "list-children",
+      rules: ["5.18"],
+      description: "A List may hold only ListItems, whichever line arrives first.",
+      input: lines("root = Stack([a, b])", "a = List([t])", 't = Text("not an item")', 'u = Text("early")', "b = List([u])"),
+      expect: { issues: [i(3, "list_mismatch"), i(5, "list_mismatch"), i(1, "dangling_ref"), i(2, "dangling_ref")] },
+    },
+    {
+      id: "list-item-parent",
+      rules: ["5.18"],
+      description: "A ListItem must sit inside a List.",
+      input: lines("root = Stack([i])", 'i = ListItem("Tote")'),
+      expect: { issues: [i(2, "list_mismatch"), i(1, "dangling_ref")] },
+    },
+    {
+      id: "date-input-state",
+      rules: ["5.7", "5.11", "5.19"],
+      description: "A DateInput's state holds a YYYY-MM-DD date or the empty string. The rejected $c line has no effect, so c's state is never declared.",
+      input: lines(
+        "root = Stack([a, b, c])",
+        '$a = ""',
+        'a = DateInput($a, label="A", min="2026-10-01")',
+        '$b = "2026-10-14"',
+        'b = DateInput($b, label="B")',
+        'c = DateInput($c, label="C")',
+        '$c = "next Tuesday"',
+      ),
+      expect: {
+        issues: [i(6, "missing_state"), i(7, "input_state_type")],
+        state: { $a: "", $b: "2026-10-14" },
       },
     },
   ],

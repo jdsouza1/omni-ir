@@ -1,5 +1,5 @@
 import { createContext, useContext, useRef, useSyncExternalStore } from "react";
-import type { Catalog } from "../catalog/types";
+import type { Catalog, Picture } from "../catalog/types";
 import type { Primitive, ToolRegistry } from "../engine/schema";
 import type { OmniStore } from "../engine/store";
 import type { Issue } from "../engine/types";
@@ -23,6 +23,8 @@ export interface OmniContextValue {
   store: OmniStore;
   tools: ToolRegistry;
   catalog: Catalog;
+  /** The app's image asset registry; streams can only show pictures named here. */
+  assets: Readonly<Record<string, Picture>>;
   locale: string;
   onMutation: (call: MutationCall) => void | Promise<void>;
   report: (event: RendererEvent) => void;

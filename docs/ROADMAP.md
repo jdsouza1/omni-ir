@@ -8,11 +8,12 @@ Updated 2026-09-30. Planned dates for the remaining work are kept from the origi
 |---|---|---|
 | 1 · Core spec | Syntax spec v0.1 draft | [SPEC.md](../SPEC.md) |
 | 1 · Core spec | Zod validation schemas | `engine/schema.ts` |
-| 1 · Core spec | Conformance suite (42 cases) | [conformance/](../conformance/README.md) |
+| 1 · Core spec | Conformance suite (47 cases) | [conformance/](../conformance/README.md) |
 | 2 · Web reference | Streaming parser in TypeScript, written test-first | `engine/` |
 | 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `catalog/`, `renderer/` |
 | 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |
 | 2 · Web reference | Interactive Playground (all but the visual design) | `playground/` |
+| 2 · Web reference | Images, ratings, date fields, lists and chat messages | `catalog/`, `app/assets.ts` |
 
 ## Planned
 
@@ -44,7 +45,6 @@ The playground design can start as soon as the design is ready; its date is the 
 
 ## Not yet scheduled
 
-- More components: images, lists, date pickers, ratings and chat messages.
 - Real backend tool handlers with authorization, in place of the stubs.
 - A check of how well a real model follows the protocol (free manual check with `npm run validate`, or a paid run only with the owner's go-ahead).
 - A written goal for the bi-directional AST sync tooling, before that work starts.

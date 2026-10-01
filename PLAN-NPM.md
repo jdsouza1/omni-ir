@@ -2,7 +2,7 @@
 
 Goal: let other projects install Omni-IR: the protocol core (parser and schema) and the React catalog. These are the roadmap's "Publish Zod Validation Schemas" and "Launch React Catalog SDK". Publishing public packages on npm is free.
 
-Status: **DRAFT, awaiting decisions** (questions at the end). Nothing is published without your explicit go-ahead.
+Status: **DECIDED 2026-09-30, Step 4 done; waiting on the owner's npm account.** Decided: names `@omni-ir/core` and `@omni-ir/react`; publish after Step 4 (new components); the owner creates the `omni-ir` npm organisation now to reserve the name. Nothing is published without the owner's explicit go-ahead.
 
 ## Proposed packages
 
@@ -14,7 +14,7 @@ Status: **DRAFT, awaiting decisions** (questions at the end). Nothing is publish
 The server, playground, fixtures and tests stay in the repo and aren't published. Both packages start at **0.1.0**, matching the spec.
 
 ## Facts that shape this
-- **Name check (2026-10-01):** `@omni-ir/core`, `@omni-ir/react`, `omni-ir` and `omni-ir-react` are all unused on npm, and the `omni-ir` organisation appears to be free. Only creating it confirms that.
+- **Name check (2026-09-30):** `@omni-ir/core`, `@omni-ir/react`, `omni-ir` and `omni-ir-react` are all unused on npm, and the `omni-ir` organisation appears to be free. Only creating it confirms that.
 - **You're not signed in to npm on this machine.** Publishing needs an npm account with two-factor authentication.
 - **Publishing is effectively permanent:** a version number can never be reused, and unpublishing is only allowed for 72 hours.
 

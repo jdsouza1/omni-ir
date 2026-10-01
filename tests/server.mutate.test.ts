@@ -32,6 +32,8 @@ describe("POST /api/mutate", () => {
     ["profile.update", { displayName: "Ada", bio: "Hello" }, "saved"],
     ["orders.requestReturn", { orderId: "A1B2-7731" }, "returnId"],
     ["support.createTicket", { subject: "Refund", message: "Please help" }, "ticketId"],
+    ["bookings.reserve", { checkIn: "2026-10-14", checkOut: "2026-10-17" }, "bookingId"],
+    ["assistant.ask", { question: "Any quiet beaches?" }, "answer"],
   ])("%s with valid params → 200 with a stub result", async (tool, params, field) => {
     const mutate = await start();
     const response = await mutate({ tool, params });
@@ -69,6 +71,18 @@ describe("POST /api/mutate", () => {
     expect(body.error.code).toBe("invalid_params");
     if (path) expect(body.error.issues.map((i) => i.path)).toContain(path);
     expect(handler).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["a date in another format", { checkIn: "14/10/2026", checkOut: "2026-10-17" }, "checkIn"],
+    ["check-out before check-in", { checkIn: "2026-10-17", checkOut: "2026-10-14" }, "checkOut"],
+    ["check-out on the check-in day", { checkIn: "2026-10-14", checkOut: "2026-10-14" }, "checkOut"],
+  ])("bookings.reserve with %s → 422", async (_, params, path) => {
+    const mutate = await start();
+    const response = await mutate({ tool: "bookings.reserve", params });
+    expect(response.status).toBe(422);
+    const body = (await response.json()) as { error: { issues: { path: string }[] } };
+    expect(body.error.issues.map((i) => i.path)).toContain(path);
   });
 
   it("rejects a __proto__ key in params → 422", async () => {

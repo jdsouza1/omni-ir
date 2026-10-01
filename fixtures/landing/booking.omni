@@ -1,7 +1,12 @@
-root = Card([title, place, dates, reserve])
+root = Card([photo, title, stars, place, dates, reserve])
+photo = Image("cabin-pines", alt="A wooden cabin among pine trees", ratio="16:9")
 title = Heading("Cabin in the Pines")
-place = Text("Big Sur, California · ★ 4.96", tone="muted")
-$dates = "Oct 14 – Oct 17"
-dates = Input($dates, label="Dates")
+stars = Rating(4.96)
+place = Text("Big Sur, California", tone="muted")
+dates = Stack([checkIn, checkOut], direction="row")
+$checkIn = "2026-10-14"
+checkIn = DateInput($checkIn, label="Check-in")
+$checkOut = "2026-10-17"
+checkOut = DateInput($checkOut, label="Check-out")
 reserve = Button("Reserve · $642", action="reserve")
-book = McpMutation(reserve, tool="bookings.reserve", params={dates: $dates})
+book = McpMutation(reserve, tool="bookings.reserve", params={checkIn: $checkIn, checkOut: $checkOut})

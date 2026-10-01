@@ -24,11 +24,12 @@ Language-neutral test cases for any Omni-IR parser, such as a Swift or Kotlin im
 
 - **`input`**: the stream, as a string or as a list of parts joined in order. A part `{"repeat": "x", "times": 17000}` stands for that text repeated, so long lines don't bloat the files.
 - **`tools`**: the names in the tool registry. When absent, the registry is `["payments.confirm"]`. Param schemas don't matter: the parser checks only that a tool exists ([5.14]).
+- **`assets`**: the picture names in the asset registry. When absent, the registry is empty. Only the names matter to the parser ([5.17]).
 - **`rules`**: the SPEC.md rules the case checks.
 
 ## Running a case
 
-1. Create a parser with the case's tool registry.
+1. Create a parser with the case's tool registry and asset registry.
 2. Feed it `input`, then end the stream.
 3. Collect every **error and warning** as `{line, code}`, where `line` is `null` for issues without a line (such as `missing_root`). Messages aren't compared.
 4. Build the result in the canonical form below and compare:

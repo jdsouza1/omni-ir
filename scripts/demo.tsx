@@ -5,6 +5,7 @@
 // Prints every parser event as it happens, then the server-rendered HTML mid-stream and at the end.
 import { readFileSync } from "node:fs";
 import { mockStream } from "../app/mockStream";
+import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { generate } from "../client/generate";
 import { createParser } from "../engine/parser";
@@ -15,7 +16,7 @@ const serverIndex = args.indexOf("--server");
 const urlIndex = args.indexOf("--url");
 const baseUrl = urlIndex >= 0 ? args[urlIndex + 1]! : "http://localhost:8787";
 
-const parser = createParser({ tools: TOOLS });
+const parser = createParser({ tools: TOOLS, assets: ASSETS });
 const started = performance.now();
 parser.subscribe(eventPrinter(started));
 

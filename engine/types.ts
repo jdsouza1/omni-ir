@@ -26,6 +26,7 @@ export type IssueCode =
   | "unknown_component"
   | "invalid_props"
   | "unknown_tool"
+  | "unknown_asset"
   // document-level
   | "duplicate_id"
   | "duplicate_child"
@@ -34,6 +35,7 @@ export type IssueCode =
   | "root_as_child"
   | "child_not_component"
   | "input_state_type"
+  | "list_mismatch"
   | "duplicate_mutation"
   | "dangling_ref"
   | "missing_state"
@@ -78,7 +80,13 @@ export const ISSUE_CODES = {
   cycle: { severity: "error", stage: "line", meaning: "A component would contain itself through its children." },
   root_as_child: { severity: "error", stage: "line", meaning: "root is listed as a child." },
   child_not_component: { severity: "error", stage: "line", meaning: "A children list names an McpMutation." },
-  input_state_type: { severity: "error", stage: "line", meaning: "An Input is bound to state that doesn't hold text." },
+  unknown_asset: { severity: "error", stage: "line", meaning: "An Image or ListItem names a picture that isn't in the app's asset registry." },
+  input_state_type: {
+    severity: "error",
+    stage: "line",
+    meaning: "An Input is bound to state that doesn't hold text, or a DateInput to state that isn't a YYYY-MM-DD date or empty.",
+  },
+  list_mismatch: { severity: "error", stage: "line", meaning: "A List contains something other than ListItems, or a ListItem is outside a List." },
   duplicate_mutation: { severity: "error", stage: "line", meaning: "A button that already has an McpMutation gets a second one." },
   dangling_ref: { severity: "error", stage: "end", meaning: "A referenced component or McpMutation target never arrived." },
   missing_state: { severity: "error", stage: "end", meaning: "A $state key is used but never declared." },

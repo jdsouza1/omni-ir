@@ -1,7 +1,9 @@
 import { memo, useMemo, useSyncExternalStore, type ComponentType as ReactComponentType, type ReactNode } from "react";
 import { DEFAULT_CATALOG } from "../catalog/catalog";
 import { SkeletonLines } from "../catalog/components";
-import type { Catalog } from "../catalog/types";
+import type { Catalog, Picture } from "../catalog/types";
+
+const NO_ASSETS: Readonly<Record<string, Picture>> = {};
 import { isMutating, ROOT_ID, stateKeysOf, type OmniNode, type Primitive, type ToolRegistry } from "../engine/schema";
 import type { OmniDocument, OmniStore } from "../engine/store";
 import {
@@ -24,13 +26,23 @@ export interface OmniRendererProps {
   onEvent?: (event: RendererEvent) => void;
   /** Host-supplied catalog (trusted code). Defaults to the built-in Trusted Catalog. */
   catalog?: Catalog;
+  /** The app's image asset registry. Without it, Images show their alt text. */
+  assets?: Readonly<Record<string, Picture>>;
   locale?: string;
 }
 
-export function OmniRenderer({ store, tools, onMutation, onEvent, catalog = DEFAULT_CATALOG, locale = "en-US" }: OmniRendererProps) {
+export function OmniRenderer({
+  store,
+  tools,
+  onMutation,
+  onEvent,
+  catalog = DEFAULT_CATALOG,
+  assets = NO_ASSETS,
+  locale = "en-US",
+}: OmniRendererProps) {
   const value = useMemo<OmniContextValue>(
-    () => ({ store, tools, catalog, locale, onMutation, report: (event) => onEvent?.(event) }),
-    [store, tools, catalog, locale, onMutation, onEvent],
+    () => ({ store, tools, catalog, assets, locale, onMutation, report: (event) => onEvent?.(event) }),
+    [store, tools, catalog, assets, locale, onMutation, onEvent],
   );
   return (
     <OmniContext.Provider value={value}>
@@ -90,7 +102,13 @@ const MemoNode = memo(function Node({
   const Component = ctx.catalog[node.type] as ReactComponentType<Record<string, unknown>>;
   const base = { id: node.id, props, children, locale: ctx.locale };
 
-  if (node.type === "Input") {
+  if (node.type === "Image" || node.type === "ListItem") {
+    const name = node.type === "Image" ? node.props.asset : node.props.image;
+    const picture = name !== undefined && Object.hasOwn(ctx.assets, name) ? ctx.assets[name] : undefined;
+    return <Component {...base} picture={picture} />;
+  }
+
+  if (node.type === "Input" || node.type === "DateInput") {
     const key = node.props.value.key;
     const onChange = (value: string) => runHandler(ctx.report, node.id, () => ctx.store.setState(key, value));
     return <Component {...base} value={String(props.value ?? "")} onChange={onChange} />;

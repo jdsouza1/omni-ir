@@ -1,7 +1,7 @@
 // Human-readable descriptions of the schema, shared by the system prompt (server/prompt.ts) and the
 // generated sections of SPEC.md (scripts/spec.ts), so both always describe the same rules.
 import { z } from "zod";
-import { COMPONENTS, type ComponentType } from "./schema";
+import { ASSET_NAME, COMPONENTS, ISO_DATE, type ComponentType } from "./schema";
 
 export interface JsonSchema {
   type?: string;
@@ -73,6 +73,8 @@ export function describeValue(def: JsonSchema, detailed = false): string {
   if (def.type === "string") {
     if (def.format === "email") return "email address";
     if (def.pattern === "^[A-Z]{3}$") return "3-letter currency code";
+    if (def.pattern === ISO_DATE.source) return 'date "YYYY-MM-DD"';
+    if (def.pattern === ASSET_NAME.source) return detailed ? `image name (max ${def.maxLength})` : "image name";
     if (!detailed) return "text";
     const limits = [def.minLength ? `min ${def.minLength}` : "", def.maxLength ? `max ${def.maxLength}` : "", def.pattern ? `matching /${def.pattern}/` : ""]
       .filter(Boolean)

@@ -8,7 +8,15 @@ import { renderOmni } from "./renderHelpers";
 afterEach(cleanup);
 
 const LINES = [
-  "root = Stack([card, badge, divider, skel, actions])",
+  "root = Stack([card, badge, divider, skel, actions, media])",
+  "media = Stack([photo, stars, when, items, msg])",
+  'photo = Image("cabin-pines", alt="A cabin")',
+  "stars = Rating(4.5)",
+  '$when = ""',
+  'when = DateInput($when, label="When")',
+  "items = List([item])",
+  'item = ListItem("Linen overshirt", detail="Sand", trailing="$128.00", image="shirt")',
+  'msg = Message("Hello", from="user")',
   'card = Card([h, t, i], title="Card title")',
   'h = Heading("Heading")',
   't = Text("Body")',

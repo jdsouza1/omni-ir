@@ -2,7 +2,7 @@
 
 Goal: add the components the landing page's original design needs (a photo, a star rating, dates, a list of items, chat messages) without weakening any security rule, then restore the landing page examples to that design. Costs nothing.
 
-Status: **DRAFT, awaiting decisions** (questions at the end).
+Status: **DONE 2026-09-30** (approved the same day). Decided: (1) images only from an app-registered asset list, chosen by name; (2) date ranges are two DateInputs; (3) names Image, Rating, DateInput, List, ListItem, Message.
 
 ## Proposed components
 
@@ -20,13 +20,13 @@ Status: **DRAFT, awaiting decisions** (questions at the end).
 - The parser, prompt, spec tables and conformance coverage pick up new components from the schema automatically, and the existing tests fail if anything is left out.
 
 ## Task checklist
-- [ ] **A. Image asset registry:** `app/assets.ts`, a name → `{ src, width, height }` map supplied by the app, like the tool registry. The schema rejects unknown asset names (new issue code `unknown_asset`); the renderer only ever uses `src` from the registry.
-- [ ] **B. Schema:** the five components in `engine/schema.ts`, with tests for valid and invalid lines (an Image with a URL, a Rating above `max`, a DateInput bound to a number, a ListItem used outside a List, and so on).
-- [ ] **C. Catalog and renderer:** React components with neutral styles in `omni.css`; DateInput wired like Input; `data-node-id` on each; render and interaction tests.
-- [ ] **D. Spec and conformance:** new rules in SPEC.md section 5 and conformance cases for each; regenerate the spec and prompt.
-- [ ] **E. Fixtures and mock model:** rewrite `fixtures/landing/*.omni` with the new components; update `landing.json`.
-- [ ] **F. Landing page:** regenerate the examples (`npm run landing:examples`) and rebuild the three cards to show the photo, rating, date fields, item list and chat bubbles again.
-- [ ] **G. Check:** full suite, playground in the browser, landing page locally before publishing.
+- [x] **A. Image asset registry:** `app/assets.ts`, a name → `{ src, width, height }` map supplied by the app, like the tool registry. The schema rejects unknown asset names (new issue code `unknown_asset`); the renderer only ever uses `src` from the registry.
+- [x] **B. Schema:** the five components in `engine/schema.ts`, with tests for valid and invalid lines (an Image with a URL, a Rating above `max`, a DateInput bound to a number, a ListItem used outside a List, and so on).
+- [x] **C. Catalog and renderer:** React components with neutral styles in `omni.css`; DateInput wired like Input; `data-node-id` on each; render and interaction tests.
+- [x] **D. Spec and conformance:** new rules in SPEC.md section 5 and conformance cases for each; regenerate the spec and prompt.
+- [x] **E. Fixtures and mock model:** rewrite `fixtures/landing/*.omni` with the new components; update `landing.json`.
+- [x] **F. Landing page:** regenerate the examples (`npm run landing:examples`) and rebuild the three cards to show the photo, rating, date fields, item list and chat bubbles again.
+- [x] **G. Check:** full suite, playground in the browser, landing page locally before publishing.
 
 ## Questions
 1. **Image source.** *Recommended:* images only from an **app-registered asset list**, chosen by name. A model that can write any URL could load tracking pixels, leak data through the URL (for example after a prompt injection), or show any picture from the web. Alternatives: (b) URLs only from hosts the app allowlists; (c) any HTTPS URL (not recommended).

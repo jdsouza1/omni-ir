@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { createParser, type ParserEvent } from "../engine/parser";
 import { COMPONENTS, COMPONENT_TYPES } from "../engine/schema";
@@ -36,6 +37,11 @@ describe("buildSystemPrompt", () => {
       const json = z.toJSONSchema(schema) as { properties: Record<string, unknown> };
       for (const param of Object.keys(json.properties)) expect(prompt, `${tool}.${param}`).toContain(param);
     }
+  });
+
+  it("lists every registered image by name, and no URLs", () => {
+    for (const name of Object.keys(ASSETS)) expect(prompt).toContain(`- ${name}\n`);
+    expect(prompt).not.toMatch(/https?:\/\/|data:image/);
   });
 
   it("states the rules the parser enforces", () => {

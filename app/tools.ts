@@ -2,7 +2,7 @@
 // It is application code, shared by the server (/api/mutate), the browser renderer, tests and the demo.
 // The stream can only name tools listed here (R6); it can never add one.
 import { z } from "zod";
-import type { ToolRegistry } from "../engine/schema";
+import { ISO_DATE, type ToolRegistry } from "../engine/schema";
 
 export const TOOLS: ToolRegistry = {
   "payments.confirm": z.strictObject({
@@ -25,9 +25,13 @@ export const TOOLS: ToolRegistry = {
     message: z.string().trim().min(1).max(2000),
   }),
   // Used by the landing page examples (fixtures/landing/).
-  "bookings.reserve": z.strictObject({
-    dates: z.string().trim().min(1).max(60),
-  }),
+  // Dates are "YYYY-MM-DD", as a DateInput writes them, so they compare as text.
+  "bookings.reserve": z
+    .strictObject({
+      checkIn: z.string().regex(ISO_DATE),
+      checkOut: z.string().regex(ISO_DATE),
+    })
+    .refine((p) => p.checkOut > p.checkIn, { message: "checkOut must be after checkIn", path: ["checkOut"] }),
   "assistant.ask": z.strictObject({
     question: z.string().trim().min(1).max(500),
   }),

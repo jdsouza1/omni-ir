@@ -20,12 +20,12 @@ describe("landing examples", () => {
   it("loads all three tabs from the fixtures, each line split and explained", () => {
     const tabs = loadLandingTabs(".");
     expect(tabs.map((t) => [t.label, t.lines.length])).toEqual([
-      ["Booking", 7],
-      ["Checkout", 7],
-      ["Assistant", 8],
+      ["Booking", 12],
+      ["Checkout", 8],
+      ["Assistant", 9],
     ]);
-    expect(tabs[0]!.lines[0]).toMatchObject({ kw: "root", name: "Card", rest: "([title, place, dates, reserve])", part: "root" });
-    expect(tabs[0]!.lines[3]).toMatchObject({ kw: "$dates", name: "", rest: '"Oct 14 – Oct 17"' });
+    expect(tabs[0]!.lines[0]).toMatchObject({ kw: "root", name: "Card", rest: "([photo, title, stars, place, dates, reserve])", part: "root" });
+    expect(tabs[0]!.lines[6]).toMatchObject({ kw: "$checkIn", name: "", rest: '"2026-10-14"', part: "checkIn" });
     for (const tab of tabs) for (const line of tab.lines) expect(line.explain.length).toBeGreaterThan(10);
   });
 

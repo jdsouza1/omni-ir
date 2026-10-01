@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Divider, Heading, Input, Skeleton, Stack, Text } from "./components";
+import { Badge, Button, Card, DateInput, Divider, Heading, Image, Input, List, ListItem, Message, Rating, Skeleton, Stack, Text } from "./components";
 import type { Catalog } from "./types";
 
 /** The default Trusted Catalog. `satisfies Catalog` makes a missing component a compile error. */
@@ -12,4 +12,10 @@ export const DEFAULT_CATALOG = {
   Divider,
   Badge,
   Skeleton,
+  Image,
+  Rating,
+  DateInput,
+  List,
+  ListItem,
+  Message,
 } satisfies Catalog;

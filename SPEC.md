@@ -33,6 +33,7 @@ payIt = McpMutation(pay, tool="payments.confirm", params={amount: $amount, note:
 - **State:** a named value such as `$amount`, declared by the stream and, for Inputs, edited by the person using the screen.
 - **Reference:** an id or `$key` used in another statement. It may refer to a line that hasn't arrived yet.
 - **Catalog:** the fixed set of components and their allowed props (section 6).
+- **Asset registry:** the app's list of pictures, by name. Streams can only show pictures named in it ([5.17]).
 - **Tool registry:** the app's list of backend actions that may run, each with a schema for its parameters.
 - **Issue:** an error or warning found in a stream, identified by a code (section 7).
 
@@ -115,6 +116,12 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.10]** `$key = value` declares state. The value MUST be a string, number, `true`, `false` or `null`; anything else is an `invalid_props` error.
 - **[5.11]** A prop MAY use a `$key` instead of a literal where section 6 allows `$state`. Every `$key` used MUST be declared by the end of the stream; otherwise it is a `missing_state` error. A component whose state isn't declared yet is pending, like a missing child.
 - **[5.12]** An Input's first argument is the `$key` it edits, and that state MUST hold text. Binding an Input to state that holds anything else is an `input_state_type` error, reported on whichever of the two lines arrives second.
+
+### Images, lists and dates
+
+- **[5.17]** An Image's `asset`, and a ListItem's `image`, MUST name a picture in the app's **asset registry**. A value that isn't shaped like an asset name (lowercase letters, digits and hyphens), such as a URL, is an `invalid_props` error; a well-formed name the registry doesn't have is an `unknown_asset` error. A stream can never make a renderer load a picture from a location it supplies.
+- **[5.18]** A List MUST contain only ListItems, and a ListItem MUST be a child of a List. Breaking either rule is a `list_mismatch` error, reported on whichever of the two lines arrives second.
+- **[5.19]** A DateInput's first argument is the `$key` it edits, and that state MUST hold a date written `"YYYY-MM-DD"` or the empty string. Anything else is an `input_state_type` error, reported as in [5.12].
 
 ### Actions
 
@@ -228,6 +235,76 @@ Skeleton(lines?)
 | Prop | Position | Required | Values |
 |---|---|---|---|
 | `lines` | named only | no | whole number 1-6 |
+
+### Image
+
+```
+Image(asset, alt, ratio?)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `asset` | 1 | yes | image name (max 64) |
+| `alt` | named only | yes | text (min 1, max 300) |
+| `ratio` | named only | no | "1:1" \| "4:3" \| "3:2" \| "16:9" |
+
+### Rating
+
+```
+Rating(value, max?)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `value` | 1 | yes | number \| $state |
+| `max` | named only | no | whole number 1-10 |
+
+### DateInput
+
+```
+DateInput(value, label, min?, max?)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `value` | 1 | yes | $state |
+| `label` | named only | yes | text (min 1, max 200) |
+| `min` | named only | no | date "YYYY-MM-DD" |
+| `max` | named only | no | date "YYYY-MM-DD" |
+
+### List
+
+```
+List(children)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `children` | 1 | yes | [id, …] (max 200) |
+
+### ListItem
+
+```
+ListItem(title, detail?, trailing?, image?)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `title` | 1 | yes | text (max 2000) \| $state |
+| `detail` | named only | no | text (max 2000) \| $state |
+| `trailing` | named only | no | text (max 2000) \| $state |
+| `image` | named only | no | image name (max 64) |
+
+### Message
+
+```
+Message(text, from)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `text` | 1 | yes | text (max 2000) \| $state |
+| `from` | named only | yes | "user" \| "assistant" |
 <!-- /generated:components -->
 
 ### McpMutation
@@ -267,7 +344,9 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 | `cycle` | error | when the line arrives | A component would contain itself through its children. |
 | `root_as_child` | error | when the line arrives | root is listed as a child. |
 | `child_not_component` | error | when the line arrives | A children list names an McpMutation. |
-| `input_state_type` | error | when the line arrives | An Input is bound to state that doesn't hold text. |
+| `unknown_asset` | error | when the line arrives | An Image or ListItem names a picture that isn't in the app's asset registry. |
+| `input_state_type` | error | when the line arrives | An Input is bound to state that doesn't hold text, or a DateInput to state that isn't a YYYY-MM-DD date or empty. |
+| `list_mismatch` | error | when the line arrives | A List contains something other than ListItems, or a ListItem is outside a List. |
 | `duplicate_mutation` | error | when the line arrives | A button that already has an McpMutation gets a second one. |
 | `dangling_ref` | error | at end of stream | A referenced component or McpMutation target never arrived. |
 | `missing_state` | error | at end of stream | A $state key is used but never declared. |
@@ -298,8 +377,15 @@ These rules apply to anything that displays an Omni-IR screen. The reference ren
 - *Tested by:* `tests/renderer.test.tsx`, `tests/e2e.payment.test.tsx`.
 
 **Input and state**
-- Typing into an Input MUST update its `$key`, and every component using that key MUST show the new value. Editing state is local and MUST NOT call the backend by itself.
-- *Tested by:* `tests/renderer.test.tsx`.
+- Typing into an Input or choosing a date in a DateInput MUST update its `$key`, and every component using that key MUST show the new value. Editing state is local and MUST NOT call the backend by itself.
+- *Tested by:* `tests/renderer.test.tsx`, `tests/components.media.test.tsx`.
+
+**Pictures and accessibility**
+- A renderer MUST take an Image's picture only from the app's asset registry, and MUST NOT load a picture from any location written in the stream. It SHOULD send no referrer when loading pictures.
+- If the renderer's registry doesn't have the named picture, it MUST show the Image's `alt` text in its place.
+- An Image MUST expose its `alt` text to assistive technology. A ListItem's thumbnail is decorative, because its title describes it.
+- A Rating MUST expose its value and maximum as text, such as "Rated 4.96 out of 5". A Message SHOULD tell assistive technology who sent it.
+- *Tested by:* `tests/components.media.test.tsx`.
 
 **Failures**
 - If rendering one component fails, only that component MUST be replaced by a fallback; the rest of the screen MUST keep working. The failed component SHOULD retry when its data changes.
@@ -330,6 +416,7 @@ This section describes the reference server in this repository. It isn't require
 What the format prevents:
 - **No code or markup from the model.** There is no syntax for HTML, styles or scripts, and renderers display strings only as text.
 - **No invented components or props.** The catalog is fixed by the app ([5.9]).
+- **No pictures from the model.** Images come only from the app's asset registry ([5.17]), so a stream can't load a tracking pixel, leak data through a URL, or show an arbitrary picture from the web.
 - **No unapproved actions.** Actions need a registered tool and pass three checks: in the parser ([5.14]), in the renderer and on the backend (section 9).
 - **Damage stays contained.** A bad line is rejected on its own ([3.8]), and a failing component only affects its own slot (section 8).
 
@@ -423,7 +510,7 @@ Issues reported:
 
 ## Not yet specified
 
-- More components: images, lists, date pickers, ratings and chat messages.
+- Data-driven lists. A List's items are written out one by one; there are no loops or bindings to collections.
 - A way to update or remove a component after its line has arrived. In v0.1 an id can't be reassigned ([5.3]).
 - A version marker inside the stream.
 - Renderers other than the web reference renderer.

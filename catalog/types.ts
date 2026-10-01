@@ -8,9 +8,20 @@ export type ResolvedProps<K extends ComponentType> = {
   [P in keyof ComponentProps[K]]: Resolve<ComponentProps[K][P]>;
 };
 
-/** Extra props the renderer supplies to interactive components. */
+/** A picture from the app's asset registry, as the renderer resolves it. */
+export interface Picture {
+  src: string;
+  width: number;
+  height: number;
+}
+
+/** Extra props the renderer supplies to interactive components and pictures. */
 export interface InteractionProps {
   Input: { value: string; onChange: (value: string) => void };
+  DateInput: { value: string; onChange: (value: string) => void };
+  /** Undefined when the renderer's asset registry doesn't have the named image. */
+  Image: { picture: Picture | undefined };
+  ListItem: { picture: Picture | undefined };
   Button: {
     /** Undefined when pressing does nothing (disabled, or no handler). */
     onPress: (() => void) | undefined;

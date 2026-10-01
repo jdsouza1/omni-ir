@@ -6,13 +6,54 @@
       "label": "Booking",
       "file": "booking.omni",
       "lines": [
-        { "part": "root", "explain": "The whole screen is one card. Its four parts are listed here and arrive on the lines below." },
-        { "part": "title", "explain": "The listing name, shown as a heading." },
-        { "part": "place", "explain": "Location and rating as quieter text. Tone comes from a fixed list; the model can’t write its own styles." },
-        { "part": "dates", "explain": "A piece of state holding the dates, with a starting value." },
-        { "part": "dates", "explain": "A labelled field the guest can edit. Typing updates $dates." },
-        { "part": "reserve", "explain": "The Reserve button. It has an action, so it stays disabled until the next line approves it." },
-        { "part": "reserve", "explain": "Links the button to one tool the app allows and sends the current dates. The app checks the tool and details before anything runs." }
+        {
+          "part": "root",
+          "explain": "The whole screen is one card. Its six parts are listed here and arrive on the lines below."
+        },
+        {
+          "part": "photo",
+          "explain": "A photo, named from the app’s own picture list. The model can’t give a web address, so a stream can never load an image from somewhere else."
+        },
+        {
+          "part": "title",
+          "explain": "The listing name, shown as a heading."
+        },
+        {
+          "part": "stars",
+          "explain": "A star rating. The app draws the stars and reads the score aloud for screen readers."
+        },
+        {
+          "part": "place",
+          "explain": "The location as quieter text. Tone comes from a fixed list; the model can’t write its own styles."
+        },
+        {
+          "part": "dates",
+          "explain": "A row holding the two date fields. A date range is simply two DateInputs."
+        },
+        {
+          "part": "checkIn",
+          "explain": "State holding the check-in date, written YYYY-MM-DD."
+        },
+        {
+          "part": "checkIn",
+          "explain": "A date picker the guest can change. Picking a day updates $checkIn."
+        },
+        {
+          "part": "checkOut",
+          "explain": "State holding the check-out date."
+        },
+        {
+          "part": "checkOut",
+          "explain": "The second date picker, bound to $checkOut."
+        },
+        {
+          "part": "reserve",
+          "explain": "The Reserve button. It has an action, so it stays disabled until the next line approves it."
+        },
+        {
+          "part": "reserve",
+          "explain": "Links the button to one tool the app allows and sends both dates. The app checks the tool and the dates before anything runs."
+        }
       ]
     },
     {
@@ -20,13 +61,38 @@
       "label": "Checkout",
       "file": "checkout.omni",
       "lines": [
-        { "part": "root", "explain": "One card for the bag, listing its five parts." },
-        { "part": "title", "explain": "The screen’s heading." },
-        { "part": "shirt", "explain": "Each item is a line of text. There’s no list component yet, so items are written out one by one." },
-        { "part": "tote", "explain": "The second item." },
-        { "part": "total", "explain": "The total, formatted as dollars by the app. Omni-IR has no formulas, so the number is given, never calculated." },
-        { "part": "pay", "explain": "The Pay button. It stays disabled until the next line approves it." },
-        { "part": "pay", "explain": "Allows exactly one action, payments.confirm, with the amount to charge. The server checks it again before running it." }
+        {
+          "part": "root",
+          "explain": "One card for the bag, listing its four parts."
+        },
+        {
+          "part": "title",
+          "explain": "The screen’s heading."
+        },
+        {
+          "part": "items",
+          "explain": "A list. It may hold only list items, and the parser rejects anything else."
+        },
+        {
+          "part": "shirt",
+          "explain": "One item: title, details, price and a thumbnail from the app’s picture list."
+        },
+        {
+          "part": "tote",
+          "explain": "The second item. Items are written out one by one; there are no loops."
+        },
+        {
+          "part": "total",
+          "explain": "The total, formatted as dollars by the app. Omni-IR has no formulas, so the number is given, never calculated."
+        },
+        {
+          "part": "pay",
+          "explain": "The Pay button. It stays disabled until the next line approves it."
+        },
+        {
+          "part": "pay",
+          "explain": "Allows exactly one action, payments.confirm, with the amount to charge. The server checks it again before running it."
+        }
       ]
     },
     {
@@ -34,14 +100,42 @@
       "label": "Assistant",
       "file": "assistant.omni",
       "lines": [
-        { "part": "root", "explain": "One card for the conversation and the question box." },
-        { "part": "title", "explain": "The screen’s heading." },
-        { "part": "asked", "explain": "The question already asked, as plain text." },
-        { "part": "answer", "explain": "The answer. Chat bubbles aren’t in the catalog yet, so the conversation is plain text." },
-        { "part": "question", "explain": "State for the next question, starting empty." },
-        { "part": "question", "explain": "A labelled text box. Typing updates $question." },
-        { "part": "send", "explain": "The Send button. It stays disabled until the next line approves it." },
-        { "part": "send", "explain": "Sends the typed question to the one tool the app allows for this." }
+        {
+          "part": "root",
+          "explain": "One card for the conversation and the question box."
+        },
+        {
+          "part": "title",
+          "explain": "The screen’s heading."
+        },
+        {
+          "part": "chat",
+          "explain": "A column holding the conversation so far."
+        },
+        {
+          "part": "asked",
+          "explain": "The guest’s question, as a chat message. The app styles it and tells screen readers who sent it."
+        },
+        {
+          "part": "answer",
+          "explain": "The assistant’s reply. Messages are plain text: markup in them is shown, never run."
+        },
+        {
+          "part": "question",
+          "explain": "State for the next question, starting empty."
+        },
+        {
+          "part": "question",
+          "explain": "A labelled text box. Typing updates $question."
+        },
+        {
+          "part": "send",
+          "explain": "The Send button. It stays disabled until the next line approves it."
+        },
+        {
+          "part": "send",
+          "explain": "Sends the typed question to the one tool the app allows for this."
+        }
       ]
     }
   ]

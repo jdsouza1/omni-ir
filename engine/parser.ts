@@ -16,6 +16,8 @@ export type ParserEvent =
 
 export interface ParserOptions {
   tools: ToolRegistry;
+  /** The app's image asset registry (only its names are used here). Without it, no Image is accepted. */
+  assets?: Readonly<Record<string, unknown>>;
   store?: OmniStore;
   maxLineLength?: number;
 }
@@ -31,7 +33,7 @@ export interface OmniParser {
 
 export function createParser(options: ParserOptions): OmniParser {
   const store = options.store ?? createStore();
-  const ctx = { tools: options.tools };
+  const ctx = { tools: options.tools, assets: Object.keys(options.assets ?? {}) };
   const buffer = new LineBuffer(options.maxLineLength === undefined ? {} : { maxLineLength: options.maxLineLength });
   const accepted: Statement[] = [];
   const lineOf = new Map<string, number>();

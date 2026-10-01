@@ -13,6 +13,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { createParser, type ParserEvent } from "../engine/parser";
 
@@ -57,7 +58,7 @@ export function loadLandingTabs(projectDir: string): LandingTab[] {
   return config.tabs.map((tab) => {
     const source = readFileSync(join(dir, tab.file), "utf8");
     const problems: string[] = [];
-    const parser = createParser({ tools: TOOLS });
+    const parser = createParser({ tools: TOOLS, assets: ASSETS });
     parser.subscribe((e: ParserEvent) => {
       if (e.type === "error" || e.type === "warning") problems.push(`line ${e.issue.line ?? "?"}: ${e.issue.code}: ${e.issue.message}`);
     });

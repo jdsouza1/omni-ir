@@ -3,6 +3,7 @@
 // every parse error and warning with its line, the end-of-stream issues, then the rendered HTML.
 // Exits with code 1 if any file has errors or issues. Costs nothing: it only reads local files.
 import { readFileSync } from "node:fs";
+import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { createParser, type ParserEvent } from "../engine/parser";
 import { bold, dim, green, red, renderHtml, yellow } from "./lib";
@@ -16,7 +17,7 @@ if (files.length === 0) {
 let failed = 0;
 for (const file of files) {
   const source = readFileSync(file, "utf8");
-  const parser = createParser({ tools: TOOLS });
+  const parser = createParser({ tools: TOOLS, assets: ASSETS });
   const errors: ParserEvent[] = [];
   const warnings: ParserEvent[] = [];
   parser.subscribe((e) => {

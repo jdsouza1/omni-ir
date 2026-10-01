@@ -1,7 +1,8 @@
-root = Card([title, asked, answer, question, send])
+root = Card([title, chat, question, send])
 title = Heading("Trip helper")
-asked = Text("You: Any quiet beaches near Lisbon?")
-answer = Text("Try Praia da Ursa. A short hike keeps the crowds away.", tone="muted")
+chat = Stack([asked, answer])
+asked = Message("Any quiet beaches near Lisbon?", from="user")
+answer = Message("Try Praia da Ursa. A short hike keeps the crowds away.", from="assistant")
 $question = ""
 question = Input($question, label="Ask a question", placeholder="Ask anything…")
 send = Button("Send", action="ask")

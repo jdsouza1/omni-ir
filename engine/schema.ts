@@ -61,6 +61,14 @@ const ToolName = z
   .string()
   .max(LIMITS.toolNameLength)
   .regex(/^[a-z][A-Za-z0-9_]*(\.[a-z][A-Za-z0-9_]*)+$/, "tool must look like namespace.action");
+export const ASSET_NAME = /^[a-z0-9][a-z0-9-]*$/;
+/** The name of an image in the app's asset registry; never a URL. */
+const AssetName = z
+  .string()
+  .max(LIMITS.idLength)
+  .regex(ASSET_NAME, "asset names are lowercase letters, digits and hyphens");
+export const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const IsoDate = z.string().regex(ISO_DATE, "dates are written YYYY-MM-DD");
 
 // ---------------------------------------------------------------------------
 // The Trusted Catalog vocabulary. Every prop is an enum or plain text: there is no
@@ -128,6 +136,55 @@ export const COMPONENTS = {
     positional: [],
     props: z.strictObject({ lines: z.number().int().min(1).max(6).optional() }),
   },
+  Image: {
+    positional: ["asset"],
+    props: z.strictObject({
+      asset: AssetName,
+      alt: z.string().min(1).max(300),
+      ratio: z.enum(["1:1", "4:3", "3:2", "16:9"]).optional(),
+    }),
+  },
+  Rating: {
+    positional: ["value"],
+    props: z
+      .strictObject({
+        value: z.union([z.number().finite().min(0), StateRef]),
+        max: z.number().int().min(1).max(10).optional(),
+      })
+      .refine((p) => typeof p.value !== "number" || p.value <= (p.max ?? 5), {
+        message: "value must not be more than max (default 5)",
+        path: ["value"],
+      }),
+  },
+  DateInput: {
+    positional: ["value"],
+    props: z.strictObject({
+      value: StateRef,
+      label: z.string().min(1).max(200),
+      min: IsoDate.optional(),
+      max: IsoDate.optional(),
+    }),
+  },
+  List: {
+    positional: ["children"],
+    props: z.strictObject({ children: Children }),
+  },
+  ListItem: {
+    positional: ["title"],
+    props: z.strictObject({
+      title: TextOrState,
+      detail: TextOrState.optional(),
+      trailing: TextOrState.optional(),
+      image: AssetName.optional(),
+    }),
+  },
+  Message: {
+    positional: ["text"],
+    props: z.strictObject({
+      text: TextOrState,
+      from: z.enum(["user", "assistant"]),
+    }),
+  },
 } as const satisfies Record<string, { positional: readonly string[]; props: z.ZodObject }>;
 
 export type ComponentType = keyof typeof COMPONENTS;
@@ -184,6 +241,8 @@ export type ToolRegistry = Readonly<Record<string, z.ZodType>>;
 
 export interface ValidationContext {
   tools: ToolRegistry;
+  /** Names of the images the app registered. When absent, no image asset is accepted. */
+  assets?: readonly string[];
 }
 
 export type StatementResult = { ok: true; statement: Statement } | { ok: false; issues: Issue[] };
@@ -299,6 +358,16 @@ export function validateStatement(raw: RawStatement, ctx: ValidationContext): St
   if (!parsed.success) return { ok: false, issues: zodIssues(parsed.error, raw.id) };
 
   const { children, ...rest } = parsed.data as { children?: NodeRef[] } & Record<string, unknown>;
+
+  // Images come only from the app's asset registry (never a URL).
+  const asset = type === "Image" ? rest.asset : type === "ListItem" ? rest.image : undefined;
+  if (typeof asset === "string" && !(ctx.assets ?? []).includes(asset)) {
+    return {
+      ok: false,
+      issues: [{ code: "unknown_asset", message: `image "${asset}" is not in the app's asset registry`, id: raw.id }],
+    };
+  }
+
   const node = {
     kind: "node",
     id: raw.id,
@@ -425,12 +494,40 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
     }
   }
 
-  // Inputs edit text, so their state must hold a string.
+  // Inputs edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD date or "".
   for (const node of nodes) {
-    if (node.type !== "Input") continue;
+    if (node.type !== "Input" && node.type !== "DateInput") continue;
     const key = node.props.value.key;
-    if (state.has(key) && typeof state.get(key) !== "string") {
+    if (!state.has(key)) continue;
+    const value = state.get(key);
+    if (node.type === "Input" && typeof value !== "string") {
       issues.push({ code: "input_state_type", message: `Input "${node.id}" is bound to ${key}, which is not a string`, id: node.id });
+    }
+    if (node.type === "DateInput" && !(value === "" || (typeof value === "string" && ISO_DATE.test(value)))) {
+      issues.push({
+        code: "input_state_type",
+        message: `DateInput "${node.id}" is bound to ${key}, which is not a YYYY-MM-DD date or ""`,
+        id: node.id,
+      });
+    }
+  }
+
+  // A List holds only ListItems, and a ListItem only sits in a List.
+  for (const node of nodes) {
+    if (node.type === "List") {
+      for (const child of node.children) {
+        const c = byId.get(child);
+        if (c?.kind === "node" && c.type !== "ListItem") {
+          issues.push({ code: "list_mismatch", message: `List "${node.id}" can only contain ListItems, not ${c.type} "${child}"`, id: node.id });
+        }
+      }
+    }
+    if (node.type === "ListItem") {
+      const parent = parentOf.get(node.id);
+      const p = parent === undefined ? undefined : byId.get(parent);
+      if (p?.kind === "node" && p.type !== "List") {
+        issues.push({ code: "list_mismatch", message: `ListItem "${node.id}" must be inside a List, not ${p.type} "${parent}"`, id: node.id });
+      }
     }
   }
 

@@ -3,6 +3,7 @@
 // browser's parser and schema, the trusted zone.
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import { z } from "zod";
+import { ASSETS, type AssetRegistry } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { createParser } from "../engine/parser";
 import type { ToolRegistry } from "../engine/schema";
@@ -15,6 +16,8 @@ export interface AppOptions {
   model: Model;
   /** Tools the server will run; defaults to the shared registry. */
   tools?: ToolRegistry;
+  /** Image assets streams may name; defaults to the shared registry. */
+  assets?: AssetRegistry;
   /** Handler per tool; defaults to the stubs. */
   handlers?: Readonly<Record<string, ToolHandler>>;
   /** Heartbeat interval for SSE streams (default 15 s). */
@@ -44,6 +47,7 @@ export function createApp({
   config,
   model,
   tools = TOOLS,
+  assets = ASSETS,
   handlers = STUB_HANDLERS,
   heartbeatMs = 15_000,
   log = defaultLog,
@@ -106,7 +110,7 @@ export function createApp({
 
     // Observer: parses the same text server-side purely to log how well the model followed the
     // protocol. It never changes what is forwarded; the browser's parser is the one that matters.
-    const observer = createParser({ tools });
+    const observer = createParser({ tools, assets });
     const parse = { errors: {} as Record<string, number>, warnings: {} as Record<string, number> };
     observer.subscribe((e) => {
       if (e.type === "error") parse.errors[e.issue.code] = (parse.errors[e.issue.code] ?? 0) + 1;

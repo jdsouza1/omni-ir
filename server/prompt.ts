@@ -4,12 +4,15 @@
 import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { z } from "zod";
+import { ASSETS, type AssetRegistry } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { describeComponent, describeValue, type JsonSchema } from "../engine/describe";
 import { COMPONENT_TYPES, type ToolRegistry } from "../engine/schema";
 
 export interface PromptOptions {
   tools?: ToolRegistry;
+  /** Images the model may name; defaults to the shared registry. */
+  assets?: AssetRegistry;
   fixturesDir?: string;
   /** Fixture names used as examples, in order. */
   examples?: string[];
@@ -19,6 +22,7 @@ const DEFAULT_EXAMPLES = ["payment-confirmation", "sign-in", "order-status"];
 
 export function buildSystemPrompt(options: PromptOptions = {}): string {
   const tools = options.tools ?? TOOLS;
+  const assets = options.assets ?? ASSETS;
   const dir = options.fixturesDir ?? resolve("fixtures");
   const examples = (options.examples ?? DEFAULT_EXAMPLES).map((name) =>
     readFileSync(join(dir, `${name}.omni`), "utf8")
@@ -51,7 +55,10 @@ Write \`root = …\` first and its parts after it; referring to an id before its
   A Button without \`action\` stays in the page (for example Cancel).
 - An Input edits a text state: declare \`$note = ""\` and write \`note = Input($note, label="Note")\`. Send typed values to the backend through McpMutation params.
 - There is no styling, HTML or CSS. Choose among the listed values.
-- Use only the components and tools listed here. If a request needs something that isn't available, build the closest screen you can with what is.
+- An Image or a ListItem's image shows a picture the app provides: name one from the Images list below. There are no URLs.
+- A List holds only ListItems, and a ListItem goes only in a List.
+- A DateInput edits a date state written \`"YYYY-MM-DD"\`, or \`""\` for none: declare \`$checkIn = ""\` and write \`checkIn = DateInput($checkIn, label="Check-in")\`. A date range is two DateInputs.
+- Use only the components, tools and images listed here. If a request needs something that isn't available, build the closest screen you can with what is.
 
 ## Components
 ${COMPONENT_TYPES.map(componentBlock).join("\n\n")}
@@ -65,6 +72,9 @@ McpMutation(target, tool, params?)
 ${Object.entries(tools)
   .map(([name, schema]) => describeTool(name, schema))
   .join("\n")}
+
+## Images
+${Object.keys(assets).length ? Object.keys(assets).map((name) => `- ${name}`).join("\n") : "(none: don't use Image)"}
 
 ## Examples
 ${examples.map((example) => `<example>\n${example}\n</example>`).join("\n\n")}
