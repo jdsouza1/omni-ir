@@ -48,10 +48,10 @@ The same shape as the iOS renderer, which worked well:
 - [x] B.4 Document rules, document updates, local state edits, parser events; parser tests beyond the suite
 - [x] B.5 CI: core tests on Linux
 
-**C. omni-ir-compose: model** *(tested on the JVM)*
-- [ ] C.1 `OmniStore` (Compose state), slots, `$state` resolution, governance (blocked until a value changes), handler failures
-- [ ] C.2 Text formats (currency, date-only values on the same day in every time zone), ratings, dates
-- [ ] C.3 Server client: event-stream decoding (tested everywhere) and the HTTP calls for `/api/generate` and `/api/mutate`
+**C. Renderer logic** *(tested on the JVM)* *Done 2026-10-01 as its own plain-Kotlin module, `omni-ir-runtime`, so it is tested on any computer (17 tests, including the client against a real local HTTP server); `omni-ir-compose` only draws it. The client uses the JDK's own HTTP and a small JSON helper, so the runtime has no dependency beyond coroutines.*
+- [x] C.1 `OmniStore` (Compose state), slots, `$state` resolution, governance (blocked until a value changes), handler failures
+- [x] C.2 Text formats (currency, date-only values on the same day in every time zone), ratings, dates
+- [x] C.3 Server client: event-stream decoding (tested everywhere) and the HTTP calls for `/api/generate` and `/api/mutate`
 
 **D. omni-ir-compose: views** *(checkpoint: you review screenshots and a recording)*
 - [ ] D.1 The 15 catalog components with Material 3, light and dark, font scaling, TalkBack labels (Rating reads "Rated 4.96 out of 5"; Message says who sent it)

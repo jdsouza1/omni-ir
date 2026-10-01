@@ -1,6 +1,7 @@
-// Omni-IR for Android (PLAN-ANDROID.md). omni-ir-core is plain Kotlin on the JVM, so it builds and
-// tests anywhere; the Android modules need the Android SDK and are included only when one is found
-// (on CI, or locally with ANDROID_HOME or local.properties).
+// Omni-IR for Android (PLAN-ANDROID.md). omni-ir-core (parser) and omni-ir-runtime (store,
+// governance, formats, client) are plain Kotlin on the JVM, so they build and test anywhere. The
+// Android modules need the Android SDK and are included only when one is found (on CI, or locally
+// with ANDROID_HOME or local.properties).
 pluginManagement {
   repositories {
     google()
@@ -19,7 +20,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "omni-ir-android"
 
-include(":omni-ir-core")
+include(":omni-ir-core", ":omni-ir-runtime")
 
 val hasAndroidSdk = System.getenv("ANDROID_HOME") != null ||
   System.getenv("ANDROID_SDK_ROOT") != null ||

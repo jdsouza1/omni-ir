@@ -1,0 +1,142 @@
+// The renderer's model: what each node resolves to, governance, actions and formats.
+// Port of swift/Tests/OmniIRSwiftUITests/OmniStoreTests.swift.
+package dev.omniir.runtime
+
+import dev.omniir.core.IssueCode
+import dev.omniir.core.Primitive
+import dev.omniir.core.Tool
+import dev.omniir.core.ToolRegistry
+import kotlinx.coroutines.test.runTest
+import java.util.Locale
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertIs
+import kotlin.test.assertNull
+
+private val tools: ToolRegistry = mapOf(
+  "payments.confirm" to Tool { params ->
+    val amount = (params["amount"] as? Primitive.Number)?.value
+    if (amount != null && amount > 0) emptyList() else listOf("amount: must be more than 0")
+  },
+  "bookings.reserve" to Tool.acceptsAnything,
+)
+
+private const val PAYMENT = """root = Card([title, amountField, pay, cancel])
+title = Heading("Confirm payment")
+${'$'}amount = 42.5
+amountField = Text(${'$'}amount, format="currency")
+pay = Button("Pay", action="pay")
+payM = McpMutation(pay, tool="payments.confirm", params={amount: ${'$'}amount, note: "Table 4"})
+cancel = Button("Cancel", variant="secondary")
+"""
+
+class OmniStoreTest {
+  @Test
+  fun `slots - a node once it arrives, a placeholder before, a fallback if it never does`() {
+    val store = OmniStore(tools)
+    store.write("root = Card([title, gone])\n")
+    assertEquals(Slot.Pending, store.slot("title"))
+    store.write("title = Heading(\"Hi\")\n")
+    val title = assertIs<Slot.Node>(store.slot("title")).node
+    assertEquals("Hi", store.text(title.props["text"]))
+    store.end()
+    assertEquals(Slot.Missing, store.slot("gone"))
+  }
+
+  @Test
+  fun `state props show the current value, and edits update every use`() {
+    val store = OmniStore(tools)
+    store.write("root = Stack([f, echo])\n\$note = \"\"\nf = Input(\$note, label=\"Note\")\necho = Text(\$note)\n")
+    store.setState("\$note", Primitive.Text("hello"))
+    val echo = assertIs<Slot.Node>(store.slot("echo")).node
+    assertEquals("hello", store.text(echo.props["text"]))
+    assertEquals("hello", store.stateText("\$note"))
+  }
+
+  @Test
+  fun `a governed Button is disabled until its McpMutation arrives, then sends resolved params`() = runTest {
+    val store = OmniStore(tools)
+    val (before, after) = PAYMENT.split("payM =")
+    store.write(before)
+    assertEquals(Governance.Ungoverned, store.governance("pay"))
+    store.write("payM =$after")
+    store.end()
+    assertEquals(Governance.Ready("payments.confirm"), store.governance("pay"))
+
+    val calls = mutableListOf<MutationCall>()
+    val events = mutableListOf<RendererEvent>()
+    store.press("pay", { calls += it }, { events += it })
+    assertEquals(
+      listOf(MutationCall("payM", "pay", "payments.confirm", mapOf("amount" to Primitive.Number(42.5), "note" to Primitive.Text("Table 4")))),
+      calls,
+    )
+    assertEquals(emptyList(), events)
+  }
+
+  @Test
+  fun `params that fail the tool's check block the Button until a value it used changes`() = runTest {
+    val store = OmniStore(tools)
+    store.write(PAYMENT.replace("\$amount = 42.5", "\$amount = 0"))
+    store.end()
+    var calls = 0
+    val events = mutableListOf<RendererEvent>()
+    store.press("pay", { calls++ }, { events += it })
+    assertEquals(0, calls)
+    assertEquals(listOf(IssueCode.MUTATION_BLOCKED), events.map { assertIs<RendererEvent.Error>(it).issue.code })
+    assertEquals(Governance.Blocked("payments.confirm", "amount: must be more than 0"), store.governance("pay"))
+    store.setState("\$amount", Primitive.Number(5.0))
+    assertEquals(Governance.Ready("payments.confirm"), store.governance("pay"))
+  }
+
+  @Test
+  fun `a failing handler is reported, and a Button without an action only reports the press`() = runTest {
+    val store = OmniStore(tools)
+    store.write(PAYMENT)
+    store.end()
+    val events = mutableListOf<RendererEvent>()
+    store.press("pay", { throw IllegalStateException("refused") }, { events += it })
+    store.press("cancel", { error("cancel must never reach the backend") }, { events += it })
+    assertEquals(2, events.size)
+    val failed = assertIs<RendererEvent.Error>(events[0]).issue
+    assertEquals(IssueCode.HANDLER_FAILED, failed.code)
+    assertEquals("pay", failed.id)
+    assertEquals(RendererEvent.Press("cancel"), events[1])
+    assertFalse(store.isRunning("pay"))
+  }
+}
+
+class FormatTest {
+  private val us = Locale.US
+
+  @Test
+  fun `text formats - currency, a date-only value on its own day everywhere, other text as is`() {
+    assertEquals("$42.50", Format.text(Primitive.Number(42.5), "currency", null, us))
+    assertEquals("€1,200.00", Format.text(Primitive.Number(1200.0), "currency", "EUR", us))
+    for (zone in listOf("America/Los_Angeles", "UTC", "Pacific/Kiritimati")) {
+      assertEquals("Sep 30, 2026", Format.text(Primitive.Text("2026-09-30"), "date", null, us, java.time.ZoneId.of(zone)), zone)
+    }
+    assertEquals("next Tuesday", Format.text(Primitive.Text("next Tuesday"), "date", null, us))
+    assertEquals("4", Format.text(Primitive.Number(4.0), null, null, us))
+    assertEquals("4.96", Format.text(Primitive.Number(4.96), null, null, us))
+    assertEquals("true", Format.text(Primitive.Bool(true), null, null, us))
+    assertEquals("", Format.text(Primitive.Null, null, null, us))
+  }
+
+  @Test
+  fun `ratings are kept within 0 to max and read as Rated x out of max`() {
+    assertEquals("Rated 4.96 out of 5", Format.rating(Primitive.Number(4.96), null, us).label)
+    assertEquals(5, Format.rating(Primitive.Number(4.96), null, us).filled)
+    assertEquals("Rated 5 out of 5", Format.rating(Primitive.Number(9.0), null, us).label)
+    assertEquals("Rated 0 out of 10", Format.rating(Primitive.Number(-2.0), 10, us).label)
+    assertEquals(3.5, Format.rating(Primitive.Text("3.5"), null, us).value)
+    assertEquals(0.0, Format.rating(Primitive.Text("lots"), null, us).value)
+  }
+
+  @Test
+  fun `impossible dates are rejected`() {
+    assertEquals("2026-10-14", Format.day("2026-10-14").toString())
+    assertNull(Format.day("2026-02-30"))
+    assertNull(Format.day("14/10/2026"))
+  }
+}
