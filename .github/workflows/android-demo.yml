@@ -1,0 +1,84 @@
+# Builds the Android demo app (android/demo), runs its UI tests on an emulator, including end to end
+# against the repo's Express server (free mock model), and keeps screenshots, a screen recording and an
+# installable debug APK as a downloadable artifact for review (PLAN-ANDROID.md, E). Mock data only;
+# nothing paid. GitHub-hosted Linux runners, emulator included, are free for public repos.
+name: Android demo
+
+on:
+  push:
+    branches: [main, "wip/**"]
+    paths: ["android/**", "fixtures/**", "server/**", ".github/workflows/android-demo.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-demo-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  demo:
+    name: Demo app on the Android emulator
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Start the Omni-IR server (free mock model)
+        env:
+          OMNI_MODEL: mock # never a paid model in CI
+        run: |
+          npm ci
+          nohup npm run server:start > server.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://localhost:8787/api/health && exit 0; sleep 1; done
+          cat server.log; exit 1
+
+      - name: Build the app and its UI tests
+        working-directory: android
+        run: ./gradlew :demo:assembleDebug :demo:assembleDebugAndroidTest --console=plain
+
+      - name: UI tests, screenshots and recording on the emulator
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          disable-animations: true
+          working-directory: android
+          script: |
+            ./gradlew :demo:connectedDebugAndroidTest --console=plain -Pandroid.testInstrumentationRunnerArguments.server=http://10.0.2.2:8787
+            bash scripts/review.sh
+
+      - name: Collect the review files
+        if: always()
+        run: |
+          mkdir -p android/review
+          cp android/demo/build/outputs/apk/debug/demo-debug.apk android/review/ || true
+          cp server.log android/review/ || true
+          cp -r android/demo/build/reports/androidTests android/review/test-report || true
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: android-review
+          path: android/review/
+          retention-days: 30

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from app/assets.ts by `npm run android:drawables`; do not edit. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+  <path android:pathData="M24,0 H176 A24,24 0 0 1 200,24 V176 A24,24 0 0 1 176,200 H24 A24,24 0 0 1 0,176 V24 A24,24 0 0 1 24,0 Z"
+      android:fillColor="#f5f0e6" />
+  <path android:pathData="M70 40 L100 52 L130 40 L170 62 L156 98 L140 90 V166 H60 V90 L44 98 L30 62Z"
+      android:fillColor="#d6c3a1"
+      android:strokeColor="#a8916a"
+      android:strokeWidth="3"
+      android:strokeLineJoin="round" />
+  <path android:pathData="M100 52 V166"
+      android:fillColor="#000000"
+      android:strokeColor="#a8916a"
+      android:strokeWidth="3" />
+  <path android:pathData="M97,78 A3,3 0 1 0 103,78 A3,3 0 1 0 97,78 Z"
+      android:fillColor="#a8916a" />
+  <path android:pathData="M97,104 A3,3 0 1 0 103,104 A3,3 0 1 0 97,104 Z"
+      android:fillColor="#a8916a" />
+  <path android:pathData="M97,130 A3,3 0 1 0 103,130 A3,3 0 1 0 97,130 Z"
+      android:fillColor="#a8916a" />
+</vector>

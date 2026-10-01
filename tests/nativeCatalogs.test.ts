@@ -54,3 +54,29 @@ describe("Kotlin catalog (Schema.generated.kt)", () => {
     expect(readFileSync(KOTLIN_SCHEMA_PATH, "utf8")).toBe(renderKotlinSchema());
   });
 });
+
+describe("Android", () => {
+  it("demo pictures match app/assets.ts (run npm run android:drawables if this fails)", async () => {
+    const { renderDrawables, DRAWABLE_DIR } = await import("../scripts/android-demo-drawables");
+    for (const [file, text] of Object.entries(renderDrawables())) expect(readFileSync(`${DRAWABLE_DIR}/${file}`, "utf8"), file).toBe(text);
+  });
+
+  // Compose can't catch a composable that fails, so the renderer must never trap on stream data
+  // (SPEC.md section 8, Failures). `!!` is Kotlin's forced unwrap; none are allowed in the sources.
+  it("Kotlin sources contain no !!", async () => {
+    const { readdirSync, statSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir).flatMap((e) => (statSync(join(dir, e)).isDirectory() ? (e === "build" ? [] : walk(join(dir, e))) : e.endsWith(".kt") ? [join(dir, e)] : []));
+    const offending = ["android/omni-ir-core/src/main", "android/omni-ir-runtime/src/main", "android/omni-ir-compose/src/main"]
+      .flatMap(walk)
+      .flatMap((file) =>
+        readFileSync(file, "utf8")
+          .split("\n")
+          .map((line, i) => ({ file, i, code: line.replace(new RegExp("//.*$"), "").replace(new RegExp(String.raw`"(?:[^"\\]|\\.)*"`, "g"), '""') }))
+          .filter(({ code }) => code.includes("!!"))
+          .map(({ file, i }) => `${file}:${i + 1}`),
+      );
+    expect(offending).toEqual([]);
+  });
+});

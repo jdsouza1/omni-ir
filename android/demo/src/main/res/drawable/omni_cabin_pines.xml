@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from app/assets.ts by `npm run android:drawables`; do not edit. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="640dp"
+    android:height="400dp"
+    android:viewportWidth="640"
+    android:viewportHeight="400">
+  <path android:pathData="M0,0 H640 V400 H0 Z">
+    <aapt:attr name="android:fillColor">
+      <gradient android:type="linear" android:startX="0" android:startY="0" android:endX="0" android:endY="400">
+        <item android:offset="0" android:color="#c7d2fe" />
+        <item android:offset="1" android:color="#fde68a" />
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path android:pathData="M0 300 Q160 250 320 290 T640 270 V400 H0Z"
+      android:fillColor="#94a3b8" />
+  <path android:pathData="M0 330 Q200 300 400 330 T640 320 V400 H0Z"
+      android:fillColor="#475569" />
+  <path android:pathData="M90 330 l45-150 45 150Z"
+      android:fillColor="#14532d" />
+  <path android:pathData="M60 340 l40-120 40 120Z"
+      android:fillColor="#14532d" />
+  <path android:pathData="M500 330 l50-170 50 170Z"
+      android:fillColor="#14532d" />
+  <path android:pathData="M560 345 l35-110 35 110Z"
+      android:fillColor="#14532d" />
+  <path android:pathData="M250 340 V255 L320 205 L390 255 V340Z"
+      android:fillColor="#92400e" />
+  <path android:pathData="M235 262 L320 196 L405 262"
+      android:strokeColor="#451a03"
+      android:strokeWidth="12"
+      android:strokeLineJoin="round" />
+  <path android:pathData="M305,290 H335 V340 H305 Z"
+      android:fillColor="#451a03" />
+  <path android:pathData="M265,270 H293 V294 H265 Z"
+      android:fillColor="#fde68a" />
+  <path android:pathData="M348,270 H376 V294 H348 Z"
+      android:fillColor="#fde68a" />
+</vector>
