@@ -81,12 +81,17 @@ struct NodeSlot: View {
 /// A list of children, each in its own slot.
 struct Children: View {
   let ids: [String]
+  /// Fill the container's width (column layouts).
   var stretch = false
+  /// Keep each child at its natural width, without wrapping (row layouts that may not fit).
+  var natural = false
 
   var body: some View {
     ForEach(ids, id: \.self) { id in
       if stretch {
         NodeSlot(id: id).frame(maxWidth: .infinity, alignment: .leading)
+      } else if natural {
+        NodeSlot(id: id).fixedSize(horizontal: true, vertical: false)
       } else {
         NodeSlot(id: id)
       }

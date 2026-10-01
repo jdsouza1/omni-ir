@@ -65,7 +65,8 @@ struct NodeView: View {
       let vertical: VerticalAlignment = align == "start" ? .top : align == "end" ? .bottom : .center
       // A row that doesn't fit (narrow screens, large text) stacks vertically instead of squeezing.
       ViewThatFits(in: .horizontal) {
-        HStack(alignment: vertical, spacing: gap) { Children(ids: node.children) }
+        // Each item at its natural single-line width; if they don't all fit, the next layout is used.
+        HStack(alignment: vertical, spacing: gap) { Children(ids: node.children, natural: true) }
         VStack(alignment: .leading, spacing: gap) { Children(ids: node.children, stretch: true) }
       }
     } else {
