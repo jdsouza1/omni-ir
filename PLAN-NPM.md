@@ -35,7 +35,7 @@ The server, playground, fixtures and tests stay in the repo and aren't published
 - **Checked as a user gets them:** the install test packs the tarballs, installs them in a fresh project, renders a screen in Node, type-checks the README example with TypeScript 5 (`nodenext` and `bundler`), and bundles with Vite. Packed sizes: core about 23 KB, react about 17 KB.
 
 ## G. First release: steps (only with your go-ahead)
-1. Decide whether the npm account's email may be public (npm shows it in package metadata), and change it first if not.
+1. ~~Decide whether the npm account's email may be public.~~ Done 2026-09-30: the npm account uses a dedicated project email.
 2. On your machine: `npm login`, then `npm run build:packages && npm run pack:check`, then `npm publish --workspace packages/core` and `npm publish --workspace packages/react` (each asks for your security key).
 3. On npmjs.com, for each package: Settings → Trusted Publisher → GitHub Actions: user `jdsouza1`, repository `omni-ir`, workflow `release.yml`, environment `npm-publish`. Then set "Publishing access" to require two-factor authentication and disallow tokens.
 4. On GitHub: Settings → Environments → `npm-publish` → add yourself as a required reviewer.
