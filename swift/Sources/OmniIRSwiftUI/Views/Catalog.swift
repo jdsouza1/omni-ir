@@ -5,6 +5,13 @@
 #if canImport(SwiftUI)
 import SwiftUI
 
+/// A card's fill: the system's grouped-content colour (white in light mode, dark grey in dark mode).
+#if os(iOS)
+private let cardFill = Color(uiColor: .secondarySystemGroupedBackground)
+#else
+private let cardFill = Color(nsColor: .controlBackgroundColor)
+#endif
+
 struct NodeView: View {
   let node: OmniNode
   let context: RenderContext
@@ -56,7 +63,11 @@ struct NodeView: View {
     let align = option("align") ?? "stretch"
     if option("direction") == "row" {
       let vertical: VerticalAlignment = align == "start" ? .top : align == "end" ? .bottom : .center
-      HStack(alignment: vertical, spacing: gap) { Children(ids: node.children) }
+      // A row that doesn't fit (narrow screens, large text) stacks vertically instead of squeezing.
+      ViewThatFits(in: .horizontal) {
+        HStack(alignment: vertical, spacing: gap) { Children(ids: node.children) }
+        VStack(alignment: .leading, spacing: gap) { Children(ids: node.children, stretch: true) }
+      }
     } else {
       let horizontal: HorizontalAlignment = align == "center" ? .center : align == "end" ? .trailing : .leading
       VStack(alignment: horizontal, spacing: gap) { Children(ids: node.children, stretch: align == "stretch") }
@@ -72,7 +83,7 @@ struct NodeView: View {
     }
     .padding(20)
     .frame(maxWidth: 512, alignment: .leading)
-    .background(.background, in: RoundedRectangle(cornerRadius: 12))
+    .background(cardFill, in: RoundedRectangle(cornerRadius: 12))
     .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.separator))
     .accessibilityElement(children: .contain)
   }

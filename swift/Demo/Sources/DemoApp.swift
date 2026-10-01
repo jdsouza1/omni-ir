@@ -86,7 +86,7 @@ struct ScreenView: View {
       }
       .padding()
     }
-    .background(.background.secondary)
+    .background(Color(uiColor: .systemGroupedBackground))
     .navigationTitle(fixture.title)
     .navigationBarTitleDisplayMode(.inline)
     .task { await stream() }
