@@ -43,6 +43,8 @@ Open http://localhost:5173, then pick an example or describe a screen. The playg
 
 ## How it works
 
+Diagram and step-by-step walkthrough: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ```
 model text ──► /api/generate (SSE) ──► line buffer ──► tokenizer ──► schema ──► store ──► React renderer
                                         (bytes→lines)   (text→AST)  (Zod rules) (snapshots) (Trusted Catalog)
@@ -86,6 +88,8 @@ To check how well a model follows the protocol without paying for API calls, pas
 The format is specified in [SPEC.md](SPEC.md). Design decisions and build history are in [PLAN.md](PLAN.md), [PLAN-SERVER.md](PLAN-SERVER.md), [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md) and [PLAN-SPEC.md](PLAN-SPEC.md).
 
 ## Roadmap
+
+What is done and what is planned, with dates: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 - Playground visual design (in progress)
 - More components (images, lists, date pickers)

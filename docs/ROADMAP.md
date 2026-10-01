@@ -1,0 +1,50 @@
+# Omni-IR roadmap
+
+Updated 2026-09-30. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
+
+## Done
+
+| Phase | Work | Where |
+|---|---|---|
+| 1 · Core spec | Syntax spec v0.1 draft | [SPEC.md](../SPEC.md) |
+| 1 · Core spec | Zod validation schemas | `engine/schema.ts` |
+| 1 · Core spec | Conformance suite (42 cases) | [conformance/](../conformance/README.md) |
+| 2 · Web reference | Streaming parser in TypeScript, written test-first | `engine/` |
+| 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `catalog/`, `renderer/` |
+| 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |
+| 2 · Web reference | Interactive Playground (all but the visual design) | `playground/` |
+
+## Planned
+
+```mermaid
+%%{init: {"gantt": {"leftPadding": 175}}}%%
+gantt
+    title Remaining work (original planned dates)
+    dateFormat YYYY-MM-DD
+    axisFormat %b '%y
+    tickInterval 2month
+    todayMarker off
+
+    section Phase 1 · Core spec
+    Publish Zod schemas as an npm package :p1, 2026-11-15, 2026-12-31
+
+    section Phase 2 · Web reference
+    Publish React Catalog SDK on npm :p2, 2027-01-15, 2027-03-15
+    Playground visual design :p3, 2027-02-01, 2027-04-01
+
+    section Phase 3 · Cross-platform
+    iOS (SwiftUI) renderer :p4, 2027-04-01, 2027-07-15
+    Android (Compose) renderer :p5, 2027-05-15, 2027-08-01
+
+    section Phase 4 · Ecosystem
+    Bi-directional AST sync tooling :p6, 2027-08-01, 2027-11-01
+```
+
+The playground design can start as soon as the design is ready; its date is the original plan's.
+
+## Not yet scheduled
+
+- More components: images, lists, date pickers, ratings and chat messages.
+- Real backend tool handlers with authorization, in place of the stubs.
+- A check of how well a real model follows the protocol (free manual check with `npm run validate`, or a paid run only with the owner's go-ahead).
+- A written goal for the bi-directional AST sync tooling, before that work starts.
