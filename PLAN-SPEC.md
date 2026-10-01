@@ -2,7 +2,7 @@
 
 Goal: one document that someone could use to build a compatible parser or renderer (for example the planned iOS and Android renderers) without reading this repo's code. It is what the landing page's "Read the spec" button will point to. Costs nothing: it's writing plus local tests.
 
-Status: **APPROVED 2026-09-30.** Decided: (1) MUST / SHOULD / MAY with short plain sentences; (2) conformance suite included; (3) transport section is informative.
+Status: **DONE 2026-09-30 (tasks A–G).** Decided: (1) MUST / SHOULD / MAY with short plain sentences; (2) conformance suite included; (3) transport section is informative.
 
 ## Principles
 - **The code stays the authority, and the spec can't drift from it.** Parts that already exist as data (component props and allowed values, issue codes, size limits) are **generated from the schema** into SPEC.md. A test fails if SPEC.md is out of date, the same way the system prompt works today.
@@ -57,14 +57,14 @@ Status: **APPROVED 2026-09-30.** Decided: (1) MUST / SHOULD / MAY with short pla
 - **Checkpoint:** every example in SPEC.md is validated by the test in A.3
 
 ### Task F: Conformance suite (see Q2)
-- [ ] F.1 `conformance/cases/*.json`: about 40 language-neutral cases, each with an input stream and the expected result (accepted nodes, state, issues with codes and lines). Covers the stream, grammar, document rules and end-of-stream checks.
-- [ ] F.2 A runner test showing this repo's TypeScript implementation passes every case
-- [ ] F.3 `conformance/README.md`: how another implementation (Swift, Kotlin) uses the cases
+- [x] F.1 `conformance/cases/*.json`: about 40 language-neutral cases, each with an input stream and the expected result (accepted nodes, state, issues with codes and lines). Covers the stream, grammar, document rules and end-of-stream checks.
+- [x] F.2 A runner test showing this repo's TypeScript implementation passes every case
+- [x] F.3 `conformance/README.md`: how another implementation (Swift, Kotlin) uses the cases
 - **Checkpoint:** all cases pass; each normative rule in sections 3–7 references at least one case
 
 ### Task G: Wire-up
-- [ ] G.1 README links to SPEC.md; CLAUDE.md lists `npm run spec` and the conformance suite
-- [ ] G.2 Mark the spec "v0.1 draft" and record decisions in this plan
+- [x] G.1 README links to SPEC.md; CLAUDE.md lists `npm run spec` and the conformance suite
+- [x] G.2 Mark the spec "v0.1 draft" and record decisions in this plan
 - **Checkpoint:** `npm test`, typecheck and `npm run spec -- --check` all pass
 
 ## Not in this step

@@ -1,0 +1,180 @@
+{
+  "area": "stream",
+  "cases": [
+    {
+      "id": "stream-utf8",
+      "rules": [
+        "3.1",
+        "3.3"
+      ],
+      "description": "Multi-byte characters decode correctly however the bytes are split.",
+      "input": "root = Text(\"Café ☕ 日本\")\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Text",
+            "props": {
+              "text": "Café ☕ 日本"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "stream-crlf",
+      "rules": [
+        "3.2"
+      ],
+      "description": "\\r\\n line endings behave like \\n.",
+      "input": "root = Stack([a])\r\na = Divider()\r\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a"
+            ]
+          },
+          "a": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "stream-no-final-newline",
+      "rules": [
+        "3.4"
+      ],
+      "description": "A last line without a line ending is processed at end of stream.",
+      "input": "root = Divider()",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "stream-line-numbers",
+      "rules": [
+        "3.5",
+        "3.6",
+        "7.2",
+        "7.4"
+      ],
+      "description": "Blank and comment lines count toward line numbers.",
+      "input": "# a comment\n\nroot = Stack([a])\n   \nb = Nope()\na = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 5,
+            "code": "unknown_component"
+          }
+        ]
+      }
+    },
+    {
+      "id": "stream-only-comments",
+      "rules": [
+        "3.6"
+      ],
+      "description": "Comment-only and whitespace-only lines are ignored.",
+      "input": "# just a comment\n   # indented comment\n\t\n",
+      "expect": {
+        "issues": [
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ],
+        "nodes": {}
+      }
+    },
+    {
+      "id": "stream-line-too-long",
+      "rules": [
+        "3.7",
+        "3.8"
+      ],
+      "description": "An over-long line is reported and skipped; the next line is processed.",
+      "input": [
+        "root = Stack([a])\nt = Text(\"",
+        {
+          "repeat": "x",
+          "times": 17000
+        },
+        "\")\na = Divider()\n"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "line_too_long"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a"
+            ]
+          },
+          "a": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "stream-continues-after-error",
+      "rules": [
+        "3.8",
+        "7.1"
+      ],
+      "description": "An error rejects only its own line.",
+      "input": "root = Stack([a, b])\na = Text('bad')\nb = Divider()\na = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "syntax"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a",
+              "b"
+            ]
+          },
+          "a": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          },
+          "b": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    }
+  ]
+}

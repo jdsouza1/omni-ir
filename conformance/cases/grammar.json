@@ -1,0 +1,442 @@
+{
+  "area": "grammar",
+  "cases": [
+    {
+      "id": "grammar-statements",
+      "rules": [
+        "4.1"
+      ],
+      "description": "Component and state statements.",
+      "input": "root = Stack([t])\n$name = \"Ada\"\nt = Text($name)\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "t"
+            ]
+          },
+          "t": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$name"
+              }
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$name": "Ada"
+        }
+      }
+    },
+    {
+      "id": "grammar-double-equals",
+      "rules": [
+        "4.1"
+      ],
+      "description": "== is not an assignment.",
+      "input": "root == Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "syntax"
+          },
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ]
+      }
+    },
+    {
+      "id": "grammar-whitespace",
+      "rules": [
+        "4.2"
+      ],
+      "description": "Spaces and tabs at line ends and between tokens don't matter.",
+      "input": "  root\t=\tStack( [ a ,b ] , gap = \"sm\" )  \na=Divider()\nb = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {
+              "gap": "sm"
+            },
+            "children": [
+              "a",
+              "b"
+            ]
+          },
+          "a": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          },
+          "b": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "grammar-positional-after-named",
+      "rules": [
+        "4.3"
+      ],
+      "description": "A positional argument after a named one is a syntax error.",
+      "input": "root = Text(tone=\"muted\", \"hi\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "syntax"
+          },
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ]
+      }
+    },
+    {
+      "id": "grammar-trailing-commas",
+      "rules": [
+        "4.3",
+        "4.11"
+      ],
+      "description": "Trailing commas are allowed in argument lists and lists.",
+      "input": "root = Stack([a, b,], direction=\"row\",)\na = Divider()\nb = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {
+              "direction": "row"
+            },
+            "children": [
+              "a",
+              "b"
+            ]
+          },
+          "a": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          },
+          "b": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "grammar-bare-value",
+      "rules": [
+        "4.4"
+      ],
+      "description": "A component statement must be a call.",
+      "input": "root = 5\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "syntax"
+          },
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ]
+      }
+    },
+    {
+      "id": "grammar-trailing-text",
+      "rules": [
+        "4.4",
+        "4.8"
+      ],
+      "description": "Text after the call is an error; a trailing comment is not.",
+      "input": "root = Text(\"a\") extra\nt = Text(\"b\")   # a trailing comment\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "syntax"
+          },
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ],
+        "nodes": {
+          "t": {
+            "type": "Text",
+            "props": {
+              "text": "b"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "strings-escapes",
+      "rules": [
+        "4.5"
+      ],
+      "description": "\\\", \\\\ and \\n are decoded.",
+      "input": "root = Text(\"She said \\\"hi\\\" \\\\ ok\\nnext\")\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Text",
+            "props": {
+              "text": "She said \"hi\" \\ ok\nnext"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "strings-single-quotes",
+      "rules": [
+        "4.5"
+      ],
+      "description": "Single-quoted strings are a syntax error.",
+      "input": "root = Text('hi')\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "syntax"
+          },
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ]
+      }
+    },
+    {
+      "id": "strings-unknown-escape",
+      "rules": [
+        "4.6",
+        "7.1"
+      ],
+      "description": "An unknown escape is kept as literal text with a warning; the line is accepted.",
+      "input": "root = Text(\"Path: C:\\data\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "unknown_escape"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Text",
+            "props": {
+              "text": "Path: C:\\data"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "strings-unterminated",
+      "rules": [
+        "4.7"
+      ],
+      "description": "A missing closing quote, including one hidden by \\\", is an error.",
+      "input": "root = Text(\"oops)\nt = Text(\"ends with \\\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "unterminated_string"
+          },
+          {
+            "line": 2,
+            "code": "unterminated_string"
+          },
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ]
+      }
+    },
+    {
+      "id": "strings-special-characters",
+      "rules": [
+        "4.8"
+      ],
+      "description": "Inside a string, # $ , ( ) [ ] { } = are text.",
+      "input": "root = Text(\"# not a comment, (really) [x] {y} = $5\")  # a real comment\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Text",
+            "props": {
+              "text": "# not a comment, (really) [x] {y} = $5"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "numbers",
+      "rules": [
+        "4.9"
+      ],
+      "description": "Integers, decimals, a leading point, a trailing point and exponents.",
+      "input": "$a = 42\n$b = -1.5e2\n$c = .5\n$d = 3.\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "state": {
+          "$a": 42,
+          "$b": -150,
+          "$c": 0.5,
+          "$d": 3
+        }
+      }
+    },
+    {
+      "id": "numbers-invalid",
+      "rules": [
+        "4.9"
+      ],
+      "description": "A number followed by a letter, and a number too large to be finite.",
+      "input": "$x = 1abc\n$y = 1e999\nroot = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "syntax"
+          },
+          {
+            "line": 2,
+            "code": "invalid_props"
+          }
+        ],
+        "state": {}
+      }
+    },
+    {
+      "id": "ids-invalid",
+      "rules": [
+        "4.10"
+      ],
+      "description": "An id must be an identifier and not a reserved word.",
+      "input": "1abc = Divider()\ntrue = Divider()\nconstructor = Divider()\nroot = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "syntax"
+          },
+          {
+            "line": 2,
+            "code": "invalid_props"
+          },
+          {
+            "line": 3,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "literals",
+      "rules": [
+        "4.10"
+      ],
+      "description": "true, false and null are literals in values.",
+      "input": "$yes = true\n$no = false\n$none = null\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "state": {
+          "$yes": true,
+          "$no": false,
+          "$none": null
+        }
+      }
+    },
+    {
+      "id": "lists-and-objects",
+      "rules": [
+        "4.11",
+        "5.16"
+      ],
+      "description": "An object of params with identifier and string keys, literals and state.",
+      "input": "root = Button(\"Pay\", action=\"pay\")\n$amount = 3\nm = McpMutation(root, tool=\"payments.confirm\", params={amount: $amount, note: \"\", \"ok\": true,})\n",
+      "expect": {
+        "issues": [],
+        "mutations": {
+          "root": {
+            "id": "m",
+            "tool": "payments.confirm",
+            "params": {
+              "amount": {
+                "state": "$amount"
+              },
+              "note": "",
+              "ok": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "not-flat",
+      "rules": [
+        "4.12"
+      ],
+      "description": "A call inside any value is rejected.",
+      "input": "root = Card([Heading(\"Hi\")])\n$x = Text(\"a\")\nt = Button(\"x\", action=Text(\"y\"))\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "not_flat"
+          },
+          {
+            "line": 2,
+            "code": "not_flat"
+          },
+          {
+            "line": 3,
+            "code": "not_flat"
+          },
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 **A line-oriented streaming protocol for generative UI.** An AI model describes a screen in short, flat lines of Omni-IR; a trusted client parses each line as it streams in and renders it with its own components. The model never writes HTML, CSS or code, and can only trigger backend actions the app has explicitly allowed.
 
-> **Status: early (v0.1).** The parser, schema, React renderer, streaming server and playground work and are tested. The spec is still defined by this repo's code and plans rather than a standalone document. Web only for now.
+> **Status: early (v0.1).** The parser, schema, React renderer, streaming server and playground work and are tested. The format is defined in [SPEC.md](SPEC.md), with a [conformance suite](conformance/README.md) for other implementations. Web only for now.
 
 ```
 root = Card([title, amount, note, actions])
@@ -39,6 +39,7 @@ Open http://localhost:5173, then pick an example or describe a screen. The playg
 | `npm run demo` | Stream a fixture in the terminal; `-- --server "prompt"` streams from the running server |
 | `npm run validate -- file.omni` | Check Omni-IR (e.g. a model's reply): errors by line, then the rendered HTML |
 | `npm run prompt:print` | Print the system prompt a real model would get |
+| `npm run spec` | Regenerate the generated sections of SPEC.md from the schema |
 
 ## How it works
 
@@ -82,12 +83,11 @@ To check how well a model follows the protocol without paying for API calls, pas
 | `app/tools.ts` | The tool registry shared by browser and server |
 | `fixtures/` | Example screens and failure cases |
 
-The grammar and runtime rules (R1–R7) are in [PLAN.md](PLAN.md); later steps are in [PLAN-SERVER.md](PLAN-SERVER.md) and [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md).
+The format is specified in [SPEC.md](SPEC.md). Design decisions and build history are in [PLAN.md](PLAN.md), [PLAN-SERVER.md](PLAN-SERVER.md), [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md) and [PLAN-SPEC.md](PLAN-SPEC.md).
 
 ## Roadmap
 
 - Playground visual design (in progress)
-- A standalone spec document
 - More components (images, lists, date pickers)
 - Publishing the schema and React catalog as packages
 - iOS and Android renderers

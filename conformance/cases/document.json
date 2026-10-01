@@ -1,0 +1,431 @@
+{
+  "area": "document",
+  "cases": [
+    {
+      "id": "root-missing",
+      "rules": [
+        "5.1"
+      ],
+      "description": "A stream without root.",
+      "input": "a = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ]
+      }
+    },
+    {
+      "id": "root-not-component",
+      "rules": [
+        "5.1",
+        "7.2"
+      ],
+      "description": "root defined as an McpMutation.",
+      "input": "b = Button(\"Pay\", action=\"pay\")\nroot = McpMutation(b, tool=\"payments.confirm\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "root_not_component"
+          }
+        ]
+      }
+    },
+    {
+      "id": "forward-references",
+      "rules": [
+        "5.2"
+      ],
+      "description": "Children may arrive later and in any order; the list order is kept.",
+      "input": "root = Stack([a, b])\nb = Divider()\na = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a",
+              "b"
+            ]
+          },
+          "a": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          },
+          "b": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        },
+        "missing": []
+      }
+    },
+    {
+      "id": "duplicate-ids",
+      "rules": [
+        "5.3"
+      ],
+      "description": "A second assignment is rejected and the first stays.",
+      "input": "root = Text(\"first\")\nroot = Text(\"second\")\n$x = 1\n$x = 2\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "duplicate_id"
+          },
+          {
+            "line": 4,
+            "code": "duplicate_id"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Text",
+            "props": {
+              "text": "first"
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$x": 1
+        }
+      }
+    },
+    {
+      "id": "one-parent",
+      "rules": [
+        "5.4",
+        "5.7",
+        "7.2"
+      ],
+      "description": "A second parent and a repeated child are rejected.",
+      "input": "root = Stack([a, b])\na = Stack([c])\nb = Stack([c])\nc = Divider()\nd = Stack([e, e])\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 3,
+            "code": "multiple_parents"
+          },
+          {
+            "line": 5,
+            "code": "duplicate_child"
+          }
+        ],
+        "missing": [
+          "b"
+        ]
+      }
+    },
+    {
+      "id": "cycle-and-root-as-child",
+      "rules": [
+        "5.5"
+      ],
+      "description": "A cycle, and root listed as a child.",
+      "input": "x = Stack([y])\ny = Stack([x])\nroot = Divider()\nc = Stack([root])\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 2,
+            "code": "cycle"
+          },
+          {
+            "line": 4,
+            "code": "root_as_child"
+          }
+        ]
+      }
+    },
+    {
+      "id": "child-not-component",
+      "rules": [
+        "5.6",
+        "7.2"
+      ],
+      "description": "A children list naming an McpMutation.",
+      "input": "root = Stack([m])\nb = Button(\"Pay\", action=\"pay\")\nm = McpMutation(b, tool=\"payments.confirm\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 2,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 3,
+            "code": "child_not_component"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rejected-line-has-no-effect",
+      "rules": [
+        "5.7",
+        "7.3"
+      ],
+      "description": "A rejected line's id stays pending and ends up missing.",
+      "input": "root = Stack([a])\na = Nope(\"x\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 2,
+            "code": "unknown_component"
+          }
+        ],
+        "missing": [
+          "a"
+        ]
+      }
+    },
+    {
+      "id": "positional-arguments",
+      "rules": [
+        "5.8"
+      ],
+      "description": "Too many positional arguments, a prop given twice, a named prop repeated.",
+      "input": "root = Divider()\na = Text(\"x\", \"y\")\nb = Text(\"x\", text=\"y\")\nc = Text(\"x\", tone=\"muted\", tone=\"strong\")\nd = Divider(\"x\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "invalid_props"
+          },
+          {
+            "line": 3,
+            "code": "invalid_props"
+          },
+          {
+            "line": 4,
+            "code": "invalid_props"
+          },
+          {
+            "line": 5,
+            "code": "invalid_props"
+          }
+        ]
+      }
+    },
+    {
+      "id": "catalog-props",
+      "rules": [
+        "5.9"
+      ],
+      "description": "An unknown component, an unknown prop and a value outside the allowed list.",
+      "input": "root = Divider()\na = Marquee(\"x\")\nb = Text(\"x\", style=\"color:red\")\nc = Stack([], direction=\"diagonal\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "unknown_component"
+          },
+          {
+            "line": 3,
+            "code": "invalid_props"
+          },
+          {
+            "line": 4,
+            "code": "invalid_props"
+          }
+        ]
+      }
+    },
+    {
+      "id": "state-values",
+      "rules": [
+        "5.10"
+      ],
+      "description": "State holds only strings, numbers, booleans and null.",
+      "input": "$a = [1]\n$b = {x: 1}\n$c = other\nroot = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "invalid_props"
+          },
+          {
+            "line": 2,
+            "code": "invalid_props"
+          },
+          {
+            "line": 3,
+            "code": "invalid_props"
+          }
+        ],
+        "state": {}
+      }
+    },
+    {
+      "id": "state-references",
+      "rules": [
+        "5.11",
+        "7.2",
+        "7.3"
+      ],
+      "description": "A used key that's never declared is reported on the line that uses it.",
+      "input": "root = Stack([t, i])\nt = Text($never)\n$name = \"\"\ni = Input($name, label=\"Name\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "missing_state"
+          }
+        ],
+        "missing": [
+          "$never"
+        ]
+      }
+    },
+    {
+      "id": "input-state-type",
+      "rules": [
+        "5.12"
+      ],
+      "description": "An Input bound to non-text state, in both arrival orders.",
+      "input": "$n = 3\nroot = Input($n, label=\"N\")\nother = Input($s, label=\"S\")\n$s = 4\n",
+      "expect": {
+        "issues": [
+          {
+            "line": null,
+            "code": "missing_root"
+          },
+          {
+            "line": 2,
+            "code": "input_state_type"
+          },
+          {
+            "line": 3,
+            "code": "missing_state"
+          },
+          {
+            "line": 4,
+            "code": "input_state_type"
+          }
+        ]
+      }
+    },
+    {
+      "id": "governance",
+      "rules": [
+        "5.13",
+        "7.2",
+        "7.4"
+      ],
+      "description": "A second McpMutation for one Button, and a Button with an action but none.",
+      "input": "root = Stack([pay, cancel, refund])\npay = Button(\"Pay\", action=\"pay\")\ncancel = Button(\"Cancel\")\nm1 = McpMutation(pay, tool=\"payments.confirm\")\nm2 = McpMutation(pay, tool=\"payments.confirm\")\nrefund = Button(\"Refund\", action=\"refund\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 5,
+            "code": "duplicate_mutation"
+          },
+          {
+            "line": 6,
+            "code": "ungoverned_mutation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "unknown-tool",
+      "rules": [
+        "5.14"
+      ],
+      "description": "A tool outside the registry, and a badly shaped tool name.",
+      "input": "root = Button(\"Pay\", action=\"pay\")\nm = McpMutation(root, tool=\"system.delete_account\")\nn = McpMutation(root, tool=\"no dots\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 2,
+            "code": "unknown_tool"
+          },
+          {
+            "line": 3,
+            "code": "invalid_props"
+          }
+        ],
+        "mutations": {}
+      }
+    },
+    {
+      "id": "mutation-targets",
+      "rules": [
+        "5.15",
+        "7.2"
+      ],
+      "description": "A target without an action, and a target that never arrives.",
+      "input": "root = Stack([cancel])\ncancel = Button(\"Cancel\")\nm = McpMutation(cancel, tool=\"payments.confirm\")\nn = McpMutation(ghost, tool=\"payments.confirm\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 3,
+            "code": "mutation_target_not_interactive"
+          },
+          {
+            "line": 4,
+            "code": "dangling_ref"
+          }
+        ]
+      }
+    },
+    {
+      "id": "params-rules",
+      "rules": [
+        "5.16"
+      ],
+      "description": "A component id as a value, a repeated key and a reserved key are rejected.",
+      "input": "root = Button(\"Pay\", action=\"pay\")\na = McpMutation(root, tool=\"payments.confirm\", params={x: root})\nb = McpMutation(root, tool=\"payments.confirm\", params={x: 1, x: 2})\nc = McpMutation(root, tool=\"payments.confirm\", params={__proto__: 1})\nd = McpMutation(root, tool=\"payments.confirm\", params={note: \"\"})\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "invalid_props"
+          },
+          {
+            "line": 3,
+            "code": "invalid_props"
+          },
+          {
+            "line": 4,
+            "code": "invalid_props"
+          }
+        ],
+        "mutations": {
+          "root": {
+            "id": "d",
+            "tool": "payments.confirm",
+            "params": {
+              "note": ""
+            }
+          }
+        }
+      }
+    }
+  ]
+}

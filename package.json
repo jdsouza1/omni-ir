@@ -21,7 +21,8 @@
     "playground": "vite --config playground/vite.config.ts --configLoader runner",
     "playground:build": "vite build --config playground/vite.config.ts --configLoader runner",
     "landing:examples": "tsx scripts/landing-examples.ts",
-    "spec": "tsx scripts/spec.ts"
+    "spec": "tsx scripts/spec.ts",
+    "conformance:build": "tsx conformance/build.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",
