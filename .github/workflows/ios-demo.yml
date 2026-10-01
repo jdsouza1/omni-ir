@@ -1,0 +1,81 @@
+# Builds the iOS demo app (swift/Demo), runs its UI tests in the iPhone simulator, and keeps the
+# screenshots and a screen recording as a downloadable artifact for review (PLAN-IOS.md, F.3).
+# Mock data only; nothing paid. GitHub-hosted macOS runners are free for public repos.
+name: iOS demo
+
+on:
+  push:
+    branches: [main, "wip/**"]
+    paths: ["swift/**", "Package.swift", "fixtures/**", ".github/workflows/ios-demo.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-demo-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  demo:
+    name: Demo app in the iPhone simulator
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Generate the Xcode project
+        run: |
+          brew install xcodegen
+          cd swift/Demo && xcodegen generate
+
+      - name: Boot an iPhone simulator
+        run: |
+          udid=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          devices = [d for runtime, ds in json.load(sys.stdin)["devices"].items() if "iOS" in runtime for d in ds]
+          phones = [d for d in devices if d["name"].startswith("iPhone") and "Pro" in d["name"] and "Max" not in d["name"]] or [d for d in devices if d["name"].startswith("iPhone")]
+          print(phones[-1]["udid"])')
+          echo "UDID=$udid" >> "$GITHUB_ENV"
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          xcrun simctl list devices | grep "$udid"
+
+      - name: Build the app and UI tests
+        run: |
+          xcodebuild build-for-testing -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo \
+            -destination "id=$UDID" -derivedDataPath build -quiet
+
+      - name: Record a screen streaming in and a governed action
+        run: |
+          mkdir -p review
+          xcrun simctl io "$UDID" recordVideo --codec h264 --force review/streaming.mp4 &
+          recorder=$!
+          sleep 2
+          xcodebuild test-without-building -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo \
+            -destination "id=$UDID" -derivedDataPath build -only-testing:OmniIRDemoUITests/StreamingTests \
+            -resultBundlePath build/Streaming.xcresult -quiet
+          status=$?
+          kill -INT "$recorder"; wait "$recorder" || true
+          exit $status
+        shell: bash {0}
+
+      - name: Take the review screenshots
+        run: |
+          xcodebuild test-without-building -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo \
+            -destination "id=$UDID" -derivedDataPath build -only-testing:OmniIRDemoUITests/ScreenshotTests \
+            -resultBundlePath build/Screenshots.xcresult -quiet
+
+      - name: Collect the screenshots
+        if: always()
+        run: |
+          mkdir -p review/screenshots
+          xcrun xcresulttool export attachments --path build/Screenshots.xcresult --output-path review/screenshots || true
+          ls -la review review/screenshots || true
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ios-review
+          path: review/
+          retention-days: 30

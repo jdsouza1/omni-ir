@@ -31,7 +31,8 @@
     "pack:check": "node scripts/pack-check.mjs",
     "install:test": "node scripts/install-test.mjs",
     "schema:export": "tsx scripts/schema-export.ts",
-    "swift:schema": "tsx scripts/swift-schema.ts"
+    "swift:schema": "tsx scripts/swift-schema.ts",
+    "swift:assets": "tsx scripts/swift-demo-assets.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",

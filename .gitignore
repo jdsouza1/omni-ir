@@ -6,3 +6,4 @@ coverage/
 # Swift Package Manager
 .build/
 .swiftpm/
+review/

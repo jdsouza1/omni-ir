@@ -16,3 +16,10 @@ describe("Swift catalog (Schema.generated.swift)", () => {
     for (const code of Object.keys(ISSUE_CODES)) expect(swift).toContain(`= "${code}"`);
   });
 });
+
+describe("iOS demo asset catalog (swift/Demo/Assets.xcassets)", () => {
+  it("has the same pictures as app/assets.ts (run npm run swift:assets if this fails)", async () => {
+    const { renderAssetCatalog, readCatalogFiles, sameFiles } = await import("../scripts/swift-demo-assets");
+    expect(sameFiles(readCatalogFiles(), renderAssetCatalog())).toBe(true);
+  });
+});

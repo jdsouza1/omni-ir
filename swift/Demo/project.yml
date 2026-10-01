@@ -1,0 +1,61 @@
+# The iOS demo app (PLAN-IOS.md, F.1). Generate the Xcode project with XcodeGen (free):
+#   brew install xcodegen && cd swift/Demo && xcodegen generate
+# The generated OmniIRDemo.xcodeproj isn't committed. The app uses the package at the repo root and
+# bundles the repo's fixtures/ folder as is.
+name: OmniIRDemo
+options:
+  bundleIdPrefix: dev.omni-ir
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  OmniIR:
+    path: ../..
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  OmniIRDemo:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Assets.xcassets
+      - path: ../../fixtures
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - package: OmniIR
+        product: OmniIRSwiftUI
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.omni-ir.demo
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Omni-IR
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+  OmniIRDemoUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: OmniIRDemo
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.omni-ir.demo.uitests
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  OmniIRDemo:
+    build:
+      targets:
+        OmniIRDemo: all
+        OmniIRDemoUITests: [test]
+    test:
+      targets:
+        - OmniIRDemoUITests

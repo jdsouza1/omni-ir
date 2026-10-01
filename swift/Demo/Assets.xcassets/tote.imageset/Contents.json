@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "tote.svg",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "omni-ir",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}
