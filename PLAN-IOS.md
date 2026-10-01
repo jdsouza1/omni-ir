@@ -46,8 +46,8 @@ Plus a small **demo app** that streams the repo's fixtures offline (no server, n
 - [x] A.2 Catalog conformance cases generated from `schema.json`: for every component and prop, an accepted line and rejected lines (wrong type, unknown value, too long, missing required), so another implementation is checked prop by prop, not only on document rules. *Done: 15 generated cases plus a hand-written one for the Rating rule (63 cases in all). Issues are now compared as distinct `{line, code}` pairs, because how many messages an implementation reports for one bad value is its own choice (Zod reports some values twice).*
 
 **B. Swift package, tests first** *(checkpoint: failing tests)*
-- [ ] B.1 `Package.swift` at the root, `swift/Sources/OmniIRCore`, `swift/Tests/OmniIRCoreTests`; Swift 6 language mode with strict concurrency
-- [ ] B.2 Conformance runner in Swift: loads every `conformance/cases/*.json`, feeds the input in 1-, 5- and 13-byte chunks, and compares issues, nodes, state, mutations and missing references. Confirm it fails before any parser code exists
+- [x] B.1 `Package.swift` at the root, `swift/Sources/OmniIRCore`, `swift/Tests/OmniIRCoreTests`; Swift 6 language mode with strict concurrency
+- [x] B.2 Conformance runner in Swift: loads every `conformance/cases/*.json`, feeds the input in 1-, 5- and 13-byte chunks, and compares issues, nodes, state, mutations and missing references. Confirm it fails before any parser code exists. *Done 2026-10-01: builds in Swift 6 mode on Windows (ARM64); all 63 cases load and fail against the stub parser (108 failed checks).*
 
 **C. OmniIRCore** *(checkpoint: all conformance cases pass on Linux, and Windows if installed)*
 - [ ] C.1 Line buffer: UTF-8 split across chunks, `\r\n`, invalid bytes become U+FFFD, 16 KB line limit
