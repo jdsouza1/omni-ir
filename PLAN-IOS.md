@@ -49,13 +49,13 @@ Plus a small **demo app** that streams the repo's fixtures offline (no server, n
 - [x] B.1 `Package.swift` at the root, `swift/Sources/OmniIRCore`, `swift/Tests/OmniIRCoreTests`; Swift 6 language mode with strict concurrency
 - [x] B.2 Conformance runner in Swift: loads every `conformance/cases/*.json`, feeds the input in 1-, 5- and 13-byte chunks, and compares issues, nodes, state, mutations and missing references. Confirm it fails before any parser code exists. *Done 2026-10-01: builds in Swift 6 mode on Windows (ARM64); all 63 cases load and fail against the stub parser (108 failed checks).*
 
-**C. OmniIRCore** *(checkpoint: all conformance cases pass on Linux, and Windows if installed)*
-- [ ] C.1 Line buffer: UTF-8 split across chunks, `\r\n`, invalid bytes become U+FFFD, 16 KB line limit
-- [ ] C.2 Tokenizer: the same grammar and lenient escapes as `tokenizer.ts`, written test-first
-- [ ] C.3 Statement validation from the generated schema (`Schema.generated.swift`), plus the hand-written refinements (Rating within max, dates, asset names, reserved words)
-- [ ] C.4 Document rules: root, duplicates, parents, cycles, lists, governance, dangling and missing references, end-of-stream checks
-- [ ] C.5 Store: snapshots with stable identity per node, state updates for Input and DateInput, change notifications
-- [ ] C.6 Tool registry protocol (each tool validates its own params) and asset registry (names only)
+**C. OmniIRCore** *(checkpoint: all conformance cases pass on Linux, and Windows if installed)* *Reached 2026-10-01: all 63 cases pass on Windows (ARM64), fed whole and in 1-, 5- and 13-byte chunks; a deliberately broken rule makes its case fail, so the runner checks for real. C.5 is the document with `apply`/`finish` and `setState`; SwiftUI observation comes with D.2.*
+- [x] C.1 Line buffer: UTF-8 split across chunks, `\r\n`, invalid bytes become U+FFFD, 16 KB line limit
+- [x] C.2 Tokenizer: the same grammar and lenient escapes as `tokenizer.ts`, written test-first
+- [x] C.3 Statement validation from the generated schema (`Schema.generated.swift`), plus the hand-written refinements (Rating within max, dates, asset names, reserved words)
+- [x] C.4 Document rules: root, duplicates, parents, cycles, lists, governance, dangling and missing references, end-of-stream checks
+- [x] C.5 Store: snapshots with stable identity per node, state updates for Input and DateInput, change notifications
+- [x] C.6 Tool registry protocol (each tool validates its own params) and asset registry (names only)
 
 **D. OmniIRSwiftUI: catalog and renderer** *(checkpoint: you review simulator screenshots)*
 - [ ] D.1 The 15 catalog components as SwiftUI views with native styling, light and dark, Dynamic Type and VoiceOver labels (Rating reads "Rated 4.96 out of 5"; Message says who sent it)

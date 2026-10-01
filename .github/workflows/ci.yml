@@ -39,3 +39,19 @@ jobs:
       - run: npm run build:packages
       - run: npm run pack:check
       - run: npm run install:test
+
+  swift:
+    # The Swift package (PLAN-IOS.md): the conformance suite and parser tests on Linux and macOS.
+    # The macOS job also builds the SwiftUI library. Free on GitHub-hosted runners for public repos.
+    name: Swift (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - run: swift --version
+      - run: swift build --build-tests
+      - run: swift test
