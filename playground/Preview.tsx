@@ -4,9 +4,9 @@
 import { useEffect, useRef } from "react";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import type { OmniStore } from "../engine/store";
-import { OmniRenderer } from "../renderer";
-import type { MutationCall, RendererEvent } from "../renderer/context";
+import type { OmniStore } from "@omni-ir/core";
+import { OmniRenderer } from "@omni-ir/react";
+import type { MutationCall, RendererEvent } from "@omni-ir/react";
 
 export interface PreviewProps {
   runId: number;

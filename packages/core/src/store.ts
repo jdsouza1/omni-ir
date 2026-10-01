@@ -1,7 +1,7 @@
 // Reactive document store, shaped for React's useSyncExternalStore.
 // Every change produces a new snapshot object, but node objects are shared between snapshots:
 // only the node a new line defines is a new object (R3), so memoized components can skip the rest.
-import { stateKeysOf, type MutationStatement, type OmniNode, type Primitive, type Statement } from "./schema";
+import { stateKeysOf, type MutationStatement, type OmniNode, type Primitive, type Statement } from "./schema.js";
 
 export interface OmniDocument {
   /** Components by id. Only the object for a newly arrived node is ever replaced (R3). */

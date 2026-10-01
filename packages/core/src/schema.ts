@@ -2,7 +2,7 @@
 // which components exist, which props they take, flat syntax, the tool registry and the
 // cross-line document rules. The parser and renderer only use the types exported here.
 import { z } from "zod";
-import type { Issue, RawStatement, RawValue } from "./types";
+import type { Issue, RawStatement, RawValue } from "./types.js";
 
 /** Size limits of the protocol (SPEC.md, generated "limits" section). */
 export const LIMITS = {

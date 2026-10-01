@@ -1,7 +1,7 @@
 // Human-readable descriptions of the schema, shared by the system prompt (server/prompt.ts) and the
 // generated sections of SPEC.md (scripts/spec.ts), so both always describe the same rules.
 import { z } from "zod";
-import { ASSET_NAME, COMPONENTS, ISO_DATE, type ComponentType } from "./schema";
+import { ASSET_NAME, COMPONENTS, ISO_DATE, type ComponentType } from "./schema.js";
 
 export interface JsonSchema {
   type?: string;

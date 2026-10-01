@@ -2,7 +2,7 @@
 // The text is written to the parser exactly as it arrives; the parser and schema decide what is valid.
 // Once the stream has started, the parser is always ended (done, error, cancel or dropped connection),
 // so anything that never arrived becomes a "missing" fallback instead of loading forever.
-import type { OmniParser } from "../engine/parser";
+import type { OmniParser } from "@omni-ir/core";
 
 export type GenerateOutcome =
   | { status: "done"; stopReason: "end_turn" | "max_tokens" | "refusal"; model: string; ms: number }

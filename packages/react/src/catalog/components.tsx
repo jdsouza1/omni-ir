@@ -1,6 +1,6 @@
 // The Trusted Catalog. These components own all styling (class names in omni.css); nothing from the
 // stream can add classes, styles or markup. Text is always rendered as a React text node.
-import type { CatalogProps } from "./types";
+import type { CatalogProps } from "./types.js";
 
 export function Stack({ id, props, children }: CatalogProps<"Stack">) {
   const direction = props.direction ?? "column";

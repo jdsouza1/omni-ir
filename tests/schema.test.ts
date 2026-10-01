@@ -1,5 +1,5 @@
-import { validateDocument, validateStatement, type Statement } from "../engine/schema";
-import type { IssueCode, RawStatement } from "../engine/types";
+import { validateDocument, validateStatement, type Statement } from "@omni-ir/core";
+import type { IssueCode, RawStatement } from "@omni-ir/core";
 import { TOOLS } from "../app/tools";
 import { arr, bool, call, nested, nul, num, obj, ref, st, state, str } from "./helpers";
 

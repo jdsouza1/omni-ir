@@ -2,8 +2,8 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { z } from "zod";
 import { CASES, renderCaseFiles, type ConformanceCase, type InputPart } from "../conformance/build";
-import { createParser } from "../engine/parser";
-import type { OmniDocument } from "../engine/store";
+import { createParser } from "@omni-ir/core";
+import type { OmniDocument } from "@omni-ir/core";
 
 const files = readdirSync("conformance/cases").filter((f) => f.endsWith(".json"));
 const cases: ConformanceCase[] = files.flatMap((f) => (JSON.parse(readFileSync(`conformance/cases/${f}`, "utf8")) as { cases: ConformanceCase[] }).cases);

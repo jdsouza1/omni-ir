@@ -3,7 +3,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
-const ROOTS = process.argv.slice(2).length ? process.argv.slice(2) : ["app", "engine", "catalog", "renderer", "server", "client", "playground"];
+const ROOTS = process.argv.slice(2).length ? process.argv.slice(2) : ["app", "packages", "server", "playground"];
 const BANNED = [
   { name: "dangerouslySetInnerHTML", re: /dangerouslySetInnerHTML/ },
   { name: "innerHTML", re: /\binnerHTML\b/ },
@@ -21,6 +21,7 @@ function* walk(dir) {
     return;
   }
   for (const entry of entries) {
+    if (entry === "node_modules" || entry === "dist") continue;
     const path = join(dir, entry);
     if (statSync(path).isDirectory()) yield* walk(path);
     else if (EXTENSIONS.test(entry)) yield path;

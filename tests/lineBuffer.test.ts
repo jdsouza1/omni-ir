@@ -1,4 +1,4 @@
-import { LineBuffer, type LineEvent } from "../engine/lineBuffer";
+import { LineBuffer, type LineEvent } from "@omni-ir/core";
 
 const texts = (events: LineEvent[]) => events.flatMap((e) => (e.kind === "line" ? [e.text] : []));
 

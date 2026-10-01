@@ -4,10 +4,10 @@
 import { useCallback, useMemo, useReducer, useRef } from "react";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import { generate as defaultGenerate, type GenerateClientOptions, type GenerateOutcome } from "../client/generate";
-import { createMutationHandler } from "../client/mutate";
-import { createParser, type OmniParser, type ParserEvent } from "../engine/parser";
-import type { MutationCall, RendererEvent } from "../renderer/context";
+import { generate as defaultGenerate, type GenerateClientOptions, type GenerateOutcome } from "@omni-ir/react";
+import { createMutationHandler } from "@omni-ir/react";
+import { createParser, type OmniParser, type ParserEvent } from "@omni-ir/core";
+import type { MutationCall, RendererEvent } from "@omni-ir/react";
 
 export type RunStatus =
   | { kind: "idle" }

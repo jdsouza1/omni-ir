@@ -1,7 +1,7 @@
 // R2: turns arbitrary network chunks into complete lines.
 // Only complete lines leave this class; the unfinished remainder waits for more input.
 
-import { LIMITS } from "./schema";
+import { LIMITS } from "./schema.js";
 
 export const DEFAULT_MAX_LINE_LENGTH = LIMITS.lineLength;
 

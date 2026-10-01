@@ -2,7 +2,7 @@
 // Playground Task B: every catalog component marks its root element with data-node-id, so the
 // playground can highlight what a line builds.
 import { cleanup } from "@testing-library/react";
-import { COMPONENT_TYPES } from "../engine/schema";
+import { COMPONENT_TYPES } from "@omni-ir/core";
 import { renderOmni } from "./renderHelpers";
 
 afterEach(cleanup);

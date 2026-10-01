@@ -7,8 +7,8 @@ import { readFileSync } from "node:fs";
 import { mockStream } from "../app/mockStream";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import { generate } from "../client/generate";
-import { createParser } from "../engine/parser";
+import { generate } from "@omni-ir/react";
+import { createParser } from "@omni-ir/core";
 import { bold, dim, eventPrinter, green, red, renderHtml } from "./lib";
 
 const args = process.argv.slice(2);

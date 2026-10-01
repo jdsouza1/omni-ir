@@ -8,10 +8,10 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import { describeComponent } from "../engine/describe";
-import { createParser } from "../engine/parser";
-import { COMPONENT_TYPES, LIMITS } from "../engine/schema";
-import { ISSUE_CODES } from "../engine/types";
+import { describeComponent } from "@omni-ir/core";
+import { createParser } from "@omni-ir/core";
+import { COMPONENT_TYPES, LIMITS } from "@omni-ir/core";
+import { ISSUE_CODES } from "@omni-ir/core";
 
 const LIMIT_LABELS: Record<keyof typeof LIMITS, string> = {
   lineLength: "Characters in one line (UTF-16 code units, excluding the line ending)",

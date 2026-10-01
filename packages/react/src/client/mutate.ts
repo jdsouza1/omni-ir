@@ -1,7 +1,7 @@
 // Browser helper: the default onMutation for <OmniRenderer>, posting governed actions to /api/mutate.
 // The server re-validates every call. If it refuses, this throws; the renderer reports that as a
 // handler_failed error event with the server's message.
-import type { MutationCall } from "../renderer/context";
+import type { MutationCall } from "../renderer/context.js";
 
 export class MutationRejectedError extends Error {
   override name = "MutationRejectedError";

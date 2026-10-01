@@ -1,8 +1,8 @@
 // R5 + R6: the only path from a Button press to onMutation.
 import { useState, useSyncExternalStore, type ReactNode } from "react";
-import type { InteractionProps } from "../catalog/types";
-import type { MutationStatement, Primitive, StateRef } from "../engine/schema";
-import { runHandler, useOmni, useStateValues } from "./context";
+import type { InteractionProps } from "../catalog/types.js";
+import type { MutationStatement, Primitive, StateRef } from "@omni-ir/core";
+import { runHandler, useOmni, useStateValues } from "./context.js";
 
 type Governance = InteractionProps["Button"];
 

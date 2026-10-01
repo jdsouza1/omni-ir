@@ -1,11 +1,11 @@
 import { memo, useMemo, useSyncExternalStore, type ComponentType as ReactComponentType, type ReactNode } from "react";
-import { DEFAULT_CATALOG } from "../catalog/catalog";
-import { SkeletonLines } from "../catalog/components";
-import type { Catalog, Picture } from "../catalog/types";
+import { DEFAULT_CATALOG } from "../catalog/catalog.js";
+import { SkeletonLines } from "../catalog/components.js";
+import type { Catalog, Picture } from "../catalog/types.js";
 
 const NO_ASSETS: Readonly<Record<string, Picture>> = {};
-import { isMutating, ROOT_ID, stateKeysOf, type OmniNode, type Primitive, type ToolRegistry } from "../engine/schema";
-import type { OmniDocument, OmniStore } from "../engine/store";
+import { isMutating, ROOT_ID, stateKeysOf, type OmniNode, type Primitive, type ToolRegistry } from "@omni-ir/core";
+import type { OmniDocument, OmniStore } from "@omni-ir/core";
 import {
   OmniContext,
   runHandler,
@@ -14,10 +14,10 @@ import {
   type MutationCall,
   type OmniContextValue,
   type RendererEvent,
-} from "./context";
-import { McpMutationBoundary } from "./McpMutationBoundary";
-import { NodeErrorBoundary } from "./NodeErrorBoundary";
-import { NodeFallback } from "./NodeFallback";
+} from "./context.js";
+import { McpMutationBoundary } from "./McpMutationBoundary.js";
+import { NodeErrorBoundary } from "./NodeErrorBoundary.js";
+import { NodeFallback } from "./NodeFallback.js";
 
 export interface OmniRendererProps {
   store: OmniStore;

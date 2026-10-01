@@ -3,11 +3,11 @@
 import { act, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TOOLS } from "../app/tools";
-import { generate, type GenerateOutcome } from "../client/generate";
-import { createMutationHandler } from "../client/mutate";
-import { createParser, type ParserEvent } from "../engine/parser";
+import { generate, type GenerateOutcome } from "@omni-ir/react";
+import { createMutationHandler } from "@omni-ir/react";
+import { createParser, type ParserEvent } from "@omni-ir/core";
 import { MockModel } from "../server/models/mock";
-import type { MutationCall } from "../renderer/context";
+import type { MutationCall } from "@omni-ir/react";
 import { FakeModel, startServer, waitForAbort } from "./serverHelpers";
 import { renderOmni } from "./renderHelpers";
 

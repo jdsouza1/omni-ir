@@ -5,8 +5,8 @@ import express, { type Express, type NextFunction, type Request, type Response }
 import { z } from "zod";
 import { ASSETS, type AssetRegistry } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import { createParser } from "../engine/parser";
-import type { ToolRegistry } from "../engine/schema";
+import { createParser } from "@omni-ir/core";
+import type { ToolRegistry } from "@omni-ir/core";
 import type { ServerConfig } from "./config";
 import { ModelError, type Model } from "./models/types";
 import { STUB_HANDLERS, type ToolHandler } from "./tools/handlers";

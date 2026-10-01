@@ -1,5 +1,5 @@
-import { parseLine, type LineResult } from "../engine/tokenizer";
-import type { RawStatement } from "../engine/types";
+import { parseLine, type LineResult } from "@omni-ir/core";
+import type { RawStatement } from "@omni-ir/core";
 import { arr, bool, call, nested, nul, num, obj, ref, st, state, str } from "./helpers";
 
 function statementOf(result: LineResult): RawStatement {

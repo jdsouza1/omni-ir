@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { TOOLS } from "../app/tools";
-import { createParser } from "../engine/parser";
-import { COMPONENT_TYPES } from "../engine/schema";
-import { ISSUE_CODES } from "../engine/types";
+import { createParser } from "@omni-ir/core";
+import { COMPONENT_TYPES } from "@omni-ir/core";
+import { ISSUE_CODES } from "@omni-ir/core";
 import { applySections, renderSections } from "../scripts/spec";
 
 const spec = readFileSync("SPEC.md", "utf8");

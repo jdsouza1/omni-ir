@@ -1,6 +1,6 @@
-import { createParser, parseStream, type OmniParser, type ParserEvent } from "../engine/parser";
-import type { OmniDocument } from "../engine/store";
-import type { IssueCode } from "../engine/types";
+import { createParser, parseStream, type OmniParser, type ParserEvent } from "@omni-ir/core";
+import type { OmniDocument } from "@omni-ir/core";
+import type { IssueCode } from "@omni-ir/core";
 import { TOOLS } from "../app/tools";
 
 function setup() {

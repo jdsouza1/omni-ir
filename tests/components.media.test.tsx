@@ -3,10 +3,10 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import { createParser } from "../engine/parser";
-import { validateStatement } from "../engine/schema";
-import type { IssueCode } from "../engine/types";
-import { OmniRenderer } from "../renderer";
+import { createParser } from "@omni-ir/core";
+import { validateStatement } from "@omni-ir/core";
+import type { IssueCode } from "@omni-ir/core";
+import { OmniRenderer } from "@omni-ir/react";
 import { call, num, st, str } from "./helpers";
 import { renderOmni } from "./renderHelpers";
 

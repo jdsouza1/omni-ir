@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import { createParser, type ParserEvent } from "../engine/parser";
-import { COMPONENTS, COMPONENT_TYPES } from "../engine/schema";
+import { createParser, type ParserEvent } from "@omni-ir/core";
+import { COMPONENTS, COMPONENT_TYPES } from "@omni-ir/core";
 import { buildSystemPrompt, examplesIn } from "../server/prompt";
 
 describe("buildSystemPrompt", () => {

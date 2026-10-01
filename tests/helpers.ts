@@ -1,4 +1,4 @@
-import type { RawStatement, RawValue } from "../engine/types";
+import type { RawStatement, RawValue } from "@omni-ir/core";
 
 // Small builders so raw-statement fixtures read like the syntax they stand for.
 export const str = (value: string): RawValue => ({ kind: "string", value });

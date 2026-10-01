@@ -14,7 +14,13 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node", "vitest/globals", "vite/client"]
+    "allowImportingTsExtensions": true,
+    "types": ["node", "vitest/globals", "vite/client"],
+    // Dev and tests use the packages' TypeScript source; the published builds use packages/*/tsconfig.build.json.
+    "paths": {
+      "@omni-ir/core": ["./packages/core/src/index.ts"],
+      "@omni-ir/react": ["./packages/react/src/index.ts"]
+    }
   },
-  "include": ["app", "engine", "catalog", "renderer", "server", "client", "playground", "conformance", "tests", "scripts", "vitest.config.ts"]
+  "include": ["app", "packages/core/src", "packages/react/src", "server", "playground", "conformance", "tests", "scripts", "vitest.config.ts"]
 }

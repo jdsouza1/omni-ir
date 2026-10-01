@@ -1,0 +1,35 @@
+{
+  "name": "@omni-ir/react",
+  "version": "0.1.0",
+  "description": "Omni-IR for React: the Trusted Catalog components and a streaming renderer with McpMutation governance",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": ["*.css"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./omni.css": "./dist/omni.css",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md", "LICENSE"],
+  "dependencies": {
+    "@omni-ir/core": "^0.1.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdsouza1/omni-ir.git",
+    "directory": "packages/react"
+  },
+  "homepage": "https://github.com/jdsouza1/omni-ir#readme",
+  "bugs": "https://github.com/jdsouza1/omni-ir/issues",
+  "keywords": ["omni-ir", "generative-ui", "react", "llm", "streaming", "mcp"],
+  "publishConfig": {
+    "access": "public"
+  }
+}

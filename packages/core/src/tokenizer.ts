@@ -1,8 +1,8 @@
 // R4: a regex matches only the line start (`id =` or `$key =`). Everything after it goes through a
 // character-by-character tokenizer and a small recursive-descent parser, so commas, parentheses,
 // `#` and `$` inside strings are just text. The grammar accepts any well-formed value, including
-// nested calls; `engine/schema.ts` decides what is allowed.
-import type { Issue, IssueCode, RawStatement, RawValue } from "./types";
+// nested calls; `schema.ts` decides what is allowed.
+import type { Issue, IssueCode, RawStatement, RawValue } from "./types.js";
 
 export type LineResult =
   | { kind: "empty" }

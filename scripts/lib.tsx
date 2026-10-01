@@ -2,8 +2,8 @@
 import { renderToString } from "react-dom/server";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import type { OmniParser, ParserEvent } from "../engine/parser";
-import { OmniRenderer } from "../renderer";
+import type { OmniParser, ParserEvent } from "@omni-ir/core";
+import { OmniRenderer } from "@omni-ir/react";
 
 const tty = process.stdout.isTTY;
 const color = (code: number) => (text: string) => (tty ? `\x1b[${code}m${text}\x1b[0m` : text);

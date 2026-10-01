@@ -2,7 +2,7 @@
 // It is application code, shared by the server (/api/mutate), the browser renderer, tests and the demo.
 // The stream can only name tools listed here (R6); it can never add one.
 import { z } from "zod";
-import { ISO_DATE, type ToolRegistry } from "../engine/schema";
+import { ISO_DATE, type ToolRegistry } from "@omni-ir/core";
 
 export const TOOLS: ToolRegistry = {
   "payments.confirm": z.strictObject({

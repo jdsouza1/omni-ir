@@ -78,22 +78,21 @@ To check how well a model follows the protocol without paying for API calls, pas
 
 | Folder | Contents |
 |---|---|
-| `engine/` | Line buffer, tokenizer, parser, store; `schema.ts` is the single authority on the protocol |
-| `catalog/`, `renderer/` | The Trusted Catalog components and `OmniRenderer` |
-| `server/`, `client/` | Express SSE server, mock and Claude models, browser helpers |
+| `packages/core/` | `@omni-ir/core`: line buffer, tokenizer, parser, store; `schema.ts` is the single authority on the protocol |
+| `packages/react/` | `@omni-ir/react`: the Trusted Catalog components, `OmniRenderer` and browser helpers |
+| `server/` | Express SSE server, mock and Claude models |
 | `playground/` | The Interactive Playground |
-| `app/tools.ts` | The tool registry shared by browser and server |
+| `app/` | The tool registry and image asset registry shared by browser and server |
 | `fixtures/` | Example screens and failure cases |
 
-The format is specified in [SPEC.md](SPEC.md). Design decisions and build history are in [PLAN.md](PLAN.md), [PLAN-SERVER.md](PLAN-SERVER.md), [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md) and [PLAN-SPEC.md](PLAN-SPEC.md).
+The format is specified in [SPEC.md](SPEC.md). Design decisions and build history are in [PLAN.md](PLAN.md), [PLAN-SERVER.md](PLAN-SERVER.md), [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md), [PLAN-SPEC.md](PLAN-SPEC.md), [PLAN-COMPONENTS.md](PLAN-COMPONENTS.md) and [PLAN-NPM.md](PLAN-NPM.md).
 
 ## Roadmap
 
 What is done and what is planned, with dates: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 - Playground visual design (in progress)
-- More components (images, lists, date pickers)
-- Publishing the schema and React catalog as packages
+- Publishing `@omni-ir/core` and `@omni-ir/react` on npm (packages ready, first release pending)
 - iOS and Android renderers
 
 ## License

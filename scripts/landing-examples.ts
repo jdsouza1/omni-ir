@@ -15,7 +15,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import { createParser, type ParserEvent } from "../engine/parser";
+import { createParser, type ParserEvent } from "@omni-ir/core";
 
 export interface LandingLine {
   kw: string;

@@ -6,8 +6,8 @@ import { join, resolve } from "node:path";
 import { z } from "zod";
 import { ASSETS, type AssetRegistry } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import { describeComponent, describeValue, type JsonSchema } from "../engine/describe";
-import { COMPONENT_TYPES, type ToolRegistry } from "../engine/schema";
+import { describeComponent, describeValue, type JsonSchema } from "@omni-ir/core";
+import { COMPONENT_TYPES, type ToolRegistry } from "@omni-ir/core";
 
 export interface PromptOptions {
   tools?: ToolRegistry;

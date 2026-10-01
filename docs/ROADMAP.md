@@ -7,13 +7,13 @@ Updated 2026-09-30. Planned dates for the remaining work are kept from the origi
 | Phase | Work | Where |
 |---|---|---|
 | 1 · Core spec | Syntax spec v0.1 draft | [SPEC.md](../SPEC.md) |
-| 1 · Core spec | Zod validation schemas | `engine/schema.ts` |
+| 1 · Core spec | Zod validation schemas | `packages/core/src/schema.ts` |
 | 1 · Core spec | Conformance suite (47 cases) | [conformance/](../conformance/README.md) |
-| 2 · Web reference | Streaming parser in TypeScript, written test-first | `engine/` |
-| 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `catalog/`, `renderer/` |
+| 2 · Web reference | Streaming parser in TypeScript, written test-first | `packages/core/` |
+| 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `packages/react/` |
 | 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |
 | 2 · Web reference | Interactive Playground (all but the visual design) | `playground/` |
-| 2 · Web reference | Images, ratings, date fields, lists and chat messages | `catalog/`, `app/assets.ts` |
+| 2 · Web reference | Images, ratings, date fields, lists and chat messages | `packages/react/`, `app/assets.ts` |
 
 ## Planned
 

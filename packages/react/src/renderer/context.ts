@@ -1,8 +1,8 @@
 import { createContext, useContext, useRef, useSyncExternalStore } from "react";
-import type { Catalog, Picture } from "../catalog/types";
-import type { Primitive, ToolRegistry } from "../engine/schema";
-import type { OmniStore } from "../engine/store";
-import type { Issue } from "../engine/types";
+import type { Catalog, Picture } from "../catalog/types.js";
+import type { Primitive, ToolRegistry } from "@omni-ir/core";
+import type { OmniStore } from "@omni-ir/core";
+import type { Issue } from "@omni-ir/core";
 
 export interface MutationCall {
   /** The McpMutation's own id. */

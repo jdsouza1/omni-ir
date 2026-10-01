@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { TOOLS } from "../app/tools";
-import { createParser, type ParserEvent } from "../engine/parser";
+import { createParser, type ParserEvent } from "@omni-ir/core";
 import { MockModel } from "../server/models/mock";
 import { ModelError } from "../server/models/types";
 

@@ -4,7 +4,7 @@ import { act, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { createParser, type ParserEvent } from "../engine/parser";
+import { createParser, type ParserEvent } from "@omni-ir/core";
 import { TOOLS } from "../app/tools";
 import { chunkBytes, mockStream } from "../app/mockStream";
 import { countingCatalog, renderOmni } from "./renderHelpers";

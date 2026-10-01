@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "../catalog/omni.css";
+import "@omni-ir/react/omni.css";
 import "./playground.css";
 import { Playground } from "./Playground";
 

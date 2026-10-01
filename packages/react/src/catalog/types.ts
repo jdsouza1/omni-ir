@@ -1,5 +1,5 @@
 import type { ComponentType as ReactComponentType, ReactNode } from "react";
-import type { ComponentProps, ComponentType, Primitive, StateRef } from "../engine/schema";
+import type { ComponentProps, ComponentType, Primitive, StateRef } from "@omni-ir/core";
 
 /** A prop as the component sees it: state references are replaced by their current value. */
 type Resolve<V> = V extends StateRef ? Primitive : V;

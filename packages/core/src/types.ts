@@ -1,5 +1,5 @@
 // Grammar-level types: what the tokenizer produces before any schema validation.
-// Nothing here is trusted. `engine/schema.ts` decides what is allowed.
+// Nothing here is trusted. `schema.ts` decides what is allowed.
 
 export type RawValue =
   | { kind: "string"; value: string }

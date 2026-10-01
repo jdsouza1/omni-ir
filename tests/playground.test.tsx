@@ -2,7 +2,7 @@
 // Playground Task C: modes, streaming status, cancel and retry, with a scripted generate().
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { GenerateClientOptions, GenerateOutcome } from "../client/generate";
+import type { GenerateClientOptions, GenerateOutcome } from "@omni-ir/react";
 import { Playground } from "../playground/Playground";
 
 afterEach(cleanup);

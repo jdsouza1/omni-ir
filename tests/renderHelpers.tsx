@@ -1,11 +1,11 @@
 import { act, render } from "@testing-library/react";
 import { useEffect, type ComponentType } from "react";
-import { DEFAULT_CATALOG } from "../catalog/catalog";
-import type { Catalog } from "../catalog/types";
-import { createParser, type OmniParser } from "../engine/parser";
-import type { ToolRegistry } from "../engine/schema";
-import { OmniRenderer } from "../renderer";
-import type { MutationCall, RendererEvent } from "../renderer/context";
+import { DEFAULT_CATALOG } from "@omni-ir/react";
+import type { Catalog } from "@omni-ir/react";
+import { createParser, type OmniParser } from "@omni-ir/core";
+import type { ToolRegistry } from "@omni-ir/core";
+import { OmniRenderer } from "@omni-ir/react";
+import type { MutationCall, RendererEvent } from "@omni-ir/react";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 

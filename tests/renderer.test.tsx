@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { act, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { DEFAULT_CATALOG } from "../catalog/catalog";
-import type { Catalog, CatalogProps } from "../catalog/types";
-import { createStore } from "../engine/store";
-import { createParser } from "../engine/parser";
+import { DEFAULT_CATALOG } from "@omni-ir/react";
+import type { Catalog, CatalogProps } from "@omni-ir/react";
+import { createStore } from "@omni-ir/core";
+import { createParser } from "@omni-ir/core";
 import { countingCatalog, renderOmni } from "./renderHelpers";
 
 afterEach(cleanup);

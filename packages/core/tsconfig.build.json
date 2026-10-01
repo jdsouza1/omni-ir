@@ -1,0 +1,25 @@
+{
+  // The published build: ES modules and type definitions in dist/. No source maps, so no local
+  // paths are published. Strict Node ESM resolution checks every import works without a bundler.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "types": [],
+    "declaration": true,
+    "sourceMap": false,
+    "declarationMap": false,
+    "removeComments": false,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src"]
+}

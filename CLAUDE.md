@@ -24,15 +24,15 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 ## Where things are
 - **SPEC.md is the specification** of the format (grammar, document rules, catalog, issue codes, renderer requirements). Its component tables, issue codes, limits and examples are generated from the schema (`npm run spec`); a test fails if it is stale. Keep its hand-written rules in step with any behaviour change. The flat grammar is the only Omni-IR syntax; indented `screen / show / ask` examples are not Omni-IR.
 - `conformance/` — language-neutral cases for any parser. Edit `conformance/build.ts`, then `npm run conformance:build`; every rule in SPEC.md sections 3–7 must be covered by a case (a test enforces this). Expected results are written from the spec, never copied from this implementation's output.
-- `engine/` — line buffer, tokenizer, parser, store; `engine/schema.ts` is the single authority on components, props, flat syntax and document rules.
-- `catalog/` — the Trusted Catalog (React components, `omni.css`); `renderer/` — `OmniRenderer`, error boundaries, fallbacks, `McpMutationBoundary`.
+- `packages/core/src/` (`@omni-ir/core`) — line buffer, tokenizer, parser, store; `schema.ts` is the single authority on components, props, flat syntax and document rules.
+- `packages/react/src/` (`@omni-ir/react`) — `catalog/` the Trusted Catalog (React components, `omni.css`); `renderer/` `OmniRenderer`, error boundaries, fallbacks, `McpMutationBoundary`; `client/` browser helpers `generate()` and `createMutationHandler()`.
+- Import the packages by name (`@omni-ir/core`, `@omni-ir/react`, `@omni-ir/react/omni.css`) everywhere outside them. In the repo these resolve to the TypeScript source (`tsconfig.json` paths, `scripts/workspace-aliases.ts` for Vite/Vitest), so nothing needs building. Inside a package, relative imports end in `.js` (Node ESM); the build fails otherwise.
 - `app/tools.ts` — the tool registry shared by browser, server, tests and demo. Adding a tool needs a param schema here **and** a handler in `server/tools/handlers.ts` (a test enforces this).
 - `app/assets.ts` — the image asset registry. Streams name pictures (`Image("cabin-pines", …)`), never URLs; pass `assets` to every parser and renderer.
 - `server/` — Express: `POST /api/generate` (SSE), `POST /api/mutate` (re-validates every action), `GET /api/health`. `server/models/` holds `MockModel` (default) and `ClaudeModel` (opt-in). `server/prompt.ts` generates the system prompt from the schema.
-- `client/` — browser helpers `generate()` and `createMutationHandler()`.
 - `playground/` — the Interactive Playground (Vite + React). The Express app runs inside the Vite dev server for `/api/*`. State is in `usePlayground.ts`; `Playground.tsx`, `SourceView.tsx`, `Preview.tsx` and `Panels.tsx` are presentation only; `playground.css` is a **first design pass** based on the landing page (PLAN-PLAYGROUND.md Task G), awaiting the owner's review; it has light and dark themes, and the preview stage stays light because the catalog is light-only. Rendered screens keep the catalog's own neutral styles.
 - `fixtures/` — the mock model's screens; `fixtures/variants/` — failure cases (`demo: …` prompts).
-- PLAN.md (Phase 1–2, done), PLAN-SERVER.md (Step 1, done), PLAN-PLAYGROUND.md (Step 2; A–F and H done, G waits for the design) and PLAN-SPEC.md (Step 3, done) are the plans and decision records.
+- PLAN.md (Phase 1–2, done), PLAN-SERVER.md (Step 1, done), PLAN-PLAYGROUND.md (Step 2; A–F and H done, G waits for the design) PLAN-SPEC.md (Step 3, done), PLAN-COMPONENTS.md (Step 4, done) and PLAN-NPM.md (Step 5; A–F done, G needs the owner) are the plans and decision records.
 
 ## Commands
 - `npm test` — raw-HTML guard + all tests (no network). `npm run typecheck`.
@@ -42,7 +42,9 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - `npm run spec` (or `-- --check`) — regenerate SPEC.md's generated sections. `npm run conformance:build` — write `conformance/cases/*.json` from `conformance/build.ts`.
 - `npm run prompt:print` — the system prompt; `npm run validate -- reply.omni` — check model output (free manual prompt check).
 - `npm run landing:examples -- page.html out.html` — regenerate the landing page artifact's example tabs from `fixtures/landing/` (explanations in `landing.json`). Get `page.html` with the Artifact tool's read action; publish `out.html` back to the same URL.
-- CI: `.github/workflows/ci.yml` runs `npm ci`, typecheck, `npm test` and `playground:build` on Node 22 and 24 (mock model only, no secrets). Node 22.22+ / 24.15+ required.
+- `npm run build:packages` → `packages/*/dist`; `npm run pack:check` — what npm would publish (dry run); `npm run install:test` — install the packed tarballs into a fresh project and render, type-check and Vite-build there (downloads free packages from npm).
+- **Never publish to npm without the owner's explicit go-ahead.** `.github/workflows/release.yml` publishes on a `v*.*.*` tag via trusted publishing (no token); the first version of each package must be published by hand (PLAN-NPM.md task G).
+- CI: `.github/workflows/ci.yml` runs `npm ci`, typecheck, `npm test`, `playground:build` and the package checks (build, pack check, install test) on Node 22 and 24 (mock model only, no secrets). Node 22.22+ / 24.15+ required.
 - Vite runs with `--configLoader runner` (in the npm scripts and the dev-server test); without it Vite warns about extensionless imports in the config. On Windows, `timeout`/stopping a background task can leave `node.exe` servers running: check and stop leftovers before `npm ci`.
 
 ## License

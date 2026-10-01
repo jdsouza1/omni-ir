@@ -1,4 +1,5 @@
-# Runs typecheck, the raw-HTML guard, every test and the playground build on each push and pull request.
+# Runs typecheck, the raw-HTML guard, every test, the playground build and the npm package checks
+# (build, contents check, install into a fresh project) on each push and pull request.
 # Nothing here calls a paid API: tests use the mock model and fake clients, and no secrets are configured.
 name: CI
 
@@ -35,3 +36,6 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run playground:build
+      - run: npm run build:packages
+      - run: npm run pack:check
+      - run: npm run install:test

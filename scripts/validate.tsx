@@ -5,7 +5,7 @@
 import { readFileSync } from "node:fs";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
-import { createParser, type ParserEvent } from "../engine/parser";
+import { createParser, type ParserEvent } from "@omni-ir/core";
 import { bold, dim, green, red, renderHtml, yellow } from "./lib";
 
 const files = process.argv.slice(2);

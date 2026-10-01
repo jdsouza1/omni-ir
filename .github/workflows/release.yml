@@ -1,0 +1,84 @@
+# Publishes @omni-ir/core and @omni-ir/react to npm when a version tag (v0.1.0, v0.2.0, …) is pushed.
+# Uses npm trusted publishing: GitHub proves to npm which repo and workflow is publishing, so no npm
+# token is stored anywhere, and npm adds provenance automatically.
+#
+# Setup, once per package, on npmjs.com → the package → Settings → Trusted Publisher → GitHub Actions:
+#   organization or user: jdsouza1 · repository: omni-ir · workflow filename: release.yml
+#   environment: npm-publish
+# Trusted publishing only works for a package that already exists on npm, so the very first version
+# of each package is published by hand (see PLAN-NPM.md, task G).
+#
+# Releasing: set the same version in packages/core and packages/react (react depends on ^that
+# version), commit, then `git tag v<version> && git push origin v<version>`. Publishing is permanent:
+# a version can never be reused. Nothing here calls a paid API.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Add yourself as a required reviewer of this environment (repo Settings → Environments) to
+    # approve each release by hand before anything is published.
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write # lets npm verify this workflow (trusted publishing and provenance)
+    env:
+      OMNI_MODEL: mock # never use a paid model in CI
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Check npm supports trusted publishing (11.5.1 or later)
+        run: |
+          node -e '
+            const [a, b, c] = process.argv[1].split(".").map(Number);
+            if (a < 11 || (a === 11 && (b < 5 || (b === 5 && c < 1)))) { console.error(`npm ${process.argv[1]} is too old for trusted publishing`); process.exit(1); }
+          ' "$(npm --version)"
+
+      - name: Check the tag matches both package versions
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          for pkg in core react; do
+            version="$(node -p "require('./packages/$pkg/package.json').version")"
+            if [ "$version" != "$tag" ]; then
+              echo "::error::packages/$pkg is $version but the tag is v$tag"; exit 1
+            fi
+          done
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build:packages
+      - run: npm run pack:check
+      - run: npm run install:test
+
+      # Core first: react depends on it. A version that is already on npm is skipped, so a failed
+      # run can be re-run safely.
+      - name: Publish
+        run: |
+          for pkg in core react; do
+            name="$(node -p "require('./packages/$pkg/package.json').name")"
+            version="$(node -p "require('./packages/$pkg/package.json').version")"
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "$name@$version is already published; skipping"
+            else
+              npm publish --workspace "packages/$pkg"
+            fi
+          done

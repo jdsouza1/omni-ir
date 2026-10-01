@@ -1,0 +1,31 @@
+{
+  "name": "@omni-ir/core",
+  "version": "0.1.0",
+  "description": "Omni-IR protocol core: streaming parser, Zod schema and document store for line-oriented generative UI",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md", "LICENSE"],
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdsouza1/omni-ir.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/jdsouza1/omni-ir#readme",
+  "bugs": "https://github.com/jdsouza1/omni-ir/issues",
+  "keywords": ["omni-ir", "generative-ui", "llm", "streaming", "parser", "zod", "mcp"],
+  "publishConfig": {
+    "access": "public"
+  }
+}

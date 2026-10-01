@@ -1,6 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import type { OmniContextValue } from "./context";
-import { NodeFallback } from "./NodeFallback";
+import type { OmniContextValue } from "./context.js";
+import { NodeFallback } from "./NodeFallback.js";
 
 interface Props {
   id: string;

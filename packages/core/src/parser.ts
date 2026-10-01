@@ -1,10 +1,10 @@
 // Streaming parser: chunks → lines (R2) → raw statements (R4) → schema validation → store.
 // A bad line is reported and skipped; it never stops the stream.
-import { LineBuffer, type LineEvent } from "./lineBuffer";
-import { validateDocument, validateStatement, type Statement, type ToolRegistry } from "./schema";
-import { createStore, type OmniDocument, type OmniStore } from "./store";
-import { parseLine } from "./tokenizer";
-import type { Issue } from "./types";
+import { LineBuffer, type LineEvent } from "./lineBuffer.js";
+import { validateDocument, validateStatement, type Statement, type ToolRegistry } from "./schema.js";
+import { createStore, type OmniDocument, type OmniStore } from "./store.js";
+import { parseLine } from "./tokenizer.js";
+import type { Issue } from "./types.js";
 
 export type ParserEvent =
   | { type: "node"; id: string; line: number }
