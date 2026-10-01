@@ -99,7 +99,6 @@ The format is specified in [SPEC.md](SPEC.md). Design decisions and build histor
 
 What is done and what is planned, with dates: [docs/ROADMAP.md](docs/ROADMAP.md).
 
-- Playground visual design (in progress)
 - iOS and Android renderers
 
 ## License

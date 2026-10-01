@@ -13,7 +13,7 @@ Updated 2026-09-30. Planned dates for the remaining work are kept from the origi
 | 2 · Web reference | Streaming parser in TypeScript, written test-first | `packages/core/` |
 | 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `packages/react/` |
 | 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |
-| 2 · Web reference | Interactive Playground (all but the visual design) | `playground/` |
+| 2 · Web reference | Interactive Playground, with its visual design (light and dark, phone layout) | `playground/` |
 | 2 · Web reference | Images, ratings, date fields, lists and chat messages | `packages/react/`, `app/assets.ts` |
 | 2 · Web reference | React Catalog SDK published on npm as [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) 0.1.0, with approved, token-free releases | `packages/react/`, `.github/workflows/release.yml` |
 
@@ -28,9 +28,6 @@ gantt
     tickInterval 2month
     todayMarker off
 
-    section Phase 2 · Web reference
-    Playground visual design :p3, 2027-02-01, 2027-04-01
-
     section Phase 3 · Cross-platform
     iOS (SwiftUI) renderer :p4, 2027-04-01, 2027-07-15
     Android (Compose) renderer :p5, 2027-05-15, 2027-08-01
@@ -39,7 +36,7 @@ gantt
     Bi-directional AST sync tooling :p6, 2027-08-01, 2027-11-01
 ```
 
-The playground design can start as soon as the design is ready; its date is the original plan's.
+Phases 1 and 2 are complete. Phase 3 starts with a plan for the iOS renderer.
 
 ## Not yet scheduled
 
