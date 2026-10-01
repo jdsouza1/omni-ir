@@ -1,0 +1,20 @@
+# No account-deletion tool is available: the danger button sends a deletion request to support instead of deleting immediately
+root = Card([title, profileSection, deleteSection])
+title = Heading("Settings", level=1)
+profileSection = Card([displayName, bio, saveRow], title="Profile")
+$displayName = ""
+displayName = Input($displayName, label="Display name", placeholder="Your name")
+$bio = ""
+bio = Input($bio, label="Bio", placeholder="A short line about you (160 characters max)")
+saveRow = Stack([save], direction="row")
+save = Button("Save changes", action="saveProfile", variant="primary")
+saveProfile = McpMutation(save, tool="profile.update", params={displayName: $displayName, bio: $bio})
+deleteSection = Card([deleteHeader, deleteWarning, deleteInfo, deleteRow], title="Danger zone")
+deleteHeader = Stack([deleteTitle, deleteBadge], direction="row", gap="sm", align="center")
+deleteTitle = Heading("Delete account", level=3)
+deleteBadge = Badge("Permanent", tone="danger")
+deleteWarning = Text("Deleting your account permanently removes your profile, orders and bookings. This can't be undone.", tone="strong")
+deleteInfo = Text("Your request goes to our support team, who will confirm by email before the account is deleted.", tone="muted")
+deleteRow = Stack([deleteBtn], direction="row")
+deleteBtn = Button("Request account deletion", action="requestDeletion", variant="danger")
+requestDeletion = McpMutation(deleteBtn, tool="support.createTicket", params={subject: "Account deletion request", message: "Please permanently delete my account and all associated data."})

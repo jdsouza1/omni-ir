@@ -1,0 +1,13 @@
+root = Card([title, intro, subject, message, fine, sep, actions])
+title = Heading("Report a broken item", 1)
+intro = Text("Sorry your item arrived damaged. Tell us what happened and we'll make it right.", null, null, "muted")
+$subject = "Item arrived broken"
+subject = Input($subject, "Subject")
+$message = ""
+message = Input($message, "What happened?", "Order number, which item, and a short description of the damage")
+fine = Text("Keep the item and packaging until we reply. We usually respond within one business day.", null, null, "muted")
+sep = Divider()
+actions = Stack([submit, cancel], "row", "sm")
+submit = Button("Send to support", Action([@Run(createTicket)]), "primary")
+createTicket = Mutation("support.createTicket", {subject: $subject, message: $message})
+cancel = Button("Cancel", null, "secondary")

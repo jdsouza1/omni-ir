@@ -1,0 +1,14 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Card","props":{},"children":["title","merchant","totalRow","note","sep","actions"]}}
+{"op":"add","path":"/elements/title","value":{"type":"Heading","props":{"text":"Payment","level":1},"children":[]}}
+{"op":"add","path":"/elements/merchant","value":{"type":"Text","props":{"text":"Shopping bag: Linen shirt, Canvas tote","tone":"muted"},"children":[]}}
+{"op":"add","path":"/elements/totalRow","value":{"type":"Stack","props":{"direction":"row","gap":"sm","align":"center"},"children":["totalLabel","total"]}}
+{"op":"add","path":"/elements/totalLabel","value":{"type":"Text","props":{"text":"Total","tone":"strong"},"children":[]}}
+{"op":"add","path":"/state/amount","value":100}
+{"op":"add","path":"/elements/total","value":{"type":"Text","props":{"text":{"$state":"/amount"},"format":"currency","currency":"USD","tone":"strong"},"children":[]}}
+{"op":"add","path":"/state/note","value":""}
+{"op":"add","path":"/elements/note","value":{"type":"Input","props":{"value":{"$bindState":"/note"},"label":"Note (optional)","placeholder":"e.g. gift wrap, please"},"children":[]}}
+{"op":"add","path":"/elements/sep","value":{"type":"Divider","props":{},"children":[]}}
+{"op":"add","path":"/elements/actions","value":{"type":"Stack","props":{"direction":"row","gap":"sm"},"children":["pay","cancel"]}}
+{"op":"add","path":"/elements/pay","value":{"type":"Button","props":{"label":"Pay now","variant":"danger"},"children":[],"on":{"press":{"action":"payments.confirm","params":{"amount":{"$state":"/amount"},"note":{"$state":"/note"}}}}}}
+{"op":"add","path":"/elements/cancel","value":{"type":"Button","props":{"label":"Cancel","variant":"secondary"},"children":[]}}

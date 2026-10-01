@@ -1,0 +1,14 @@
+{"version":"v0.9","createSurface":{"surfaceId":"styling","catalogId":"https://example.com/catalogs/omni-ir.json"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"root","component":"Card","children":["title","merchant","totalRow","note","sep","actions"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"title","component":"Heading","text":"Payment","level":1}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"merchant","component":"Text","text":"Shopping bag: Linen shirt, Canvas tote","tone":"muted"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"totalRow","component":"Stack","children":["totalLabel","total"],"direction":"row","gap":"sm","align":"center"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"totalLabel","component":"Text","text":"Total","tone":"strong"}]}}
+{"version":"v0.9","updateDataModel":{"surfaceId":"styling","path":"/amount","value":100}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"total","component":"Text","text":{"path":"/amount"},"format":"currency","currency":"USD","tone":"strong"}]}}
+{"version":"v0.9","updateDataModel":{"surfaceId":"styling","path":"/note","value":""}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"note","component":"Input","value":{"path":"/note"},"label":"Note (optional)","placeholder":"e.g. gift wrap, please"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"sep","component":"Divider"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"actions","component":"Stack","children":["pay","cancel"],"direction":"row","gap":"sm"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"pay","component":"Button","label":"Pay now","variant":"danger","action":{"event":{"name":"payments.confirm","context":{"amount":{"path":"/amount"},"note":{"path":"/note"}}}}}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"styling","components":[{"id":"cancel","component":"Button","label":"Cancel","variant":"secondary"}]}}

@@ -1,0 +1,15 @@
+root = Card([title, items, sep, totalRow, note, actions])
+title = Heading("Shopping bag", level=1)
+items = List([shirtItem, toteItem])
+shirtItem = ListItem("Linen shirt", detail="Size M · Natural · Qty 1", trailing="$68.00", image="shirt")
+toteItem = ListItem("Canvas tote", detail="Olive · Qty 1", trailing="$32.00", image="tote")
+sep = Divider()
+totalRow = Stack([totalLabel, total], direction="row", gap="sm", align="center")
+totalLabel = Text("Total", tone="strong")
+$amount = 100.00
+total = Text($amount, format="currency", currency="USD", tone="strong")
+$note = ""
+note = Input($note, label="Order note (optional)", placeholder="e.g. gift wrap, please")
+actions = Stack([pay], direction="row")
+pay = Button("Pay now", action="pay", variant="primary")
+payBag = McpMutation(pay, tool="payments.confirm", params={amount: $amount, note: $note})

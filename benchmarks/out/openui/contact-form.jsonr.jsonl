@@ -1,0 +1,22 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Stack","props":{"direction":"column","gap":"l"},"children":["title","form"]}}
+{"op":"add","path":"/elements/title","value":{"type":"TextContent","props":{"text":"Contact Us","size":"large-heavy"},"children":[]}}
+{"op":"add","path":"/elements/form","value":{"type":"Form","props":{"name":"contact"},"children":["nameField","emailField","phoneField","subjectField","messageField","formButtons"]}}
+{"op":"add","path":"/elements/nameField","value":{"type":"FormControl","props":{"label":"Name"},"children":["input1"]}}
+{"op":"add","path":"/elements/input1","value":{"type":"Input","props":{"name":"name","placeholder":"Your full name","type":"text","rules":["required","minLength:2"]},"children":[]}}
+{"op":"add","path":"/elements/emailField","value":{"type":"FormControl","props":{"label":"Email"},"children":["input2"]}}
+{"op":"add","path":"/elements/input2","value":{"type":"Input","props":{"name":"email","placeholder":"you@example.com","type":"email","rules":["required","email"]},"children":[]}}
+{"op":"add","path":"/elements/phoneField","value":{"type":"FormControl","props":{"label":"Phone"},"children":["input3"]}}
+{"op":"add","path":"/elements/input3","value":{"type":"Input","props":{"name":"phone","placeholder":"e.g., +1 555 123 4567","type":"text","rules":["required","minLength:7","maxLength:20"]},"children":[]}}
+{"op":"add","path":"/elements/subjectField","value":{"type":"FormControl","props":{"label":"Subject"},"children":["select1"]}}
+{"op":"add","path":"/elements/select1","value":{"type":"Select","props":{"name":"subject","placeholder":"Select a subject...","rules":["required"]},"children":["selectItem1","selectItem2","selectItem3","selectItem4","selectItem5"]}}
+{"op":"add","path":"/elements/messageField","value":{"type":"FormControl","props":{"label":"Message"},"children":["textArea1"]}}
+{"op":"add","path":"/elements/textArea1","value":{"type":"TextArea","props":{"name":"message","placeholder":"How can we help?","rows":6,"rules":["required","minLength:10"]},"children":[]}}
+{"op":"add","path":"/elements/selectItem1","value":{"type":"SelectItem","props":{"value":"general","label":"General inquiry"},"children":[]}}
+{"op":"add","path":"/elements/selectItem2","value":{"type":"SelectItem","props":{"value":"support","label":"Support"},"children":[]}}
+{"op":"add","path":"/elements/selectItem3","value":{"type":"SelectItem","props":{"value":"sales","label":"Sales"},"children":[]}}
+{"op":"add","path":"/elements/selectItem4","value":{"type":"SelectItem","props":{"value":"billing","label":"Billing"},"children":[]}}
+{"op":"add","path":"/elements/selectItem5","value":{"type":"SelectItem","props":{"value":"feedback","label":"Feedback"},"children":[]}}
+{"op":"add","path":"/elements/formButtons","value":{"type":"Buttons","props":{"direction":"row"},"children":["submitBtn","cancelBtn"]}}
+{"op":"add","path":"/elements/submitBtn","value":{"type":"Button","props":{"label":"Submit","action":"submit:contact","variant":"primary"},"children":[]}}
+{"op":"add","path":"/elements/cancelBtn","value":{"type":"Button","props":{"label":"Cancel","action":"action:cancel_contact","variant":"secondary"},"children":[]}}

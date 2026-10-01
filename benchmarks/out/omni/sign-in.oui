@@ -1,0 +1,9 @@
+root = Card([title, intro, email, actions, fine])
+title = Heading("Sign in", 1)
+intro = Text("Enter your email and we'll send you a one-time sign-in link. No password needed.", null, null, "muted")
+$email = ""
+email = Input($email, "Email address", "you@example.com")
+actions = Stack([send], "row")
+send = Button("Email me a link", Action([@Run(sendLink)]), "primary")
+sendLink = Mutation("auth.sendMagicLink", {email: $email})
+fine = Text("The link expires after 15 minutes. Check your spam folder if it doesn't arrive.", null, null, "muted")

@@ -1,0 +1,48 @@
+{"version":"v0.9","createSurface":{"surfaceId":"dashboard","catalogId":"https://example.com/catalogs/openui.json"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"root","component":"Stack","children":["headerCard","kpiRow","chartsRow1","featuresCard","revenueCard"],"direction":"column","gap":"l"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"headerCard","component":"Card","children":["header"],"variant":"card"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"header","component":"CardHeader","title":"Product Analytics Dashboard","subtitle":"Usage, acquisition, feature adoption, and revenue trends"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpiRow","component":"Stack","children":["kpi1","kpi2","kpi3","kpi4"],"direction":"row","gap":"m","align":"stretch","justify":"start","wrap":true}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi1","component":"Card","children":["kpi1Title","kpi1Value","kpi1Note"],"variant":"sunk"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi1Title","component":"TextContent","text":"Monthly Active Users (MAU)","size":"small-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi1Value","component":"TextContent","text":"128,400","size":"large-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi1Note","component":"TextContent","text":"+6.2% vs last month","size":"small"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi2","component":"Card","children":["kpi2Title","kpi2Value","kpi2Note"],"variant":"sunk"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi2Title","component":"TextContent","text":"New Users (30d)","size":"small-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi2Value","component":"TextContent","text":"24,950","size":"large-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi2Note","component":"TextContent","text":"+3.1% vs last 30d","size":"small"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi3","component":"Card","children":["kpi3Title","kpi3Value","kpi3Note"],"variant":"sunk"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi3Title","component":"TextContent","text":"MRR","size":"small-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi3Value","component":"TextContent","text":"$412,000","size":"large-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi3Note","component":"TextContent","text":"+4.4% MoM","size":"small"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi4","component":"Card","children":["kpi4Title","kpi4Value","kpi4Note"],"variant":"sunk"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi4Title","component":"TextContent","text":"ARR","size":"small-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi4Value","component":"TextContent","text":"$4.94M","size":"large-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"kpi4Note","component":"TextContent","text":"+18.7% YoY","size":"small"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"chartsRow1","component":"Stack","children":["mauCard","acquisitionCard"],"direction":"row","gap":"l","align":"stretch","justify":"start","wrap":true}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"mauCard","component":"Card","children":["mauHeader","mauChart"],"variant":"card"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"mauHeader","component":"CardHeader","title":"Monthly Active Users","subtitle":"Last 12 months"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"mauChart","component":"BarChart","labels":["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"],"series":["mauSeries"],"variant":"grouped","xLabel":"Month","yLabel":"Users"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"mauSeries","component":"Series","category":"MAU","values":[84500,87200,90100,93800,96500,100200,104800,109600,114300,119900,123700,128400]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"acquisitionCard","component":"Card","children":["acqHeader","acqChart","acqLegendNote"],"variant":"card"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"acqHeader","component":"CardHeader","title":"User Acquisition","subtitle":"Share of new users (last 30 days)"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"acqChart","component":"PieChart","slices":["acq1","acq2","acq3","acq4","acq5"],"variant":"donut"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"acq1","component":"Slice","category":"Organic Search","value":34}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"acq2","component":"Slice","category":"Paid Search","value":22}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"acq3","component":"Slice","category":"Referrals","value":16}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"acq4","component":"Slice","category":"Social","value":12}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"acq5","component":"Slice","category":"Direct / Other","value":16}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"acqLegendNote","component":"TextContent","text":"Tip: Track CAC and conversion rate by channel to explain mix shifts.","size":"small"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"featuresCard","component":"Card","children":["featuresHeader","featuresTable"],"variant":"card"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"featuresHeader","component":"CardHeader","title":"Top Features","subtitle":"Adoption and engagement (last 30 days)"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"featuresTable","component":"Table","columns":["col1","col2","col3","col4"],"rows":[["Dashboards",48200,62.5,5.8],["Automations",31750,41.2,3.1],["Integrations",28900,37.5,2.4],["Team Collaboration",27100,35.2,4.6],["Exports",19850,25.8,1.7],["Alerts",17600,22.9,2],["API Access",12150,15.8,6.3]]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"col1","component":"Col","label":"Feature","type":"string"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"col2","component":"Col","label":"Weekly Active Users","type":"number"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"col3","component":"Col","label":"Adoption Rate (%)","type":"number"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"col4","component":"Col","label":"Avg. Uses / User","type":"number"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"revenueCard","component":"Card","children":["revenueHeader","revenueChart","revenueNote"],"variant":"card"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"revenueHeader","component":"CardHeader","title":"Revenue Trend","subtitle":"MRR and ARR (last 12 months)"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"revenueChart","component":"LineChart","labels":["Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","Jan","Feb","Mar"],"series":["mrrSeries","arrSeries"],"variant":"natural","xLabel":"Month","yLabel":"USD"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"mrrSeries","component":"Series","category":"MRR ($)","values":[332000,341000,349000,356000,364000,372000,381000,389000,397000,404000,408000,412000]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"arrSeries","component":"Series","category":"ARR ($)","values":[3984000,4092000,4188000,4272000,4368000,4464000,4572000,4668000,4764000,4848000,4896000,4944000]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"dashboard","components":[{"id":"revenueNote","component":"TextContent","text":"ARR shown as 12×MRR for directional tracking; replace with contracted ARR if you track annual commitments.","size":"small"}]}}

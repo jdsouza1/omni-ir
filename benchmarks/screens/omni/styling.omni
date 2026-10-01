@@ -1,0 +1,15 @@
+# No CSS or HTML available: the red button uses variant="danger" and the bold total uses tone="strong"
+root = Card([title, merchant, totalRow, note, sep, actions])
+title = Heading("Payment", level=1)
+merchant = Text("Shopping bag: Linen shirt, Canvas tote", tone="muted")
+totalRow = Stack([totalLabel, total], direction="row", gap="sm", align="center")
+totalLabel = Text("Total", tone="strong")
+$amount = 100.00
+total = Text($amount, format="currency", currency="USD", tone="strong")
+$note = ""
+note = Input($note, label="Note (optional)", placeholder="e.g. gift wrap, please")
+sep = Divider()
+actions = Stack([pay, cancel], direction="row", gap="sm")
+pay = Button("Pay now", action="pay", variant="danger")
+payNow = McpMutation(pay, tool="payments.confirm", params={amount: $amount, note: $note})
+cancel = Button("Cancel", variant="secondary")

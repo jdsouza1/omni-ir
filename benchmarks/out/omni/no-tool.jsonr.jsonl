@@ -1,0 +1,18 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Card","props":{},"children":["title","profileSection","deleteSection"]}}
+{"op":"add","path":"/elements/title","value":{"type":"Heading","props":{"text":"Settings","level":1},"children":[]}}
+{"op":"add","path":"/elements/profileSection","value":{"type":"Card","props":{"title":"Profile"},"children":["displayName","bio","saveRow"]}}
+{"op":"add","path":"/state/displayName","value":""}
+{"op":"add","path":"/elements/displayName","value":{"type":"Input","props":{"value":{"$bindState":"/displayName"},"label":"Display name","placeholder":"Your name"},"children":[]}}
+{"op":"add","path":"/state/bio","value":""}
+{"op":"add","path":"/elements/bio","value":{"type":"Input","props":{"value":{"$bindState":"/bio"},"label":"Bio","placeholder":"A short line about you (160 characters max)"},"children":[]}}
+{"op":"add","path":"/elements/saveRow","value":{"type":"Stack","props":{"direction":"row"},"children":["save"]}}
+{"op":"add","path":"/elements/save","value":{"type":"Button","props":{"label":"Save changes","variant":"primary"},"children":[],"on":{"press":{"action":"profile.update","params":{"displayName":{"$state":"/displayName"},"bio":{"$state":"/bio"}}}}}}
+{"op":"add","path":"/elements/deleteSection","value":{"type":"Card","props":{"title":"Danger zone"},"children":["deleteHeader","deleteWarning","deleteInfo","deleteRow"]}}
+{"op":"add","path":"/elements/deleteHeader","value":{"type":"Stack","props":{"direction":"row","gap":"sm","align":"center"},"children":["deleteTitle","deleteBadge"]}}
+{"op":"add","path":"/elements/deleteTitle","value":{"type":"Heading","props":{"text":"Delete account","level":3},"children":[]}}
+{"op":"add","path":"/elements/deleteBadge","value":{"type":"Badge","props":{"text":"Permanent","tone":"danger"},"children":[]}}
+{"op":"add","path":"/elements/deleteWarning","value":{"type":"Text","props":{"text":"Deleting your account permanently removes your profile, orders and bookings. This can't be undone.","tone":"strong"},"children":[]}}
+{"op":"add","path":"/elements/deleteInfo","value":{"type":"Text","props":{"text":"Your request goes to our support team, who will confirm by email before the account is deleted.","tone":"muted"},"children":[]}}
+{"op":"add","path":"/elements/deleteRow","value":{"type":"Stack","props":{"direction":"row"},"children":["deleteBtn"]}}
+{"op":"add","path":"/elements/deleteBtn","value":{"type":"Button","props":{"label":"Request account deletion","variant":"danger"},"children":[],"on":{"press":{"action":"support.createTicket","params":{"subject":"Account deletion request","message":"Please permanently delete my account and all associated data."}}}}}

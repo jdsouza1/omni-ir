@@ -1,0 +1,12 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Stack","props":{"direction":"column","gap":"l"},"children":["header","layout"]}}
+{"op":"add","path":"/elements/header","value":{"type":"TextContent","props":{"text":"Revenue Dashboard","size":"large-heavy"},"children":[]}}
+{"op":"add","path":"/elements/layout","value":{"type":"Stack","props":{"direction":"row","gap":"l","align":"stretch","justify":"start","wrap":true},"children":["metricCard","chartCard"]}}
+{"op":"add","path":"/elements/metricCard","value":{"type":"Card","props":{"variant":"card"},"children":["metricHeader","metricValue","metricDelta"]}}
+{"op":"add","path":"/elements/metricHeader","value":{"type":"CardHeader","props":{"title":"Total Revenue","subtitle":"Last 6 months"},"children":[]}}
+{"op":"add","path":"/elements/metricValue","value":{"type":"TextContent","props":{"text":"$1,284,000","size":"large-heavy"},"children":[]}}
+{"op":"add","path":"/elements/metricDelta","value":{"type":"TextCallout","props":{"variant":"success","title":"Up 8.4%","description":"Compared to the previous 6 months"},"children":[]}}
+{"op":"add","path":"/elements/chartCard","value":{"type":"Card","props":{"variant":"card"},"children":["chartHeader","revenueChart"]}}
+{"op":"add","path":"/elements/chartHeader","value":{"type":"CardHeader","props":{"title":"Monthly Revenue","subtitle":"Last 6 months"},"children":[]}}
+{"op":"add","path":"/elements/revenueChart","value":{"type":"BarChart","props":{"labels":["Oct","Nov","Dec","Jan","Feb","Mar"],"variant":"grouped","xLabel":"Month","yLabel":"Revenue (USD)"},"children":["revenueSeries"]}}
+{"op":"add","path":"/elements/revenueSeries","value":{"type":"Series","props":{"category":"Revenue","values":[198000,205000,214000,210000,223000,234000]},"children":[]}}

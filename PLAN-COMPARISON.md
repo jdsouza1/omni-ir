@@ -2,7 +2,7 @@
 
 Goal: honest, reproducible numbers on how Omni-IR compares with other ways a model can describe a UI, covering size, streaming and reliability, plus a sourced table of what each format allows. The owner asked for this on 2026-10-01; nothing goes on the landing page without the owner's review.
 
-Status: **APPROVED 2026-10-01** as a thorough comparison with the recommendations: OpenUI Lang, A2UI and json-render measured, HTML and React as baselines; reliability runs for both Omni-IR (current prompt) and OpenUI Lang; results in `benchmarks/` and `docs/COMPARISON.md` with a visual review page; landing wording only after review. The paid 46-brief run stays out unless the owner asks.
+Status: **APPROVED 2026-10-01** as a thorough comparison with the recommendations: OpenUI Lang, A2UI and json-render measured, HTML and React as baselines; reliability runs for both Omni-IR (current prompt) and OpenUI Lang; results in `benchmarks/` and `docs/COMPARISON.md` with a visual review page; landing wording only after review. The paid 46-brief run is not part of this step: the owner confirmed on 2026-10-01 not to run it and to keep it as an optional extra (task E.1), only with the owner's go-ahead.
 
 ## The landscape (researched 2026-10-01)
 
@@ -78,6 +78,9 @@ So this plan **extends OpenUI's published benchmark** (same seven scenarios, sam
 **D. Write-up** *(checkpoint: you review)*
 - [ ] D.1 `docs/COMPARISON.md`: method, results, caveats and sources; a review page
 - [ ] D.2 Only after your review: landing page and README wording
+
+**E. Optional, not scheduled** *(only if the owner decides to; costs money)*
+- [ ] E.1 Omni-IR on Thesys's 46 briefs × 4 runs (184 paid API runs). Not run unless the owner gives the go-ahead.
 
 ## What I needed from you
 Answered 2026-10-01: "a thorough comparison", with a visual.

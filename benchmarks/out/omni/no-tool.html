@@ -1,0 +1,29 @@
+<section class="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+  <h1 class="text-2xl font-semibold text-gray-900">Settings</h1>
+  <section class="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <h2 class="text-base font-semibold text-gray-900">Profile</h2>
+    <label class="flex flex-col gap-1">
+      <span class="text-sm font-medium text-gray-700">Display name</span>
+      <input type="text" name="displayName" placeholder="Your name" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+    </label>
+    <label class="flex flex-col gap-1">
+      <span class="text-sm font-medium text-gray-700">Bio</span>
+      <input type="text" name="bio" placeholder="A short line about you (160 characters max)" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+    </label>
+    <div class="flex flex-row flex-wrap gap-4 items-stretch">
+      <button type="button" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" data-tool="profile.update" data-params="{&quot;displayName&quot;:&quot;#displayName&quot;,&quot;bio&quot;:&quot;#bio&quot;}">Save changes</button>
+    </div>
+  </section>
+  <section class="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <h2 class="text-base font-semibold text-gray-900">Danger zone</h2>
+    <div class="flex flex-row flex-wrap gap-2 items-center">
+      <h3 class="text-lg font-semibold text-gray-900">Delete account</h3>
+      <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700">Permanent</span>
+    </div>
+    <p class="font-semibold text-gray-900">Deleting your account permanently removes your profile, orders and bookings. This can't be undone.</p>
+    <p class="text-sm text-gray-500">Your request goes to our support team, who will confirm by email before the account is deleted.</p>
+    <div class="flex flex-row flex-wrap gap-4 items-stretch">
+      <button type="button" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700" data-tool="support.createTicket" data-params="{&quot;subject&quot;:&quot;Account deletion request&quot;,&quot;message&quot;:&quot;Please permanently delete my account and all associated data.&quot;}">Request account deletion</button>
+    </div>
+  </section>
+</section>

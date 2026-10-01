@@ -1,0 +1,1268 @@
+{
+  "tokenizer": "tiktoken 1.x, encoding_for_model(\"gpt-5\") (o200k_base), as in OpenUI's benchmark",
+  "formats": [
+    {
+      "id": "omni-ir",
+      "label": "Omni-IR",
+      "ext": "omni",
+      "sets": [
+        "omni",
+        "openui"
+      ]
+    },
+    {
+      "id": "openui-lang",
+      "label": "OpenUI Lang",
+      "ext": "oui",
+      "sets": [
+        "omni",
+        "openui"
+      ]
+    },
+    {
+      "id": "a2ui",
+      "label": "A2UI v0.9",
+      "ext": "a2ui.jsonl",
+      "sets": [
+        "omni",
+        "openui"
+      ]
+    },
+    {
+      "id": "a2ui-streamed",
+      "label": "A2UI v0.9 (one message per component)",
+      "ext": "a2ui-streamed.jsonl",
+      "sets": [
+        "omni",
+        "openui"
+      ]
+    },
+    {
+      "id": "json-render",
+      "label": "json-render",
+      "ext": "jsonr.jsonl",
+      "sets": [
+        "omni",
+        "openui"
+      ]
+    },
+    {
+      "id": "html",
+      "label": "HTML + Tailwind",
+      "ext": "html",
+      "sets": [
+        "omni"
+      ]
+    },
+    {
+      "id": "jsx",
+      "label": "React JSX",
+      "ext": "jsx",
+      "sets": [
+        "omni",
+        "openui"
+      ]
+    }
+  ],
+  "screens": [
+    {
+      "name": "booking",
+      "set": "omni",
+      "components": 14,
+      "tokens": {
+        "omni-ir": 273,
+        "openui-lang": 260,
+        "a2ui": 436,
+        "a2ui-streamed": 732,
+        "json-render": 609,
+        "html": 541,
+        "jsx": 341
+      },
+      "chars": {
+        "omni-ir": 937,
+        "openui-lang": 835,
+        "a2ui": 1643,
+        "a2ui-streamed": 2727,
+        "json-render": 2166,
+        "html": 1798,
+        "jsx": 1199
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.154,
+          "half": 0.513,
+          "firstTokens": 42,
+          "halfTokens": 140
+        },
+        "openui-lang": {
+          "first": 0.154,
+          "half": 0.527,
+          "firstTokens": 40,
+          "halfTokens": 137
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 436,
+          "halfTokens": 436
+        },
+        "a2ui-streamed": {
+          "first": 0.175,
+          "half": 0.53,
+          "firstTokens": 128,
+          "halfTokens": 388
+        },
+        "json-render": {
+          "first": 0.159,
+          "half": 0.522,
+          "firstTokens": 97,
+          "halfTokens": 318
+        },
+        "html": {
+          "first": 0.105,
+          "half": 0.442,
+          "firstTokens": 57,
+          "halfTokens": 239
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 341,
+          "halfTokens": 341
+        }
+      },
+      "original": {
+        "format": "omni-ir",
+        "tokens": 273,
+        "chars": 937
+      }
+    },
+    {
+      "name": "bag",
+      "set": "omni",
+      "components": 12,
+      "tokens": {
+        "omni-ir": 237,
+        "openui-lang": 221,
+        "a2ui": 394,
+        "a2ui-streamed": 646,
+        "json-render": 541,
+        "html": 551,
+        "jsx": 296
+      },
+      "chars": {
+        "omni-ir": 844,
+        "openui-lang": 714,
+        "a2ui": 1491,
+        "a2ui-streamed": 2373,
+        "json-render": 1933,
+        "html": 1819,
+        "jsx": 1094
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.118,
+          "half": 0.435,
+          "firstTokens": 28,
+          "halfTokens": 103
+        },
+        "openui-lang": {
+          "first": 0.122,
+          "half": 0.434,
+          "firstTokens": 27,
+          "halfTokens": 96
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 394,
+          "halfTokens": 394
+        },
+        "a2ui-streamed": {
+          "first": 0.175,
+          "half": 0.463,
+          "firstTokens": 113,
+          "halfTokens": 299
+        },
+        "json-render": {
+          "first": 0.152,
+          "half": 0.455,
+          "firstTokens": 82,
+          "halfTokens": 246
+        },
+        "html": {
+          "first": 0.085,
+          "half": 0.57,
+          "firstTokens": 47,
+          "halfTokens": 314
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 296,
+          "halfTokens": 296
+        }
+      },
+      "original": {
+        "format": "omni-ir",
+        "tokens": 239,
+        "chars": 847
+      }
+    },
+    {
+      "name": "assistant",
+      "set": "omni",
+      "components": 9,
+      "tokens": {
+        "omni-ir": 210,
+        "openui-lang": 203,
+        "a2ui": 339,
+        "a2ui-streamed": 508,
+        "json-render": 423,
+        "html": 394,
+        "jsx": 261
+      },
+      "chars": {
+        "omni-ir": 821,
+        "openui-lang": 757,
+        "a2ui": 1359,
+        "a2ui-streamed": 1997,
+        "json-render": 1600,
+        "html": 1375,
+        "jsx": 1067
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.176,
+          "half": 0.643,
+          "firstTokens": 37,
+          "halfTokens": 135
+        },
+        "openui-lang": {
+          "first": 0.192,
+          "half": 0.655,
+          "firstTokens": 39,
+          "halfTokens": 133
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 339,
+          "halfTokens": 339
+        },
+        "a2ui-streamed": {
+          "first": 0.244,
+          "half": 0.6,
+          "firstTokens": 124,
+          "halfTokens": 305
+        },
+        "json-render": {
+          "first": 0.215,
+          "half": 0.593,
+          "firstTokens": 91,
+          "halfTokens": 251
+        },
+        "html": {
+          "first": 0.173,
+          "half": 0.536,
+          "firstTokens": 68,
+          "halfTokens": 211
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 261,
+          "halfTokens": 261
+        }
+      },
+      "original": {
+        "format": "omni-ir",
+        "tokens": 210,
+        "chars": 821
+      }
+    },
+    {
+      "name": "sign-in",
+      "set": "omni",
+      "components": 7,
+      "tokens": {
+        "omni-ir": 148,
+        "openui-lang": 146,
+        "a2ui": 268,
+        "a2ui-streamed": 399,
+        "json-render": 321,
+        "html": 278,
+        "jsx": 203
+      },
+      "chars": {
+        "omni-ir": 586,
+        "openui-lang": 544,
+        "a2ui": 1061,
+        "a2ui-streamed": 1529,
+        "json-render": 1218,
+        "html": 993,
+        "jsx": 802
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.169,
+          "half": 0.486,
+          "firstTokens": 25,
+          "halfTokens": 72
+        },
+        "openui-lang": {
+          "first": 0.164,
+          "half": 0.493,
+          "firstTokens": 24,
+          "halfTokens": 72
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 268,
+          "halfTokens": 268
+        },
+        "a2ui-streamed": {
+          "first": 0.283,
+          "half": 0.612,
+          "firstTokens": 113,
+          "halfTokens": 244
+        },
+        "json-render": {
+          "first": 0.246,
+          "half": 0.583,
+          "firstTokens": 79,
+          "halfTokens": 187
+        },
+        "html": {
+          "first": 0.169,
+          "half": 0.55,
+          "firstTokens": 47,
+          "halfTokens": 153
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 203,
+          "halfTokens": 203
+        }
+      },
+      "original": {
+        "format": "omni-ir",
+        "tokens": 148,
+        "chars": 586
+      }
+    },
+    {
+      "name": "order",
+      "set": "omni",
+      "components": 13,
+      "tokens": {
+        "omni-ir": 236,
+        "openui-lang": 228,
+        "a2ui": 360,
+        "a2ui-streamed": 609,
+        "json-render": 511,
+        "html": 370,
+        "jsx": 263
+      },
+      "chars": {
+        "omni-ir": 845,
+        "openui-lang": 758,
+        "a2ui": 1387,
+        "a2ui-streamed": 2287,
+        "json-render": 1861,
+        "html": 1217,
+        "jsx": 950
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.233,
+          "half": 0.585,
+          "firstTokens": 55,
+          "halfTokens": 138
+        },
+        "openui-lang": {
+          "first": 0.224,
+          "half": 0.596,
+          "firstTokens": 51,
+          "halfTokens": 136
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 360,
+          "halfTokens": 360
+        },
+        "a2ui-streamed": {
+          "first": 0.276,
+          "half": 0.635,
+          "firstTokens": 168,
+          "halfTokens": 387
+        },
+        "json-render": {
+          "first": 0.25,
+          "half": 0.62,
+          "firstTokens": 128,
+          "halfTokens": 317
+        },
+        "html": {
+          "first": 0.189,
+          "half": 0.519,
+          "firstTokens": 70,
+          "halfTokens": 192
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 263,
+          "halfTokens": 263
+        }
+      },
+      "original": {
+        "format": "omni-ir",
+        "tokens": 236,
+        "chars": 845
+      }
+    },
+    {
+      "name": "support",
+      "set": "omni",
+      "components": 10,
+      "tokens": {
+        "omni-ir": 204,
+        "openui-lang": 200,
+        "a2ui": 342,
+        "a2ui-streamed": 553,
+        "json-render": 463,
+        "html": 422,
+        "jsx": 268
+      },
+      "chars": {
+        "omni-ir": 873,
+        "openui-lang": 817,
+        "a2ui": 1440,
+        "a2ui-streamed": 2216,
+        "json-render": 1797,
+        "html": 1552,
+        "jsx": 1115
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.152,
+          "half": 0.51,
+          "firstTokens": 31,
+          "halfTokens": 104
+        },
+        "openui-lang": {
+          "first": 0.15,
+          "half": 0.515,
+          "firstTokens": 30,
+          "halfTokens": 103
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 342,
+          "halfTokens": 342
+        },
+        "a2ui-streamed": {
+          "first": 0.21,
+          "half": 0.584,
+          "firstTokens": 116,
+          "halfTokens": 323
+        },
+        "json-render": {
+          "first": 0.184,
+          "half": 0.557,
+          "firstTokens": 85,
+          "halfTokens": 258
+        },
+        "html": {
+          "first": 0.116,
+          "half": 0.555,
+          "firstTokens": 49,
+          "halfTokens": 234
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 268,
+          "halfTokens": 268
+        }
+      },
+      "original": {
+        "format": "omni-ir",
+        "tokens": 204,
+        "chars": 873
+      }
+    },
+    {
+      "name": "outside-catalog",
+      "set": "omni",
+      "components": 14,
+      "tokens": {
+        "omni-ir": 179,
+        "openui-lang": 179,
+        "a2ui": 323,
+        "a2ui-streamed": 619,
+        "json-render": 485,
+        "html": 451,
+        "jsx": 212
+      },
+      "chars": {
+        "omni-ir": 670,
+        "openui-lang": 608,
+        "a2ui": 1296,
+        "a2ui-streamed": 2401,
+        "json-render": 1805,
+        "html": 1469,
+        "jsx": 789
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.117,
+          "half": 0.581,
+          "firstTokens": 21,
+          "halfTokens": 104
+        },
+        "openui-lang": {
+          "first": 0.112,
+          "half": 0.564,
+          "firstTokens": 20,
+          "halfTokens": 101
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 323,
+          "halfTokens": 323
+        },
+        "a2ui-streamed": {
+          "first": 0.179,
+          "half": 0.599,
+          "firstTokens": 111,
+          "halfTokens": 371
+        },
+        "json-render": {
+          "first": 0.153,
+          "half": 0.584,
+          "firstTokens": 74,
+          "halfTokens": 283
+        },
+        "html": {
+          "first": 0.322,
+          "half": 0.596,
+          "firstTokens": 145,
+          "halfTokens": 269
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 212,
+          "halfTokens": 212
+        }
+      },
+      "original": {
+        "format": "omni-ir",
+        "tokens": 206,
+        "chars": 795
+      }
+    },
+    {
+      "name": "styling",
+      "set": "omni",
+      "components": 11,
+      "tokens": {
+        "omni-ir": 198,
+        "openui-lang": 191,
+        "a2ui": 347,
+        "a2ui-streamed": 589,
+        "json-render": 478,
+        "html": 357,
+        "jsx": 253
+      },
+      "chars": {
+        "omni-ir": 739,
+        "openui-lang": 654,
+        "a2ui": 1361,
+        "a2ui-streamed": 2214,
+        "json-render": 1752,
+        "html": 1226,
+        "jsx": 969
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.136,
+          "half": 0.515,
+          "firstTokens": 27,
+          "halfTokens": 102
+        },
+        "openui-lang": {
+          "first": 0.136,
+          "half": 0.529,
+          "firstTokens": 26,
+          "halfTokens": 101
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 347,
+          "halfTokens": 347
+        },
+        "a2ui-streamed": {
+          "first": 0.195,
+          "half": 0.557,
+          "firstTokens": 115,
+          "halfTokens": 328
+        },
+        "json-render": {
+          "first": 0.169,
+          "half": 0.538,
+          "firstTokens": 81,
+          "halfTokens": 257
+        },
+        "html": {
+          "first": 0.129,
+          "half": 0.333,
+          "firstTokens": 46,
+          "halfTokens": 119
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 253,
+          "halfTokens": 253
+        }
+      },
+      "original": {
+        "format": "omni-ir",
+        "tokens": 224,
+        "chars": 845
+      }
+    },
+    {
+      "name": "no-tool",
+      "set": "omni",
+      "components": 15,
+      "tokens": {
+        "omni-ir": 333,
+        "openui-lang": 316,
+        "a2ui": 499,
+        "a2ui-streamed": 830,
+        "json-render": 676,
+        "html": 655,
+        "jsx": 371
+      },
+      "chars": {
+        "omni-ir": 1453,
+        "openui-lang": 1313,
+        "a2ui": 2158,
+        "a2ui-streamed": 3319,
+        "json-render": 2715,
+        "html": 2448,
+        "jsx": 1582
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.066,
+          "half": 0.598,
+          "firstTokens": 22,
+          "halfTokens": 199
+        },
+        "openui-lang": {
+          "first": 0.066,
+          "half": 0.579,
+          "firstTokens": 21,
+          "halfTokens": 183
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 499,
+          "halfTokens": 499
+        },
+        "a2ui-streamed": {
+          "first": 0.133,
+          "half": 0.682,
+          "firstTokens": 110,
+          "halfTokens": 566
+        },
+        "json-render": {
+          "first": 0.112,
+          "half": 0.664,
+          "firstTokens": 76,
+          "halfTokens": 449
+        },
+        "html": {
+          "first": 0.07,
+          "half": 0.67,
+          "firstTokens": 46,
+          "halfTokens": 439
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 371,
+          "halfTokens": 371
+        }
+      },
+      "original": {
+        "format": "omni-ir",
+        "tokens": 356,
+        "chars": 1580
+      }
+    },
+    {
+      "name": "simple-table",
+      "set": "openui",
+      "components": 7,
+      "tokens": {
+        "omni-ir": 169,
+        "openui-lang": 146,
+        "a2ui": 253,
+        "a2ui-streamed": 383,
+        "json-render": 318,
+        "jsx": 191
+      },
+      "chars": {
+        "omni-ir": 486,
+        "openui-lang": 432,
+        "a2ui": 882,
+        "a2ui-streamed": 1374,
+        "json-render": 1062,
+        "jsx": 621
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.13,
+          "half": 0.787,
+          "firstTokens": 22,
+          "halfTokens": 133
+        },
+        "openui-lang": {
+          "first": 0.144,
+          "half": 0.425,
+          "firstTokens": 21,
+          "halfTokens": 62
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 253,
+          "halfTokens": 253
+        },
+        "a2ui-streamed": {
+          "first": 0.287,
+          "half": 0.687,
+          "firstTokens": 110,
+          "halfTokens": 263
+        },
+        "json-render": {
+          "first": 0.245,
+          "half": 0.679,
+          "firstTokens": 78,
+          "halfTokens": 216
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 191,
+          "halfTokens": 191
+        }
+      },
+      "original": {
+        "format": "openui-lang",
+        "tokens": 148,
+        "chars": 433
+      },
+      "openuiFiles": {
+        "jsonRender": 340,
+        "c1": 322,
+        "yaml": 317,
+        "published": {
+          "openui": 148,
+          "yaml": 316,
+          "jsonRender": 340,
+          "c1": 357
+        },
+        "jsonRenderReproduced": 340
+      }
+    },
+    {
+      "name": "chart-with-data",
+      "set": "openui",
+      "components": 11,
+      "tokens": {
+        "omni-ir": 247,
+        "openui-lang": 231,
+        "a2ui": 369,
+        "a2ui-streamed": 598,
+        "json-render": 481,
+        "jsx": 278
+      },
+      "chars": {
+        "omni-ir": 915,
+        "openui-lang": 796,
+        "a2ui": 1471,
+        "a2ui-streamed": 2321,
+        "json-render": 1811,
+        "jsx": 1040
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.117,
+          "half": 0.551,
+          "firstTokens": 29,
+          "halfTokens": 136
+        },
+        "openui-lang": {
+          "first": 0.113,
+          "half": 0.532,
+          "firstTokens": 26,
+          "halfTokens": 123
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 369,
+          "halfTokens": 369
+        },
+        "a2ui-streamed": {
+          "first": 0.201,
+          "half": 0.629,
+          "firstTokens": 120,
+          "halfTokens": 376
+        },
+        "json-render": {
+          "first": 0.173,
+          "half": 0.617,
+          "firstTokens": 83,
+          "halfTokens": 297
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 278,
+          "halfTokens": 278
+        }
+      },
+      "original": {
+        "format": "openui-lang",
+        "tokens": 231,
+        "chars": 795
+      },
+      "openuiFiles": {
+        "jsonRender": 520,
+        "c1": 498,
+        "yaml": 465,
+        "published": {
+          "openui": 231,
+          "yaml": 464,
+          "jsonRender": 520,
+          "c1": 516
+        },
+        "jsonRenderReproduced": 520
+      }
+    },
+    {
+      "name": "contact-form",
+      "set": "openui",
+      "components": 21,
+      "tokens": {
+        "omni-ir": 396,
+        "openui-lang": 294,
+        "a2ui": 596,
+        "a2ui-streamed": 1031,
+        "json-render": 837,
+        "jsx": 410
+      },
+      "chars": {
+        "omni-ir": 1554,
+        "openui-lang": 1118,
+        "a2ui": 2439,
+        "a2ui-streamed": 4079,
+        "json-render": 3230,
+        "jsx": 1699
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.073,
+          "half": 0.598,
+          "firstTokens": 29,
+          "halfTokens": 237
+        },
+        "openui-lang": {
+          "first": 0.088,
+          "half": 0.588,
+          "firstTokens": 26,
+          "halfTokens": 173
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 596,
+          "halfTokens": 596
+        },
+        "a2ui-streamed": {
+          "first": 0.113,
+          "half": 0.563,
+          "firstTokens": 117,
+          "halfTokens": 580
+        },
+        "json-render": {
+          "first": 0.099,
+          "half": 0.56,
+          "firstTokens": 83,
+          "halfTokens": 469
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 410,
+          "halfTokens": 410
+        }
+      },
+      "original": {
+        "format": "openui-lang",
+        "tokens": 294,
+        "chars": 1117
+      },
+      "openuiFiles": {
+        "jsonRender": 893,
+        "c1": 824,
+        "yaml": 763,
+        "published": {
+          "openui": 294,
+          "yaml": 762,
+          "jsonRender": 893,
+          "c1": 849
+        },
+        "jsonRenderReproduced": 893
+      }
+    },
+    {
+      "name": "dashboard",
+      "set": "openui",
+      "components": 47,
+      "tokens": {
+        "omni-ir": 1280,
+        "openui-lang": 1224,
+        "a2ui": 1576,
+        "a2ui-streamed": 2531,
+        "json-render": 2190,
+        "jsx": 1166
+      },
+      "chars": {
+        "omni-ir": 3816,
+        "openui-lang": 3477,
+        "a2ui": 5420,
+        "a2ui-streamed": 9054,
+        "json-render": 7495,
+        "jsx": 3972
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.048,
+          "half": 0.54,
+          "firstTokens": 62,
+          "halfTokens": 691
+        },
+        "openui-lang": {
+          "first": 0.047,
+          "half": 0.523,
+          "firstTokens": 58,
+          "halfTokens": 640
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 1576,
+          "halfTokens": 1576
+        },
+        "a2ui-streamed": {
+          "first": 0.07,
+          "half": 0.584,
+          "firstTokens": 176,
+          "halfTokens": 1477
+        },
+        "json-render": {
+          "first": 0.062,
+          "half": 0.574,
+          "firstTokens": 136,
+          "halfTokens": 1257
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 1166,
+          "halfTokens": 1166
+        }
+      },
+      "original": {
+        "format": "openui-lang",
+        "tokens": 1226,
+        "chars": 3478
+      },
+      "openuiFiles": {
+        "jsonRender": 2247,
+        "c1": 2182,
+        "yaml": 2129,
+        "published": {
+          "openui": 1226,
+          "yaml": 2128,
+          "jsonRender": 2247,
+          "c1": 2261
+        },
+        "jsonRenderReproduced": 2247
+      }
+    },
+    {
+      "name": "pricing-page",
+      "set": "openui",
+      "components": 50,
+      "tokens": {
+        "omni-ir": 1314,
+        "openui-lang": 1181,
+        "a2ui": 1698,
+        "a2ui-streamed": 2761,
+        "json-render": 2350,
+        "jsx": 1286
+      },
+      "chars": {
+        "omni-ir": 5354,
+        "openui-lang": 4727,
+        "a2ui": 7173,
+        "a2ui-streamed": 11191,
+        "json-render": 9306,
+        "jsx": 5524
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.045,
+          "half": 0.479,
+          "firstTokens": 59,
+          "halfTokens": 629
+        },
+        "openui-lang": {
+          "first": 0.046,
+          "half": 0.483,
+          "firstTokens": 54,
+          "halfTokens": 571
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 1698,
+          "halfTokens": 1698
+        },
+        "a2ui-streamed": {
+          "first": 0.064,
+          "half": 0.535,
+          "firstTokens": 176,
+          "halfTokens": 1476
+        },
+        "json-render": {
+          "first": 0.057,
+          "half": 0.524,
+          "firstTokens": 134,
+          "halfTokens": 1231
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 1286,
+          "halfTokens": 1286
+        }
+      },
+      "original": {
+        "format": "openui-lang",
+        "tokens": 1195,
+        "chars": 4761
+      },
+      "openuiFiles": {
+        "jsonRender": 2487,
+        "c1": 2285,
+        "yaml": 2231,
+        "published": {
+          "openui": 1195,
+          "yaml": 2230,
+          "jsonRender": 2487,
+          "c1": 2379
+        },
+        "jsonRenderReproduced": 2487
+      }
+    },
+    {
+      "name": "settings-panel",
+      "set": "openui",
+      "components": 27,
+      "tokens": {
+        "omni-ir": 596,
+        "openui-lang": 540,
+        "a2ui": 851,
+        "a2ui-streamed": 1409,
+        "json-render": 1163,
+        "jsx": 624
+      },
+      "chars": {
+        "omni-ir": 2762,
+        "openui-lang": 2365,
+        "a2ui": 3869,
+        "a2ui-streamed": 6053,
+        "json-render": 4894,
+        "jsx": 2852
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.049,
+          "half": 0.423,
+          "firstTokens": 29,
+          "halfTokens": 252
+        },
+        "openui-lang": {
+          "first": 0.048,
+          "half": 0.415,
+          "firstTokens": 26,
+          "halfTokens": 224
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 851,
+          "halfTokens": 851
+        },
+        "a2ui-streamed": {
+          "first": 0.083,
+          "half": 0.488,
+          "firstTokens": 117,
+          "halfTokens": 688
+        },
+        "json-render": {
+          "first": 0.071,
+          "half": 0.469,
+          "firstTokens": 83,
+          "halfTokens": 545
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 624,
+          "halfTokens": 624
+        }
+      },
+      "original": {
+        "format": "openui-lang",
+        "tokens": 540,
+        "chars": 2367
+      },
+      "openuiFiles": {
+        "jsonRender": 1244,
+        "c1": 1195,
+        "yaml": 1078,
+        "published": {
+          "openui": 540,
+          "yaml": 1077,
+          "jsonRender": 1244,
+          "c1": 1205
+        },
+        "jsonRenderReproduced": 1244
+      }
+    },
+    {
+      "name": "e-commerce-product",
+      "set": "openui",
+      "components": 49,
+      "tokens": {
+        "omni-ir": 1319,
+        "openui-lang": 1166,
+        "a2ui": 1687,
+        "a2ui-streamed": 2780,
+        "json-render": 2330,
+        "jsx": 1291
+      },
+      "chars": {
+        "omni-ir": 4883,
+        "openui-lang": 4166,
+        "a2ui": 6684,
+        "a2ui-streamed": 10908,
+        "json-render": 8801,
+        "jsx": 5239
+      },
+      "streaming": {
+        "omni-ir": {
+          "first": 0.031,
+          "half": 0.557,
+          "firstTokens": 41,
+          "halfTokens": 735
+        },
+        "openui-lang": {
+          "first": 0.032,
+          "half": 0.34,
+          "firstTokens": 37,
+          "halfTokens": 397
+        },
+        "a2ui": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 1687,
+          "halfTokens": 1687
+        },
+        "a2ui-streamed": {
+          "first": 0.058,
+          "half": 0.546,
+          "firstTokens": 162,
+          "halfTokens": 1517
+        },
+        "json-render": {
+          "first": 0.049,
+          "half": 0.545,
+          "firstTokens": 114,
+          "halfTokens": 1271
+        },
+        "jsx": {
+          "first": 1,
+          "half": 1,
+          "firstTokens": 1291,
+          "halfTokens": 1291
+        }
+      },
+      "original": {
+        "format": "openui-lang",
+        "tokens": 1166,
+        "chars": 4165
+      },
+      "openuiFiles": {
+        "jsonRender": 2449,
+        "c1": 2344,
+        "yaml": 2146,
+        "published": {
+          "openui": 1166,
+          "yaml": 2145,
+          "jsonRender": 2449,
+          "c1": 2381
+        },
+        "jsonRenderReproduced": 2449
+      }
+    }
+  ],
+  "totals": {
+    "omni": {
+      "omni-ir": 2018,
+      "openui-lang": 1944,
+      "a2ui": 3308,
+      "a2ui-streamed": 5485,
+      "json-render": 4507,
+      "html": 4019,
+      "jsx": 2468
+    },
+    "openui": {
+      "omni-ir": 5321,
+      "openui-lang": 4782,
+      "a2ui": 7030,
+      "a2ui-streamed": 11493,
+      "json-render": 9669,
+      "jsx": 5246
+    }
+  }
+}

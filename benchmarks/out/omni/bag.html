@@ -1,0 +1,33 @@
+<section class="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+  <h1 class="text-2xl font-semibold text-gray-900">Shopping bag</h1>
+  <ul class="divide-y divide-gray-200">
+    <li class="flex items-center gap-3 py-3">
+      <img src="/images/shirt.jpg" alt="" class="h-12 w-12 rounded-md object-cover">
+      <div class="min-w-0 flex-1">
+        <p class="font-medium text-gray-900">Linen shirt</p>
+        <p class="text-sm text-gray-500">Size M · Natural · Qty 1</p>
+      </div>
+      <span class="text-sm font-medium text-gray-900">$68.00</span>
+    </li>
+    <li class="flex items-center gap-3 py-3">
+      <img src="/images/tote.jpg" alt="" class="h-12 w-12 rounded-md object-cover">
+      <div class="min-w-0 flex-1">
+        <p class="font-medium text-gray-900">Canvas tote</p>
+        <p class="text-sm text-gray-500">Olive · Qty 1</p>
+      </div>
+      <span class="text-sm font-medium text-gray-900">$32.00</span>
+    </li>
+  </ul>
+  <hr class="border-gray-200">
+  <div class="flex flex-row flex-wrap gap-2 items-center">
+    <p class="font-semibold text-gray-900">Total</p>
+    <p class="font-semibold text-gray-900">$100.00</p>
+  </div>
+  <label class="flex flex-col gap-1">
+    <span class="text-sm font-medium text-gray-700">Order note (optional)</span>
+    <input type="text" name="note" placeholder="e.g. gift wrap, please" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+  </label>
+  <div class="flex flex-row flex-wrap gap-4 items-stretch">
+    <button type="button" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" data-tool="payments.confirm" data-params="{&quot;amount&quot;:&quot;#amount&quot;,&quot;note&quot;:&quot;#note&quot;}">Pay now</button>
+  </div>
+</section>

@@ -1,0 +1,15 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Card","props":{},"children":["title","items","sep","totalRow","note","actions"]}}
+{"op":"add","path":"/elements/title","value":{"type":"Heading","props":{"text":"Shopping bag","level":1},"children":[]}}
+{"op":"add","path":"/elements/items","value":{"type":"List","props":{},"children":["shirtItem","toteItem"]}}
+{"op":"add","path":"/elements/shirtItem","value":{"type":"ListItem","props":{"title":"Linen shirt","detail":"Size M · Natural · Qty 1","trailing":"$68.00","image":"shirt"},"children":[]}}
+{"op":"add","path":"/elements/toteItem","value":{"type":"ListItem","props":{"title":"Canvas tote","detail":"Olive · Qty 1","trailing":"$32.00","image":"tote"},"children":[]}}
+{"op":"add","path":"/elements/sep","value":{"type":"Divider","props":{},"children":[]}}
+{"op":"add","path":"/elements/totalRow","value":{"type":"Stack","props":{"direction":"row","gap":"sm","align":"center"},"children":["totalLabel","total"]}}
+{"op":"add","path":"/elements/totalLabel","value":{"type":"Text","props":{"text":"Total","tone":"strong"},"children":[]}}
+{"op":"add","path":"/state/amount","value":100}
+{"op":"add","path":"/elements/total","value":{"type":"Text","props":{"text":{"$state":"/amount"},"format":"currency","currency":"USD","tone":"strong"},"children":[]}}
+{"op":"add","path":"/state/note","value":""}
+{"op":"add","path":"/elements/note","value":{"type":"Input","props":{"value":{"$bindState":"/note"},"label":"Order note (optional)","placeholder":"e.g. gift wrap, please"},"children":[]}}
+{"op":"add","path":"/elements/actions","value":{"type":"Stack","props":{"direction":"row"},"children":["pay"]}}
+{"op":"add","path":"/elements/pay","value":{"type":"Button","props":{"label":"Pay now","variant":"primary"},"children":[],"on":{"press":{"action":"payments.confirm","params":{"amount":{"$state":"/amount"},"note":{"$state":"/note"}}}}}}

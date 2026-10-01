@@ -1,0 +1,17 @@
+root = Card([photo, header, ratingRow, sep, dates, actions])
+photo = Image("cabin-pines", alt="Lakeside cabin among pine trees", ratio="16:9")
+header = Stack([title, location], direction="column", gap="sm")
+title = Heading("Lakeside Cabin", level=1)
+location = Text("Private dock, wood stove, sleeps 4", tone="muted")
+ratingRow = Stack([stars, reviews], direction="row", gap="sm", align="center")
+stars = Rating(4.8, max=5)
+reviews = Text("4.8 · 126 reviews", tone="muted")
+sep = Divider()
+dates = Stack([checkIn, checkOut], direction="row", gap="md")
+$checkIn = ""
+checkIn = DateInput($checkIn, label="Check-in", min="2026-10-01")
+$checkOut = ""
+checkOut = DateInput($checkOut, label="Check-out", min="2026-10-02")
+actions = Stack([reserve], direction="row")
+reserve = Button("Reserve", action="reserve", variant="primary")
+reserveBooking = McpMutation(reserve, tool="bookings.reserve", params={checkIn: $checkIn, checkOut: $checkOut})

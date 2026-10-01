@@ -1,0 +1,28 @@
+<section class="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+  <img src="/images/cabin-pines.jpg" alt="Lakeside cabin among pine trees" class="w-full rounded-lg object-cover aspect-video">
+  <div class="flex flex-col gap-2 items-stretch">
+    <h1 class="text-2xl font-semibold text-gray-900">Lakeside Cabin</h1>
+    <p class="text-sm text-gray-500">Private dock, wood stove, sleeps 4</p>
+  </div>
+  <div class="flex flex-row flex-wrap gap-2 items-center">
+    <div class="flex items-center gap-1" role="img" aria-label="Rated 4.8 out of 5">
+      <span class="text-amber-500">★★★★★<span class="text-gray-300"></span></span>
+      <span class="text-sm text-gray-600">4.8</span>
+    </div>
+    <p class="text-sm text-gray-500">4.8 · 126 reviews</p>
+  </div>
+  <hr class="border-gray-200">
+  <div class="flex flex-row flex-wrap gap-4 items-stretch">
+    <label class="flex flex-col gap-1">
+      <span class="text-sm font-medium text-gray-700">Check-in</span>
+      <input type="date" name="checkIn" min="2026-10-01" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+    </label>
+    <label class="flex flex-col gap-1">
+      <span class="text-sm font-medium text-gray-700">Check-out</span>
+      <input type="date" name="checkOut" min="2026-10-02" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+    </label>
+  </div>
+  <div class="flex flex-row flex-wrap gap-4 items-stretch">
+    <button type="button" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" data-tool="bookings.reserve" data-params="{&quot;checkIn&quot;:&quot;#checkIn&quot;,&quot;checkOut&quot;:&quot;#checkOut&quot;}">Reserve</button>
+  </div>
+</section>
