@@ -450,7 +450,11 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
 
   if (!opts.complete) return issues;
 
-  if (!byId.has(ROOT_ID)) issues.push({ code: "missing_root", message: `no "${ROOT_ID} = …" line was received` });
+  const root = byId.get(ROOT_ID);
+  if (root === undefined) issues.push({ code: "missing_root", message: `no "${ROOT_ID} = …" line was received` });
+  else if (root.kind !== "node") {
+    issues.push({ code: "root_not_component", message: `"${ROOT_ID}" must be a component, not an McpMutation`, id: ROOT_ID });
+  }
 
   for (const node of nodes) {
     for (const child of node.children) {

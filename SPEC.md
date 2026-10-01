@@ -97,7 +97,7 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 
 ### Components, ids and children
 
-- **[5.1]** The screen's top component MUST have the id `root`. If no `root` line has arrived by the end of the stream, that is a `missing_root` error.
+- **[5.1]** The screen's top component MUST have the id `root`. If no `root` line has arrived by the end of the stream, that is a `missing_root` error. If `root` is defined as an McpMutation instead of a component, that is a `root_not_component` error, reported on root's line.
 - **[5.2]** A component's children are the ids in its children list, in display order. A child MAY be referenced before its own line arrives. Until it arrives it is **pending**, and a renderer shows a placeholder (section 8).
 - **[5.3]** Each id and each `$key` MUST be assigned at most once. A second assignment is a `duplicate_id` error; the first assignment stays unchanged.
 - **[5.4]** A component MUST have at most one parent. Listing it as a child of a second component is a `multiple_parents` error. Listing the same id twice in one children list is a `duplicate_child` error.
@@ -247,7 +247,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 ## 7. Validation and errors
 
 - **[7.1]** Issues are found at three stages: **when the line arrives** (the line is checked on its own and against the lines accepted so far), **at end of stream**, and **in the renderer** while the screen is used. An error found when a line arrives rejects that line ([5.7]). A warning never rejects a line.
-- **[7.2]** Each issue is reported with the number of the line it concerns. End-of-stream issues are reported on the line that defined the responsible component: `dangling_ref` on the component or McpMutation holding the reference, `missing_state` on the component or McpMutation using the key, `ungoverned_mutation` on the Button, and `mutation_target_not_interactive` on the McpMutation. `missing_root` has no line.
+- **[7.2]** Each issue is reported with the number of the line it concerns. End-of-stream issues are reported on the line that defined the responsible component: `dangling_ref` on the component or McpMutation holding the reference, `missing_state` on the component or McpMutation using the key, `ungoverned_mutation` on the Button, `mutation_target_not_interactive` on the McpMutation, and `root_not_component` on root's line. `missing_root` has no line.
 - **[7.3]** At end of stream every reference that is still pending becomes **missing**. A renderer shows a missing component as a fallback (section 8).
 - **[7.4]** Implementations MUST report issues with the codes below, so tools and tests can compare them. The wording of messages is free.
 
@@ -272,6 +272,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 | `dangling_ref` | error | at end of stream | A referenced component or McpMutation target never arrived. |
 | `missing_state` | error | at end of stream | A $state key is used but never declared. |
 | `missing_root` | error | at end of stream | No root line arrived. |
+| `root_not_component` | error | at end of stream | root is defined, but as an McpMutation instead of a component. |
 | `ungoverned_mutation` | error | at end of stream | A button with an action has no McpMutation. |
 | `mutation_target_not_interactive` | error | at end of stream | An McpMutation targets a component that has no action. |
 | `mutation_blocked` | error | in the renderer | When pressed, the action's tool or params failed the registry's checks, so nothing was sent. |
@@ -419,10 +420,6 @@ Issues reported:
 
 - line 6: `ungoverned_mutation` ("confirm" has an action but is not wrapped by an McpMutation)
 <!-- /generated:examples -->
-
-## Known gaps
-
-- **`root` that isn't a component.** [5.1] requires the top component to have the id `root`, but a stream where `root` is an McpMutation (`root = McpMutation(…)`) currently produces no error; the reference renderer shows a fallback in its place. A future version should report it.
 
 ## Not yet specified
 

@@ -200,6 +200,12 @@ describe("createParser: end of stream", () => {
     expect(parser.end().find((i) => i.code === "missing_state")).toMatchObject({ id: "note", line: 2 });
   });
 
+  it("reports root that isn't a component, on root's line", () => {
+    const { parser } = setup();
+    feed(parser, ['b = Button("Pay", action="pay")', 'root = McpMutation(b, tool="payments.confirm")']);
+    expect(parser.end()).toEqual([expect.objectContaining({ code: "root_not_component", id: "root", line: 2 })]);
+  });
+
   it("reports an ungoverned mutating Button", () => {
     const { parser } = setup();
     feed(parser, ["root = Stack([b])", 'b = Button("Pay", action="pay")']);

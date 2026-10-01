@@ -81,4 +81,4 @@ Checked every rule in sections 3–10 against the code and by running the parser
 - Fixed in the spec: McpMutation `tool` is named-only (was listed as positional); finite numbers only ([4.9]); invalid UTF-8 becomes U+FFFD ([3.1]); spaces allowed at line start/end ([4.2]).
 - Fixed in the code (test-first): the line-length limit now excludes the `\r` of `\r\n`, as the spec says.
 - Fixed a flaky test: the mock model's realistic-speed test timed out under full-suite load.
-- **Open decision:** `root = McpMutation(…)` produces no error (listed under "Known gaps" in SPEC.md). Option: report a new `root_not_component` error at end of stream.
+- **Decided:** `root = McpMutation(…)` now reports `root_not_component` at end of stream ([5.1]).

@@ -38,6 +38,7 @@ export type IssueCode =
   | "dangling_ref"
   | "missing_state"
   | "missing_root"
+  | "root_not_component"
   | "ungoverned_mutation"
   | "mutation_target_not_interactive"
   // runtime (renderer)
@@ -82,6 +83,7 @@ export const ISSUE_CODES = {
   dangling_ref: { severity: "error", stage: "end", meaning: "A referenced component or McpMutation target never arrived." },
   missing_state: { severity: "error", stage: "end", meaning: "A $state key is used but never declared." },
   missing_root: { severity: "error", stage: "end", meaning: "No root line arrived." },
+  root_not_component: { severity: "error", stage: "end", meaning: "root is defined, but as an McpMutation instead of a component." },
   ungoverned_mutation: { severity: "error", stage: "end", meaning: "A button with an action has no McpMutation." },
   mutation_target_not_interactive: {
     severity: "error",
