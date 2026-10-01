@@ -9,8 +9,10 @@ package dev.omniir.demo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
+import androidx.activity.enableEdgeToEdge
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -38,7 +41,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -64,12 +66,17 @@ class MainActivity : ComponentActivity() {
     val appearance = extras?.getString("appearance")
     val instant = extras?.getString("instant") == "true"
     val fixtures = Fixtures.list(this)
+    val systemDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    val dark = when (appearance) {
+      "dark" -> true
+      "light" -> false
+      else -> systemDark
+    }
+    // Status bar icons that contrast with the page: dark icons on the light theme, light on the dark one.
+    val bars = if (dark) SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+    else SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
+    enableEdgeToEdge(statusBarStyle = bars, navigationBarStyle = bars)
     setContent {
-      val dark = when (appearance) {
-        "dark" -> true
-        "light" -> false
-        else -> isSystemInDarkTheme()
-      }
       MaterialTheme(colorScheme = if (dark) DarkColors else LightColors) {
         DemoApp(start, instant, fixtures) { Fixtures.read(this, it) }
       }
@@ -97,17 +104,15 @@ sealed interface Source {
 fun DemoApp(start: Source?, instant: Boolean, fixtures: List<String>, read: (String) -> String) {
   var screen by remember { mutableStateOf(start) }
   val current = screen
-  Column(
-    Modifier
-      .fillMaxSize()
-      .background(MaterialTheme.colorScheme.surfaceContainer)
-      .windowInsetsPadding(WindowInsets.safeDrawing),
-  ) {
-    if (current == null) {
-      Home(fixtures) { screen = it }
-    } else {
-      BackHandler { screen = null }
-      ScreenView(current, instant, read)
+  // The Surface gives everything inside it the theme's text colour, in light and dark mode.
+  Surface(color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxSize()) {
+    Column(Modifier.windowInsetsPadding(WindowInsets.safeDrawing)) {
+      if (current == null) {
+        Home(fixtures) { screen = it }
+      } else {
+        BackHandler { screen = null }
+        ScreenView(current, instant, read)
+      }
     }
   }
 }
