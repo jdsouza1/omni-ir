@@ -36,8 +36,8 @@ message = Input($message, label="What happened?", lines=4)
 
 **B. Renderers**
 - [x] B.1 React: `<textarea rows={lines}>` when `lines` > 1, styled like the field; typing updates the state (test)
-- [ ] B.2 SwiftUI: a vertical `TextField` showing `lines` lines
-- [ ] B.3 Compose: `OutlinedTextField` with `minLines`/`maxLines` set to `lines`
+- [x] B.2 SwiftUI: a vertical `TextField` showing `lines` lines
+- [x] B.3 Compose: `OutlinedTextField` with `minLines`/`maxLines` set to `lines`
 - [x] B.4 The Swift and Kotlin conformance suites pass with the regenerated catalogs
 
 **C. Prompt, fixtures and docs**
@@ -46,7 +46,7 @@ message = Input($message, label="What happened?", lines=4)
 - [x] C.3 README component list; CLAUDE.md if needed
 
 **D. Check** *(checkpoint: you review)*
-- [ ] D.1 Full suite, the iOS and Android demo workflows (the support screen is already in both screenshot sets), and the playground
+- [x] D.1 Full suite, the iOS and Android demo workflows (the support screen is already in both screenshot sets), and the playground
 - [ ] D.2 Optional: re-run the support request (test 6) on the model check page to see the model use `lines`
 
 ## What I needed from you
