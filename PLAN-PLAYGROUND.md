@@ -45,5 +45,5 @@ Status: **Tasks A–F and H DONE 2026-09-30** with temporary styling (simple two
 - [x] D. Source view with line numbers, streaming growth and error markers, with tests
 - [x] E. Source ↔ preview highlighting (hover and keyboard focus), with tests
 - [x] F. Actions panel and event log, with tests
-- [ ] G. Apply the design (layout, styles, phone layout, light/dark)
+- [x] G. Apply the design (layout, styles, phone layout, light/dark): first pass by Claude on 2026-09-30, based on the landing page (Plus Jakarta Sans + JetBrains Mono, slate + indigo, one workspace card, dotted light stage, dark mode). Owner review pending.
 - [x] H. End-to-end tests + manual check in the built-in browser; update CLAUDE.md

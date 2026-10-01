@@ -1,5 +1,29 @@
 // The Omni-IR source, line by line, as it streams. Model text is only ever rendered as React text.
+import type { ReactNode } from "react";
 import type { LineIssue } from "./usePlayground";
+
+const STATEMENT = /^(\s*)(\$?[A-Za-z_]\w*)(\s*=\s*)([A-Z]\w*)?(.*)$/;
+
+/**
+ * Colour a line like the landing page's blueprint: id, `=`, component name, arguments.
+ * Presentation only; the spans hold the same text, and anything that doesn't look like a
+ * statement (comments, broken lines) stays one plain span.
+ */
+function colorize(text: string): ReactNode {
+  if (/^\s*#/.test(text)) return <span className="pg-tok-comment">{text}</span>;
+  const m = STATEMENT.exec(text);
+  if (!m) return text;
+  const [, lead, id, eq, name, rest] = m;
+  return (
+    <>
+      {lead}
+      <span className={id!.startsWith("$") ? "pg-tok-state" : "pg-tok-id"}>{id}</span>
+      <span className="pg-tok-eq">{eq}</span>
+      {name && <span className="pg-tok-name">{name}</span>}
+      <span className="pg-tok-rest">{rest}</span>
+    </>
+  );
+}
 
 export interface SourceViewProps {
   source: string;
@@ -55,7 +79,7 @@ export function SourceView({ source, issues, nodeLines, streaming, highlightedId
               <span className="pg-line-number" aria-hidden="true">
                 {n}
               </span>
-              <span className="pg-line-text">{text}</span>
+              <span className="pg-line-text">{colorize(text)}</span>
               {lineIssues.map((issue, k) => (
                 <span key={k} className="pg-line-issue" data-severity={issue.severity}>
                   {issue.severity === "error" ? "Error" : "Warning"} ({issue.code}): {issue.message}

@@ -67,10 +67,20 @@ export function Playground(deps: PlaygroundDeps) {
   return (
     <main className="pg">
       <header className="pg-header">
+        <span className="pg-logo" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m12 2 9 5-9 5-9-5 9-5Z" />
+            <path d="m3 12 9 5 9-5" />
+            <path d="m3 17 9 5 9-5" />
+          </svg>
+        </span>
         <h1 className="pg-title">Omni-IR Playground</h1>
         <span className="pg-badge" title="Which model the server is using">
           {apiModel === null ? "connecting…" : apiModel === "mock" ? "mock model · free" : apiModel}
         </span>
+        <a className="pg-header-link" href="https://github.com/jdsouza1/omni-ir/blob/main/SPEC.md" target="_blank" rel="noopener noreferrer">
+          Read the spec
+        </a>
       </header>
 
       <div className="pg-tabs" role="tablist" aria-label="Input mode">
@@ -145,6 +155,7 @@ export function Playground(deps: PlaygroundDeps) {
       )}
 
       <p className="pg-status" role="status" aria-live="polite" data-status={state.status.kind}>
+        <span className="pg-status-dot" aria-hidden="true" />
         {statusText(state.status, state.source)}
         {state.status.kind === "error" && state.status.retryable && (
           <button type="button" className="pg-link" onClick={() => void pg.retry()}>
@@ -153,7 +164,7 @@ export function Playground(deps: PlaygroundDeps) {
         )}
       </p>
 
-      <div className="pg-panels">
+      <div className="pg-panels pg-workspace">
         <section className="pg-panel" aria-label="Omni-IR source">
           <h2 className="pg-panel-title">Source</h2>
           <SourceView
@@ -164,7 +175,7 @@ export function Playground(deps: PlaygroundDeps) {
             highlightedId={highlighted}
             onHighlight={setHighlighted}
           />
-          <p className="pg-caption">
+          <p className="pg-caption" data-active={highlightedNode ? "true" : undefined}>
             {highlightedNode && highlightedLine !== undefined
               ? `Line ${highlightedLine} builds ${highlightedNode.type} "${highlighted}"`
               : state.source
