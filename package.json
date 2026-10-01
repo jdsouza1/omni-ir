@@ -32,7 +32,8 @@
     "install:test": "node scripts/install-test.mjs",
     "schema:export": "tsx scripts/schema-export.ts",
     "swift:schema": "tsx scripts/swift-schema.ts",
-    "swift:assets": "tsx scripts/swift-demo-assets.ts"
+    "swift:assets": "tsx scripts/swift-demo-assets.ts",
+    "kotlin:schema": "tsx scripts/kotlin-schema.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",

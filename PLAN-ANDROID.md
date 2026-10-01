@@ -38,8 +38,8 @@ The same shape as the iOS renderer, which worked well:
 ## Task checklist
 
 **A. Kotlin parser, tests first** *(checkpoint: failing tests)*
-- [ ] A.1 Gradle project in `android/` (Kotlin, wrapper committed); `npm run kotlin:schema` writes `Schema.generated.kt` from `conformance/schema.json`, with a staleness test
-- [ ] A.2 Conformance runner in Kotlin (JUnit): every case, whole and in 1-, 5- and 13-byte chunks, issues as distinct `{line, code}` pairs. Confirm it fails before any parser code exists
+- [x] A.1 Gradle project in `android/` (Kotlin, wrapper committed); `npm run kotlin:schema` writes `Schema.generated.kt` from `conformance/schema.json`, with a staleness test
+- [x] A.2 Conformance runner in Kotlin (JUnit): every case, whole and in 1-, 5- and 13-byte chunks, issues as distinct `{line, code}` pairs. Confirm it fails before any parser code exists. *Done 2026-10-01: Gradle 9.8 wrapper, Kotlin 2.4.20, JDK 21 on the owner's PC; all 63 cases fail against the stub parser.*
 
 **B. omni-ir-core** *(checkpoint: all 63 conformance cases pass)*
 - [ ] B.1 Line buffer with streaming UTF-8 (split characters wait, invalid bytes become U+FFFD, a leading byte order mark is dropped), lengths in UTF-16 units

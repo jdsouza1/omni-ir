@@ -1,4 +1,4 @@
-// The Swift parser validates props from swift/Sources/OmniIRCore/Schema.generated.swift, generated
+// The Swift and Kotlin parsers validate props from catalogs generated from conformance/schema.json;
 // from conformance/schema.json; it must never fall behind the TypeScript schema.
 import { readFileSync } from "node:fs";
 import { COMPONENT_TYPES, ISSUE_CODES } from "@omni-ir/core";
@@ -45,5 +45,12 @@ describe("Swift sources", () => {
         });
     }
     expect(offending).toEqual([]);
+  });
+});
+
+describe("Kotlin catalog (Schema.generated.kt)", () => {
+  it("is up to date with conformance/schema.json (run npm run kotlin:schema if this fails)", async () => {
+    const { renderKotlinSchema, KOTLIN_SCHEMA_PATH } = await import("../scripts/kotlin-schema");
+    expect(readFileSync(KOTLIN_SCHEMA_PATH, "utf8")).toBe(renderKotlinSchema());
   });
 });

@@ -9,3 +9,9 @@ coverage/
 review/
 swift/Demo/Generated/
 swift/Demo/*.xcodeproj/
+
+# Android (Gradle)
+android/.gradle/
+android/**/build/
+android/local.properties
+android/.kotlin/
