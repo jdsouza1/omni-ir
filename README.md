@@ -27,6 +27,8 @@ npm install @omni-ir/core @omni-ir/react
 
 [`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) parses and validates a stream; [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) renders it with the Trusted Catalog. Their READMEs have examples.
 
+**iPhone, iPad and Mac (SwiftUI):** add the package `https://github.com/jdsouza1/omni-ir` with Swift Package Manager and use `OmniIRSwiftUI` (iOS 17+, macOS 14+). It passes the same conformance suite as the TypeScript parser. See [swift/README.md](swift/README.md).
+
 ## Try it locally
 
 Requires Node.js 22.22+ or 24.15+.
@@ -69,7 +71,7 @@ button click ──► McpMutationBoundary ──► /api/mutate ──► serve
 - **A fixed component catalog.** The schema rejects unknown components and unknown or free-form props (`style`, `className`, HTML attributes). Every visual option is a fixed set of values.
 - **Governed actions.** A button that changes backend state must be wrapped by an `McpMutation` naming a tool from the app's registry. Until then it is disabled.
 - **Checked three times:** the parser rejects unknown tools, the browser validates params against the tool's schema before sending, and the server re-validates both before running anything. The server doesn't trust the browser.
-- **Contained failures.** A component that crashes shows a fallback; the rest of the screen keeps working.
+- **Contained failures.** A component that crashes shows a fallback; the rest of the screen keeps working. (In SwiftUI, which can't catch a failing view, components only ever receive validated props, so rendering can't fail.)
 - Stub action handlers mark where a real backend must add **authorization** (is this user allowed to do this?). Validation proves a request is well-formed, not that it's permitted.
 
 ## Components (v0.1)
@@ -91,6 +93,7 @@ To check how well a model follows the protocol without paying for API calls, pas
 | `server/` | Express SSE server, mock and Claude models |
 | `playground/` | The Interactive Playground |
 | `app/` | The tool registry and image asset registry shared by browser and server |
+| `Package.swift`, `swift/` | The Swift package: `OmniIRCore` (parser) and `OmniIRSwiftUI` (renderer and client), plus the iOS demo app |
 | `fixtures/` | Example screens and failure cases |
 
 The format is specified in [SPEC.md](SPEC.md). Design decisions and build history are in [PLAN.md](PLAN.md), [PLAN-SERVER.md](PLAN-SERVER.md), [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md), [PLAN-SPEC.md](PLAN-SPEC.md), [PLAN-COMPONENTS.md](PLAN-COMPONENTS.md) and [PLAN-NPM.md](PLAN-NPM.md).
@@ -99,7 +102,7 @@ The format is specified in [SPEC.md](SPEC.md). Design decisions and build histor
 
 What is done and what is planned, with dates: [docs/ROADMAP.md](docs/ROADMAP.md).
 
-- iOS and Android renderers
+- Android (Compose) renderer
 
 ## License
 

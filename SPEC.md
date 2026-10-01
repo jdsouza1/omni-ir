@@ -362,7 +362,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 
 ## 8. Renderer requirements
 
-These rules apply to anything that displays an Omni-IR screen. The reference renderer's tests are listed after each group.
+These rules apply to anything that displays an Omni-IR screen. There are two reference renderers: React (`@omni-ir/react`) and SwiftUI (`OmniIRSwiftUI`, in `swift/`). The React renderer's tests are listed after each group; the SwiftUI renderer's are in `swift/Tests/` and the iOS demo's UI tests.
 
 **Content and styling**
 - A renderer MUST display strings only as text. It MUST NOT interpret any value as markup, a style, a script or a URL to load.
@@ -388,8 +388,10 @@ These rules apply to anything that displays an Omni-IR screen. The reference ren
 - *Tested by:* `tests/components.media.test.tsx`.
 
 **Failures**
-- If rendering one component fails, only that component MUST be replaced by a fallback; the rest of the screen MUST keep working. The failed component SHOULD retry when its data changes.
-- *Tested by:* `tests/renderer.test.tsx`.
+- A failure in one component MUST NOT break the rest of the screen.
+- Where the platform can catch a component that fails while rendering (as React's error boundaries do), the renderer MUST replace only that component with a fallback, and SHOULD retry it when its data changes.
+- Where the platform can't catch it (as in SwiftUI, where a failing view stops the app), the renderer MUST make rendering a component unable to fail: it shows only props that passed validation, and never stops on a value from the stream.
+- *Tested by:* `tests/renderer.test.tsx` (React). The SwiftUI views take only validated props and contain no forced unwraps.
 
 ## 9. Actions
 

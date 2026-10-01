@@ -23,3 +23,27 @@ describe("iOS demo asset catalog (swift/Demo/Assets.xcassets)", () => {
     expect(sameFiles(readCatalogFiles(), renderAssetCatalog())).toBe(true);
   });
 });
+
+describe("Swift sources", () => {
+  // SwiftUI can't catch a view that fails, so the renderer must never trap on stream data (SPEC.md
+  // section 8, Failures). Forced unwraps and forced casts are the usual way to trap; none are allowed.
+  it("contain no forced unwraps, try! or as!", async () => {
+    const { readdirSync, readFileSync, statSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const walk = (dir: string): string[] =>
+      readdirSync(dir).flatMap((e) => (statSync(join(dir, e)).isDirectory() ? walk(join(dir, e)) : e.endsWith(".swift") ? [join(dir, e)] : []));
+    const offending: string[] = [];
+    for (const file of walk("swift/Sources")) {
+      readFileSync(file, "utf8")
+        .split("\n")
+        .forEach((line, i) => {
+          const code = line
+            .replace(new RegExp("//.*$"), "")
+            .replace(new RegExp('#"[^#]*"#', "g"), '""')
+            .replace(new RegExp(String.raw`"(?:[^"\\]|\\.)*"`, "g"), '""');
+          if (new RegExp(String.raw`try!|as!|[\w)\]]!(?!=)`).test(code)) offending.push(`${file}:${i + 1}: ${line.trim()}`);
+        });
+    }
+    expect(offending).toEqual([]);
+  });
+});

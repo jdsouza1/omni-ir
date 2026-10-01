@@ -15,6 +15,7 @@ Updated 2026-09-30. Planned dates for the remaining work are kept from the origi
 | 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |
 | 2 · Web reference | Interactive Playground, with its visual design (light and dark, phone layout) | `playground/` |
 | 2 · Web reference | Images, ratings, date fields, lists and chat messages | `packages/react/`, `app/assets.ts` |
+| 3 · Cross-platform | iOS (SwiftUI) renderer: native parser passing all 63 conformance cases, SwiftUI catalog, streaming client, demo app | `swift/`, `Package.swift` |
 | 2 · Web reference | React Catalog SDK published on npm as [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) 0.1.0, with approved, token-free releases | `packages/react/`, `.github/workflows/release.yml` |
 
 ## Planned
@@ -29,14 +30,13 @@ gantt
     todayMarker off
 
     section Phase 3 · Cross-platform
-    iOS (SwiftUI) renderer :p4, 2027-04-01, 2027-07-15
     Android (Compose) renderer :p5, 2027-05-15, 2027-08-01
 
     section Phase 4 · Ecosystem
     Bi-directional AST sync tooling :p6, 2027-08-01, 2027-11-01
 ```
 
-Phases 1 and 2 are complete. Phase 3 starts with a plan for the iOS renderer.
+Phases 1 and 2 are complete, and so is Phase 3's iOS renderer (ahead of its April 2027 date). Android is next in Phase 3.
 
 ## Not yet scheduled
 

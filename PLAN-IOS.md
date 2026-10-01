@@ -2,7 +2,7 @@
 
 Goal: render Omni-IR natively on iPhone and iPad with SwiftUI, following the same rules as the web renderer: the model's stream only chooses components from a fixed catalog, the renderer owns all styling, and backend actions go through McpMutation governance. This is roadmap Phase 3's first item.
 
-Status: **APPROVED 2026-09-30** with the recommendations: review in the browser (CI screenshots and recording); Swift code in this repo with one version number for the whole project; iOS 17 and macOS 14; spec wording for failures changed as in question 4; system dark mode and Dynamic Type; the free Swift toolchain installed on the owner's PC.
+Status: **DONE 2026-10-01** (owner reviewed the simulator screenshots and recording, then approved the merge). **APPROVED 2026-09-30** with the recommendations: review in the browser (CI screenshots and recording); Swift code in this repo with one version number for the whole project; iOS 17 and macOS 14; spec wording for failures changed as in question 4; system dark mode and Dynamic Type; the free Swift toolchain installed on the owner's PC.
 
 ## Approach (recommended)
 
@@ -58,26 +58,34 @@ Plus a small **demo app** that streams the repo's fixtures offline (no server, n
 - [x] C.6 Tool registry protocol (each tool validates its own params) and asset registry (names only)
 
 **D. OmniIRSwiftUI: catalog and renderer** *(checkpoint: you review simulator screenshots)*
-- [ ] D.1 The 15 catalog components as SwiftUI views with native styling, light and dark, Dynamic Type and VoiceOver labels (Rating reads "Rated 4.96 out of 5"; Message says who sent it)
-- [ ] D.2 `OmniView`: one view per node id so components keep their identity while streaming; placeholders for pending parts, fallbacks for missing ones
-- [ ] D.3 McpMutation governance: buttons stay disabled until governed; on tap, fill in state, validate params with the tool registry, then call the app's handler; report failures as events
-- [ ] D.4 Input and DateInput edit state locally, never calling the backend by themselves
-- [ ] D.5 Images only from the app's asset registry (e.g. the asset catalog); alt text shown when a picture is missing
-- [ ] D.6 Text formats: currency and date-only values shown as the same calendar day in every time zone
+- [x] D.1 The 15 catalog components as SwiftUI views with native styling, light and dark, Dynamic Type and VoiceOver labels (Rating reads "Rated 4.96 out of 5"; Message says who sent it)
+- [x] D.2 `OmniView`: one view per node id so components keep their identity while streaming; placeholders for pending parts, fallbacks for missing ones
+- [x] D.3 McpMutation governance: buttons stay disabled until governed; on tap, fill in state, validate params with the tool registry, then call the app's handler; report failures as events
+- [x] D.4 Input and DateInput edit state locally, never calling the backend by themselves
+- [x] D.5 Images only from the app's asset registry (e.g. the asset catalog); alt text shown when a picture is missing
+- [x] D.6 Text formats: currency and date-only values shown as the same calendar day in every time zone
 
 **E. Streaming client**
-- [ ] E.1 `generate(prompt:)`: reads the reference server's `/api/generate` stream (URLSession) into the parser; cancel and error outcomes like the web client
-- [ ] E.2 `createMutationHandler()`: posts actions to `/api/mutate` and reports refusals
+- [x] E.1 `generate(prompt:)`: reads the reference server's `/api/generate` stream (URLSession) into the parser; cancel and error outcomes like the web client
+- [x] E.2 `createMutationHandler()`: posts actions to `/api/mutate` and reports refusals
 
 **F. Demo app and CI**
-- [ ] F.1 Demo app: pick any fixture (including the landing examples and failure demos) and watch it stream offline, or connect to `npm run server` on the same network. Mock data only; nothing paid
-- [ ] F.2 Tests on the view layer (what each node resolves to, disabled/enabled buttons, state binding) and one simulator UI test that streams a screen and taps a governed button
-- [ ] F.3 CI: core tests on Linux; package tests, demo build and UI test on macOS with the iPhone simulator; screenshots and a screen recording uploaded, and collected into one review page for the owner
+- [x] F.1 Demo app: pick any fixture (including the landing examples and failure demos) and watch it stream offline, or connect to `npm run server` on the same network. Mock data only; nothing paid
+- [x] F.2 Tests on the view layer (what each node resolves to, disabled/enabled buttons, state binding) and one simulator UI test that streams a screen and taps a governed button
+- [x] F.3 CI: core tests on Linux; package tests, demo build and UI test on macOS with the iPhone simulator; screenshots and a screen recording uploaded, and collected into one review page for the owner
 
 **G. Spec and docs**
-- [ ] G.1 SPEC.md section 8 failure wording (question 4); note which tests cover the Swift renderer
-- [ ] G.2 README (installing with Swift Package Manager), CLAUDE.md, ROADMAP; Swift README with an example
-- [ ] G.3 Release notes on versioning (question 2). Nothing is tagged or released without your go-ahead
+- [x] G.1 SPEC.md section 8 failure wording (question 4); note which tests cover the Swift renderer
+- [x] G.2 README (installing with Swift Package Manager), CLAUDE.md, ROADMAP; Swift README with an example
+- [x] G.3 Release notes on versioning (question 2). Nothing is tagged or released without your go-ahead
+
+## Decisions made while building (2026-10-01)
+- **The renderer's logic is Foundation-only** (`OmniIRSwiftUI/Model`: store, governance, formats, client events), so it is tested on Windows and Linux too; the SwiftUI views stay thin.
+- **Issues are compared as distinct `{line, code}` pairs** in the conformance suite: Zod reports some bad values twice, and how many messages an implementation gives is its own choice.
+- **Rows that don't fit stack vertically**, measuring items at their single-line width; buttons in a row size to their labels, as on the web.
+- **The demo's Xcode project is generated** (XcodeGen) rather than committed, and the demo uses the repo's `fixtures/` folder and pictures from `app/assets.ts` directly.
+- **End-to-end on CI:** the iOS demo workflow starts the Express server with the mock model, streams a screen into the simulator and runs a governed action against `/api/mutate`.
+- **Versioning (G.3):** Swift Package Manager reads git tags, and the release workflow publishes npm on the same tags, so the next release (`v0.2.0`) bumps both npm packages and becomes the first Swift version. The existing `v0.1.0` tag predates the Swift package; until then, apps use the `main` branch. Nothing is tagged without the owner's go-ahead.
 
 ## What I needed from you
 Answered 2026-09-30: "go with the recommendations" for questions 2–6; question 1 as recorded above.
