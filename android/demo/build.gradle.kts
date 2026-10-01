@@ -9,7 +9,7 @@ plugins {
 
 android {
   namespace = "dev.omniir.demo"
-  compileSdk = 36
+  compileSdk = 37
   defaultConfig {
     applicationId = "dev.omniir.demo"
     minSdk = 26
