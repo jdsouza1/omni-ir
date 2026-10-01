@@ -7,3 +7,5 @@ coverage/
 .build/
 .swiftpm/
 review/
+swift/Demo/Generated/
+swift/Demo/*.xcodeproj/

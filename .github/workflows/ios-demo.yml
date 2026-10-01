@@ -6,7 +6,7 @@ name: iOS demo
 on:
   push:
     branches: [main, "wip/**"]
-    paths: ["swift/**", "Package.swift", "fixtures/**", ".github/workflows/ios-demo.yml"]
+    paths: ["swift/**", "Package.swift", "fixtures/**", "server/**", ".github/workflows/ios-demo.yml"]
   workflow_dispatch:
 
 permissions:
@@ -62,6 +62,24 @@ jobs:
           exit $status
         shell: bash {0}
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Start the Omni-IR server (free mock model)
+        env:
+          OMNI_MODEL: mock # never a paid model in CI
+        run: |
+          npm ci
+          nohup npm run server:start > server.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://localhost:8787/api/health && exit 0; sleep 1; done
+          cat server.log; exit 1
+
+      - name: Stream a screen from the server and run a governed action
+        run: |
+          xcodebuild test-without-building -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo             -destination "id=$UDID" -derivedDataPath build -only-testing:OmniIRDemoUITests/ServerTests             -resultBundlePath build/Server.xcresult -quiet
+
       - name: Take the review screenshots
         run: |
           xcodebuild test-without-building -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo \
@@ -73,6 +91,8 @@ jobs:
         run: |
           mkdir -p review/screenshots
           xcrun xcresulttool export attachments --path build/Screenshots.xcresult --output-path review/screenshots || true
+          xcrun xcresulttool export attachments --path build/Server.xcresult --output-path review/server || true
+          cp server.log review/ || true
           ls -la review review/screenshots || true
 
       - uses: actions/upload-artifact@v7

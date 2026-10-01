@@ -2,7 +2,9 @@
 // Mock data only: nothing is sent anywhere, and actions are logged with a stub result.
 //
 // Launch options (used by the UI tests): `-fixture landing/booking` opens a screen directly,
-// `-appearance dark` forces dark mode, `-instant YES` writes the whole screen at once.
+// `-appearance dark` forces dark mode, `-instant YES` writes the whole screen at once, and
+// `-server http://localhost:8787 -prompt "book a stay"` streams from a running Omni-IR server
+// (`npm run server`, free mock model) instead of a fixture.
 import OmniIRSwiftUI
 import SwiftUI
 
@@ -13,8 +15,23 @@ struct OmniIRDemoApp: App {
   }
 }
 
+/// Where a screen comes from: a bundled fixture, or a prompt sent to an Omni-IR server.
+enum Source: Hashable {
+  case fixture(Fixture)
+  case server(URL, prompt: String)
+
+  var title: String {
+    switch self {
+    case .fixture(let f): f.title
+    case .server(_, let prompt): prompt
+    }
+  }
+}
+
 struct RootView: View {
-  @State private var path: [Fixture] = []
+  @State private var path: [Source] = []
+  @State private var serverURL = "http://localhost:8787"
+  @State private var prompt = "book a stay"
   private let fixtures = Fixture.all()
   private let options = UserDefaults.standard
 
@@ -24,18 +41,31 @@ struct RootView: View {
         ForEach(Fixture.groups, id: \.self) { group in
           Section(group) {
             ForEach(fixtures.filter { $0.group == group }) { fixture in
-              NavigationLink(fixture.title, value: fixture)
+              NavigationLink(fixture.title, value: Source.fixture(fixture))
             }
           }
         }
+        Section {
+          TextField("Server", text: $serverURL).textInputAutocapitalization(.never).autocorrectionDisabled().keyboardType(.URL)
+          TextField("Describe a screen", text: $prompt)
+          Button("Ask the server") {
+            if let url = URL(string: serverURL) { path.append(.server(url, prompt: prompt)) }
+          }
+        } header: {
+          Text("Live server")
+        } footer: {
+          Text("Start one with npm run server (free mock model).")
+        }
       }
       .navigationTitle("Omni-IR")
-      .navigationDestination(for: Fixture.self) { ScreenView(fixture: $0, instant: options.bool(forKey: "instant")) }
+      .navigationDestination(for: Source.self) { ScreenView(source: $0, instant: options.bool(forKey: "instant")) }
     }
     .preferredColorScheme(appearance)
     .onAppear {
       if let name = options.string(forKey: "fixture"), let fixture = fixtures.first(where: { $0.id == name }) {
-        path = [fixture]
+        path = [.fixture(fixture)]
+      } else if let server = options.string(forKey: "server").flatMap(URL.init(string:)) {
+        path = [.server(server, prompt: options.string(forKey: "prompt") ?? prompt)]
       }
     }
   }
@@ -49,9 +79,9 @@ struct RootView: View {
   }
 }
 
-/// One fixture, streamed into an OmniView.
+/// One screen, streamed into an OmniView from a fixture or a server.
 struct ScreenView: View {
-  let fixture: Fixture
+  let source: Source
   let instant: Bool
   @State private var store = OmniStore(tools: demoTools, assets: Set(demoPictureNames))
   @State private var log: [String] = []
@@ -63,9 +93,7 @@ struct ScreenView: View {
         OmniView(
           store: store,
           pictures: demoPictures(),
-          onMutation: { call in
-            log.append("Sent \(call.tool) \(describe(call.params)): stub result, nothing left the device")
-          },
+          onMutation: mutationHandler,
           onEvent: { event in
             switch event {
             case .press(let id): log.append("Pressed \(id) (local only)")
@@ -87,7 +115,7 @@ struct ScreenView: View {
       .padding()
     }
     .background(Color(uiColor: .systemGroupedBackground))
-    .navigationTitle(fixture.title)
+    .navigationTitle(source.title)
     .navigationBarTitleDisplayMode(.inline)
     .task { await stream() }
   }
@@ -101,9 +129,32 @@ struct ScreenView: View {
     }
   }
 
-  /// Writes the fixture in small random chunks with short pauses, like a model streaming its reply.
+  /// Fixtures log the action with a stub result; a server runs it (and checks it again).
+  private var mutationHandler: @MainActor (MutationCall) async throws -> Void {
+    switch source {
+    case .fixture:
+      return { call in log.append("Sent \(call.tool) \(describe(call.params)): stub result, nothing left the device") }
+    case .server(let url, _):
+      let send = OmniClient(baseURL: url).mutationHandler { call, result in
+        log.append("Sent \(call.tool) \(describe(call.params)). Server result: \(String(decoding: result, as: UTF8.self))")
+      }
+      return send
+    }
+  }
+
   private func stream() async {
     guard !done, store.document.nodes.isEmpty else { return }
+    switch source {
+    case .fixture(let fixture): await streamFixture(fixture)
+    case .server(let url, let prompt):
+      let outcome = await OmniClient(baseURL: url).generate(prompt, into: store)
+      if case .error(let code, let message, _) = outcome { log.append("\(code): \(message)") }
+      done = true
+    }
+  }
+
+  /// Writes the fixture in small random chunks with short pauses, like a model streaming its reply.
+  private func streamFixture(_ fixture: Fixture) async {
     let text = (try? String(contentsOf: fixture.url, encoding: .utf8)) ?? ""
     if instant {
       store.write(text)

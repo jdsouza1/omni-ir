@@ -66,3 +66,23 @@ final class StreamingTests: XCTestCase {
     XCTAssertTrue(app.buttons["Cancel"].isEnabled, "a button without an action is never governed")
   }
 }
+
+/// End to end with the repo's Express server (started by the workflow with the free mock model):
+/// the Swift client streams a screen over server-sent events, and a governed action goes to /api/mutate.
+final class ServerTests: XCTestCase {
+  func testStreamFromServerThenReserve() {
+    let app = XCUIApplication()
+    app.launchArguments = ["-server", "http://localhost:8787", "-prompt", "book a stay", "-appearance", "light"]
+    app.launch()
+    waitUntilDone(app, self, timeout: 60)
+    let reserve = app.buttons["Reserve · $642"]
+    XCTAssertTrue(reserve.waitForExistence(timeout: 5), "the server's booking screen arrived")
+    reserve.tap()
+    let result = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "bookingId")).firstMatch
+    XCTAssertTrue(result.waitForExistence(timeout: 10), "the server ran the action and returned its result")
+    let attachment = XCTAttachment(screenshot: app.screenshot())
+    attachment.name = "server-booking-after-reserve"
+    attachment.lifetime = .keepAlways
+    add(attachment)
+  }
+}

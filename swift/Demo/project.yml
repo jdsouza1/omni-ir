@@ -31,6 +31,12 @@ targets:
     dependencies:
       - package: OmniIR
         product: OmniIRSwiftUI
+    info:
+      path: Generated/Info.plist
+      properties:
+        # Lets the demo reach a server on this Mac (npm run server) over plain HTTP; nothing else.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.omni-ir.demo
