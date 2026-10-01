@@ -2,7 +2,7 @@
 
 Goal: let a screen ask for longer text, such as a support message or a bio, in a box that shows several lines. Found by the model check of 2026-10-01 (docs/model-check-2026-10-01.md): the support form's "What happened?" field and the settings screen's bio were single-line, so longer text was cut off.
 
-Status: **APPROVED 2026-10-01** with the recommendations: a `lines` prop on Input (1–10), fixed height with scrolling, released in `v0.2.0` only with the owner's go-ahead.
+Status: **DONE 2026-10-01** (owner reviewed web, iPhone and Android screenshots, then approved the merge; ships in `v0.2.0`). **APPROVED 2026-10-01** with the recommendations: a `lines` prop on Input (1–10), fixed height with scrolling, released in `v0.2.0` only with the owner's go-ahead.
 
 ## Proposal
 
