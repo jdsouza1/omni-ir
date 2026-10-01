@@ -36,7 +36,7 @@ The server, playground, fixtures and tests stay in the repo and aren't published
 
 ## G. First release: steps (only with your go-ahead)
 1. ~~Decide whether the npm account's email may be public.~~ Done 2026-09-30: the npm account uses a dedicated project email.
-2. On your machine: `npm login`, then `npm run build:packages && npm run pack:check`, then `npm publish --workspace packages/core` and `npm publish --workspace packages/react` (each asks for your security key).
+2. ~~Publish 0.1.0 by hand.~~ Done 2026-09-30: `@omni-ir/core@0.1.0` and `@omni-ir/react@0.1.0` are live on npm, published by the owner, and verified by installing from the public registry.
 3. On npmjs.com, for each package: Settings → Trusted Publisher → GitHub Actions: user `jdsouza1`, repository `omni-ir`, workflow `release.yml`, environment `npm-publish`. Then set "Publishing access" to require two-factor authentication and disallow tokens.
 4. On GitHub: Settings → Environments → `npm-publish` → add yourself as a required reviewer.
 5. Later releases: bump both versions, commit, push a `v<version>` tag, approve the run.
