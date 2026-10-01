@@ -33,7 +33,7 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - `server/` — Express: `POST /api/generate` (SSE), `POST /api/mutate` (re-validates every action), `GET /api/health`. `server/models/` holds `MockModel` (default) and `ClaudeModel` (opt-in). `server/prompt.ts` generates the system prompt from the schema.
 - `playground/` — the Interactive Playground (Vite + React). The Express app runs inside the Vite dev server for `/api/*`. State is in `usePlayground.ts`; `Playground.tsx`, `SourceView.tsx`, `Preview.tsx` and `Panels.tsx` are presentation only; `playground.css` is the approved design, based on the landing page (PLAN-PLAYGROUND.md Task G); it has light and dark themes, and the preview stage stays light because the catalog is light-only. Rendered screens keep the catalog's own neutral styles.
 - `fixtures/` — the mock model's screens; `fixtures/variants/` — failure cases (`demo: …` prompts).
-- PLAN.md (Phase 1–2, done), PLAN-SERVER.md (Step 1, done), PLAN-PLAYGROUND.md (Step 2, done), PLAN-SPEC.md (Step 3, done), PLAN-COMPONENTS.md (Step 4, done) and PLAN-NPM.md (Step 5, done: 0.1.0 on npm) and PLAN-IOS.md (Step 6, done) are the plans and decision records.
+- PLAN.md (Phase 1–2, done), PLAN-SERVER.md (Step 1, done), PLAN-PLAYGROUND.md (Step 2, done), PLAN-SPEC.md (Step 3, done), PLAN-COMPONENTS.md (Step 4, done) and PLAN-NPM.md (Step 5, done: 0.1.0 on npm) PLAN-IOS.md (Step 6, done) and PLAN-ANDROID.md (Step 7, approved, in progress) are the plans and decision records.
 
 ## Commands
 - `npm test` — raw-HTML guard + all tests (no network). `npm run typecheck`.
