@@ -804,9 +804,9 @@
         "5.8",
         "5.9"
       ],
-      "description": "Every prop of Input: 2 accepted lines and 28 rejected ones. Generated from schema.json.",
+      "description": "Every prop of Input: 4 accepted lines and 37 rejected ones. Generated from schema.json.",
       "input": [
-        "root = Stack([a1, a2])\n$s = \"\"\na1 = Input($s, label=\"Hello\")\na2 = Input($s, label=\"Hello\", placeholder=\"Hello\")\nr1 = Input(true, label=\"Hello\")\nr2 = Input(null, label=\"Hello\")\nr3 = Input(\"nope\", label=\"Hello\")\nr4 = Input(4, label=\"Hello\")\nr5 = Input(1.5, label=\"Hello\")\nr6 = Input([], label=\"Hello\")\nr7 = Input(other, label=\"Hello\")\nr8 = Input(label=\"Hello\")\nr9 = Input($s, label=true)\nr10 = Input($s, label=null)\nr11 = Input($s, label=4)\nr12 = Input($s, label=1.5)\nr13 = Input($s, label=$s)\nr14 = Input($s, label=[])\nr15 = Input($s, label=other)\nr16 = Input($s, label=\"",
+        "root = Stack([a1, a2, a3, a4])\n$s = \"\"\na1 = Input($s, label=\"Hello\")\na2 = Input($s, label=\"Hello\", placeholder=\"Hello\")\na3 = Input($s, label=\"Hello\", lines=1)\na4 = Input($s, label=\"Hello\", lines=10)\nr1 = Input(true, label=\"Hello\")\nr2 = Input(null, label=\"Hello\")\nr3 = Input(\"nope\", label=\"Hello\")\nr4 = Input(4, label=\"Hello\")\nr5 = Input(1.5, label=\"Hello\")\nr6 = Input([], label=\"Hello\")\nr7 = Input(other, label=\"Hello\")\nr8 = Input(label=\"Hello\")\nr9 = Input($s, label=true)\nr10 = Input($s, label=null)\nr11 = Input($s, label=4)\nr12 = Input($s, label=1.5)\nr13 = Input($s, label=$s)\nr14 = Input($s, label=[])\nr15 = Input($s, label=other)\nr16 = Input($s, label=\"",
         {
           "repeat": "x",
           "times": 201
@@ -816,21 +816,13 @@
           "repeat": "x",
           "times": 201
         },
-        "\")\nr27 = Input($s, label=\"Hello\", style=\"color: red\")\nr28 = Input($s, \"extra\", label=\"Hello\")\n"
+        "\")\nr27 = Input($s, label=\"Hello\", lines=true)\nr28 = Input($s, label=\"Hello\", lines=null)\nr29 = Input($s, label=\"Hello\", lines=\"nope\")\nr30 = Input($s, label=\"Hello\", lines=1.5)\nr31 = Input($s, label=\"Hello\", lines=$s)\nr32 = Input($s, label=\"Hello\", lines=[])\nr33 = Input($s, label=\"Hello\", lines=other)\nr34 = Input($s, label=\"Hello\", lines=0)\nr35 = Input($s, label=\"Hello\", lines=11)\nr36 = Input($s, label=\"Hello\", style=\"color: red\")\nr37 = Input($s, \"extra\", label=\"Hello\")\n"
       ],
       "assets": [
         "cabin-pines"
       ],
       "expect": {
         "issues": [
-          {
-            "line": 5,
-            "code": "invalid_props"
-          },
-          {
-            "line": 6,
-            "code": "invalid_props"
-          },
           {
             "line": 7,
             "code": "invalid_props"
@@ -934,6 +926,50 @@
           {
             "line": 32,
             "code": "invalid_props"
+          },
+          {
+            "line": 33,
+            "code": "invalid_props"
+          },
+          {
+            "line": 34,
+            "code": "invalid_props"
+          },
+          {
+            "line": 35,
+            "code": "invalid_props"
+          },
+          {
+            "line": 36,
+            "code": "invalid_props"
+          },
+          {
+            "line": 37,
+            "code": "invalid_props"
+          },
+          {
+            "line": 38,
+            "code": "invalid_props"
+          },
+          {
+            "line": 39,
+            "code": "invalid_props"
+          },
+          {
+            "line": 40,
+            "code": "invalid_props"
+          },
+          {
+            "line": 41,
+            "code": "invalid_props"
+          },
+          {
+            "line": 42,
+            "code": "invalid_props"
+          },
+          {
+            "line": 43,
+            "code": "invalid_props"
           }
         ],
         "nodes": {
@@ -942,7 +978,9 @@
             "props": {},
             "children": [
               "a1",
-              "a2"
+              "a2",
+              "a3",
+              "a4"
             ]
           },
           "a1": {
@@ -963,6 +1001,28 @@
               },
               "label": "Hello",
               "placeholder": "Hello"
+            },
+            "children": []
+          },
+          "a3": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "lines": 1
+            },
+            "children": []
+          },
+          "a4": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "lines": 10
             },
             "children": []
           }

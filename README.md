@@ -80,7 +80,7 @@ button click ──► McpMutationBoundary ──► /api/mutate ──► serve
 
 ## Components (v0.1)
 
-`Stack`, `Card`, `Heading`, `Text`, `Input`, `DateInput`, `Button`, `Divider`, `Badge`, `Skeleton`, `Image`, `Rating`, `List`, `ListItem`, `Message`, plus `McpMutation` for governed actions. Images come only from the app's asset registry (`app/assets.ts`), named by the model, never as URLs. `npm run prompt:print` shows every prop and allowed value, generated from the schema.
+`Stack`, `Card`, `Heading`, `Text`, `Input` (one line, or several with `lines`), `DateInput`, `Button`, `Divider`, `Badge`, `Skeleton`, `Image`, `Rating`, `List`, `ListItem`, `Message`, plus `McpMutation` for governed actions. Images come only from the app's asset registry (`app/assets.ts`), named by the model, never as URLs. `npm run prompt:print` shows every prop and allowed value, generated from the schema.
 
 ## Using a real model (optional, costs money)
 

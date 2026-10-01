@@ -5,7 +5,7 @@ intro = Text("Tell us what's going on (we reply within 1 business day).", tone="
 $subject = ""
 subject = Input($subject, label="Subject", placeholder="e.g. Refund for order A1B2-7731")
 $message = ""
-message = Input($message, label="Message", placeholder="Describe the problem, what you expected, and what happened")
+message = Input($message, label="Message", placeholder="Describe the problem, what you expected, and what happened", lines=4)
 actions = Stack([sendTicket], direction="row")
 sendTicket = Button("Send message", action="createTicket")
 createTicket = McpMutation(sendTicket, tool="support.createTicket", params={subject: $subject, message: $message})

@@ -301,12 +301,16 @@ private fun ListItemView(props: Props, context: RenderContext) {
 /** An Input edits its `$key` locally; it never calls the backend by itself (R1). */
 @Composable
 private fun InputView(props: Props) {
+  // More than one line: a fixed-height box that shows `lines` lines; longer text scrolls inside it.
+  val lines = props.number("lines")?.toInt()?.coerceIn(1, 10) ?: 1
   OutlinedTextField(
     value = props.stateText(),
     onValueChange = { props.setState(it) },
     label = { Text(props.text("label")) },
     placeholder = if (props.has("placeholder")) ({ Text(props.text("placeholder")) }) else null,
-    singleLine = true,
+    singleLine = lines == 1,
+    minLines = lines,
+    maxLines = lines,
     modifier = Modifier.fillMaxWidth(),
   )
 }

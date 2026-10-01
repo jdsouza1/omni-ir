@@ -239,14 +239,23 @@ struct InputField: View {
   var body: some View {
     let key = stateKey(node)
     let label = store.text(node.props["label"])
-    VStack(alignment: .leading, spacing: 6) {
+    let text = Binding(get: { store.stateText(key) }, set: { store.setState(key, .text($0)) })
+    let prompt = node.props["placeholder"] == nil ? nil : Text(verbatim: store.text(node.props["placeholder"]))
+    var lines = 1
+    if case .number(let n)? = node.props["lines"] { lines = Int(n) }
+    return VStack(alignment: .leading, spacing: 6) {
       Text(verbatim: label).font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
-      TextField(
-        text: Binding(get: { store.stateText(key) }, set: { store.setState(key, .text($0)) }),
-        prompt: node.props["placeholder"] == nil ? nil : Text(verbatim: store.text(node.props["placeholder"]))
-      ) { Text(verbatim: label) }
-        .labelsHidden()
-        .textFieldStyle(.roundedBorder)
+      if lines > 1 {
+        // A fixed-height box: it keeps room for `lines` lines and longer text scrolls inside it.
+        TextField(text: text, prompt: prompt, axis: .vertical) { Text(verbatim: label) }
+          .lineLimit(lines, reservesSpace: true)
+          .labelsHidden()
+          .textFieldStyle(.roundedBorder)
+      } else {
+        TextField(text: text, prompt: prompt) { Text(verbatim: label) }
+          .labelsHidden()
+          .textFieldStyle(.roundedBorder)
+      }
     }
   }
 }

@@ -43,13 +43,24 @@ export function Input({ id, props, value, onChange }: CatalogProps<"Input">) {
   return (
     <label data-node-id={id} className="omni-input">
       <span className="omni-input__label">{props.label}</span>
-      <input
-        className="omni-input__field"
-        type="text"
-        value={value}
-        placeholder={props.placeholder}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      {(props.lines ?? 1) > 1 ? (
+        // A fixed-height box: longer text scrolls inside it, so the screen doesn't jump while typing.
+        <textarea
+          className="omni-input__field omni-input__field--multiline"
+          rows={props.lines}
+          value={value}
+          placeholder={props.placeholder}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      ) : (
+        <input
+          className="omni-input__field"
+          type="text"
+          value={value}
+          placeholder={props.placeholder}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
     </label>
   );
 }

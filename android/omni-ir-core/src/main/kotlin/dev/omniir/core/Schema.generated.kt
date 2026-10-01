@@ -121,6 +121,7 @@ internal object Catalog {
         PropSpec("value", required = true, value = ValueSpec.State),
         PropSpec("label", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
         PropSpec("placeholder", required = false, value = ValueSpec.TextValue(minLength = null, maxLength = 200, pattern = null)),
+        PropSpec("lines", required = false, value = ValueSpec.NumberValue(minimum = 1.0, maximum = 10.0, integer = true)),
       ),
     ),
     ComponentType.BUTTON to ComponentSpec(

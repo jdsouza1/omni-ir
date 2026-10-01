@@ -205,6 +205,7 @@ enum Catalog {
         PropSpec(name: "value", required: true, value: .state),
         PropSpec(name: "label", required: true, value: .text(minLength: 1, maxLength: 200, pattern: nil)),
         PropSpec(name: "placeholder", required: false, value: .text(minLength: nil, maxLength: 200, pattern: nil)),
+        PropSpec(name: "lines", required: false, value: .number(minimum: 1, maximum: 10, integer: true)),
       ]
     ),
     .button: ComponentSpec(

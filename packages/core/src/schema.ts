@@ -112,6 +112,8 @@ export const COMPONENTS = {
       value: StateRef,
       label: z.string().min(1).max(200),
       placeholder: z.string().max(200).optional(),
+      /** Lines the box shows; more than 1 makes it a multi-line box (text scrolls inside it). */
+      lines: z.number().int().min(1).max(10).optional(),
     }),
   },
   Button: {

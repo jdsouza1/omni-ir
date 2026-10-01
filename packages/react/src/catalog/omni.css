@@ -27,6 +27,7 @@
 .omni-input { display: flex; flex-direction: column; gap: 0.25rem; }
 .omni-input__label { font-size: 0.875rem; color: #3c4048; }
 .omni-input__field { font: inherit; padding: 0.5rem 0.625rem; border: 1px solid #c3c7ce; border-radius: 8px; }
+.omni-input__field--multiline { resize: none; overflow-y: auto; line-height: 1.45; }
 
 .omni-button-wrap { display: inline-flex; flex-direction: column; gap: 0.25rem; }
 .omni-button { font: inherit; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid transparent; cursor: pointer; }

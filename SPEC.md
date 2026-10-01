@@ -186,7 +186,7 @@ Text(text, format?, currency?, tone?)
 ### Input
 
 ```
-Input(value, label, placeholder?)
+Input(value, label, placeholder?, lines?)
 ```
 
 | Prop | Position | Required | Values |
@@ -194,6 +194,7 @@ Input(value, label, placeholder?)
 | `value` | 1 | yes | $state |
 | `label` | named only | yes | text (min 1, max 200) |
 | `placeholder` | named only | no | text (max 200) |
+| `lines` | named only | no | whole number 1-10 |
 
 ### Button
 
@@ -431,6 +432,8 @@ What the app must still handle:
 ## 12. Versioning and limits
 
 This is version 0.1, a draft. Until version 1.0, any change MAY be incompatible; changes are listed in this repository's history. A stream doesn't declare its version in v0.1.
+
+Adding to the catalog is a change too. Because the catalog is strict ([5.9]), a parser built for an older version rejects a new component (`unknown_component`), a new prop or a new allowed value (`invalid_props`), and its renderer shows a fallback in that place. A server SHOULD therefore ask a model only for what its clients' version accepts. The reference server generates its system prompt from its own schema, so a server and its clients stay compatible by using the same version.
 
 <!-- generated:limits -->
 | Limit | Maximum |
