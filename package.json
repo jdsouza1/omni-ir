@@ -36,7 +36,9 @@
     "kotlin:schema": "tsx scripts/kotlin-schema.ts",
     "android:drawables": "tsx scripts/android-demo-drawables.ts",
     "model-check:page": "tsx scripts/model-check-page.ts",
-    "bench": "tsx benchmarks/run.ts"
+    "bench": "tsx benchmarks/run.ts",
+    "reliability:page": "tsx scripts/reliability-page.ts",
+    "comparison:page": "tsx scripts/comparison-page.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",

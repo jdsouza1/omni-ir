@@ -6,6 +6,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { A2UI_BATCHED, A2UI_STREAMED, JSON_RENDER, JSX, OMNI, OPENUI, jsonRenderOpenUIStyle, type Format } from "./src/emit";
+import { NO_COUNTERPART } from "./capabilities";
+import { fillSections, renderSections } from "./report";
 import { HTML } from "./src/html";
 import { freeEncoder, round, streaming, tokens, type Streaming } from "./src/measure";
 import { BENCH_DIR, loadScreens } from "./src/screens";
@@ -28,6 +30,8 @@ export interface ScreenResult {
   name: string;
   set: ScreenSet;
   components: number;
+  /** Components with no counterpart in the other library (benchmarks/capabilities.ts). */
+  noCounterpart: string[];
   /** Tokens per format id. */
   tokens: Record<string, number>;
   chars: Record<string, number>;
@@ -53,6 +57,7 @@ export function run(): { results: Results; files: Map<string, string> } {
       name: screen.name,
       set: screen.set,
       components: screen.stmts.filter((s) => s.kind === "node").length,
+      noCounterpart: [...new Set(screen.stmts.flatMap((s) => (s.kind === "node" && NO_COUNTERPART[screen.set].includes(s.type) ? [s.type] : [])))],
       tokens: {},
       chars: {},
       streaming: {},
@@ -88,6 +93,9 @@ export function run(): { results: Results; files: Map<string, string> } {
     totals,
   };
   files.set("results.json", JSON.stringify(results, null, 2) + "\n");
+  // docs/COMPARISON.md's tables are generated from the results.
+  const doc = join(BENCH_DIR, "../docs/COMPARISON.md");
+  if (existsSync(doc)) files.set("../docs/COMPARISON.md", fillSections(readFileSync(doc, "utf8"), renderSections(results)));
   return { results, files };
 }
 

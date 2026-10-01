@@ -61,23 +61,29 @@ So this plan **extends OpenUI's published benchmark** (same seven scenarios, sam
 ## Task checklist
 
 **A. Set-up**
-- [ ] A.1 `benchmarks/` with the offline tokenizer, the screen list and a `npm run bench` script; a test that the script runs and its outputs are committed
-- [ ] A.2 Sources pinned: OpenUI's published samples and system prompt, the A2UI v0.9 spec and basic catalog, json-render's spec format, each with its link and version
+- [x] A.1 `benchmarks/` with the offline tokenizer, the screen list and a `npm run bench` script; a test that the script runs and its outputs are committed
+- [x] A.2 Sources pinned: OpenUI's published samples and system prompt, the A2UI v0.9 spec and basic catalog, json-render's spec format, each with its link and version
 
 **B. Screens and converters**
-- [ ] B.1 The nine model-check screens as Omni-IR (the replies already recorded), plus OpenUI's seven scenarios written in Omni-IR where the catalog can express them
-- [ ] B.2 Converters from one parsed screen to A2UI v0.9 JSONL, json-render (spec and patch stream), HTML with Tailwind and React JSX; checked by validating the A2UI and json-render output against their published schemas where available
-- [ ] B.3 A converter to OpenUI Lang for our nine screens, using the component library in OpenUI's published `schema.json`, so it is generated like the others rather than written by hand
+- [x] B.1 The nine model-check screens as Omni-IR (the replies already recorded), plus OpenUI's seven scenarios written in Omni-IR where the catalog can express them
+- [x] B.2 Converters from one parsed screen to A2UI v0.9 JSONL, json-render (spec and patch stream), HTML with Tailwind and React JSX; checked by validating the A2UI and json-render output against their published schemas where available
+- [x] B.3 A converter to OpenUI Lang for our nine screens, using the component library in OpenUI's published `schema.json`, so it is generated like the others rather than written by hand
 
 **C. Measurements**
-- [ ] C.1 Size: tokens and characters per screen and format, with totals
-- [ ] C.2 Streaming: share of the reply needed before the first component and before the whole first card
+- [x] C.1 Size: tokens and characters per screen and format, with totals
+- [x] C.2 Streaming: share of the reply needed before the first component and before the whole first card
 - [ ] C.3 Reliability: the nine requests in both Omni-IR (current prompt) and OpenUI Lang, in fresh Claude.ai chats on your account, each checked with its own parser
-- [ ] C.4 The capability table, every cell sourced
+- [x] C.4 The capability table, every cell sourced
 
 **D. Write-up** *(checkpoint: you review)*
-- [ ] D.1 `docs/COMPARISON.md`: method, results, caveats and sources; a review page
+- [x] D.1 `docs/COMPARISON.md`: method, results, caveats and sources; a review page
 - [ ] D.2 Only after your review: landing page and README wording
+
+**Progress (2026-10-01):** A, B, C.1, C.2, C.4 and D.1 done on `wip/comparison`; awaiting the owner's review and the C.3 runs.
+- Method decision made while building: every format carries the screen's own components and props (OpenUI's benchmark does the same), so size compares syntax; which library can draw which screen is reported separately as coverage. So B.1's "OpenUI's scenarios written in Omni-IR where the catalog can express them" became: all seven are written in Omni-IR syntax with OpenUI's components for the size numbers, and the coverage table shows that Omni-IR's catalog can draw none of them unchanged. B.3 likewise writes the nine screens in OpenUI Lang syntax with Omni-IR's components.
+- A2UI is pinned at v0.9.1, its current production release (v1.0 is a release candidate).
+- `@openuidev/lang-core` sends install telemetry from a postinstall script, so it is not a dependency: the parser check is manual (`benchmarks/checks/openui-parser.mjs`), and the reliability page loads it from jsDelivr in the browser.
+- Review page: https://claude.ai/artifact/GhtD7m2BgFzryM8o3eBiuH · reliability check page (C.3): https://claude.ai/artifact/5Ae5aFVfZDM1pM8nSyFbq9 (`npm run comparison:page`, `npm run reliability:page`).
 
 **E. Optional, not scheduled** *(only if the owner decides to; costs money)*
 - [ ] E.1 Omni-IR on Thesys's 46 briefs × 4 runs (184 paid API runs). Not run unless the owner gives the go-ahead.
