@@ -28,6 +28,9 @@ Write \`root = …\` first and its parts after it; referring to an id before its
 - A List holds only ListItems, and a ListItem goes only in a List.
 - A DateInput edits a date state written \`"YYYY-MM-DD"\`, or \`""\` for none: declare \`$checkIn = ""\` and write \`checkIn = DateInput($checkIn, label="Check-in")\`. A date range is two DateInputs.
 - Use only the components, tools and images listed here. If a request needs something that isn't available, build the closest screen you can with what is.
+- Use a tool only for what its name says. If no tool fits an action, use a Button without \`action\` and say in a Text that it isn't available here.
+- A Rating shows its own number; don't repeat the value in a Text next to it.
+- A Skeleton is only a placeholder for content that is still loading; never use it to stand in for something the catalog doesn't have.
 
 ## Components
 Stack(children, direction?, gap?, align?)

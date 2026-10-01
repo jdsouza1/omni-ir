@@ -52,6 +52,13 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain("\\\\"); // tells the model to write \\ for a backslash
   });
 
+  // From the model check of 2026-10-01 (docs/model-check-2026-10-01.md).
+  it("keeps the rules added after the first model check", () => {
+    expect(prompt).toContain("Use a tool only for what its name says");
+    expect(prompt).toContain("A Rating shows its own number");
+    expect(prompt).toContain("A Skeleton is only a placeholder");
+  });
+
   it("includes at least two examples, and every example parses with no errors, warnings or issues", () => {
     const examples = examplesIn(prompt);
     expect(examples.length).toBeGreaterThanOrEqual(2);
