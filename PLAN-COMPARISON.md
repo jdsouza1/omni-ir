@@ -77,7 +77,7 @@ So this plan **extends OpenUI's published benchmark** (same seven scenarios, sam
 
 **D. Write-up** *(checkpoint: you review)*
 - [x] D.1 `docs/COMPARISON.md`: method, results, caveats and sources; a review page
-- [ ] D.2 Only after your review: landing page and README wording
+- [x] D.2 Landing page and README wording (drafted 2026-10-02 at the owner's request; awaiting review): README "How it compares"; landing draft v6 at https://claude.ai/artifact/PUptQnnDGK8eZL2oQkLVhu, with a comparison section and the stale "iOS and Android planned" lines fixed. The live landing page is unchanged until approved. Reliability claims wait for C.3
 
 **Progress (2026-10-01):** A, B, C.1, C.2, C.4 and D.1 done on `wip/comparison`; awaiting the owner's review and the C.3 runs.
 - Method decision made while building: every format carries the screen's own components and props (OpenUI's benchmark does the same), so size compares syntax; which library can draw which screen is reported separately as coverage. So B.1's "OpenUI's scenarios written in Omni-IR where the catalog can express them" became: all seven are written in Omni-IR syntax with OpenUI's components for the size numbers, and the coverage table shows that Omni-IR's catalog can draw none of them unchanged. B.3 likewise writes the nine screens in OpenUI Lang syntax with Omni-IR's components.
