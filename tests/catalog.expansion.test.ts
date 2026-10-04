@@ -1,5 +1,6 @@
 // Step 10: Select, Switch, Table/TableRow, Tabs/Tab and Notice (PLAN-CATALOG.md). Protocol rules only;
 // rendering is covered in components.expansion.test.tsx.
+import { readFileSync } from "node:fs";
 import { createParser, validateStatement } from "@omni-ir/core";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
@@ -141,3 +142,18 @@ describe("new components never call the backend", () => {
     ).toContain("4:mutation_target_not_interactive");
   });
 });
+
+describe("model check, 2026-10-04 (docs/model-check-2026-10-04.md)", () => {
+  const doc = readFileSync("docs/model-check-2026-10-04.md", "utf8");
+  const block = doc.slice(doc.indexOf("```\n## ") + 4, doc.lastIndexOf("\n```"));
+  const replies = block.split(/^## /m).filter(Boolean);
+
+  it.each(replies.map((r) => [r.slice(0, r.indexOf("\n")), r.slice(r.indexOf("\n") + 1)]))("the %s reply is valid", (_, text) => {
+    expect(issues(text)).toEqual([]);
+  });
+
+  it("records all five replies", () => {
+    expect(replies).toHaveLength(5);
+  });
+});
+
