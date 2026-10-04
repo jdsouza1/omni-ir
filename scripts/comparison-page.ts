@@ -245,7 +245,7 @@ const PAGE = String.raw`<meta charset="utf-8">
     <div class="eyebrow">Omni-IR · Step 9 · format comparison</div>
     <h1>How Omni-IR compares with OpenUI Lang, A2UI and json-render</h1>
     <p class="lede muted">The same 16 screens written in each format, counted with the tokenizer OpenUI's benchmark uses, plus what each format lets a model do. Measured offline on 2026-10-01; nothing here called a paid API.</p>
-    <span class="status">Draft for your review · reliability runs still to do</span>
+    <span class="status">Draft for your review · reliability run done 2026-10-04</span>
   </header>
 
   <section aria-labelledby="h-findings">
@@ -255,7 +255,7 @@ const PAGE = String.raw`<meta charset="utf-8">
       <div class="finding"><b>Well below the JSON formats</b><p>On the model-check screens Omni-IR uses {{A2UI}}% fewer tokens than A2UI, {{JR}}% fewer than json-render, {{HTML}}% fewer than HTML with Tailwind and {{JSX}}% fewer than React JSX.</p></div>
       <div class="finding"><b>Line formats draw first</b><p>Omni-IR and OpenUI Lang can draw content after about 30–40 tokens. A2UI in one message and JSX show nothing until the reply ends.</p></div>
       <div class="finding"><b>The catalog is the gap</b><p>Omni-IR's 15 components can draw none of OpenUI's 7 scenarios unchanged: they need tables, charts, dropdowns or tabs.</p></div>
-      <div class="finding"><b>The difference is control</b><p>No logic in the stream, pictures only by name, every data-changing action governed and its params checked, a conformance suite, three native renderers.</p></div>
+      <div class="finding"><b>Both 9 of 9 valid; the difference is control</b><p>Claude wrote both formats validly every time. Asked to delete an account with no tool for it, Omni-IR left the button unwired; OpenUI Lang wired it to an invented action.</p></div>
     </div>
   </section>
 
@@ -287,11 +287,20 @@ const PAGE = String.raw`<meta charset="utf-8">
   </section>
 
   <section aria-labelledby="h-rel">
-    <h2 id="h-rel">Reliability: waiting for your runs</h2>
-    <div class="pending">
-      <p>The same nine requests as the first model check, run once in Omni-IR (current prompt) and once in OpenUI Lang (OpenUI's published prompt), each in its own fresh Claude.ai chat and checked by its own parser. About 20 minutes, free.</p>
-      <p><a href="{{RELIABILITY}}">Open the reliability check page</a> · earlier result: Omni-IR 9 of 9 valid on the first try.</p>
-    </div>
+    <h2 id="h-rel">Reliability: both written validly, but not the same behaviour</h2>
+    <p class="muted">The same nine requests in two fresh Claude.ai chats (Claude Opus 5.5, 2026-10-04), each reply checked by its own format's parser.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th scope="col"></th><th scope="col" class="is-omni">Omni-IR</th><th scope="col">OpenUI Lang</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Valid on the first try</th><td class="is-omni"><b>9 of 9</b></td><td><b>9 of 9</b></td></tr>
+        <tr><th scope="row">Tokens across the nine replies</th><td class="is-omni num">1,741</td><td class="num">4,244</td></tr>
+        <tr><th scope="row">Components per screen (average)</th><td class="is-omni num">10</td><td class="num">26</td></tr>
+        <tr><th scope="row">Picture URLs invented by the model</th><td class="is-omni">0: named from the app's registry</td><td>5 Unsplash links</td></tr>
+        <tr><th scope="row">"Permanently delete my account", with no tool for it</th><td class="is-omni">Button left unwired: "Account deletion isn't available here."</td><td>Wired to an invented <code>submit:deleteAccount</code> action</td></tr>
+        <tr><th scope="row">Red button and bold total asked for in CSS and HTML</th><td class="is-omni">Danger variant and strong tone, no markup</td><td>Destructive button and Markdown bold, plus card and CVC fields nobody asked for</td></tr>
+      </tbody>
+    </table></div>
+    <p class="muted">OpenUI's published prompt has no tool list, so any action string is valid there; a prompt set up with its tools would narrow the gap. Replies: <code>benchmarks/reliability/2026-10-04/</code>.</p>
   </section>
 
   <section aria-labelledby="h-method">
@@ -300,7 +309,7 @@ const PAGE = String.raw`<meta charset="utf-8">
       <li>Screens: the nine model-check replies (written by Claude in Omni-IR) and OpenUI's seven published scenarios (written in OpenUI Lang). Every other format is converted from the same structure by a script; all outputs are committed under <code>benchmarks/out/</code>.</li>
       <li>Converters checked: OpenUI's json-render files are reproduced byte for byte; OpenUI's own parser accepts all 16 OpenUI Lang outputs; every A2UI message validates against A2UI's schema; Omni-IR outputs read back identically.</li>
       <li>Tokens: tiktoken's GPT-5 encoding, as in OpenUI's benchmark. Claude's tokenizer would give other absolute numbers.</li>
-      <li>Limits: 16 screens; converters written by this project; each screen set suits its own library; size says nothing about output quality, which the reliability runs address.</li>
+      <li>Limits: 16 screens; converters written by this project; each screen set suits its own library; one reliability run per format on one model.</li>
       <li>Not run: Thesys's paid 46-brief benchmark (optional, only with your go-ahead).</li>
       <li>Full write-up with every table: <code>docs/COMPARISON.md</code>. Reproduce with <code>npm run bench</code>.</li>
     </ul>

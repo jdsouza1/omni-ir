@@ -56,6 +56,12 @@ describe("benchmarks: sources", () => {
     },
   );
 
+  it("the reliability run's Omni-IR replies (2026-10-04) are all valid", () => {
+    const replies = bench("reliability/2026-10-04/omni-ir.txt").split(/^## /m).filter(Boolean);
+    expect(replies).toHaveLength(9);
+    for (const reply of replies) expect(omniIssues(reply.slice(reply.indexOf("\n") + 1)), reply.slice(0, reply.indexOf("\n"))).toEqual([]);
+  });
+
   it("are the replies recorded in docs/model-check-2026-10-01.md", () => {
     const doc = readFileSync(join(BENCH_DIR, "../docs/model-check-2026-10-01.md"), "utf8");
     for (const { screen, original } of sources.filter((s) => s.screen.set === "omni")) {

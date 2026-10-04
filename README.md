@@ -80,14 +80,13 @@ button click ──► McpMutationBoundary ──► /api/mutate ──► serve
 
 ## How it compares
 
-Measured offline on the same screens in each format, counting tokens the way OpenUI's benchmark does ([docs/COMPARISON.md](docs/COMPARISON.md), reproduce with `npm run bench`):
+The same screens in each format; sizes are counted offline the way OpenUI's benchmark counts them, and validity was checked in fresh Claude.ai chats ([docs/COMPARISON.md](docs/COMPARISON.md); sizes reproduce with `npm run bench`):
 
 - **Compact:** on the nine model-check screens, Omni-IR uses 39% fewer tokens than A2UI, 55% fewer than json-render, 50% fewer than HTML with Tailwind and 18% fewer than React JSX. OpenUI Lang, the closest relative, is 4–10% smaller still: it allows positional arguments and components nested inside other components.
 - **Streams line by line:** the first content can be drawn after about 30–40 tokens. A2UI sent as one message, and generated React code, show nothing until the reply is complete.
 - **Tighter control than the alternatives:** no logic in the stream, pictures only from the app's registry, every data-changing action governed with its params checked, a 63-case conformance suite, and native web, iOS and Android renderers that pass it.
 - **A smaller catalog:** 15 components against OpenUI's 53. Omni-IR has no tables, charts, dropdowns or tabs yet.
-
-A side-by-side reliability check (how often a model writes each format validly on the first try) is still to be run.
+- **Reliable, and safer when asked for something risky:** in fresh Claude.ai chats, Claude wrote both Omni-IR and OpenUI Lang validly on the first try for 9 of 9 requests. Asked for a button that permanently deletes the account, with no tool for it, Omni-IR left the button unwired and said so, while the OpenUI Lang reply wired it to an invented action.
 
 ## Components (v0.1)
 

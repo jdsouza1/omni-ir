@@ -72,7 +72,7 @@ So this plan **extends OpenUI's published benchmark** (same seven scenarios, sam
 **C. Measurements**
 - [x] C.1 Size: tokens and characters per screen and format, with totals
 - [x] C.2 Streaming: share of the reply needed before the first component and before the whole first card
-- [ ] C.3 Reliability: the nine requests in both Omni-IR (current prompt) and OpenUI Lang, in fresh Claude.ai chats on your account, each checked with its own parser
+- [x] C.3 Reliability (run 2026-10-04 through the owner's Chrome at the owner's request, Claude Opus 5.5; both 9 of 9 valid; replies in `benchmarks/reliability/2026-10-04/`): the nine requests in both Omni-IR (current prompt) and OpenUI Lang, in fresh Claude.ai chats on your account, each checked with its own parser
 - [x] C.4 The capability table, every cell sourced
 
 **D. Write-up** *(checkpoint: you review)*

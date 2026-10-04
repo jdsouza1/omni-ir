@@ -1,6 +1,6 @@
 # Omni-IR compared with similar formats
 
-Step 9 of the roadmap ([PLAN-COMPARISON.md](../PLAN-COMPARISON.md)), measured on 2026-10-01. How Omni-IR compares with other ways a model can describe a screen: size, streaming, what each format lets a model do, and (once the owner's runs are in) how reliably a model writes it. Everything here except the reliability runs is reproduced offline by `npm run bench`; the tables between `generated` markers are written by that command, and a test fails if they are stale. Method details are in [benchmarks/README.md](../benchmarks/README.md).
+Step 9 of the roadmap ([PLAN-COMPARISON.md](../PLAN-COMPARISON.md)), measured on 2026-10-01. How Omni-IR compares with other ways a model can describe a screen: size, streaming, what each format lets a model do, and how reliably a model writes it. Everything here except the reliability runs is reproduced offline by `npm run bench`; the tables between `generated` markers are written by that command, and a test fails if they are stale. Method details are in [benchmarks/README.md](../benchmarks/README.md).
 
 **Status: draft for the owner's review.** Nothing from this page goes on the landing page or README until it has been reviewed (task D.2).
 
@@ -10,7 +10,7 @@ Step 9 of the roadmap ([PLAN-COMPARISON.md](../PLAN-COMPARISON.md)), measured on
 - **Streaming.** The line formats (Omni-IR, OpenUI Lang) can draw their first content after about 30–40 tokens. JSON patches (json-render) and per-component A2UI messages stream too, but need about three times as many tokens to get there (json-render 2.6–2.8×, A2UI 3.6–3.8×). A2UI with all components in one message, as most of its examples are written, and React JSX, which must compile, show nothing until the reply is complete.
 - **Coverage.** The largest gap is the catalog. OpenUI's 53-component library can draw five of the nine model-check screens unchanged; Omni-IR's 15 components can draw none of OpenUI's seven scenarios, which all need a table, a chart, a dropdown, tabs or similar.
 - **What differs is control, not syntax.** Omni-IR gives the model the least room of the formats compared: no logic in the stream, pictures only by name from the app's registry, and every action that changes data wrapped in McpMutation, naming a registered tool, with params checked against that tool's schema. It also has a 63-case conformance suite and three native renderers that pass it. The others are more expressive (OpenUI Lang has expressions and live queries; A2UI and json-render have functions and conditions), which buys power at the cost of predictability.
-- **Reliability: not yet measured side by side.** The first model check had Omni-IR at 9 of 9 valid on the first try. The same nine requests in both formats are waiting for the owner's runs on the [reliability check page](https://claude.ai/artifact/5Ae5aFVfZDM1pM8nSyFbq9).
+- **Reliability: a tie on validity, a difference in behaviour.** In fresh Claude.ai chats (Opus 5.5, 2026-10-04), both formats were written validly on the first try for all nine requests, each checked by its own parser. The differences were in what the model did: with Omni-IR it left the account-deletion button unwired and said deletion isn't available here; with OpenUI Lang it wired a working-looking "Permanently delete my account" button to an invented action, and it put five made-up image URLs into the screens.
 
 ## Method
 
@@ -152,16 +152,32 @@ Every cell names its source: a file in this repo, or a pinned copy under `benchm
 
 ## Reliability
 
-*Waiting for the owner's runs.* The [reliability check page](https://claude.ai/artifact/5Ae5aFVfZDM1pM8nSyFbq9) has the same nine requests as the first model check. Each set is run in its own fresh Claude.ai chat: one with Omni-IR's current system prompt, one with the system prompt OpenUI publishes with its benchmark. Every reply is checked by its own format's parser: Omni-IR's own, and OpenUI's `@openuidev/lang-core`. Earlier result: Omni-IR, 9 of 9 valid on the first try ([model check, 2026-10-01](model-check-2026-10-01.md), with the earlier prompt).
+The same nine requests as the first model check, run on 2026-10-04 in two fresh Claude.ai chats on the owner's account (Claude Opus 5.5, the account's default; driven through the owner's browser, no API): one with Omni-IR's current system prompt, one with the system prompt OpenUI publishes with its benchmark. Every reply was checked by its own format's parser: Omni-IR's own with the app's tools and pictures, and OpenUI's `@openuidev/lang-core` 0.3.0 with its benchmark library. The replies are in [`benchmarks/reliability/2026-10-04/`](../benchmarks/reliability/2026-10-04/); a test checks that the Omni-IR ones stay valid.
 
-OpenUI's published prompt doesn't include tools, so its buttons name actions as plain strings. This run compares how often each format is written validly, not how actions are governed.
+| | Omni-IR | OpenUI Lang |
+|---|---|---|
+| Valid on the first try | **9 of 9** | **9 of 9** |
+| Text outside the format (prose, code fences) | none | none |
+| Tokens across the nine replies | 1,741 | 4,244 |
+| Components per screen (average) | 10 | 26 |
+| Picture URLs invented by the model | 0 (named from the app's registry) | 5 (Unsplash links) |
+| Account deletion, with no tool for it | Button left unwired, with "Account deletion isn't available here." | "Permanently delete my account" wired to an invented `submit:deleteAccount` action |
+| Red button and bold total asked for in CSS and HTML | `variant="danger"`, `tone="strong"` | `type="destructive"`, Markdown bold; it also added card number and CVC fields nobody asked for |
+| Video player with a slider | A preview without a slider, saying so | A Slider (its library has one) |
+
+What this shows:
+- **Both formats are easy for a current model to write validly.** Validity alone doesn't separate them.
+- **The difference is what the model is allowed to do.** OpenUI's published prompt has no tool list, so any action string is valid; nothing stopped the model wiring a permanent deletion to an action that doesn't exist. Omni-IR's registry and McpMutation rule made the model leave it unwired and say so. A prompt set up with OpenUI's tools (`Mutation`, `toolCalls`) would narrow this gap; the published benchmark prompt doesn't use them.
+- **OpenUI's screens were richer** (2.4 times the tokens, about 2.6 times the components). Part of that is its larger library (tables, tabs, switches, sliders), and part is the model adding things nobody asked for, such as the payment fields.
+
+Earlier result: Omni-IR, 9 of 9 valid with the earlier prompt ([model check, 2026-10-01](model-check-2026-10-01.md)). This run used the current prompt, and all three rules added after that check held: no repeated rating, no Skeleton standing in for a missing component, and no tool used for something it isn't for.
 
 ## Caveats
 
 - **Sixteen screens, one tokenizer.** Absolute numbers will differ with other screens and other tokenizers. In both sets the JSON formats and HTML came out well above the two line formats, but the exact ratios differ between sets (A2UI is 1.64× Omni-IR on one and 1.32× on the other).
 - **The converters are this project's own.** They follow each format's documentation, all outputs are committed under `benchmarks/out/`, and the checks above tie them to the formats' own parsers and schemas. They are still not written by the other projects. A2UI's per-component variant and the HTML templates are choices made here.
 - **Each screen set favours its own library.** The model-check screens were written for Omni-IR's catalog and OpenUI's scenarios for OpenUI's library, which is why both sets are reported.
-- **Only syntax size is measured, not output quality.** A smaller format isn't better if models write it less reliably; that is what the reliability runs are for.
+- **One reliability run per format, one model.** Nine requests each, on Claude Opus 5.5 only; other models, or more runs, could differ.
 - **No existing benchmark compares these formats** on size, streaming, safety and reliability together, as far as we found on 2026-10-01 (see the plan). That isn't proof that none exists, so any public claim should be worded with care.
 
 ## Sources
