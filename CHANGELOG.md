@@ -2,7 +2,7 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
-## 0.2.0 (unreleased)
+## 0.2.0 (2026-10-04)
 
 ### Added
 - **New components:** `Select` (pick one option; edits a text `$key`), `Switch` (on/off; edits a true/false `$key`), `Table` and `TableRow` (rows of text or numbers under column headings, one line per row), `Tabs` and `Tab` (sections of one screen; which tab is open is the viewer's choice), and `Notice` (an info, success, warning or danger message). The catalog now has 22 components plus McpMutation.
