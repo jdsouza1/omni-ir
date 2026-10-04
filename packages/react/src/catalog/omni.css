@@ -98,7 +98,8 @@
 .omni-table > .omni-skeleton, .omni-table > .omni-fallback { grid-column: 1 / -1; }
 
 .omni-tabs { display: flex; flex-direction: column; gap: 0.75rem; }
-.omni-tabs__list { display: flex; gap: 0.25rem; border-bottom: 1px solid #e3e5e8; overflow-x: auto; }
+.omni-tabs__list { display: flex; gap: 0.25rem; border-bottom: 1px solid #e3e5e8; overflow-x: auto; scrollbar-width: none; }
+.omni-tabs__list::-webkit-scrollbar { display: none; }
 .omni-tabs__tab { font: inherit; padding: 0.5rem 0.85rem; border: 0; border-bottom: 2px solid transparent; background: none; color: #5b616e; cursor: pointer; white-space: nowrap; }
 .omni-tabs__tab--open { color: #1f2329; font-weight: 600; border-bottom-color: #1f5eff; }
 .omni-tab { display: flex; flex-direction: column; gap: 0.75rem; }
