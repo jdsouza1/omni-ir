@@ -2,7 +2,7 @@
 
 Goal: honest, reproducible numbers on how Omni-IR compares with other ways a model can describe a UI, covering size, streaming and reliability, plus a sourced table of what each format allows. The owner asked for this on 2026-10-01; nothing goes on the landing page without the owner's review.
 
-Status: **APPROVED 2026-10-01** as a thorough comparison with the recommendations: OpenUI Lang, A2UI and json-render measured, HTML and React as baselines; reliability runs for both Omni-IR (current prompt) and OpenUI Lang; results in `benchmarks/` and `docs/COMPARISON.md` with a visual review page; landing wording only after review. The paid 46-brief run is not part of this step: the owner confirmed on 2026-10-01 not to run it and to keep it as an optional extra (task E.1), only with the owner's go-ahead.
+Status: **DONE 2026-10-04** (merged; landing page v6 published). Approved 2026-10-01 as a thorough comparison with the recommendations: OpenUI Lang, A2UI and json-render measured, HTML and React as baselines; reliability runs for both Omni-IR (current prompt) and OpenUI Lang; results in `benchmarks/` and `docs/COMPARISON.md` with a visual review page; landing wording only after review. The paid 46-brief run is not part of this step: the owner confirmed on 2026-10-01 not to run it and to keep it as an optional extra (task E.1), only with the owner's go-ahead.
 
 ## The landscape (researched 2026-10-01)
 
