@@ -8,7 +8,7 @@ Step 9 of the roadmap ([PLAN-COMPARISON.md](../PLAN-COMPARISON.md)), measured on
 
 - **Size.** Omni-IR and OpenUI Lang are in the same class, and OpenUI Lang is the more compact: 4% fewer tokens on the model-check screens and 10% fewer on OpenUI's own scenarios. Both are well below the JSON formats on the same screens: Omni-IR uses 39% fewer tokens than A2UI (55% fewer than json-render, 50% fewer than HTML with Tailwind, 18% fewer than React JSX). OpenUI Lang's lead comes from positional arguments and components written inline; Omni-IR names every optional prop and puts every component on its own line.
 - **Streaming.** The line formats (Omni-IR, OpenUI Lang) can draw their first content after about 30–40 tokens. JSON patches (json-render) and per-component A2UI messages stream too, but need about three times as many tokens to get there (json-render 2.6–2.8×, A2UI 3.6–3.8×). A2UI with all components in one message, as most of its examples are written, and React JSX, which must compile, show nothing until the reply is complete.
-- **Coverage.** The largest gap is the catalog. OpenUI's 53-component library can draw five of the nine model-check screens unchanged; Omni-IR's 15 components can draw none of OpenUI's seven scenarios, which all need a table, a chart, a dropdown, tabs or similar.
+- **Coverage.** The catalog was the largest gap. Before Step 10, Omni-IR's 15 components could draw none of OpenUI's seven scenarios; with Select, Switch, Table, Tabs and Notice added (22 components, 2026-10-04) it draws three of them (the simple table, the contact form and the settings panel). The other four need charts, Markdown, an accordion or an image gallery. OpenUI's 53-component library draws five of the nine model-check screens unchanged.
 - **What differs is control, not syntax.** Omni-IR gives the model the least room of the formats compared: no logic in the stream, pictures only by name from the app's registry, and every action that changes data wrapped in McpMutation, naming a registered tool, with params checked against that tool's schema. It also has a 63-case conformance suite and three native renderers that pass it. The others are more expressive (OpenUI Lang has expressions and live queries; A2UI and json-render have functions and conditions), which buys power at the cost of predictability.
 - **Reliability: a tie on validity, a difference in behaviour.** In fresh Claude.ai chats (Opus 5.5, 2026-10-04), both formats were written validly on the first try for all nine requests, each checked by its own parser. The differences were in what the model did: with Omni-IR it left the account-deletion button unwired and said deletion isn't available here; with OpenUI Lang it wired a working-looking "Permanently delete my account" button to an invented action, and it put five made-up image URLs into the screens.
 
@@ -119,16 +119,16 @@ These are components with no counterpart in the other library. Close counterpart
 | outside-catalog | model check | 14 | Skeleton |
 | styling | model check | 11 | none: drawable there too |
 | no-tool | model check | 15 | none: drawable there too |
-| simple-table | OpenUI | 7 | Table, Col |
-| chart-with-data | OpenUI | 11 | TextCallout, BarChart |
-| contact-form | OpenUI | 21 | Select |
-| dashboard | OpenUI | 47 | BarChart, PieChart, Table, Col, LineChart |
-| pricing-page | OpenUI | 50 | MarkDownRenderer, Callout, TextCallout, Table, Col, Accordion |
-| settings-panel | OpenUI | 27 | Tabs, SwitchGroup, TextCallout |
-| e-commerce-product | OpenUI | 49 | ImageGallery, Select, RadioGroup, MarkDownRenderer, Table, Col |
+| simple-table | OpenUI | 7 | none: drawable there too |
+| chart-with-data | OpenUI | 11 | BarChart |
+| contact-form | OpenUI | 21 | none: drawable there too |
+| dashboard | OpenUI | 47 | BarChart, PieChart, LineChart |
+| pricing-page | OpenUI | 50 | MarkDownRenderer, Accordion |
+| settings-panel | OpenUI | 27 | none: drawable there too |
+| e-commerce-product | OpenUI | 49 | ImageGallery, RadioGroup, MarkDownRenderer |
 <!-- /generated:coverage -->
 
-OpenUI's benchmark library has 53 components; Omni-IR's catalog has 15. Data screens (tables, charts) and choice inputs (dropdowns, radio buttons, switches) are what Omni-IR is missing for this kind of scenario. Adding any of them is a protocol change across the three renderers, so it would need its own plan.
+OpenUI's benchmark library has 53 components; Omni-IR's catalog has 22 since Step 10 (PLAN-CATALOG.md) added Select, Switch, Table and TableRow, Tabs and Tab, and Notice. That took Omni-IR from none of OpenUI's seven scenarios to three. What remains is mostly charts (planned as their own step), plus Markdown, which Omni-IR deliberately never supports because it would let the model send markup.
 
 ## What each format lets a model do
 
@@ -137,7 +137,7 @@ Every cell names its source: a file in this repo, or a pinned copy under `benchm
 <!-- generated:capabilities -->
 | | Omni-IR | OpenUI Lang | A2UI v0.9 | json-render | HTML + Tailwind | React JSX |
 |---|---|---|---|---|---|---|
-| **Who defines the components** | A fixed catalog in the spec: 15 components plus McpMutation <sub>SPEC.md §6</sub> | The app's library (Zod schemas); 53 components in its benchmark library <sub>sources/openui/specification-v05.mdx</sub> | The catalog named in createSurface: the basic catalog or the app's own <sub>sources/a2ui/a2ui_protocol.md</sub> | The app's catalog (Zod schemas) <sub>sources/json-render/README.md</sub> | Any element | Any code |
+| **Who defines the components** | A fixed catalog in the spec: 22 components plus McpMutation <sub>SPEC.md §6</sub> | The app's library (Zod schemas); 53 components in its benchmark library <sub>sources/openui/specification-v05.mdx</sub> | The catalog named in createSurface: the basic catalog or the app's own <sub>sources/a2ui/a2ui_protocol.md</sub> | The app's catalog (Zod schemas) <sub>sources/json-render/README.md</sub> | Any element | Any code |
 | **Markup or scripts from the model** | No. Text is always drawn as text <sub>SPEC.md §8, §11</sub> | No HTML; the default library renders Markdown and code blocks <sub>sources/openui/system-prompt.txt</sub> | No; the basic Text allows simple Markdown without HTML, images or links <sub>sources/a2ui/catalog.json</sub> | No; catalog components only <sub>sources/json-render/README.md</sub> | Yes: needs sanitizing | Yes: runs as code, needs a sandbox |
 | **Styling from the model** | No: only the catalog's variants and tones <sub>SPEC.md §6</sub> | Variants and sizes from the library <sub>sources/openui/system-prompt.txt</sub> | Variants, plus a theme colour (primaryColor) in createSurface <sub>sources/a2ui/catalog.json</sub> | Whatever the catalog's props allow <sub>sources/json-render/README.md</sub> | Any class or style | Any class or style |
 | **Pictures** | Names from the app's registry, never URLs <sub>SPEC.md §6 (Image)</sub> | Any URL (Image, ImageGallery) <sub>sources/openui/system-prompt.txt</sub> | Any URL (Image, Video, AudioPlayer) <sub>sources/a2ui/catalog.json</sub> | Whatever the catalog allows <sub>sources/json-render/README.md</sub> | Any URL | Any URL |

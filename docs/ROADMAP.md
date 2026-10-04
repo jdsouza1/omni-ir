@@ -19,6 +19,7 @@ Updated 2026-10-04. Planned dates for the remaining work are kept from the origi
 | 3 · Cross-platform | Android (Compose) renderer: Kotlin parser passing all 63 conformance cases, Compose catalog, streaming client, demo app | `android/` |
 | 2 · Web reference | React Catalog SDK published on npm as [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) 0.1.0, with approved, token-free releases | `packages/react/`, `.github/workflows/release.yml` |
 | Since then | Comparison with OpenUI Lang, A2UI, json-render, HTML and React: size, streaming, coverage, capabilities and a reliability run (both formats 9 of 9) | [docs/COMPARISON.md](COMPARISON.md), `benchmarks/` |
+| Since then | Catalog expansion: Select, Switch, Table/TableRow, Tabs/Tab and Notice on web, iOS and Android (unreleased until `v0.2.0`) | [PLAN-CATALOG.md](../PLAN-CATALOG.md) |
 
 ## Planned
 
@@ -39,6 +40,7 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 ## Not yet scheduled
 
+- Charts (Step 11): the remaining gap found by the format comparison; a big build on three platforms, so it gets its own plan.
 - Real backend tool handlers with authorization, in place of the stubs.
 - A check of how well a real model follows the protocol (free manual check with `npm run validate`, or a paid run only with the owner's go-ahead).
 - A written goal for the bi-directional AST sync tooling, before that work starts.

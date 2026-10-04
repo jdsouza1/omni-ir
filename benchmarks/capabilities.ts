@@ -25,7 +25,7 @@ export const CAPABILITIES: readonly Row[] = [
   {
     question: "Who defines the components",
     cells: [
-      { text: "A fixed catalog in the spec: 15 components plus McpMutation", source: "SPEC.md §6" },
+      { text: "A fixed catalog in the spec: 22 components plus McpMutation", source: "SPEC.md §6" },
       { text: "The app's library (Zod schemas); 53 components in its benchmark library", source: OPENUI_SPEC },
       { text: "The catalog named in createSurface: the basic catalog or the app's own", source: A2UI_PROTOCOL },
       { text: "The app's catalog (Zod schemas)", source: JR },
@@ -149,14 +149,16 @@ export const CAPABILITIES: readonly Row[] = [
  * Catalog coverage: components with no counterpart in the other library, so a screen using one
  * can't be drawn there without changing what it shows. Components with a close counterpart
  * (TextContent ↔ Text or Heading, Separator ↔ Divider, Tag ↔ Badge, DatePicker ↔ DateInput,
- * TextArea ↔ Input with lines, FormControl and Form ↔ Input in a Stack) are not listed.
+ * TextArea ↔ Input with lines, FormControl and Form ↔ Input in a Stack, and since Step 10: Table and
+ * Col ↔ Table and TableRow, Select ↔ Select, SwitchGroup ↔ Switches, Tabs ↔ Tabs, Callout and
+ * TextCallout ↔ Notice) are not listed.
  */
 export const NO_COUNTERPART: Record<"omni" | "openui", readonly string[]> = {
   // OpenUI components Omni-IR's catalog has nothing for (asked of OpenUI's scenarios).
   openui: [
-    "Table", "Col", "BarChart", "LineChart", "AreaChart", "PieChart", "RadarChart", "RadialChart", "HorizontalBarChart",
-    "SingleStackedBarChart", "ScatterChart", "Select", "RadioGroup", "CheckBoxGroup", "SwitchGroup", "Slider", "Tabs",
-    "Accordion", "Carousel", "Steps", "ImageGallery", "MarkDownRenderer", "CodeBlock", "Callout", "TextCallout",
+    "BarChart", "LineChart", "AreaChart", "PieChart", "RadarChart", "RadialChart", "HorizontalBarChart",
+    "SingleStackedBarChart", "ScatterChart", "RadioGroup", "CheckBoxGroup", "Slider",
+    "Accordion", "Carousel", "Steps", "ImageGallery", "MarkDownRenderer", "CodeBlock",
   ],
   // Omni-IR components OpenUI's benchmark library has nothing for (asked of the model-check screens).
   omni: ["Rating", "List", "ListItem", "Message", "Skeleton"],

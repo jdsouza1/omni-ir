@@ -735,10 +735,7 @@
       "name": "simple-table",
       "set": "openui",
       "components": 7,
-      "noCounterpart": [
-        "Table",
-        "Col"
-      ],
+      "noCounterpart": [],
       "tokens": {
         "omni-ir": 169,
         "openui-lang": 146,
@@ -816,7 +813,6 @@
       "set": "openui",
       "components": 11,
       "noCounterpart": [
-        "TextCallout",
         "BarChart"
       ],
       "tokens": {
@@ -895,9 +891,7 @@
       "name": "contact-form",
       "set": "openui",
       "components": 21,
-      "noCounterpart": [
-        "Select"
-      ],
+      "noCounterpart": [],
       "tokens": {
         "omni-ir": 396,
         "openui-lang": 294,
@@ -977,8 +971,6 @@
       "noCounterpart": [
         "BarChart",
         "PieChart",
-        "Table",
-        "Col",
         "LineChart"
       ],
       "tokens": {
@@ -1059,10 +1051,6 @@
       "components": 50,
       "noCounterpart": [
         "MarkDownRenderer",
-        "Callout",
-        "TextCallout",
-        "Table",
-        "Col",
         "Accordion"
       ],
       "tokens": {
@@ -1141,11 +1129,7 @@
       "name": "settings-panel",
       "set": "openui",
       "components": 27,
-      "noCounterpart": [
-        "Tabs",
-        "SwitchGroup",
-        "TextCallout"
-      ],
+      "noCounterpart": [],
       "tokens": {
         "omni-ir": 596,
         "openui-lang": 540,
@@ -1224,11 +1208,8 @@
       "components": 49,
       "noCounterpart": [
         "ImageGallery",
-        "Select",
         "RadioGroup",
-        "MarkDownRenderer",
-        "Table",
-        "Col"
+        "MarkDownRenderer"
       ],
       "tokens": {
         "omni-ir": 1319,

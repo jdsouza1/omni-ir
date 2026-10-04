@@ -2,7 +2,7 @@
 
 Goal: close the biggest gap the format comparison found (docs/COMPARISON.md): Omni-IR's 15 components can draw none of OpenUI's seven published scenarios, because they need dropdowns, tables, tabs, switches or notices. Add the components that fill the most of that gap, on all three renderers, without loosening any of Omni-IR's rules.
 
-Status: **APPROVED 2026-10-04** with the recommendations: all five components (Select, Switch, Table/TableRow, Tabs/Tab, Notice), one line per table row, charts left for their own step, and a screenshot review on all three platforms before merging.
+Status: **DONE 2026-10-04** (owner reviewed and approved; merged; ships in `v0.2.0`). **APPROVED 2026-10-04** with the recommendations: all five components (Select, Switch, Table/TableRow, Tabs/Tab, Notice), one line per table row, charts left for their own step, and a screenshot review on all three platforms before merging.
 
 ## Proposal
 
@@ -109,8 +109,8 @@ From 0 of 7 to 3 of 7. The rest mostly need charts, or Markdown. Markdown is del
 - [x] D.1 Web, iPhone and Android screenshots of the new fixtures from the CI workflows, on a review page
 
 **E. After your approval**
-- [ ] E.1 Merge; landing page and README component lists updated
-- [ ] E.2 Re-run the format comparison (coverage, size and reliability) with the new components, as recorded in PLAN-COMPARISON.md's decision
+- [x] E.1 Merge; landing page and README component lists updated
+- [x] E.2 Re-run the format comparison with the new components: coverage went from 0 to 3 of OpenUI's 7 scenarios; sizes are unchanged (they compare syntax). The reliability run's nine requests don't need the new components, so it wasn't repeated; the Step 10 model check (5 of 5) covers them. README landing: the README component list is updated; the landing page lists no components, so it needed no change
 - [ ] E.3 `v0.2.0` release (npm, the first Swift tag): a separate go-ahead from you
 
 **Progress (2026-10-04):** A–D done on `wip/catalog`; waiting for the owner's review.
