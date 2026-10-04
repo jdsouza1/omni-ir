@@ -124,6 +124,26 @@ public final class OmniStore {
     return ""
   }
 
+  /// A Switch's `$key`: true only when it holds `true`.
+  public func stateBool(_ key: String) -> Bool {
+    if case .bool(true)? = document.state[key] { return true }
+    return false
+  }
+
+  /// A Select's chosen option, or "" when its `$key` holds anything that isn't one of the options.
+  public func chosenOption(_ key: String, options: [String]) -> String {
+    let value = stateText(key)
+    return options.contains(value) ? value : ""
+  }
+
+  /// The labels of a Tabs' children, in order; nil for a Tab that hasn't arrived yet.
+  public func tabLabels(_ ids: [String]) -> [String?] {
+    ids.map { id in
+      guard let node = document.nodes[id], node.type == .tab, case .text(let label)? = node.props["label"] else { return nil }
+      return label
+    }
+  }
+
   /// A local edit (R1): it never calls the backend by itself.
   public func setState(_ key: String, _ value: Primitive) {
     parser.setState(key, value)

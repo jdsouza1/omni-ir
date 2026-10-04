@@ -69,28 +69,49 @@ func validateDocument(_ statements: [Statement], complete: Bool) -> [Issue] {
     }
   }
 
-  // Inputs edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD date or "".
-  for n in nodes where n.type == .input || n.type == .dateInput {
+  // Inputs and Selects edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD
+  // date or ""; Switches need true or false.
+  for n in nodes where [.input, .dateInput, .select, .switch].contains(n.type) {
     guard case .state(let key)? = n.props["value"], let value = state[key] else { continue }
-    if n.type == .input, case .text = value { continue }
-    if n.type == .dateInput, case .text(let s) = value, s.isEmpty || isISODate(s) { continue }
-    let message = n.type == .input
-      ? "Input \"\(n.id)\" is bound to \(key), which is not a string"
-      : "DateInput \"\(n.id)\" is bound to \(key), which is not a YYYY-MM-DD date or \"\""
+    let message: String
+    switch n.type {
+    case .input, .select:
+      if case .text = value { continue }
+      message = "\(n.type.rawValue) \"\(n.id)\" is bound to \(key), which is not a string"
+    case .switch:
+      if case .bool = value { continue }
+      message = "Switch \"\(n.id)\" is bound to \(key), which is not true or false"
+    default:
+      if case .text(let s) = value, s.isEmpty || isISODate(s) { continue }
+      message = "DateInput \"\(n.id)\" is bound to \(key), which is not a YYYY-MM-DD date or \"\""
+    }
     issues.append(Issue(code: .inputStateType, message: message, id: n.id))
   }
 
-  // A List holds only ListItems, and a ListItem only sits in a List.
-  for n in nodes {
-    if n.type == .list {
-      for child in n.children {
-        if let c = node(child), c.type != .listItem {
-          issues.append(Issue(code: .listMismatch, message: "List \"\(n.id)\" can only contain ListItems, not \(c.type.rawValue) \"\(child)\"", id: n.id))
+  // Containers with one kind of item: a List holds only ListItems, a Table only TableRows and Tabs
+  // only Tab; each item sits only in its container. Reported on whichever line arrives second.
+  for pair in containerPairs {
+    for n in nodes {
+      if n.type == pair.container {
+        for child in n.children {
+          if let c = node(child), c.type != pair.item {
+            issues.append(Issue(code: pair.code, message: "\(pair.container.rawValue) \"\(n.id)\" can only contain \(pair.item.rawValue)s, not \(c.type.rawValue) \"\(child)\"", id: n.id))
+          }
         }
       }
+      if n.type == pair.item, let parent = parentOf[n.id], let p = node(parent), p.type != pair.container {
+        issues.append(Issue(code: pair.code, message: "\(pair.item.rawValue) \"\(n.id)\" must be inside a \(pair.container.rawValue), not \(p.type.rawValue) \"\(parent)\"", id: n.id))
+      }
     }
-    if n.type == .listItem, let parent = parentOf[n.id], let p = node(parent), p.type != .list {
-      issues.append(Issue(code: .listMismatch, message: "ListItem \"\(n.id)\" must be inside a List, not \(p.type.rawValue) \"\(parent)\"", id: n.id))
+  }
+
+  // A TableRow has one cell per column of its Table.
+  for n in nodes where n.type == .table {
+    guard case .list(let columns)? = n.props["columns"] else { continue }
+    for child in n.children {
+      if let row = node(child), row.type == .tableRow, case .list(let cells)? = row.props["cells"], cells.count != columns.count {
+        issues.append(Issue(code: .tableMismatch, message: "TableRow \"\(child)\" has \(cells.count) cell(s), but Table \"\(n.id)\" has \(columns.count) column(s)", id: child))
+      }
     }
   }
 
@@ -150,6 +171,13 @@ func stateKeys(_ values: [String: PropValue]) -> [String] {
 }
 
 /// `^\d{4}-\d{2}-\d{2}$` with ASCII digits.
+/// Components that hold only one kind of item, and the issue code for breaking that rule.
+let containerPairs: [(container: ComponentType, item: ComponentType, code: IssueCode)] = [
+  (.list, .listItem, .listMismatch),
+  (.table, .tableRow, .tableMismatch),
+  (.tabs, .tab, .tabsMismatch),
+]
+
 func isISODate(_ s: String) -> Bool {
   let u = Array(s.utf8)
   guard u.count == 10, u[4] == UInt8(ascii: "-"), u[7] == UInt8(ascii: "-") else { return false }

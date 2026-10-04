@@ -21,6 +21,13 @@ public enum ComponentType: String, Sendable, CaseIterable, Hashable {
   case list = "List"
   case listItem = "ListItem"
   case message = "Message"
+  case select = "Select"
+  case `switch` = "Switch"
+  case table = "Table"
+  case tableRow = "TableRow"
+  case tabs = "Tabs"
+  case tab = "Tab"
+  case notice = "Notice"
 }
 
 /// Every error and warning a parser reports.
@@ -41,6 +48,8 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
   case unknownAsset = "unknown_asset"
   case inputStateType = "input_state_type"
   case listMismatch = "list_mismatch"
+  case tableMismatch = "table_mismatch"
+  case tabsMismatch = "tabs_mismatch"
   case duplicateMutation = "duplicate_mutation"
   case danglingRef = "dangling_ref"
   case missingState = "missing_state"
@@ -71,6 +80,8 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .unknownAsset: .error
     case .inputStateType: .error
     case .listMismatch: .error
+    case .tableMismatch: .error
+    case .tabsMismatch: .error
     case .duplicateMutation: .error
     case .danglingRef: .error
     case .missingState: .error
@@ -103,6 +114,8 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .unknownAsset: .line
     case .inputStateType: .line
     case .listMismatch: .line
+    case .tableMismatch: .line
+    case .tabsMismatch: .line
     case .duplicateMutation: .line
     case .danglingRef: .end
     case .missingState: .end
@@ -134,8 +147,10 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .rootAsChild: "root is listed as a child."
     case .childNotComponent: "A children list names an McpMutation."
     case .unknownAsset: "An Image or ListItem names a picture that isn't in the app's asset registry."
-    case .inputStateType: "An Input is bound to state that doesn't hold text, or a DateInput to state that isn't a YYYY-MM-DD date or empty."
+    case .inputStateType: "An Input or Select is bound to state that doesn't hold text, a DateInput to state that isn't a YYYY-MM-DD date or empty, or a Switch to state that isn't true or false."
     case .listMismatch: "A List contains something other than ListItems, or a ListItem is outside a List."
+    case .tableMismatch: "A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns."
+    case .tabsMismatch: "A Tabs contains something other than Tab, or a Tab is outside a Tabs."
     case .duplicateMutation: "A button that already has an McpMutation gets a second one."
     case .danglingRef: "A referenced component or McpMutation target never arrived."
     case .missingState: "A $state key is used but never declared."
@@ -160,6 +175,7 @@ public enum Limits {
   public static let stateKeyLength = 65
   public static let toolNameLength = 128
   public static let actionNameLength = 64
+  public static let tableColumns = 8
 }
 
 enum Catalog {
@@ -278,6 +294,56 @@ enum Catalog {
       props: [
         PropSpec(name: "text", required: true, value: .anyOf([.text(minLength: nil, maxLength: 2000, pattern: nil), .state])),
         PropSpec(name: "from", required: true, value: .oneOf(["user", "assistant"])),
+      ]
+    ),
+    .select: ComponentSpec(
+      positional: ["value"],
+      props: [
+        PropSpec(name: "value", required: true, value: .state),
+        PropSpec(name: "label", required: true, value: .text(minLength: 1, maxLength: 200, pattern: nil)),
+        PropSpec(name: "options", required: true, value: .list(item: .text(minLength: 1, maxLength: 200, pattern: nil), minItems: 1, maxItems: 50)),
+        PropSpec(name: "placeholder", required: false, value: .text(minLength: nil, maxLength: 200, pattern: nil)),
+      ]
+    ),
+    .switch: ComponentSpec(
+      positional: ["value"],
+      props: [
+        PropSpec(name: "value", required: true, value: .state),
+        PropSpec(name: "label", required: true, value: .text(minLength: 1, maxLength: 200, pattern: nil)),
+      ]
+    ),
+    .table: ComponentSpec(
+      positional: ["columns", "children"],
+      props: [
+        PropSpec(name: "columns", required: true, value: .list(item: .text(minLength: 1, maxLength: 200, pattern: nil), minItems: 1, maxItems: 8)),
+        PropSpec(name: "children", required: true, value: .refList(maxItems: 200)),
+      ]
+    ),
+    .tableRow: ComponentSpec(
+      positional: ["cells"],
+      props: [
+        PropSpec(name: "cells", required: true, value: .list(item: .anyOf([.text(minLength: nil, maxLength: 2000, pattern: nil), .number(minimum: nil, maximum: nil, integer: false)]), minItems: 1, maxItems: 8)),
+      ]
+    ),
+    .tabs: ComponentSpec(
+      positional: ["children"],
+      props: [
+        PropSpec(name: "children", required: true, value: .refList(maxItems: 200)),
+      ]
+    ),
+    .tab: ComponentSpec(
+      positional: ["label", "children"],
+      props: [
+        PropSpec(name: "label", required: true, value: .text(minLength: 1, maxLength: 200, pattern: nil)),
+        PropSpec(name: "children", required: true, value: .refList(maxItems: 200)),
+      ]
+    ),
+    .notice: ComponentSpec(
+      positional: ["text"],
+      props: [
+        PropSpec(name: "text", required: true, value: .anyOf([.text(minLength: nil, maxLength: 2000, pattern: nil), .state])),
+        PropSpec(name: "tone", required: false, value: .oneOf(["info", "success", "warning", "danger"])),
+        PropSpec(name: "title", required: false, value: .anyOf([.text(minLength: nil, maxLength: 2000, pattern: nil), .state])),
       ]
     ),
   ]

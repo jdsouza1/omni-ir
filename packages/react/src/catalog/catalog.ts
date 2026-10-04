@@ -1,4 +1,27 @@
-import { Badge, Button, Card, DateInput, Divider, Heading, Image, Input, List, ListItem, Message, Rating, Skeleton, Stack, Text } from "./components.js";
+import {
+  Badge,
+  Button,
+  Card,
+  DateInput,
+  Divider,
+  Heading,
+  Image,
+  Input,
+  List,
+  ListItem,
+  Message,
+  Notice,
+  Rating,
+  Select,
+  Skeleton,
+  Stack,
+  Switch,
+  Tab,
+  Table,
+  TableRow,
+  Tabs,
+  Text,
+} from "./components.js";
 import type { Catalog } from "./types.js";
 
 /** The default Trusted Catalog. `satisfies Catalog` makes a missing component a compile error. */
@@ -18,4 +41,11 @@ export const DEFAULT_CATALOG = {
   List,
   ListItem,
   Message,
+  Select,
+  Switch,
+  Table,
+  TableRow,
+  Tabs,
+  Tab,
+  Notice,
 } satisfies Catalog;

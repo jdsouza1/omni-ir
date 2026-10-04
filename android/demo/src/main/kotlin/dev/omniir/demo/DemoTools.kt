@@ -43,6 +43,13 @@ object DemoTools {
       }
     },
     "assistant.ask" to Tool { p -> problems(rule(trimmed(p["question"])?.length in 1..500, "question: 1 to 500 characters")) },
+    "settings.update" to Tool { p ->
+      problems(
+        rule(trimmed(p["language"])?.length in 1..40, "language: 1 to 40 characters"),
+        rule(p["orderUpdates"] is Primitive.Bool, "orderUpdates: must be true or false"),
+        rule(p["promotions"] is Primitive.Bool, "promotions: must be true or false"),
+      )
+    },
   )
 
   private fun rule(ok: Boolean, problem: String): String? = if (ok) null else problem

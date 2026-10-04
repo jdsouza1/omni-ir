@@ -23,6 +23,7 @@ interface Def {
   pattern?: string;
   minimum?: number;
   maximum?: number;
+  minItems?: number;
   maxItems?: number;
 }
 interface ComponentShape {
@@ -54,6 +55,9 @@ const EMPTY_LIST: Sample = { src: ["[]"], value: [] };
 
 const isStateRef = (d: Def) => d.type === "object" && d.properties?.kind?.const === "state";
 const isRefList = (d: Def) => d.type === "array" && d.items?.properties?.kind?.const === "ref";
+/** A list of plain values, such as a Select's options or a TableRow's cells. */
+const isValueList = (d: Def) => d.type === "array" && !isRefList(d);
+const list = (items: Sample[]): Sample => ({ src: ["[", ...items.flatMap((it, i) => (i ? [", ", ...it.src] : it.src)), "]"], value: items.map((it) => it.value) });
 
 /** Does the JSON Schema definition accept this canonical value? Covers the subset the catalog uses. */
 function accepts(d: Def, v: unknown): boolean {
@@ -62,6 +66,9 @@ function accepts(d: Def, v: unknown): boolean {
   if (d.enum) return d.enum.includes(v);
   if (isStateRef(d)) return typeof v === "object" && v !== null && "state" in v;
   if (isRefList(d)) return Array.isArray(v) && v.length <= (d.maxItems ?? Infinity);
+  if (isValueList(d)) {
+    return Array.isArray(v) && v.length >= (d.minItems ?? 0) && v.length <= (d.maxItems ?? Infinity) && v.every((x) => accepts(d.items!, x));
+  }
   switch (d.type) {
     case "string":
       return (
@@ -91,6 +98,14 @@ function validSamples(d: Def): Sample[] {
   if (d.enum) return (d.enum as string[]).map(text);
   if (isStateRef(d)) return [STATE];
   if (isRefList(d)) return [EMPTY_LIST];
+  if (isValueList(d)) {
+    // One list per kind of item at the shortest allowed length, and one at the longest.
+    const items = validSamples(d.items!);
+    const shortest = Math.max(d.minItems ?? 0, 1);
+    const out = items.map((item) => list(Array.from({ length: shortest }, () => item)));
+    if (d.maxItems !== undefined && d.maxItems > shortest) out.push(list(Array.from({ length: d.maxItems }, (_, i) => items[i % items.length]!)));
+    return out;
+  }
   if (d.type === "string") {
     if (d.pattern) {
       const sample = PATTERNS[d.pattern];
@@ -127,9 +142,13 @@ function invalidCandidates(d: Def): Sample[] {
     if (b.pattern && PATTERNS[b.pattern]) out.push(text(PATTERNS[b.pattern]!.invalid));
     if (b.minimum !== undefined) out.push(num(b.minimum - 1));
     if (b.maximum !== undefined) out.push(num(b.maximum + 1));
-    if (b.maxItems !== undefined) {
+    if (b.maxItems !== undefined && isRefList(b)) {
       const ids = Array.from({ length: b.maxItems + 1 }, (_, i) => `c${i}`);
-      out.push({ src: [`[${ids.join(", ")}]`], value: ids });
+      out.push({ src: [`[${ids.join(", ")}]`], value: ids.map((id) => ({ ref: id })) });
+    }
+    if (isValueList(b)) {
+      out.push(list([{ src: ["true"], value: true }]));
+      if (b.maxItems !== undefined) out.push(list(Array.from({ length: b.maxItems + 1 }, () => text("x"))));
     }
   };
   walk(d);
@@ -182,13 +201,25 @@ function catalogCase(type: string, shape: ComponentShape): ConformanceCase {
   rejected.push(call(new Map(base).set("style", text("color: red"))));
   rejected.push(call(base, true));
 
-  const parent = type === "ListItem" ? "List" : "Stack";
+  // Items sit in their own kind of container. A TableRow gets a Table of its own with one column per
+  // cell, since a row must match its table's columns.
+  const parent = type === "ListItem" ? "List" : type === "Tab" ? "Tabs" : "Stack";
   const ids = accepted.map((_, i) => `a${i + 1}`);
-  const lines: InputPart[][] = [[`root = ${parent}([${ids.join(", ")}])`], [`${STATE_KEY} = ""`]];
+  const wrapped = type === "TableRow";
+  const topIds = wrapped ? accepted.map((_, i) => `w${i + 1}`) : ids;
+  // A Switch edits true/false state; everything else that takes $state edits text.
+  const stateValue = type === "Switch" ? false : "";
+  const lines: InputPart[][] = [[`root = ${parent}([${topIds.join(", ")}])`], [`${STATE_KEY} = ${JSON.stringify(stateValue)}`]];
   const nodes: Record<string, { type: string; props: Record<string, unknown>; children: string[] }> = {
-    root: { type: parent, props: {}, children: ids },
+    root: { type: parent, props: {}, children: topIds },
   };
   accepted.forEach(({ values, governed }, i) => {
+    if (wrapped) {
+      const cells = (values.get("cells")?.value as unknown[] | undefined) ?? [];
+      const columns = cells.map((_, c) => `C${c + 1}`);
+      lines.push([`${topIds[i]} = Table(${JSON.stringify(columns).replace(/,/g, ", ")}, [${ids[i]}])`]);
+      nodes[topIds[i]!] = { type: "Table", props: { columns }, children: [ids[i]!] };
+    }
     lines.push([`${ids[i]} = `, ...call(values)]);
     if (governed) lines.push([`g${i + 1} = McpMutation(${ids[i]}, tool="payments.confirm")`]);
     const nodeProps: Record<string, unknown> = {};
@@ -210,7 +241,7 @@ function catalogCase(type: string, shape: ComponentShape): ConformanceCase {
     description: `Every prop of ${type}: ${accepted.length} accepted lines and ${rejected.length} rejected ones. Generated from schema.json.`,
     input: mergeParts(lines.flatMap((l) => [...l, "\n"])),
     assets: ASSETS,
-    expect: { issues, nodes, state: { [STATE_KEY]: "" } },
+    expect: { issues, nodes, state: { [STATE_KEY]: stateValue } },
   };
 }
 

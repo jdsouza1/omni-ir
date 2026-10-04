@@ -91,27 +91,34 @@ From 0 of 7 to 3 of 7. The rest mostly need charts, or Markdown. Markdown is del
 ## Task checklist
 
 **A. Protocol, tests first** *(checkpoint: failing tests)*
-- [ ] A.1 Failing tests for each component's props and limits, the new parent/child rules, cell counts and state types
-- [ ] A.2 Add the five components and their rules to `schema.ts`. Regenerate `schema.json`, SPEC.md, the conformance cases, and the Swift and Kotlin catalogs. Write the hand-written SPEC rules and new conformance cases for each new rule.
-- [ ] A.3 Swift and Kotlin parsers: implement the new rules; all conformance cases pass, fed whole and in chunks
+- [x] A.1 Failing tests for each component's props and limits, the new parent/child rules, cell counts and state types
+- [x] A.2 Add the five components and their rules to `schema.ts`. Regenerate `schema.json`, SPEC.md, the conformance cases, and the Swift and Kotlin catalogs. Write the hand-written SPEC rules and new conformance cases for each new rule.
+- [x] A.3 Swift and Kotlin parsers: implement the new rules; all conformance cases pass, fed whole and in chunks
 
 **B. Renderers**
-- [ ] B.1 React: Select, Switch, Table (scrolls sideways on phones), Tabs (keyboard arrows, ARIA tab pattern), Notice. Tests for state editing and tab switching.
-- [ ] B.2 SwiftUI: the same five; no forced unwraps (the existing test enforces this)
-- [ ] B.3 Compose: the same five; no `!!`
+- [x] B.1 React: Select, Switch, Table (scrolls sideways on phones), Tabs (keyboard arrows, ARIA tab pattern), Notice. Tests for state editing and tab switching.
+- [x] B.2 SwiftUI: the same five; no forced unwraps (the existing test enforces this)
+- [x] B.3 Compose: the same five; no `!!`
 
 **C. Model and examples**
-- [ ] C.1 System prompt: the new components and when to use them; prompt test updated
-- [ ] C.2 Fixtures and the mock model: a settings screen (Tabs, Switch, Notice), an order history (Table) and a form with a Select; playground examples
-- [ ] C.3 Free model check: a few new requests that need these components, run in your Claude.ai chat
+- [x] C.1 System prompt: the new components and when to use them; prompt test updated
+- [x] C.2 Fixtures and the mock model: a settings screen (Tabs, Switch, Notice), an order history (Table) and a form with a Select; playground examples
+- [x] C.3 Free model check: a few new requests that need these components, run in your Claude.ai chat
 
 **D. Review** *(checkpoint: you review)*
-- [ ] D.1 Web, iPhone and Android screenshots of the new fixtures from the CI workflows, on a review page
+- [x] D.1 Web, iPhone and Android screenshots of the new fixtures from the CI workflows, on a review page
 
 **E. After your approval**
 - [ ] E.1 Merge; landing page and README component lists updated
 - [ ] E.2 Re-run the format comparison (coverage, size and reliability) with the new components, as recorded in PLAN-COMPARISON.md's decision
 - [ ] E.3 `v0.2.0` release (npm, the first Swift tag): a separate go-ahead from you
+
+**Progress (2026-10-04):** A–D done on `wip/catalog`; waiting for the owner's review.
+- All three parsers pass the 73 conformance cases; 626 tests; CI, the iOS demo and the Android demo pass.
+- Model check: 5 of 5 valid (docs/model-check-2026-10-04.md); one prompt rule added (a Select's starting state).
+- Review page: https://claude.ai/artifact/1nqSUxEAG5xASdRYrRdPG9
+- New tool `settings.update` (app, server, iOS and Android demos) for the account settings example.
+- The Android review screenshots had an emulator "isn't responding" dialog over them; `android/scripts/review.sh` now suppresses system error dialogs.
 
 ## What I needed from you
 

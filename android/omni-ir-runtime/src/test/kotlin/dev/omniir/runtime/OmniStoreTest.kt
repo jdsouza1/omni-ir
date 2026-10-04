@@ -139,4 +139,43 @@ class FormatTest {
     assertNull(Format.day("2026-02-30"))
     assertNull(Format.day("14/10/2026"))
   }
+
+  @Test
+  fun `Select shows its option or nothing chosen, Switch reads true only for true, edits update state`() {
+    val store = OmniStore(tools)
+    store.write(
+      """root = Stack([s, w])
+${'$'}size = "XL"
+s = Select(${'$'}size, label="Size", options=["S", "M"])
+${'$'}news = false
+w = Switch(${'$'}news, label="News")
+""",
+    )
+    assertEquals("", store.chosenOption("\$size", listOf("S", "M")))
+    store.setState("\$size", Primitive.Text("M"))
+    assertEquals("M", store.chosenOption("\$size", listOf("S", "M")))
+    assertFalse(store.stateBool("\$news"))
+    store.setState("\$news", Primitive.Bool(true))
+    assertEquals(true, store.stateBool("\$news"))
+  }
+
+  @Test
+  fun `a table's headings and cells with numbers marked, and Tabs' labels as their lines arrive`() {
+    val store = OmniStore(tools)
+    store.write(
+      """root = Stack([t, tabs])
+t = Table(["Plan", "Projects"], [r])
+r = TableRow(["Pro", 1200])
+tabs = Tabs([a, b])
+a = Tab("Profile", [])
+""",
+    )
+    val table = assertIs<Slot.Node>(store.slot("t")).node
+    val row = assertIs<Slot.Node>(store.slot("r")).node
+    assertEquals(listOf("Plan", "Projects"), Format.texts(table.props["columns"]))
+    assertEquals(listOf(Format.Cell("Pro", false), Format.Cell("1,200", true)), Format.cells(row.props["cells"], us))
+    assertEquals(listOf("Profile", null), store.tabLabels(listOf("a", "b")))
+    store.write("b = Tab(\"Alerts\", [])\n")
+    assertEquals(listOf("Profile", "Alerts"), store.tabLabels(listOf("a", "b")))
+  }
 }

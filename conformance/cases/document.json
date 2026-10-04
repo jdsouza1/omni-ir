@@ -587,6 +587,102 @@
       }
     },
     {
+      "id": "select-switch-state",
+      "rules": [
+        "5.7",
+        "5.11",
+        "5.20"
+      ],
+      "description": "A Select edits text state and a Switch true/false state. A Select value that isn't one of its options is allowed. Rejected lines have no effect.",
+      "input": "root = Stack([a, b, c, d])\n$size = \"XL\"\na = Select($size, label=\"Size\", options=[\"S\", \"M\"])\n$news = true\nb = Switch($news, label=\"News\")\n$flag = \"yes\"\nc = Switch($flag, label=\"Flag\")\n$count = 2\nd = Select($count, label=\"Count\", options=[\"1\", \"2\"])\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 7,
+            "code": "input_state_type"
+          },
+          {
+            "line": 9,
+            "code": "input_state_type"
+          },
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          }
+        ],
+        "state": {
+          "$size": "XL",
+          "$news": true,
+          "$flag": "yes",
+          "$count": 2
+        }
+      }
+    },
+    {
+      "id": "table-rows",
+      "rules": [
+        "5.21"
+      ],
+      "description": "A Table holds only TableRows, each with one cell per column, whichever line arrives first; a TableRow sits only in a Table.",
+      "input": "root = Stack([t, u, loose])\nt = Table([\"Plan\", \"Price\"], [a, b, x])\na = TableRow([\"Basic\", 12])\nb = TableRow([\"Pro\"])\nx = Text(\"not a row\")\nearly = TableRow([\"One\", \"Two\", \"Three\"])\nu = Table([\"A\", \"B\"], [early])\nloose = TableRow([\"Alone\"])\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 4,
+            "code": "table_mismatch"
+          },
+          {
+            "line": 5,
+            "code": "table_mismatch"
+          },
+          {
+            "line": 7,
+            "code": "table_mismatch"
+          },
+          {
+            "line": 8,
+            "code": "table_mismatch"
+          },
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 2,
+            "code": "dangling_ref"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tabs-children",
+      "rules": [
+        "5.22"
+      ],
+      "description": "A Tabs holds only Tab components, and a Tab sits only in a Tabs; a Tab holds any components.",
+      "input": "root = Stack([tabs, stray])\ntabs = Tabs([one, two, x])\none = Tab(\"Profile\", [t])\nt = Text(\"Hello\")\ntwo = Tab(\"Alerts\", [])\nx = Text(\"not a tab\")\nstray = Tab(\"Lost\", [])\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 6,
+            "code": "tabs_mismatch"
+          },
+          {
+            "line": 7,
+            "code": "tabs_mismatch"
+          },
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 2,
+            "code": "dangling_ref"
+          }
+        ]
+      }
+    },
+    {
       "id": "rating-max",
       "rules": [
         "5.9"

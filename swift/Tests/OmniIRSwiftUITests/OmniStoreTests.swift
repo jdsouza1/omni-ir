@@ -111,6 +111,45 @@ struct OmniStoreTests {
     #expect(Format.text(.null, format: nil, currency: nil, locale: us) == "")
   }
 
+  @Test("Select shows its option or nothing chosen; Switch reads true only for true; edits update state")
+  func choices() {
+    let store = OmniStore(tools: tools)
+    store.write("""
+      root = Stack([s, w])
+      $size = "XL"
+      s = Select($size, label="Size", options=["S", "M"])
+      $news = false
+      w = Switch($news, label="News")
+
+      """)
+    #expect(store.chosenOption("$size", options: ["S", "M"]) == "")
+    store.setState("$size", .text("M"))
+    #expect(store.chosenOption("$size", options: ["S", "M"]) == "M")
+    #expect(!store.stateBool("$news"))
+    store.setState("$news", .bool(true))
+    #expect(store.stateBool("$news"))
+  }
+
+  @Test("a table's headings and cells, numbers marked for end alignment; Tabs' labels as their lines arrive")
+  func tablesAndTabs() {
+    let store = OmniStore(tools: tools)
+    store.write("""
+      root = Stack([t, tabs])
+      t = Table(["Plan", "Projects"], [r])
+      r = TableRow(["Pro", 1200])
+      tabs = Tabs([a, b])
+      a = Tab("Profile", [])
+
+      """)
+    guard case .node(let table) = store.slot("t"), case .node(let row) = store.slot("r") else { Testing.Issue.record("table should have arrived"); return }
+    #expect(Format.texts(table.props["columns"]) == ["Plan", "Projects"])
+    let cells = Format.cells(row.props["cells"], locale: Locale(identifier: "en_US"))
+    #expect(cells == [Format.Cell(text: "Pro", isNumber: false), Format.Cell(text: "1,200", isNumber: true)])
+    #expect(store.tabLabels(["a", "b"]) == ["Profile", nil])
+    store.write("b = Tab(\"Alerts\", [])\n")
+    #expect(store.tabLabels(["a", "b"]) == ["Profile", "Alerts"])
+  }
+
   @Test("ratings are kept within 0…max and read as \"Rated x out of max\"")
   func ratings() {
     let us = Locale(identifier: "en_US")

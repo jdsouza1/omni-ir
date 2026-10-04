@@ -34,6 +34,9 @@ internal sealed interface ValueSpec {
   /** A list of component ids (children). */
   data class RefList(val maxItems: Int?) : ValueSpec
 
+  /** A list of plain values, such as a Select's options or a TableRow's cells. */
+  data class ListOf(val item: ValueSpec, val minItems: Int?, val maxItems: Int?) : ValueSpec
+
   /** An object with checked keys and values (McpMutation params). */
   data class Record(val key: ValueSpec, val value: ValueSpec) : ValueSpec
 

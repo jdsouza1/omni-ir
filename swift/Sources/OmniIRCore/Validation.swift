@@ -217,6 +217,10 @@ private func accepts(_ spec: ValueSpec, _ value: Value) -> Bool {
   case (.refList(let maxItems), .array(let items)):
     if let maxItems, items.count > maxItems { return false }
     return items.allSatisfy { if case .ref(let id) = $0 { isIdentifier(id) } else { false } }
+  case (.list(let item, let minItems, let maxItems), .array(let items)):
+    if let minItems, items.count < minItems { return false }
+    if let maxItems, items.count > maxItems { return false }
+    return items.allSatisfy { accepts(item, $0) }
   case (.record(let keySpec, let valueSpec), .object(let entries)):
     return entries.allSatisfy { accepts(keySpec, .text($0.0)) && !Catalog.reservedWords.contains($0.0) && accepts(valueSpec, $0.1) }
   default:
@@ -269,7 +273,7 @@ private func propValue(_ value: Value) -> PropValue {
   case .null: .null
   case .ref(let id): .ref(id)
   case .state(let key): .state(key)
-  case .array: .null  // only children are lists, and they are taken out before this
+  case .array(let items): .list(items.map(propValue))  // children are taken out before this
   case .object(let entries): .record(Dictionary(entries.map { ($0.0, propValue($0.1)) }, uniquingKeysWith: { first, _ in first }))
   }
 }

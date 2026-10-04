@@ -43,7 +43,7 @@ Write \`root = …\` first and its parts after it; referring to an id before its
 
 ## Grammar
 - Arguments: positional first, then named: \`Button("Pay now", action="pay", variant="primary")\`.
-- Values: "double-quoted text", numbers, true, false, null, component ids, $state, and [id, id] lists of children.
+- Values: "double-quoted text", numbers, true, false, null, component ids, $state, [id, id] lists of children, and ["text", 2] lists of values (a Select's options, a Table's columns and a TableRow's cells).
 - One component call per line. Never nest a call inside another: write \`root = Card([title])\` and \`title = Heading("Hi")\`, not \`root = Card([Heading("Hi")])\`.
 - Ids are unique. Every component except root has exactly one parent.
 - In text, escape a double quote as \\" and write \\\\ for every backslash (a path is "C:\\\\data"); \\n is a line break.
@@ -58,6 +58,10 @@ Write \`root = …\` first and its parts after it; referring to an id before its
 - An Image or a ListItem's image shows a picture the app provides: name one from the Images list below. There are no URLs.
 - A List holds only ListItems, and a ListItem goes only in a List.
 - A DateInput edits a date state written \`"YYYY-MM-DD"\`, or \`""\` for none: declare \`$checkIn = ""\` and write \`checkIn = DateInput($checkIn, label="Check-in")\`. A date range is two DateInputs.
+- A Select picks one option and edits a text state: declare \`$size = ""\` and write \`size = Select($size, label="Size", options=["Small", "Large"])\`. A Switch turns a setting on or off and edits a true/false state: \`$news = false\` and \`news = Switch($news, label="Email me order updates")\`. A Select's state starts as \`""\` (nothing chosen) or exactly one of its options. Like an Input, neither calls the backend; send their values through McpMutation params.
+- A Table holds only TableRows, one line per row, each with one cell per column: \`orders = Table(["Order", "Total"], [r1])\` and \`r1 = TableRow(["A1B2-7731", 42.5])\`.
+- Tabs hold only Tab components, and each Tab has a label and its own children: \`tabs = Tabs([profileTab, alertsTab])\` and \`profileTab = Tab("Profile", [name, bio])\`.
+- A Notice shows a short message in a box: \`tone="warning"\` or \`"danger"\` for problems, \`"success"\` when something worked, \`"info"\` otherwise.
 - Use only the components, tools and images listed here. If a request needs something that isn't available, build the closest screen you can with what is.
 - Use a tool only for what its name says. If no tool fits an action, use a Button without \`action\` and say in a Text that it isn't available here.
 - A Rating shows its own number; don't repeat the value in a Text next to it.

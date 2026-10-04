@@ -2556,6 +2556,1153 @@
           "$s": ""
         }
       }
+    },
+    {
+      "id": "catalog-Select",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of Select: 3 accepted lines and 39 rejected ones. Generated from schema.json.",
+      "input": [
+        "root = Stack([a1, a2, a3])\n$s = \"\"\na1 = Select($s, label=\"Hello\", options=[\"Hello\"])\na2 = Select($s, label=\"Hello\", options=[\"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\"])\na3 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=\"Hello\")\nr1 = Select(true, label=\"Hello\", options=[\"Hello\"])\nr2 = Select(null, label=\"Hello\", options=[\"Hello\"])\nr3 = Select(\"nope\", label=\"Hello\", options=[\"Hello\"])\nr4 = Select(4, label=\"Hello\", options=[\"Hello\"])\nr5 = Select(1.5, label=\"Hello\", options=[\"Hello\"])\nr6 = Select([], label=\"Hello\", options=[\"Hello\"])\nr7 = Select(other, label=\"Hello\", options=[\"Hello\"])\nr8 = Select(label=\"Hello\", options=[\"Hello\"])\nr9 = Select($s, label=true, options=[\"Hello\"])\nr10 = Select($s, label=null, options=[\"Hello\"])\nr11 = Select($s, label=4, options=[\"Hello\"])\nr12 = Select($s, label=1.5, options=[\"Hello\"])\nr13 = Select($s, label=$s, options=[\"Hello\"])\nr14 = Select($s, label=[], options=[\"Hello\"])\nr15 = Select($s, label=other, options=[\"Hello\"])\nr16 = Select($s, label=\"",
+        {
+          "repeat": "x",
+          "times": 201
+        },
+        "\", options=[\"Hello\"])\nr17 = Select($s, label=\"\", options=[\"Hello\"])\nr18 = Select($s, options=[\"Hello\"])\nr19 = Select($s, label=\"Hello\", options=true)\nr20 = Select($s, label=\"Hello\", options=null)\nr21 = Select($s, label=\"Hello\", options=\"nope\")\nr22 = Select($s, label=\"Hello\", options=4)\nr23 = Select($s, label=\"Hello\", options=1.5)\nr24 = Select($s, label=\"Hello\", options=$s)\nr25 = Select($s, label=\"Hello\", options=[])\nr26 = Select($s, label=\"Hello\", options=other)\nr27 = Select($s, label=\"Hello\", options=[true])\nr28 = Select($s, label=\"Hello\", options=[\"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\"])\nr29 = Select($s, label=\"Hello\")\nr30 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=true)\nr31 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=null)\nr32 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=4)\nr33 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=1.5)\nr34 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=$s)\nr35 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=[])\nr36 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=other)\nr37 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=\"",
+        {
+          "repeat": "x",
+          "times": 201
+        },
+        "\")\nr38 = Select($s, label=\"Hello\", options=[\"Hello\"], style=\"color: red\")\nr39 = Select($s, \"extra\", label=\"Hello\", options=[\"Hello\"])\n"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "invalid_props"
+          },
+          {
+            "line": 8,
+            "code": "invalid_props"
+          },
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          },
+          {
+            "line": 25,
+            "code": "invalid_props"
+          },
+          {
+            "line": 26,
+            "code": "invalid_props"
+          },
+          {
+            "line": 27,
+            "code": "invalid_props"
+          },
+          {
+            "line": 28,
+            "code": "invalid_props"
+          },
+          {
+            "line": 29,
+            "code": "invalid_props"
+          },
+          {
+            "line": 30,
+            "code": "invalid_props"
+          },
+          {
+            "line": 31,
+            "code": "invalid_props"
+          },
+          {
+            "line": 32,
+            "code": "invalid_props"
+          },
+          {
+            "line": 33,
+            "code": "invalid_props"
+          },
+          {
+            "line": 34,
+            "code": "invalid_props"
+          },
+          {
+            "line": 35,
+            "code": "invalid_props"
+          },
+          {
+            "line": 36,
+            "code": "invalid_props"
+          },
+          {
+            "line": 37,
+            "code": "invalid_props"
+          },
+          {
+            "line": 38,
+            "code": "invalid_props"
+          },
+          {
+            "line": 39,
+            "code": "invalid_props"
+          },
+          {
+            "line": 40,
+            "code": "invalid_props"
+          },
+          {
+            "line": 41,
+            "code": "invalid_props"
+          },
+          {
+            "line": 42,
+            "code": "invalid_props"
+          },
+          {
+            "line": 43,
+            "code": "invalid_props"
+          },
+          {
+            "line": 44,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a1",
+              "a2",
+              "a3"
+            ]
+          },
+          "a1": {
+            "type": "Select",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "options": [
+                "Hello"
+              ]
+            },
+            "children": []
+          },
+          "a2": {
+            "type": "Select",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "options": [
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello"
+              ]
+            },
+            "children": []
+          },
+          "a3": {
+            "type": "Select",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "options": [
+                "Hello"
+              ],
+              "placeholder": "Hello"
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
+    },
+    {
+      "id": "catalog-Switch",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of Switch: 1 accepted lines and 20 rejected ones. Generated from schema.json.",
+      "input": [
+        "root = Stack([a1])\n$s = false\na1 = Switch($s, label=\"Hello\")\nr1 = Switch(true, label=\"Hello\")\nr2 = Switch(null, label=\"Hello\")\nr3 = Switch(\"nope\", label=\"Hello\")\nr4 = Switch(4, label=\"Hello\")\nr5 = Switch(1.5, label=\"Hello\")\nr6 = Switch([], label=\"Hello\")\nr7 = Switch(other, label=\"Hello\")\nr8 = Switch(label=\"Hello\")\nr9 = Switch($s, label=true)\nr10 = Switch($s, label=null)\nr11 = Switch($s, label=4)\nr12 = Switch($s, label=1.5)\nr13 = Switch($s, label=$s)\nr14 = Switch($s, label=[])\nr15 = Switch($s, label=other)\nr16 = Switch($s, label=\"",
+        {
+          "repeat": "x",
+          "times": 201
+        },
+        "\")\nr17 = Switch($s, label=\"\")\nr18 = Switch($s)\nr19 = Switch($s, label=\"Hello\", style=\"color: red\")\nr20 = Switch($s, \"extra\", label=\"Hello\")\n"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 4,
+            "code": "invalid_props"
+          },
+          {
+            "line": 5,
+            "code": "invalid_props"
+          },
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "invalid_props"
+          },
+          {
+            "line": 8,
+            "code": "invalid_props"
+          },
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a1"
+            ]
+          },
+          "a1": {
+            "type": "Switch",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello"
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": false
+        }
+      }
+    },
+    {
+      "id": "catalog-Table",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of Table: 2 accepted lines and 22 rejected ones. Generated from schema.json.",
+      "input": "root = Stack([a1, a2])\n$s = \"\"\na1 = Table([\"Hello\"], [])\na2 = Table([\"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\"], [])\nr1 = Table(true, [])\nr2 = Table(null, [])\nr3 = Table(\"nope\", [])\nr4 = Table(4, [])\nr5 = Table(1.5, [])\nr6 = Table($s, [])\nr7 = Table([], [])\nr8 = Table(other, [])\nr9 = Table([true], [])\nr10 = Table([\"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\"], [])\nr11 = Table(children=[])\nr12 = Table([\"Hello\"], true)\nr13 = Table([\"Hello\"], null)\nr14 = Table([\"Hello\"], \"nope\")\nr15 = Table([\"Hello\"], 4)\nr16 = Table([\"Hello\"], 1.5)\nr17 = Table([\"Hello\"], $s)\nr18 = Table([\"Hello\"], other)\nr19 = Table([\"Hello\"], [c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, c34, c35, c36, c37, c38, c39, c40, c41, c42, c43, c44, c45, c46, c47, c48, c49, c50, c51, c52, c53, c54, c55, c56, c57, c58, c59, c60, c61, c62, c63, c64, c65, c66, c67, c68, c69, c70, c71, c72, c73, c74, c75, c76, c77, c78, c79, c80, c81, c82, c83, c84, c85, c86, c87, c88, c89, c90, c91, c92, c93, c94, c95, c96, c97, c98, c99, c100, c101, c102, c103, c104, c105, c106, c107, c108, c109, c110, c111, c112, c113, c114, c115, c116, c117, c118, c119, c120, c121, c122, c123, c124, c125, c126, c127, c128, c129, c130, c131, c132, c133, c134, c135, c136, c137, c138, c139, c140, c141, c142, c143, c144, c145, c146, c147, c148, c149, c150, c151, c152, c153, c154, c155, c156, c157, c158, c159, c160, c161, c162, c163, c164, c165, c166, c167, c168, c169, c170, c171, c172, c173, c174, c175, c176, c177, c178, c179, c180, c181, c182, c183, c184, c185, c186, c187, c188, c189, c190, c191, c192, c193, c194, c195, c196, c197, c198, c199, c200])\nr20 = Table([\"Hello\"])\nr21 = Table([\"Hello\"], [], style=\"color: red\")\nr22 = Table([\"Hello\"], [], \"extra\")\n",
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 5,
+            "code": "invalid_props"
+          },
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "invalid_props"
+          },
+          {
+            "line": 8,
+            "code": "invalid_props"
+          },
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          },
+          {
+            "line": 25,
+            "code": "invalid_props"
+          },
+          {
+            "line": 26,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a1",
+              "a2"
+            ]
+          },
+          "a1": {
+            "type": "Table",
+            "props": {
+              "columns": [
+                "Hello"
+              ]
+            },
+            "children": []
+          },
+          "a2": {
+            "type": "Table",
+            "props": {
+              "columns": [
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello"
+              ]
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
+    },
+    {
+      "id": "catalog-TableRow",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of TableRow: 4 accepted lines and 13 rejected ones. Generated from schema.json.",
+      "input": "root = Stack([w1, w2, w3, w4])\n$s = \"\"\nw1 = Table([\"C1\"], [a1])\na1 = TableRow([\"Hello\"])\nw2 = Table([\"C1\"], [a2])\na2 = TableRow([3])\nw3 = Table([\"C1\"], [a3])\na3 = TableRow([0.5])\nw4 = Table([\"C1\", \"C2\", \"C3\", \"C4\", \"C5\", \"C6\", \"C7\", \"C8\"], [a4])\na4 = TableRow([\"Hello\", 3, 0.5, \"Hello\", 3, 0.5, \"Hello\", 3])\nr1 = TableRow(true)\nr2 = TableRow(null)\nr3 = TableRow(\"nope\")\nr4 = TableRow(4)\nr5 = TableRow(1.5)\nr6 = TableRow($s)\nr7 = TableRow([])\nr8 = TableRow(other)\nr9 = TableRow([true])\nr10 = TableRow([\"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\"])\nr11 = TableRow()\nr12 = TableRow([\"Hello\"], style=\"color: red\")\nr13 = TableRow([\"Hello\"], \"extra\")\n",
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "w1",
+              "w2",
+              "w3",
+              "w4"
+            ]
+          },
+          "w1": {
+            "type": "Table",
+            "props": {
+              "columns": [
+                "C1"
+              ]
+            },
+            "children": [
+              "a1"
+            ]
+          },
+          "a1": {
+            "type": "TableRow",
+            "props": {
+              "cells": [
+                "Hello"
+              ]
+            },
+            "children": []
+          },
+          "w2": {
+            "type": "Table",
+            "props": {
+              "columns": [
+                "C1"
+              ]
+            },
+            "children": [
+              "a2"
+            ]
+          },
+          "a2": {
+            "type": "TableRow",
+            "props": {
+              "cells": [
+                3
+              ]
+            },
+            "children": []
+          },
+          "w3": {
+            "type": "Table",
+            "props": {
+              "columns": [
+                "C1"
+              ]
+            },
+            "children": [
+              "a3"
+            ]
+          },
+          "a3": {
+            "type": "TableRow",
+            "props": {
+              "cells": [
+                0.5
+              ]
+            },
+            "children": []
+          },
+          "w4": {
+            "type": "Table",
+            "props": {
+              "columns": [
+                "C1",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6",
+                "C7",
+                "C8"
+              ]
+            },
+            "children": [
+              "a4"
+            ]
+          },
+          "a4": {
+            "type": "TableRow",
+            "props": {
+              "cells": [
+                "Hello",
+                3,
+                0.5,
+                "Hello",
+                3,
+                0.5,
+                "Hello",
+                3
+              ]
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
+    },
+    {
+      "id": "catalog-Tabs",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of Tabs: 1 accepted lines and 11 rejected ones. Generated from schema.json.",
+      "input": "root = Stack([a1])\n$s = \"\"\na1 = Tabs([])\nr1 = Tabs(true)\nr2 = Tabs(null)\nr3 = Tabs(\"nope\")\nr4 = Tabs(4)\nr5 = Tabs(1.5)\nr6 = Tabs($s)\nr7 = Tabs(other)\nr8 = Tabs([c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, c34, c35, c36, c37, c38, c39, c40, c41, c42, c43, c44, c45, c46, c47, c48, c49, c50, c51, c52, c53, c54, c55, c56, c57, c58, c59, c60, c61, c62, c63, c64, c65, c66, c67, c68, c69, c70, c71, c72, c73, c74, c75, c76, c77, c78, c79, c80, c81, c82, c83, c84, c85, c86, c87, c88, c89, c90, c91, c92, c93, c94, c95, c96, c97, c98, c99, c100, c101, c102, c103, c104, c105, c106, c107, c108, c109, c110, c111, c112, c113, c114, c115, c116, c117, c118, c119, c120, c121, c122, c123, c124, c125, c126, c127, c128, c129, c130, c131, c132, c133, c134, c135, c136, c137, c138, c139, c140, c141, c142, c143, c144, c145, c146, c147, c148, c149, c150, c151, c152, c153, c154, c155, c156, c157, c158, c159, c160, c161, c162, c163, c164, c165, c166, c167, c168, c169, c170, c171, c172, c173, c174, c175, c176, c177, c178, c179, c180, c181, c182, c183, c184, c185, c186, c187, c188, c189, c190, c191, c192, c193, c194, c195, c196, c197, c198, c199, c200])\nr9 = Tabs()\nr10 = Tabs([], style=\"color: red\")\nr11 = Tabs([], \"extra\")\n",
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 4,
+            "code": "invalid_props"
+          },
+          {
+            "line": 5,
+            "code": "invalid_props"
+          },
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "invalid_props"
+          },
+          {
+            "line": 8,
+            "code": "invalid_props"
+          },
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a1"
+            ]
+          },
+          "a1": {
+            "type": "Tabs",
+            "props": {},
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
+    },
+    {
+      "id": "catalog-Tab",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of Tab: 1 accepted lines and 21 rejected ones. Generated from schema.json.",
+      "input": [
+        "root = Tabs([a1])\n$s = \"\"\na1 = Tab(\"Hello\", [])\nr1 = Tab(true, [])\nr2 = Tab(null, [])\nr3 = Tab(4, [])\nr4 = Tab(1.5, [])\nr5 = Tab($s, [])\nr6 = Tab([], [])\nr7 = Tab(other, [])\nr8 = Tab(\"",
+        {
+          "repeat": "x",
+          "times": 201
+        },
+        "\", [])\nr9 = Tab(\"\", [])\nr10 = Tab(children=[])\nr11 = Tab(\"Hello\", true)\nr12 = Tab(\"Hello\", null)\nr13 = Tab(\"Hello\", \"nope\")\nr14 = Tab(\"Hello\", 4)\nr15 = Tab(\"Hello\", 1.5)\nr16 = Tab(\"Hello\", $s)\nr17 = Tab(\"Hello\", other)\nr18 = Tab(\"Hello\", [c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, c16, c17, c18, c19, c20, c21, c22, c23, c24, c25, c26, c27, c28, c29, c30, c31, c32, c33, c34, c35, c36, c37, c38, c39, c40, c41, c42, c43, c44, c45, c46, c47, c48, c49, c50, c51, c52, c53, c54, c55, c56, c57, c58, c59, c60, c61, c62, c63, c64, c65, c66, c67, c68, c69, c70, c71, c72, c73, c74, c75, c76, c77, c78, c79, c80, c81, c82, c83, c84, c85, c86, c87, c88, c89, c90, c91, c92, c93, c94, c95, c96, c97, c98, c99, c100, c101, c102, c103, c104, c105, c106, c107, c108, c109, c110, c111, c112, c113, c114, c115, c116, c117, c118, c119, c120, c121, c122, c123, c124, c125, c126, c127, c128, c129, c130, c131, c132, c133, c134, c135, c136, c137, c138, c139, c140, c141, c142, c143, c144, c145, c146, c147, c148, c149, c150, c151, c152, c153, c154, c155, c156, c157, c158, c159, c160, c161, c162, c163, c164, c165, c166, c167, c168, c169, c170, c171, c172, c173, c174, c175, c176, c177, c178, c179, c180, c181, c182, c183, c184, c185, c186, c187, c188, c189, c190, c191, c192, c193, c194, c195, c196, c197, c198, c199, c200])\nr19 = Tab(\"Hello\")\nr20 = Tab(\"Hello\", [], style=\"color: red\")\nr21 = Tab(\"Hello\", [], \"extra\")\n"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 4,
+            "code": "invalid_props"
+          },
+          {
+            "line": 5,
+            "code": "invalid_props"
+          },
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "invalid_props"
+          },
+          {
+            "line": 8,
+            "code": "invalid_props"
+          },
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Tabs",
+            "props": {},
+            "children": [
+              "a1"
+            ]
+          },
+          "a1": {
+            "type": "Tab",
+            "props": {
+              "label": "Hello"
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
+    },
+    {
+      "id": "catalog-Notice",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of Notice: 8 accepted lines and 25 rejected ones. Generated from schema.json.",
+      "input": [
+        "root = Stack([a1, a2, a3, a4, a5, a6, a7, a8])\n$s = \"\"\na1 = Notice(\"Hello\")\na2 = Notice($s)\na3 = Notice(\"Hello\", tone=\"info\")\na4 = Notice(\"Hello\", tone=\"success\")\na5 = Notice(\"Hello\", tone=\"warning\")\na6 = Notice(\"Hello\", tone=\"danger\")\na7 = Notice(\"Hello\", title=\"Hello\")\na8 = Notice(\"Hello\", title=$s)\nr1 = Notice(true)\nr2 = Notice(null)\nr3 = Notice(4)\nr4 = Notice(1.5)\nr5 = Notice([])\nr6 = Notice(other)\nr7 = Notice(\"",
+        {
+          "repeat": "x",
+          "times": 2001
+        },
+        "\")\nr8 = Notice()\nr9 = Notice(\"Hello\", tone=true)\nr10 = Notice(\"Hello\", tone=null)\nr11 = Notice(\"Hello\", tone=\"nope\")\nr12 = Notice(\"Hello\", tone=4)\nr13 = Notice(\"Hello\", tone=1.5)\nr14 = Notice(\"Hello\", tone=$s)\nr15 = Notice(\"Hello\", tone=[])\nr16 = Notice(\"Hello\", tone=other)\nr17 = Notice(\"Hello\", title=true)\nr18 = Notice(\"Hello\", title=null)\nr19 = Notice(\"Hello\", title=4)\nr20 = Notice(\"Hello\", title=1.5)\nr21 = Notice(\"Hello\", title=[])\nr22 = Notice(\"Hello\", title=other)\nr23 = Notice(\"Hello\", title=\"",
+        {
+          "repeat": "x",
+          "times": 2001
+        },
+        "\")\nr24 = Notice(\"Hello\", style=\"color: red\")\nr25 = Notice(\"Hello\", \"extra\")\n"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          },
+          {
+            "line": 25,
+            "code": "invalid_props"
+          },
+          {
+            "line": 26,
+            "code": "invalid_props"
+          },
+          {
+            "line": 27,
+            "code": "invalid_props"
+          },
+          {
+            "line": 28,
+            "code": "invalid_props"
+          },
+          {
+            "line": 29,
+            "code": "invalid_props"
+          },
+          {
+            "line": 30,
+            "code": "invalid_props"
+          },
+          {
+            "line": 31,
+            "code": "invalid_props"
+          },
+          {
+            "line": 32,
+            "code": "invalid_props"
+          },
+          {
+            "line": 33,
+            "code": "invalid_props"
+          },
+          {
+            "line": 34,
+            "code": "invalid_props"
+          },
+          {
+            "line": 35,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6",
+              "a7",
+              "a8"
+            ]
+          },
+          "a1": {
+            "type": "Notice",
+            "props": {
+              "text": "Hello"
+            },
+            "children": []
+          },
+          "a2": {
+            "type": "Notice",
+            "props": {
+              "text": {
+                "state": "$s"
+              }
+            },
+            "children": []
+          },
+          "a3": {
+            "type": "Notice",
+            "props": {
+              "text": "Hello",
+              "tone": "info"
+            },
+            "children": []
+          },
+          "a4": {
+            "type": "Notice",
+            "props": {
+              "text": "Hello",
+              "tone": "success"
+            },
+            "children": []
+          },
+          "a5": {
+            "type": "Notice",
+            "props": {
+              "text": "Hello",
+              "tone": "warning"
+            },
+            "children": []
+          },
+          "a6": {
+            "type": "Notice",
+            "props": {
+              "text": "Hello",
+              "tone": "danger"
+            },
+            "children": []
+          },
+          "a7": {
+            "type": "Notice",
+            "props": {
+              "text": "Hello",
+              "title": "Hello"
+            },
+            "children": []
+          },
+          "a8": {
+            "type": "Notice",
+            "props": {
+              "text": "Hello",
+              "title": {
+                "state": "$s"
+              }
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
     }
   ]
 }

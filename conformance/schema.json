@@ -9,7 +9,8 @@
     "idLength": 64,
     "stateKeyLength": 65,
     "toolNameLength": 128,
-    "actionNameLength": 64
+    "actionNameLength": 64,
+    "tableColumns": 8
   },
   "reservedWords": [
     "true",
@@ -768,6 +769,343 @@
         ],
         "additionalProperties": false
       }
+    },
+    "Select": {
+      "positional": [
+        "value"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "state"
+              },
+              "key": {
+                "type": "string",
+                "maxLength": 65,
+                "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+              }
+            },
+            "required": [
+              "kind",
+              "key"
+            ],
+            "additionalProperties": false
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "options": {
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          },
+          "placeholder": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "value",
+          "label",
+          "options"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Switch": {
+      "positional": [
+        "value"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "state"
+              },
+              "key": {
+                "type": "string",
+                "maxLength": 65,
+                "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+              }
+            },
+            "required": [
+              "kind",
+              "key"
+            ],
+            "additionalProperties": false
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Table": {
+      "positional": [
+        "columns",
+        "children"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "columns": {
+            "minItems": 1,
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          },
+          "children": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "ref"
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                }
+              },
+              "required": [
+                "kind",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "columns",
+          "children"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "TableRow": {
+      "positional": [
+        "cells"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "cells": {
+            "minItems": 1,
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "cells"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Tabs": {
+      "positional": [
+        "children"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "children": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "ref"
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                }
+              },
+              "required": [
+                "kind",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "children"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Tab": {
+      "positional": [
+        "label",
+        "children"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "children": {
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "ref"
+                },
+                "id": {
+                  "type": "string",
+                  "maxLength": 64,
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                }
+              },
+              "required": [
+                "kind",
+                "id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "label",
+          "children"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Notice": {
+      "positional": [
+        "text"
+      ],
+      "props": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "info",
+              "success",
+              "warning",
+              "danger"
+            ]
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "state"
+                  },
+                  "key": {
+                    "type": "string",
+                    "maxLength": 65,
+                    "pattern": "^\\$[A-Za-z_][A-Za-z0-9_]*$"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "key"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false
+      }
     }
   },
   "mcpMutation": {
@@ -939,12 +1277,22 @@
     "input_state_type": {
       "severity": "error",
       "stage": "line",
-      "meaning": "An Input is bound to state that doesn't hold text, or a DateInput to state that isn't a YYYY-MM-DD date or empty."
+      "meaning": "An Input or Select is bound to state that doesn't hold text, a DateInput to state that isn't a YYYY-MM-DD date or empty, or a Switch to state that isn't true or false."
     },
     "list_mismatch": {
       "severity": "error",
       "stage": "line",
       "meaning": "A List contains something other than ListItems, or a ListItem is outside a List."
+    },
+    "table_mismatch": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns."
+    },
+    "tabs_mismatch": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "A Tabs contains something other than Tab, or a Tab is outside a Tabs."
     },
     "duplicate_mutation": {
       "severity": "error",

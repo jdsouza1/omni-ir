@@ -76,3 +76,36 @@
 .omni-message--assistant { align-self: flex-start; background: #eef0f3; color: #1f2329; border-bottom-left-radius: 4px; }
 
 .omni-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.omni-select { background: #fff; }
+
+.omni-switch { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.omni-switch__label { font-size: 0.95rem; }
+.omni-switch__track { position: relative; flex-shrink: 0; width: 2.75rem; height: 1.6rem; border-radius: 999px; border: 0; padding: 0; background: #c3c7ce; cursor: pointer; transition: background 0.15s; }
+.omni-switch__track--on { background: #1f5eff; }
+.omni-switch__thumb { position: absolute; top: 0.2rem; left: 0.2rem; width: 1.2rem; height: 1.2rem; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); transition: transform 0.15s; }
+.omni-switch__track--on .omni-switch__thumb { transform: translateX(1.15rem); }
+.omni-switch__track:focus-visible, .omni-tabs__tab:focus-visible { outline: 2px solid #1f5eff; outline-offset: 2px; }
+
+/* A grid of cells; rows use display: contents so every cell lines up with its column. Too wide a
+   table scrolls sideways inside its own box instead of squeezing its cells. */
+.omni-table-wrap { overflow-x: auto; max-width: 100%; }
+.omni-table { display: grid; font-size: 0.9rem; }
+.omni-table__row { display: contents; }
+.omni-table__heading, .omni-table__cell { padding: 0.5rem 0.75rem; border-bottom: 1px solid #e3e5e8; white-space: nowrap; }
+.omni-table__heading { font-weight: 600; color: #3c4048; border-bottom-color: #c3c7ce; }
+.omni-table__cell--number { text-align: end; font-variant-numeric: tabular-nums; }
+.omni-table > .omni-skeleton, .omni-table > .omni-fallback { grid-column: 1 / -1; }
+
+.omni-tabs { display: flex; flex-direction: column; gap: 0.75rem; }
+.omni-tabs__list { display: flex; gap: 0.25rem; border-bottom: 1px solid #e3e5e8; overflow-x: auto; scrollbar-width: none; }
+.omni-tabs__list::-webkit-scrollbar { display: none; }
+.omni-tabs__tab { font: inherit; padding: 0.5rem 0.85rem; border: 0; border-bottom: 2px solid transparent; background: none; color: #5b616e; cursor: pointer; white-space: nowrap; }
+.omni-tabs__tab--open { color: #1f2329; font-weight: 600; border-bottom-color: #1f5eff; }
+.omni-tab { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.omni-notice { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.75rem 0.9rem; border-radius: 10px; border-left: 4px solid #1f5eff; background: #eef3ff; color: #1f2329; }
+.omni-notice--success { border-left-color: #2e7d32; background: #e3f4e6; }
+.omni-notice--warning { border-left-color: #b7791f; background: #fff4d6; }
+.omni-notice--danger { border-left-color: #c62828; background: #fde4e4; }
+.omni-notice__title { font-weight: 600; }

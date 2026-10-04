@@ -38,6 +38,13 @@ let demoTools: ToolRegistry = [
   "assistant.ask": Tool { p in
     problems([rule(trimmed(p["question"]).map { (1...500).contains($0.count) } ?? false, "question: 1 to 500 characters")])
   },
+  "settings.update": Tool { p in
+    problems([
+      rule(trimmed(p["language"]).map { (1...40).contains($0.count) } ?? false, "language: 1 to 40 characters"),
+      rule(bool(p["orderUpdates"]) != nil, "orderUpdates: must be true or false"),
+      rule(bool(p["promotions"]) != nil, "promotions: must be true or false"),
+    ])
+  },
 ]
 
 let demoPictureNames = ["cabin-pines", "shirt", "tote"]
@@ -60,6 +67,11 @@ private func problems(_ results: [String?]) -> [String] {
 
 private func text(_ value: Primitive?) -> String? {
   if case .text(let s)? = value { return s }
+  return nil
+}
+
+private func bool(_ value: Primitive?) -> Bool? {
+  if case .bool(let b)? = value { return b }
   return nil
 }
 

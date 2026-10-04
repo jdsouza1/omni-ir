@@ -108,10 +108,20 @@ const MemoNode = memo(function Node({
     return <Component {...base} picture={picture} />;
   }
 
-  if (node.type === "Input" || node.type === "DateInput") {
+  if (node.type === "Input" || node.type === "DateInput" || node.type === "Select") {
     const key = node.props.value.key;
     const onChange = (value: string) => runHandler(ctx.report, node.id, () => ctx.store.setState(key, value));
     return <Component {...base} value={String(props.value ?? "")} onChange={onChange} />;
+  }
+
+  if (node.type === "Switch") {
+    const key = node.props.value.key;
+    const onChange = (value: boolean) => runHandler(ctx.report, node.id, () => ctx.store.setState(key, value));
+    return <Component {...base} value={props.value === true} onChange={onChange} />;
+  }
+
+  if (node.type === "Tabs") {
+    return <TabLabels ids={node.children}>{(tabs) => <Component {...base} tabs={tabs} />}</TabLabels>;
   }
 
   if (node.type === "Button") {
@@ -124,6 +134,24 @@ const MemoNode = memo(function Node({
 
   return <Component {...base} />;
 });
+
+/**
+ * Tabs show their Tabs' labels, which arrive on the Tabs' own lines. This subscribes to those labels
+ * only (a joined string, so unrelated changes don't re-render the Tabs).
+ */
+function TabLabels({ ids, children }: { ids: readonly string[]; children: (tabs: { id: string; label: string | undefined }[]) => ReactNode }) {
+  const { store } = useOmni();
+  const read = () => {
+    const nodes = store.getSnapshot().nodes;
+    return JSON.stringify(ids.map((id) => {
+      const n = nodes.get(id);
+      return n?.type === "Tab" ? n.props.label : null;
+    }));
+  };
+  const joined = useSyncExternalStore(store.subscribe, read, read);
+  const labels = useMemo(() => JSON.parse(joined) as (string | null)[], [joined]);
+  return <>{children(ids.map((id, i) => ({ id, label: labels[i] ?? undefined })))}</>;
+}
 
 function resolveProps(props: object, keys: readonly string[], values: readonly Primitive[]): Record<string, unknown> {
   const out: Record<string, unknown> = {};

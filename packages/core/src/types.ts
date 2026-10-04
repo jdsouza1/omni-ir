@@ -36,6 +36,8 @@ export type IssueCode =
   | "child_not_component"
   | "input_state_type"
   | "list_mismatch"
+  | "table_mismatch"
+  | "tabs_mismatch"
   | "duplicate_mutation"
   | "dangling_ref"
   | "missing_state"
@@ -84,9 +86,16 @@ export const ISSUE_CODES = {
   input_state_type: {
     severity: "error",
     stage: "line",
-    meaning: "An Input is bound to state that doesn't hold text, or a DateInput to state that isn't a YYYY-MM-DD date or empty.",
+    meaning:
+      "An Input or Select is bound to state that doesn't hold text, a DateInput to state that isn't a YYYY-MM-DD date or empty, or a Switch to state that isn't true or false.",
   },
   list_mismatch: { severity: "error", stage: "line", meaning: "A List contains something other than ListItems, or a ListItem is outside a List." },
+  table_mismatch: {
+    severity: "error",
+    stage: "line",
+    meaning: "A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns.",
+  },
+  tabs_mismatch: { severity: "error", stage: "line", meaning: "A Tabs contains something other than Tab, or a Tab is outside a Tabs." },
   duplicate_mutation: { severity: "error", stage: "line", meaning: "A button that already has an McpMutation gets a second one." },
   dangling_ref: { severity: "error", stage: "end", meaning: "A referenced component or McpMutation target never arrived." },
   missing_state: { severity: "error", stage: "end", meaning: "A $state key is used but never declared." },

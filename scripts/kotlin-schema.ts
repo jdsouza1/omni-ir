@@ -25,6 +25,7 @@ interface Def {
   pattern?: string;
   minimum?: number;
   maximum?: number;
+  minItems?: number;
   maxItems?: number;
 }
 interface Shape {
@@ -57,6 +58,7 @@ function valueSpec(d: Def): string {
   if (d.type === "object" && d.properties?.kind?.const === "state") return "ValueSpec.State";
   if (d.type === "object" && d.properties?.kind?.const === "ref") return "ValueSpec.Ref";
   if (d.type === "array" && d.items?.properties?.kind?.const === "ref") return `ValueSpec.RefList(maxItems = ${int(d.maxItems)})`;
+  if (d.type === "array" && d.items) return `ValueSpec.ListOf(item = ${valueSpec(d.items)}, minItems = ${int(d.minItems)}, maxItems = ${int(d.maxItems)})`;
   if (d.type === "object" && d.propertyNames && typeof d.additionalProperties === "object") {
     return `ValueSpec.Record(key = ${valueSpec(d.propertyNames)}, value = ${valueSpec(d.additionalProperties)})`;
   }

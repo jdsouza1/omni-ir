@@ -17,7 +17,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Tab
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -47,7 +58,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
@@ -62,6 +77,7 @@ import dev.omniir.core.PropValue
 import dev.omniir.core.isMutating
 import dev.omniir.runtime.Format
 import dev.omniir.runtime.Governance
+import dev.omniir.runtime.Slot
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -86,6 +102,13 @@ internal fun NodeContent(node: OmniNode, context: RenderContext) {
     ComponentType.LIST -> ListView(node)
     ComponentType.LIST_ITEM -> ListItemView(props, context)
     ComponentType.MESSAGE -> MessageView(props)
+    ComponentType.SELECT -> SelectView(props, context)
+    ComponentType.SWITCH -> SwitchView(props, context)
+    ComponentType.TABLE -> TableView(node, props, context)
+    ComponentType.TABLE_ROW -> TableRowLine(node, context)
+    ComponentType.TABS -> TabsView(node, context)
+    ComponentType.TAB -> Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) { ColumnChildren(node.children, stretch = true) }
+    ComponentType.NOTICE -> NoticeView(props)
   }
 }
 
@@ -99,6 +122,7 @@ internal class Props(private val node: OmniNode, private val context: RenderCont
   fun stateKey() = (node.props["value"] as? PropValue.State)?.key ?: ""
   fun stateText() = context.store.stateText(stateKey(), context.document)
   fun setState(value: String) = context.store.setState(stateKey(), Primitive.Text(value))
+  fun texts(name: String) = Format.texts(node.props[name])
 }
 
 @Composable
@@ -351,6 +375,173 @@ private fun DateInputView(props: Props) {
       },
       dismissButton = { TextButton(onClick = { open = false }) { Text("Cancel") } },
     ) { DatePicker(state) }
+  }
+}
+
+/** A Select edits a text `$key`; a value that isn't one of its options shows as nothing chosen. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectView(props: Props, context: RenderContext) {
+  val options = props.texts("options")
+  val chosen = context.store.chosenOption(props.stateKey(), options, context.document)
+  var expanded by remember { mutableStateOf(false) }
+  ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
+    OutlinedTextField(
+      value = chosen,
+      onValueChange = {},
+      readOnly = true,
+      label = { Text(props.text("label")) },
+      placeholder = if (props.has("placeholder")) ({ Text(props.text("placeholder")) }) else null,
+      trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+      modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+    )
+    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+      for (option in options) {
+        DropdownMenuItem(text = { Text(option) }, onClick = {
+          props.setState(option)
+          expanded = false
+        })
+      }
+    }
+  }
+}
+
+/** A Switch edits a true/false `$key`. */
+@Composable
+private fun SwitchView(props: Props, context: RenderContext) {
+  val key = props.stateKey()
+  val on = context.store.stateBool(key, context.document)
+  val label = props.text("label")
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.spacedBy(16.dp),
+    modifier = Modifier.fillMaxWidth().toggleable(value = on, role = Role.Switch, onValueChange = { context.store.setState(key, Primitive.Bool(it)) }),
+  ) {
+    Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+    Switch(checked = on, onCheckedChange = null)
+  }
+}
+
+/**
+ * A Table: column headings, then one row per TableRow, each column as wide as its widest cell. A row
+ * that hasn't arrived is a placeholder; one that never arrives is a fallback. Too wide a table scrolls sideways.
+ */
+@Composable
+private fun TableView(node: OmniNode, props: Props, context: RenderContext) {
+  val columns = props.texts("columns")
+  val count = columns.size.coerceAtLeast(1)
+  val loc = locale()
+  // Every grid cell, row by row: headings, then each row's cells (or a placeholder or fallback).
+  val cells = buildList<TableCell> {
+    for (column in columns) add(TableCell.Heading(column))
+    for (id in node.children) {
+      val slot = context.store.slot(id, context.document)
+      val row = (slot as? Slot.Node)?.node?.takeIf { it.type == ComponentType.TABLE_ROW }
+      if (row != null) {
+        val values = Format.cells(row.props["cells"], loc)
+        for (c in 0 until count) add(TableCell.Value(values.getOrNull(c) ?: Format.Cell("", false)))
+      } else {
+        add(if (slot is Slot.Pending) TableCell.Pending else TableCell.Missing)
+        repeat(count - 1) { add(TableCell.Value(Format.Cell("", false))) }
+      }
+    }
+  }
+  Box(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).semantics { collectionInfo = CollectionInfo(node.children.size + 1, count) }) {
+    TableGrid(count, ends = cells.map { it is TableCell.Value && it.cell.isNumber }) {
+      cells.forEachIndexed { i, cell ->
+        val pad = Modifier.cellPadding(i % count)
+        when (cell) {
+          is TableCell.Heading -> Text(cell.text, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = pad.semantics { heading() })
+          is TableCell.Value -> Text(cell.cell.text, style = MaterialTheme.typography.bodyMedium, modifier = pad)
+          TableCell.Pending -> Box(pad.width(64.dp)) { SkeletonLines(1) }
+          TableCell.Missing -> Box(pad) { Fallback() }
+        }
+      }
+    }
+  }
+}
+
+private sealed interface TableCell {
+  data class Heading(val text: String) : TableCell
+  data class Value(val cell: Format.Cell) : TableCell
+  data object Pending : TableCell
+  data object Missing : TableCell
+}
+
+private fun Modifier.cellPadding(column: Int): Modifier = this.padding(start = if (column == 0) 0.dp else 16.dp, top = 8.dp, bottom = 8.dp)
+
+/** Lays out its children as a grid of `columns` columns, each as wide as its widest cell; `ends` marks cells aligned to their column's end. */
+@Composable
+private fun TableGrid(columns: Int, ends: List<Boolean>, content: @Composable () -> Unit) {
+  Layout(content) { measurables, constraints ->
+    val loose = constraints.copy(minWidth = 0, minHeight = 0, maxWidth = Constraints.Infinity)
+    val placeables = measurables.map { it.measure(loose) }
+    val widths = IntArray(columns)
+    placeables.forEachIndexed { i, p -> widths[i % columns] = maxOf(widths[i % columns], p.width) }
+    val rows = (placeables.size + columns - 1) / columns
+    val heights = IntArray(rows) { r -> (0 until columns).maxOf { c -> placeables.getOrNull(r * columns + c)?.height ?: 0 } }
+    layout(widths.sum().coerceAtLeast(constraints.minWidth), heights.sum()) {
+      var y = 0
+      for (r in 0 until rows) {
+        var x = 0
+        for (c in 0 until columns) {
+          val i = r * columns + c
+          val p = placeables.getOrNull(i) ?: continue
+          p.placeRelative(if (ends.getOrNull(i) == true) x + widths[c] - p.width else x, y)
+          x += widths[c]
+        }
+        y += heights[r]
+      }
+    }
+  }
+}
+
+/** A TableRow is drawn by its Table. This is only reached for a row outside a Table, which the parser rejects. */
+@Composable
+private fun TableRowLine(node: OmniNode, context: RenderContext) {
+  val cells = Format.cells(node.props["cells"], locale())
+  Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { for (cell in cells) Text(cell.text) }
+}
+
+/**
+ * Tabs: a row of tabs with the Tabs' labels, then the open Tab. The first Tab is open until the viewer
+ * picks another; which one is open is the viewer's choice, never `$state`.
+ */
+@Composable
+private fun TabsView(node: OmniNode, context: RenderContext) {
+  val labels = context.store.tabLabels(node.children, context.document)
+  var picked by remember { mutableStateOf<String?>(null) }
+  val open = picked?.takeIf { it in node.children } ?: node.children.firstOrNull()
+  val index = node.children.indexOf(open).coerceAtLeast(0)
+  Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+    PrimaryScrollableTabRow(selectedTabIndex = index, edgePadding = 0.dp) {
+      node.children.forEachIndexed { i, id ->
+        Tab(selected = id == open, onClick = { picked = id }, text = { Text(labels.getOrNull(i) ?: "…") })
+      }
+    }
+    if (open != null) key(open) { Box(Modifier.fillMaxWidth()) { NodeSlot(open) } }
+  }
+}
+
+/** A Notice: a short message in a tinted box, with an icon for its tone. */
+@Composable
+private fun NoticeView(props: Props) {
+  val dark = isDark()
+  val (container, accent, symbol) = when (props.option("tone")) {
+    "success" -> Triple(if (dark) Color(0xFF1E3A26) else Color(0xFFE3F4E6), if (dark) Color(0xFF8FD6A0) else Color(0xFF1B5E20), "✓")
+    "warning" -> Triple(if (dark) Color(0xFF3D3011) else Color(0xFFFFF4D6), if (dark) Color(0xFFF2CC6B) else Color(0xFF7A5200), "!")
+    "danger" -> Triple(if (dark) Color(0xFF45201F) else Color(0xFFFDE4E4), if (dark) Color(0xFFF2A3A0) else Color(0xFF8E1C1C), "✕")
+    else -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, "i")
+  }
+  Row(
+    horizontalArrangement = Arrangement.spacedBy(10.dp),
+    modifier = Modifier.fillMaxWidth().background(container, RoundedCornerShape(10.dp)).padding(12.dp).semantics(mergeDescendants = true) {},
+  ) {
+    Text(symbol, color = accent, fontWeight = FontWeight.Bold, modifier = Modifier.clearAndSetSemantics {})
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+      if (props.has("title")) Text(props.text("title"), style = MaterialTheme.typography.titleSmall, color = accent)
+      Text(props.text("text"), style = MaterialTheme.typography.bodyMedium)
+    }
   }
 }
 

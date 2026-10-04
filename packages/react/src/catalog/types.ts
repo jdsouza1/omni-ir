@@ -19,6 +19,10 @@ export interface Picture {
 export interface InteractionProps {
   Input: { value: string; onChange: (value: string) => void };
   DateInput: { value: string; onChange: (value: string) => void };
+  Select: { value: string; onChange: (value: string) => void };
+  Switch: { value: boolean; onChange: (value: boolean) => void };
+  /** Each Tab child's label, in order; undefined while that Tab's line hasn't arrived. */
+  Tabs: { tabs: readonly { id: string; label: string | undefined }[] };
   /** Undefined when the renderer's asset registry doesn't have the named image. */
   Image: { picture: Picture | undefined };
   ListItem: { picture: Picture | undefined };

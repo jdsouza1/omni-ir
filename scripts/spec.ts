@@ -21,6 +21,7 @@ const LIMIT_LABELS: Record<keyof typeof LIMITS, string> = {
   stateKeyLength: "Characters in a $state key, including the $",
   toolNameLength: "Characters in a tool name",
   actionNameLength: "Characters in a Button action name",
+  tableColumns: "Columns in a Table, and cells in a TableRow",
 };
 
 const STAGE_LABEL = { line: "when the line arrives", end: "at end of stream", renderer: "in the renderer" } as const;
