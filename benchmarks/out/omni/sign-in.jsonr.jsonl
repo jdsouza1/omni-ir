@@ -1,0 +1,9 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Card","props":{},"children":["title","intro","email","actions","fine"]}}
+{"op":"add","path":"/elements/title","value":{"type":"Heading","props":{"text":"Sign in","level":1},"children":[]}}
+{"op":"add","path":"/elements/intro","value":{"type":"Text","props":{"text":"Enter your email and we'll send you a one-time sign-in link. No password needed.","tone":"muted"},"children":[]}}
+{"op":"add","path":"/state/email","value":""}
+{"op":"add","path":"/elements/email","value":{"type":"Input","props":{"value":{"$bindState":"/email"},"label":"Email address","placeholder":"you@example.com"},"children":[]}}
+{"op":"add","path":"/elements/actions","value":{"type":"Stack","props":{"direction":"row"},"children":["send"]}}
+{"op":"add","path":"/elements/send","value":{"type":"Button","props":{"label":"Email me a link","variant":"primary"},"children":[],"on":{"press":{"action":"auth.sendMagicLink","params":{"email":{"$state":"/email"}}}}}}
+{"op":"add","path":"/elements/fine","value":{"type":"Text","props":{"text":"The link expires after 15 minutes. Check your spam folder if it doesn't arrive.","tone":"muted"},"children":[]}}

@@ -1,0 +1,14 @@
+root = Card([title, merchant, totalRow, note, sep, actions])
+title = Heading("Payment", 1)
+merchant = Text("Shopping bag: Linen shirt, Canvas tote", null, null, "muted")
+totalRow = Stack([totalLabel, total], "row", "sm", "center")
+totalLabel = Text("Total", null, null, "strong")
+$amount = 100
+total = Text($amount, "currency", "USD", "strong")
+$note = ""
+note = Input($note, "Note (optional)", "e.g. gift wrap, please")
+sep = Divider()
+actions = Stack([pay, cancel], "row", "sm")
+pay = Button("Pay now", Action([@Run(payNow)]), "danger")
+payNow = Mutation("payments.confirm", {amount: $amount, note: $note})
+cancel = Button("Cancel", null, "secondary")

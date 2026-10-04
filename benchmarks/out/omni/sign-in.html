@@ -1,0 +1,12 @@
+<section class="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+  <h1 class="text-2xl font-semibold text-gray-900">Sign in</h1>
+  <p class="text-sm text-gray-500">Enter your email and we'll send you a one-time sign-in link. No password needed.</p>
+  <label class="flex flex-col gap-1">
+    <span class="text-sm font-medium text-gray-700">Email address</span>
+    <input type="text" name="email" placeholder="you@example.com" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
+  </label>
+  <div class="flex flex-row flex-wrap gap-4 items-stretch">
+    <button type="button" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" data-tool="auth.sendMagicLink" data-params="{&quot;email&quot;:&quot;#email&quot;}">Email me a link</button>
+  </div>
+  <p class="text-sm text-gray-500">The link expires after 15 minutes. Check your spam folder if it doesn't arrive.</p>
+</section>

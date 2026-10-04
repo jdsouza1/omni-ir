@@ -1,0 +1,17 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Card","props":{},"children":["photo","header","ratingRow","sep","dates","actions"]}}
+{"op":"add","path":"/elements/photo","value":{"type":"Image","props":{"asset":"cabin-pines","alt":"Lakeside cabin among pine trees","ratio":"16:9"},"children":[]}}
+{"op":"add","path":"/elements/header","value":{"type":"Stack","props":{"direction":"column","gap":"sm"},"children":["title","location"]}}
+{"op":"add","path":"/elements/title","value":{"type":"Heading","props":{"text":"Lakeside Cabin","level":1},"children":[]}}
+{"op":"add","path":"/elements/location","value":{"type":"Text","props":{"text":"Private dock, wood stove, sleeps 4","tone":"muted"},"children":[]}}
+{"op":"add","path":"/elements/ratingRow","value":{"type":"Stack","props":{"direction":"row","gap":"sm","align":"center"},"children":["stars","reviews"]}}
+{"op":"add","path":"/elements/stars","value":{"type":"Rating","props":{"value":4.8,"max":5},"children":[]}}
+{"op":"add","path":"/elements/reviews","value":{"type":"Text","props":{"text":"4.8 · 126 reviews","tone":"muted"},"children":[]}}
+{"op":"add","path":"/elements/sep","value":{"type":"Divider","props":{},"children":[]}}
+{"op":"add","path":"/elements/dates","value":{"type":"Stack","props":{"direction":"row","gap":"md"},"children":["checkIn","checkOut"]}}
+{"op":"add","path":"/state/checkIn","value":""}
+{"op":"add","path":"/elements/checkIn","value":{"type":"DateInput","props":{"value":{"$bindState":"/checkIn"},"label":"Check-in","min":"2026-10-01"},"children":[]}}
+{"op":"add","path":"/state/checkOut","value":""}
+{"op":"add","path":"/elements/checkOut","value":{"type":"DateInput","props":{"value":{"$bindState":"/checkOut"},"label":"Check-out","min":"2026-10-02"},"children":[]}}
+{"op":"add","path":"/elements/actions","value":{"type":"Stack","props":{"direction":"row"},"children":["reserve"]}}
+{"op":"add","path":"/elements/reserve","value":{"type":"Button","props":{"label":"Reserve","variant":"primary"},"children":[],"on":{"press":{"action":"bookings.reserve","params":{"checkIn":{"$state":"/checkIn"},"checkOut":{"$state":"/checkOut"}}}}}}

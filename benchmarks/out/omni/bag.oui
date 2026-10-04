@@ -1,0 +1,15 @@
+root = Card([title, items, sep, totalRow, note, actions])
+title = Heading("Shopping bag", 1)
+items = List([shirtItem, toteItem])
+shirtItem = ListItem("Linen shirt", "Size M · Natural · Qty 1", "$68.00", "shirt")
+toteItem = ListItem("Canvas tote", "Olive · Qty 1", "$32.00", "tote")
+sep = Divider()
+totalRow = Stack([totalLabel, total], "row", "sm", "center")
+totalLabel = Text("Total", null, null, "strong")
+$amount = 100
+total = Text($amount, "currency", "USD", "strong")
+$note = ""
+note = Input($note, "Order note (optional)", "e.g. gift wrap, please")
+actions = Stack([pay], "row")
+pay = Button("Pay now", Action([@Run(payBag)]), "primary")
+payBag = Mutation("payments.confirm", {amount: $amount, note: $note})

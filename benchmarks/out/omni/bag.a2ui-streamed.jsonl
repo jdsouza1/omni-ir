@@ -1,0 +1,15 @@
+{"version":"v0.9","createSurface":{"surfaceId":"bag","catalogId":"https://example.com/catalogs/omni-ir.json"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"root","component":"Card","children":["title","items","sep","totalRow","note","actions"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"title","component":"Heading","text":"Shopping bag","level":1}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"items","component":"List","children":["shirtItem","toteItem"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"shirtItem","component":"ListItem","title":"Linen shirt","detail":"Size M · Natural · Qty 1","trailing":"$68.00","image":"shirt"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"toteItem","component":"ListItem","title":"Canvas tote","detail":"Olive · Qty 1","trailing":"$32.00","image":"tote"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"sep","component":"Divider"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"totalRow","component":"Stack","children":["totalLabel","total"],"direction":"row","gap":"sm","align":"center"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"totalLabel","component":"Text","text":"Total","tone":"strong"}]}}
+{"version":"v0.9","updateDataModel":{"surfaceId":"bag","path":"/amount","value":100}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"total","component":"Text","text":{"path":"/amount"},"format":"currency","currency":"USD","tone":"strong"}]}}
+{"version":"v0.9","updateDataModel":{"surfaceId":"bag","path":"/note","value":""}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"note","component":"Input","value":{"path":"/note"},"label":"Order note (optional)","placeholder":"e.g. gift wrap, please"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"actions","component":"Stack","children":["pay"],"direction":"row"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"bag","components":[{"id":"pay","component":"Button","label":"Pay now","variant":"primary","action":{"event":{"name":"payments.confirm","context":{"amount":{"path":"/amount"},"note":{"path":"/note"}}}}}]}}

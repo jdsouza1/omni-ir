@@ -2,7 +2,7 @@
 
 Goal: honest, reproducible numbers on how Omni-IR compares with other ways a model can describe a UI, covering size, streaming and reliability, plus a sourced table of what each format allows. The owner asked for this on 2026-10-01; nothing goes on the landing page without the owner's review.
 
-Status: **APPROVED 2026-10-01** as a thorough comparison with the recommendations: OpenUI Lang, A2UI and json-render measured, HTML and React as baselines; reliability runs for both Omni-IR (current prompt) and OpenUI Lang; results in `benchmarks/` and `docs/COMPARISON.md` with a visual review page; landing wording only after review. The paid 46-brief run stays out unless the owner asks.
+Status: **APPROVED 2026-10-01** as a thorough comparison with the recommendations: OpenUI Lang, A2UI and json-render measured, HTML and React as baselines; reliability runs for both Omni-IR (current prompt) and OpenUI Lang; results in `benchmarks/` and `docs/COMPARISON.md` with a visual review page; landing wording only after review. The paid 46-brief run is not part of this step: the owner confirmed on 2026-10-01 not to run it and to keep it as an optional extra (task E.1), only with the owner's go-ahead.
 
 ## The landscape (researched 2026-10-01)
 
@@ -61,23 +61,44 @@ So this plan **extends OpenUI's published benchmark** (same seven scenarios, sam
 ## Task checklist
 
 **A. Set-up**
-- [ ] A.1 `benchmarks/` with the offline tokenizer, the screen list and a `npm run bench` script; a test that the script runs and its outputs are committed
-- [ ] A.2 Sources pinned: OpenUI's published samples and system prompt, the A2UI v0.9 spec and basic catalog, json-render's spec format, each with its link and version
+- [x] A.1 `benchmarks/` with the offline tokenizer, the screen list and a `npm run bench` script; a test that the script runs and its outputs are committed
+- [x] A.2 Sources pinned: OpenUI's published samples and system prompt, the A2UI v0.9 spec and basic catalog, json-render's spec format, each with its link and version
 
 **B. Screens and converters**
-- [ ] B.1 The nine model-check screens as Omni-IR (the replies already recorded), plus OpenUI's seven scenarios written in Omni-IR where the catalog can express them
-- [ ] B.2 Converters from one parsed screen to A2UI v0.9 JSONL, json-render (spec and patch stream), HTML with Tailwind and React JSX; checked by validating the A2UI and json-render output against their published schemas where available
-- [ ] B.3 A converter to OpenUI Lang for our nine screens, using the component library in OpenUI's published `schema.json`, so it is generated like the others rather than written by hand
+- [x] B.1 The nine model-check screens as Omni-IR (the replies already recorded), plus OpenUI's seven scenarios written in Omni-IR where the catalog can express them
+- [x] B.2 Converters from one parsed screen to A2UI v0.9 JSONL, json-render (spec and patch stream), HTML with Tailwind and React JSX; checked by validating the A2UI and json-render output against their published schemas where available
+- [x] B.3 A converter to OpenUI Lang for our nine screens, using the component library in OpenUI's published `schema.json`, so it is generated like the others rather than written by hand
 
 **C. Measurements**
-- [ ] C.1 Size: tokens and characters per screen and format, with totals
-- [ ] C.2 Streaming: share of the reply needed before the first component and before the whole first card
-- [ ] C.3 Reliability: the nine requests in both Omni-IR (current prompt) and OpenUI Lang, in fresh Claude.ai chats on your account, each checked with its own parser
-- [ ] C.4 The capability table, every cell sourced
+- [x] C.1 Size: tokens and characters per screen and format, with totals
+- [x] C.2 Streaming: share of the reply needed before the first component and before the whole first card
+- [x] C.3 Reliability (run 2026-10-04 through the owner's Chrome at the owner's request, Claude Opus 5.5; both 9 of 9 valid; replies in `benchmarks/reliability/2026-10-04/`): the nine requests in both Omni-IR (current prompt) and OpenUI Lang, in fresh Claude.ai chats on your account, each checked with its own parser
+- [x] C.4 The capability table, every cell sourced
 
 **D. Write-up** *(checkpoint: you review)*
-- [ ] D.1 `docs/COMPARISON.md`: method, results, caveats and sources; a review page
-- [ ] D.2 Only after your review: landing page and README wording
+- [x] D.1 `docs/COMPARISON.md`: method, results, caveats and sources; a review page
+- [x] D.2 Landing page and README wording (drafted 2026-10-02 at the owner's request; awaiting review): README "How it compares"; landing draft v6 at https://claude.ai/artifact/PUptQnnDGK8eZL2oQkLVhu, with a comparison section and the stale "iOS and Android planned" lines fixed. The live landing page is unchanged until approved. Reliability claims wait for C.3
+
+**Progress (2026-10-01):** A, B, C.1, C.2, C.4 and D.1 done on `wip/comparison`; awaiting the owner's review and the C.3 runs.
+- Method decision made while building: every format carries the screen's own components and props (OpenUI's benchmark does the same), so size compares syntax; which library can draw which screen is reported separately as coverage. So B.1's "OpenUI's scenarios written in Omni-IR where the catalog can express them" became: all seven are written in Omni-IR syntax with OpenUI's components for the size numbers, and the coverage table shows that Omni-IR's catalog can draw none of them unchanged. B.3 likewise writes the nine screens in OpenUI Lang syntax with Omni-IR's components.
+- A2UI is pinned at v0.9.1, its current production release (v1.0 is a release candidate).
+- `@openuidev/lang-core` sends install telemetry from a postinstall script, so it is not a dependency: the parser check is manual (`benchmarks/checks/openui-parser.mjs`), and the reliability page loads it from jsDelivr in the browser.
+- Review page: https://claude.ai/artifact/GhtD7m2BgFzryM8o3eBiuH · reliability check page (C.3): https://claude.ai/artifact/5Ae5aFVfZDM1pM8nSyFbq9 (`npm run comparison:page`, `npm run reliability:page`).
+
+**E. Optional, not scheduled** *(only if the owner decides to; costs money)*
+- [ ] E.1 Omni-IR on Thesys's 46 briefs × 4 runs (184 paid API runs). Not run unless the owner gives the go-ahead.
+
+## Decisions
+
+**2026-10-04 · Keep Omni-IR's explicit, flat syntax (owner's decision).**
+- **Considered:** making Omni-IR smaller by adopting OpenUI Lang's positional arguments (about 4% fewer tokens on the model-check screens) and nested components (about 10% fewer on form-heavy screens).
+- **Decided:** no change. The saving is small in practice. A typical screen is about 200 tokens, so 4% is about 8 tokens. Per component the two formats are already close (19.3 against 18.1 tokens in the reliability run); the 2.4× difference in reply length came from what the model built, not the syntax.
+- **Why:**
+  - Positional arguments let a model put values in the wrong order and still be valid, and skipped props need `null`.
+  - Nesting breaks the flat-lines rule (CLAUDE.md constraint 1). A nested line can only be drawn once it is complete, and one bad nested part rejects the whole line.
+  - Named props keep the stream readable and each issue tied to one line.
+- **Revisit if:** a customer has a real token-budget constraint at high volume. The lowest-risk option then would be positional arguments for the first one or two props only.
+- **Follow-up:** re-run the size and reliability comparison after the catalog expansion, when Omni-IR's screens can be as rich as OpenUI's.
 
 ## What I needed from you
 Answered 2026-10-01: "a thorough comparison", with a visual.

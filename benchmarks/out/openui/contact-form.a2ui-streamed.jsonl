@@ -1,0 +1,22 @@
+{"version":"v0.9","createSurface":{"surfaceId":"contact-form","catalogId":"https://example.com/catalogs/openui.json"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"root","component":"Stack","children":["title","form"],"direction":"column","gap":"l"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"title","component":"TextContent","text":"Contact Us","size":"large-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"form","component":"Form","name":"contact","fields":["nameField","emailField","phoneField","subjectField","messageField"],"buttons":"formButtons"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"nameField","component":"FormControl","label":"Name","input":"input1"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"input1","component":"Input","name":"name","placeholder":"Your full name","type":"text","rules":["required","minLength:2"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"emailField","component":"FormControl","label":"Email","input":"input2"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"input2","component":"Input","name":"email","placeholder":"you@example.com","type":"email","rules":["required","email"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"phoneField","component":"FormControl","label":"Phone","input":"input3"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"input3","component":"Input","name":"phone","placeholder":"e.g., +1 555 123 4567","type":"text","rules":["required","minLength:7","maxLength:20"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"subjectField","component":"FormControl","label":"Subject","input":"select1"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"select1","component":"Select","name":"subject","items":["selectItem1","selectItem2","selectItem3","selectItem4","selectItem5"],"placeholder":"Select a subject...","rules":["required"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"messageField","component":"FormControl","label":"Message","input":"textArea1"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"textArea1","component":"TextArea","name":"message","placeholder":"How can we help?","rows":6,"rules":["required","minLength:10"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"selectItem1","component":"SelectItem","value":"general","label":"General inquiry"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"selectItem2","component":"SelectItem","value":"support","label":"Support"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"selectItem3","component":"SelectItem","value":"sales","label":"Sales"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"selectItem4","component":"SelectItem","value":"billing","label":"Billing"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"selectItem5","component":"SelectItem","value":"feedback","label":"Feedback"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"formButtons","component":"Buttons","buttons":["submitBtn","cancelBtn"],"direction":"row"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"submitBtn","component":"Button","label":"Submit","action":{"event":{"name":"submit:contact"}},"variant":"primary"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"contact-form","components":[{"id":"cancelBtn","component":"Button","label":"Cancel","action":{"event":{"name":"action:cancel_contact"}},"variant":"secondary"}]}}

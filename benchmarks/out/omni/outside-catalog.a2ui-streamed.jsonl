@@ -1,0 +1,15 @@
+{"version":"v0.9","createSurface":{"surfaceId":"outside-catalog","catalogId":"https://example.com/catalogs/omni-ir.json"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"root","component":"Card","children":["video","header","progress","sep","controls"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"video","component":"Skeleton","lines":6}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"header","component":"Stack","children":["title","status"],"direction":"row","gap":"sm","align":"center"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"title","component":"Heading","text":"Video","level":2}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"status","component":"Badge","text":"Paused","tone":"neutral"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"progress","component":"Stack","children":["elapsed","divider","duration"],"direction":"row","gap":"sm","align":"center"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"elapsed","component":"Text","text":"0:00","tone":"strong"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"divider","component":"Text","text":"/","tone":"muted"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"duration","component":"Text","text":"3:42","tone":"muted"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"sep","component":"Divider"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"controls","component":"Stack","children":["back","play","forward"],"direction":"row","gap":"sm","align":"center"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"back","component":"Button","label":"Back 10s","variant":"secondary"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"play","component":"Button","label":"Play","variant":"primary"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"outside-catalog","components":[{"id":"forward","component":"Button","label":"Forward 10s","variant":"secondary"}]}}

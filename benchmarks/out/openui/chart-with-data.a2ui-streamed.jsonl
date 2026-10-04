@@ -1,0 +1,12 @@
+{"version":"v0.9","createSurface":{"surfaceId":"chart-with-data","catalogId":"https://example.com/catalogs/openui.json"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"root","component":"Stack","children":["header","layout"],"direction":"column","gap":"l"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"header","component":"TextContent","text":"Revenue Dashboard","size":"large-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"layout","component":"Stack","children":["metricCard","chartCard"],"direction":"row","gap":"l","align":"stretch","justify":"start","wrap":true}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"metricCard","component":"Card","children":["metricHeader","metricValue","metricDelta"],"variant":"card"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"metricHeader","component":"CardHeader","title":"Total Revenue","subtitle":"Last 6 months"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"metricValue","component":"TextContent","text":"$1,284,000","size":"large-heavy"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"metricDelta","component":"TextCallout","variant":"success","title":"Up 8.4%","description":"Compared to the previous 6 months"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"chartCard","component":"Card","children":["chartHeader","revenueChart"],"variant":"card"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"chartHeader","component":"CardHeader","title":"Monthly Revenue","subtitle":"Last 6 months"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"revenueChart","component":"BarChart","labels":["Oct","Nov","Dec","Jan","Feb","Mar"],"series":["revenueSeries"],"variant":"grouped","xLabel":"Month","yLabel":"Revenue (USD)"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"chart-with-data","components":[{"id":"revenueSeries","component":"Series","category":"Revenue","values":[198000,205000,214000,210000,223000,234000]}]}}

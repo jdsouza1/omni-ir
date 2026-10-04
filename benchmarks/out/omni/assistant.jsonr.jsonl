@@ -1,0 +1,11 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Card","props":{"title":"Trip assistant"},"children":["title","thread","sep","ask","actions"]}}
+{"op":"add","path":"/elements/title","value":{"type":"Text","props":{"text":"Ask anything about your stay or the area.","tone":"muted"},"children":[]}}
+{"op":"add","path":"/elements/thread","value":{"type":"Stack","props":{"direction":"column","gap":"sm"},"children":["q1","a1"]}}
+{"op":"add","path":"/elements/q1","value":{"type":"Message","props":{"text":"Is there anywhere to rent kayaks near the lakeside cabin?","from":"user"},"children":[]}}
+{"op":"add","path":"/elements/a1","value":{"type":"Message","props":{"text":"Yes. The cabin has a private dock, and the marina about 10 minutes away rents kayaks and canoes by the hour or day. Mornings are usually calmest on the water, so book an early slot if you can.","from":"assistant"},"children":[]}}
+{"op":"add","path":"/elements/sep","value":{"type":"Divider","props":{},"children":[]}}
+{"op":"add","path":"/state/question","value":""}
+{"op":"add","path":"/elements/ask","value":{"type":"Input","props":{"value":{"$bindState":"/question"},"label":"Ask another question","placeholder":"e.g. What time is check-in?"},"children":[]}}
+{"op":"add","path":"/elements/actions","value":{"type":"Stack","props":{"direction":"row"},"children":["send"]}}
+{"op":"add","path":"/elements/send","value":{"type":"Button","props":{"label":"Send","variant":"primary"},"children":[],"on":{"press":{"action":"assistant.ask","params":{"question":{"$state":"/question"}}}}}}

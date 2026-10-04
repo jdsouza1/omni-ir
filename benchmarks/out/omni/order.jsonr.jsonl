@@ -1,0 +1,14 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Card","props":{},"children":["header","items","carrier","etaRow","sep","actions"]}}
+{"op":"add","path":"/elements/header","value":{"type":"Stack","props":{"direction":"row","gap":"sm","align":"center"},"children":["title","status"]}}
+{"op":"add","path":"/elements/title","value":{"type":"Heading","props":{"text":"Order #A1B2-7731","level":1},"children":[]}}
+{"op":"add","path":"/elements/status","value":{"type":"Badge","props":{"text":"Shipped","tone":"success"},"children":[]}}
+{"op":"add","path":"/elements/items","value":{"type":"Text","props":{"text":"2 items: Linen shirt, Canvas tote"},"children":[]}}
+{"op":"add","path":"/elements/carrier","value":{"type":"Text","props":{"text":"Carrier: Parcelwise, tracking 1Z-88-4410","tone":"muted"},"children":[]}}
+{"op":"add","path":"/elements/etaRow","value":{"type":"Stack","props":{"direction":"row","gap":"sm","align":"center"},"children":["etaLabel","eta"]}}
+{"op":"add","path":"/elements/etaLabel","value":{"type":"Text","props":{"text":"Estimated delivery","tone":"muted"},"children":[]}}
+{"op":"add","path":"/elements/eta","value":{"type":"Text","props":{"text":"2026-10-03","format":"date","tone":"strong"},"children":[]}}
+{"op":"add","path":"/elements/sep","value":{"type":"Divider","props":{},"children":[]}}
+{"op":"add","path":"/elements/actions","value":{"type":"Stack","props":{"direction":"row","gap":"sm"},"children":["returnItem","help"]}}
+{"op":"add","path":"/elements/returnItem","value":{"type":"Button","props":{"label":"Request a return","variant":"secondary"},"children":[],"on":{"press":{"action":"orders.requestReturn","params":{"orderId":"A1B2-7731"}}}}}
+{"op":"add","path":"/elements/help","value":{"type":"Button","props":{"label":"Contact support","variant":"secondary"},"children":[]}}

@@ -1,0 +1,13 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Card","props":{},"children":["title","intro","subject","message","fine","sep","actions"]}}
+{"op":"add","path":"/elements/title","value":{"type":"Heading","props":{"text":"Report a broken item","level":1},"children":[]}}
+{"op":"add","path":"/elements/intro","value":{"type":"Text","props":{"text":"Sorry your item arrived damaged. Tell us what happened and we'll make it right.","tone":"muted"},"children":[]}}
+{"op":"add","path":"/state/subject","value":"Item arrived broken"}
+{"op":"add","path":"/elements/subject","value":{"type":"Input","props":{"value":{"$bindState":"/subject"},"label":"Subject"},"children":[]}}
+{"op":"add","path":"/state/message","value":""}
+{"op":"add","path":"/elements/message","value":{"type":"Input","props":{"value":{"$bindState":"/message"},"label":"What happened?","placeholder":"Order number, which item, and a short description of the damage"},"children":[]}}
+{"op":"add","path":"/elements/fine","value":{"type":"Text","props":{"text":"Keep the item and packaging until we reply. We usually respond within one business day.","tone":"muted"},"children":[]}}
+{"op":"add","path":"/elements/sep","value":{"type":"Divider","props":{},"children":[]}}
+{"op":"add","path":"/elements/actions","value":{"type":"Stack","props":{"direction":"row","gap":"sm"},"children":["submit","cancel"]}}
+{"op":"add","path":"/elements/submit","value":{"type":"Button","props":{"label":"Send to support","variant":"primary"},"children":[],"on":{"press":{"action":"support.createTicket","params":{"subject":{"$state":"/subject"},"message":{"$state":"/message"}}}}}}
+{"op":"add","path":"/elements/cancel","value":{"type":"Button","props":{"label":"Cancel","variant":"secondary"},"children":[]}}

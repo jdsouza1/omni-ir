@@ -1,0 +1,28 @@
+{"op":"add","path":"/root","value":"root"}
+{"op":"add","path":"/elements/root","value":{"type":"Stack","props":{"direction":"column","gap":"l"},"children":["title","tabs"]}}
+{"op":"add","path":"/elements/title","value":{"type":"TextContent","props":{"text":"User Settings","size":"large-heavy"},"children":[]}}
+{"op":"add","path":"/elements/tabs","value":{"type":"Tabs","props":{},"children":["tabProfile","tabSecurity","tabNotifications"]}}
+{"op":"add","path":"/elements/tabProfile","value":{"type":"TabItem","props":{"value":"profile","trigger":"Profile"},"children":["profileCard"]}}
+{"op":"add","path":"/elements/profileCard","value":{"type":"Card","props":{"variant":"card"},"children":["profileHeader","profileForm"]}}
+{"op":"add","path":"/elements/profileHeader","value":{"type":"CardHeader","props":{"title":"Profile","subtitle":"Update your personal information and avatar."},"children":[]}}
+{"op":"add","path":"/elements/profileForm","value":{"type":"Form","props":{"name":"profile_update"},"children":["nameField","avatarField","profileButtons"]}}
+{"op":"add","path":"/elements/nameField","value":{"type":"FormControl","props":{"label":"Display name"},"children":["input1"]}}
+{"op":"add","path":"/elements/input1","value":{"type":"Input","props":{"name":"display_name","placeholder":"e.g., Alex Johnson","type":"text","rules":["required","minLength:2","maxLength:60"]},"children":[]}}
+{"op":"add","path":"/elements/avatarField","value":{"type":"FormControl","props":{"label":"Avatar URL"},"children":["input2"]}}
+{"op":"add","path":"/elements/input2","value":{"type":"Input","props":{"name":"avatar_url","placeholder":"https://example.com/avatar.png","type":"url","rules":["url"]},"children":[]}}
+{"op":"add","path":"/elements/profileButtons","value":{"type":"Buttons","props":{},"children":["saveProfileBtn","resetProfileBtn"]}}
+{"op":"add","path":"/elements/saveProfileBtn","value":{"type":"Button","props":{"label":"Save changes","action":"submit:profile_update","variant":"primary"},"children":[]}}
+{"op":"add","path":"/elements/resetProfileBtn","value":{"type":"Button","props":{"label":"Reset","action":"action:reset_profile_form","variant":"secondary"},"children":[]}}
+{"op":"add","path":"/elements/tabSecurity","value":{"type":"TabItem","props":{"value":"security","trigger":"Security"},"children":["securityCard"]}}
+{"op":"add","path":"/elements/securityCard","value":{"type":"Card","props":{"variant":"card"},"children":["securityHeader","securityToggles","securityHint"]}}
+{"op":"add","path":"/elements/securityHeader","value":{"type":"CardHeader","props":{"title":"Security","subtitle":"Manage sign-in protection and account security."},"children":[]}}
+{"op":"add","path":"/elements/securityToggles","value":{"type":"SwitchGroup","props":{"variant":"sunk"},"children":["twoFaSwitch"]}}
+{"op":"add","path":"/elements/twoFaSwitch","value":{"type":"SwitchItem","props":{"label":"Two-factor authentication (2FA)","description":"Require a verification code when signing in.","name":"two_fa","value":"enabled","checked":false,"defaultChecked":true,"disabled":false},"children":[]}}
+{"op":"add","path":"/elements/securityHint","value":{"type":"TextCallout","props":{"variant":"info","title":"Tip","description":"After enabling 2FA, you may be asked to set up an authenticator app or backup codes."},"children":[]}}
+{"op":"add","path":"/elements/tabNotifications","value":{"type":"TabItem","props":{"value":"notifications","trigger":"Notifications"},"children":["notificationsCard"]}}
+{"op":"add","path":"/elements/notificationsCard","value":{"type":"Card","props":{"variant":"card"},"children":["notificationsHeader","notificationsToggles"]}}
+{"op":"add","path":"/elements/notificationsHeader","value":{"type":"CardHeader","props":{"title":"Notifications","subtitle":"Choose what you want to be notified about."},"children":[]}}
+{"op":"add","path":"/elements/notificationsToggles","value":{"type":"SwitchGroup","props":{"variant":"sunk"},"children":["emailSwitch","productSwitch","securityAlertsSwitch"]}}
+{"op":"add","path":"/elements/emailSwitch","value":{"type":"SwitchItem","props":{"label":"Email notifications","description":"Receive updates and account messages by email.","name":"notif_email","value":"enabled","checked":true,"defaultChecked":true,"disabled":false},"children":[]}}
+{"op":"add","path":"/elements/productSwitch","value":{"type":"SwitchItem","props":{"label":"Product updates","description":"Get notified about new features and improvements.","name":"notif_product","value":"enabled","checked":false,"defaultChecked":false,"disabled":false},"children":[]}}
+{"op":"add","path":"/elements/securityAlertsSwitch","value":{"type":"SwitchItem","props":{"label":"Security alerts","description":"Important alerts about sign-ins and security changes.","name":"notif_security","value":"enabled","checked":true,"defaultChecked":true,"disabled":false},"children":[]}}

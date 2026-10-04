@@ -1,0 +1,18 @@
+{"version":"v0.9","createSurface":{"surfaceId":"no-tool","catalogId":"https://example.com/catalogs/omni-ir.json"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"root","component":"Card","children":["title","profileSection","deleteSection"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"title","component":"Heading","text":"Settings","level":1}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"profileSection","component":"Card","children":["displayName","bio","saveRow"],"title":"Profile"}]}}
+{"version":"v0.9","updateDataModel":{"surfaceId":"no-tool","path":"/displayName","value":""}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"displayName","component":"Input","value":{"path":"/displayName"},"label":"Display name","placeholder":"Your name"}]}}
+{"version":"v0.9","updateDataModel":{"surfaceId":"no-tool","path":"/bio","value":""}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"bio","component":"Input","value":{"path":"/bio"},"label":"Bio","placeholder":"A short line about you (160 characters max)"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"saveRow","component":"Stack","children":["save"],"direction":"row"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"save","component":"Button","label":"Save changes","variant":"primary","action":{"event":{"name":"profile.update","context":{"displayName":{"path":"/displayName"},"bio":{"path":"/bio"}}}}}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"deleteSection","component":"Card","children":["deleteHeader","deleteWarning","deleteInfo","deleteRow"],"title":"Danger zone"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"deleteHeader","component":"Stack","children":["deleteTitle","deleteBadge"],"direction":"row","gap":"sm","align":"center"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"deleteTitle","component":"Heading","text":"Delete account","level":3}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"deleteBadge","component":"Badge","text":"Permanent","tone":"danger"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"deleteWarning","component":"Text","text":"Deleting your account permanently removes your profile, orders and bookings. This can't be undone.","tone":"strong"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"deleteInfo","component":"Text","text":"Your request goes to our support team, who will confirm by email before the account is deleted.","tone":"muted"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"deleteRow","component":"Stack","children":["deleteBtn"],"direction":"row"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"no-tool","components":[{"id":"deleteBtn","component":"Button","label":"Request account deletion","variant":"danger","action":{"event":{"name":"support.createTicket","context":{"subject":"Account deletion request","message":"Please permanently delete my account and all associated data."}}}}]}}

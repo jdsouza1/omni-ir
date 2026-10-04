@@ -1,0 +1,11 @@
+root = Card([title, thread, sep, ask, actions], "Trip assistant")
+title = Text("Ask anything about your stay or the area.", null, null, "muted")
+thread = Stack([q1, a1], "column", "sm")
+q1 = Message("Is there anywhere to rent kayaks near the lakeside cabin?", "user")
+a1 = Message("Yes. The cabin has a private dock, and the marina about 10 minutes away rents kayaks and canoes by the hour or day. Mornings are usually calmest on the water, so book an early slot if you can.", "assistant")
+sep = Divider()
+$question = ""
+ask = Input($question, "Ask another question", "e.g. What time is check-in?")
+actions = Stack([send], "row")
+send = Button("Send", Action([@Run(askAssistant)]), "primary")
+askAssistant = Mutation("assistant.ask", {question: $question})

@@ -1,0 +1,9 @@
+{"version":"v0.9","createSurface":{"surfaceId":"sign-in","catalogId":"https://example.com/catalogs/omni-ir.json"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"sign-in","components":[{"id":"root","component":"Card","children":["title","intro","email","actions","fine"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"sign-in","components":[{"id":"title","component":"Heading","text":"Sign in","level":1}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"sign-in","components":[{"id":"intro","component":"Text","text":"Enter your email and we'll send you a one-time sign-in link. No password needed.","tone":"muted"}]}}
+{"version":"v0.9","updateDataModel":{"surfaceId":"sign-in","path":"/email","value":""}}
+{"version":"v0.9","updateComponents":{"surfaceId":"sign-in","components":[{"id":"email","component":"Input","value":{"path":"/email"},"label":"Email address","placeholder":"you@example.com"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"sign-in","components":[{"id":"actions","component":"Stack","children":["send"],"direction":"row"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"sign-in","components":[{"id":"send","component":"Button","label":"Email me a link","variant":"primary","action":{"event":{"name":"auth.sendMagicLink","context":{"email":{"path":"/email"}}}}}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"sign-in","components":[{"id":"fine","component":"Text","text":"The link expires after 15 minutes. Check your spam folder if it doesn't arrive.","tone":"muted"}]}}

@@ -23,7 +23,7 @@ export const REQUESTS = [
 
 const escapeScript = (s: string) => s.replace(/<\/(script)/gi, "<\\/$1").replace(/<!--/g, "<\\!--");
 
-async function bundle(): Promise<{ js: string; css: string }> {
+export async function bundle(): Promise<{ js: string; css: string }> {
   const result = (await build({
     configFile: false,
     logLevel: "warn",

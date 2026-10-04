@@ -22,5 +22,7 @@
       "@omni-ir/react": ["./packages/react/src/index.ts"]
     }
   },
-  "include": ["app", "packages/core/src", "packages/react/src", "server", "playground", "conformance", "tests", "scripts", "vitest.config.ts"]
+  "include": ["app", "benchmarks", "packages/core/src", "packages/react/src", "server", "playground", "conformance", "tests", "scripts", "vitest.config.ts"],
+  // Pinned third-party files kept for reference, not compiled.
+  "exclude": ["benchmarks/sources"]
 }

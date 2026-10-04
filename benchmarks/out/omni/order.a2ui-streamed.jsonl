@@ -1,0 +1,14 @@
+{"version":"v0.9","createSurface":{"surfaceId":"order","catalogId":"https://example.com/catalogs/omni-ir.json"}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"root","component":"Card","children":["header","items","carrier","etaRow","sep","actions"]}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"header","component":"Stack","children":["title","status"],"direction":"row","gap":"sm","align":"center"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"title","component":"Heading","text":"Order #A1B2-7731","level":1}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"status","component":"Badge","text":"Shipped","tone":"success"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"items","component":"Text","text":"2 items: Linen shirt, Canvas tote"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"carrier","component":"Text","text":"Carrier: Parcelwise, tracking 1Z-88-4410","tone":"muted"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"etaRow","component":"Stack","children":["etaLabel","eta"],"direction":"row","gap":"sm","align":"center"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"etaLabel","component":"Text","text":"Estimated delivery","tone":"muted"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"eta","component":"Text","text":"2026-10-03","format":"date","tone":"strong"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"sep","component":"Divider"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"actions","component":"Stack","children":["returnItem","help"],"direction":"row","gap":"sm"}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"returnItem","component":"Button","label":"Request a return","variant":"secondary","action":{"event":{"name":"orders.requestReturn","context":{"orderId":"A1B2-7731"}}}}]}}
+{"version":"v0.9","updateComponents":{"surfaceId":"order","components":[{"id":"help","component":"Button","label":"Contact support","variant":"secondary"}]}}
