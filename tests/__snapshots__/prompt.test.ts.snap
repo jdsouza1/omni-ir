@@ -147,6 +147,7 @@ McpMutation(target, tool, params?)
 - support.createTicket: params {subject: text (min 1, max 120); message: text (min 1, max 2000)}
 - bookings.reserve: params {checkIn: date "YYYY-MM-DD"; checkOut: date "YYYY-MM-DD"}
 - assistant.ask: params {question: text (min 1, max 500)}
+- settings.update: params {language: text (min 1, max 40); orderUpdates: true | false; promotions: true | false}
 
 ## Images
 - cabin-pines

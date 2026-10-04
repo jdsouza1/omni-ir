@@ -16,9 +16,11 @@ async function collect(model: MockModel, prompt: string, signal = new AbortContr
 describe("fixtures", () => {
   const screens = readdirSync("fixtures").filter((f) => f.endsWith(".omni"));
 
-  it("includes the six mock screens", () => {
+  it("includes the eight mock screens", () => {
     expect(screens.sort()).toEqual([
+      "account-settings.omni",
       "demo-mode.omni",
+      "order-history.omni",
       "order-status.omni",
       "payment-confirmation.omni",
       "profile-settings.omni",
@@ -55,6 +57,8 @@ describe("MockModel routing", () => {
     ["my shopping bag", "landing/checkout"],
     ["a trip assistant", "landing/assistant"],
     ["a weather dashboard", "demo-mode"],
+    ["notification settings with a language picker", "account-settings"],
+    ["my order history", "order-history"],
     ["", "demo-mode"],
   ])("%j → %s", (prompt, screen) => {
     expect(model.route(prompt)).toBe(screen);

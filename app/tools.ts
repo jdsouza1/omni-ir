@@ -35,4 +35,10 @@ export const TOOLS: ToolRegistry = {
   "assistant.ask": z.strictObject({
     question: z.string().trim().min(1).max(500),
   }),
+  // Account settings (fixtures/account-settings.omni): a Select's choice and two Switches.
+  "settings.update": z.strictObject({
+    language: z.string().trim().min(1).max(40),
+    orderUpdates: z.boolean(),
+    promotions: z.boolean(),
+  }),
 };

@@ -1,0 +1,9 @@
+# Omni-IR: past orders in a table, one line per row, with a notice about a late one.
+root = Card([title, late, orders, help])
+title = Heading("Order history")
+late = Notice("Order A1B2-7740 will arrive a day later than planned.", tone="warning", title="Running late")
+orders = Table(["Order", "Placed", "Items", "Status"], [o1, o2, o3])
+o1 = TableRow(["A1B2-7740", "Oct 3", 2, "Delayed"])
+o2 = TableRow(["A1B2-7731", "Sep 28", 1, "Shipped"])
+o3 = TableRow(["A1B2-7702", "Sep 12", 3, "Delivered"])
+help = Button("Contact support", variant="secondary")

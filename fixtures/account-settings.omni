@@ -1,0 +1,17 @@
+# Omni-IR: account settings in tabs, with a language choice, notification switches and a governed Save.
+root = Card([title, tabs, note, actions])
+title = Heading("Account settings")
+tabs = Tabs([general, alerts])
+general = Tab("General", [language, zone])
+$language = "English"
+language = Select($language, label="Language", options=["English", "Español", "Français", "Deutsch"])
+zone = Text("Times are shown in your device's time zone.", tone="muted")
+alerts = Tab("Notifications", [orderUpdates, promotions])
+$orderUpdates = true
+orderUpdates = Switch($orderUpdates, label="Order updates")
+$promotions = false
+promotions = Switch($promotions, label="Offers and promotions")
+note = Notice("Changes apply on every device you're signed in on.")
+actions = Stack([save], direction="row")
+save = Button("Save settings", action="saveSettings")
+saveSettings = McpMutation(save, tool="settings.update", params={language: $language, orderUpdates: $orderUpdates, promotions: $promotions})

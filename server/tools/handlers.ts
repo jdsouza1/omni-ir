@@ -21,4 +21,5 @@ export const STUB_HANDLERS: Readonly<Record<string, ToolHandler>> = {
   "bookings.reserve": async ({ checkIn, checkOut }) => ({ stub: true, bookingId: id("bkg"), checkIn, checkOut, status: "held" }),
   // A real handler would ask a model; the stub answers without one, so it costs nothing.
   "assistant.ask": async () => ({ stub: true, answer: "This is a stub answer. Connect a real handler to answer questions." }),
+  "settings.update": async (settings) => ({ stub: true, saved: true, settings }),
 };

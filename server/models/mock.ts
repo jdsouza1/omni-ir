@@ -19,6 +19,8 @@ const SCREENS: { id: string; keywords: string[] }[] = [
   { id: "payment-confirmation", keywords: ["pay", "payment", "payments", "checkout", "purchase", "confirm", "confirmation", "billing"] },
   { id: "sign-in", keywords: ["login", "log", "signin", "sign", "auth", "authenticate"] },
   { id: "profile-settings", keywords: ["profile", "settings", "account", "preferences"] },
+  { id: "account-settings", keywords: ["notifications", "notification", "language", "alerts", "toggle", "switch", "tabs"] },
+  { id: "order-history", keywords: ["history", "past", "previous", "table", "invoices"] },
   { id: "order-status", keywords: ["order", "orders", "track", "tracking", "shipping", "delivery", "shipment", "package"] },
   { id: "support-contact", keywords: ["support", "help", "contact", "ticket"] },
   // The landing page examples.
