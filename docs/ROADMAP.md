@@ -1,6 +1,6 @@
 # Omni-IR roadmap
 
-Updated 2026-09-30. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
+Updated 2026-10-04. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
 
 ## Done
 
