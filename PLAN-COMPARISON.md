@@ -88,6 +88,18 @@ So this plan **extends OpenUI's published benchmark** (same seven scenarios, sam
 **E. Optional, not scheduled** *(only if the owner decides to; costs money)*
 - [ ] E.1 Omni-IR on Thesys's 46 briefs × 4 runs (184 paid API runs). Not run unless the owner gives the go-ahead.
 
+## Decisions
+
+**2026-10-04 · Keep Omni-IR's explicit, flat syntax (owner's decision).**
+- **Considered:** making Omni-IR smaller by adopting OpenUI Lang's positional arguments (about 4% fewer tokens on the model-check screens) and nested components (about 10% fewer on form-heavy screens).
+- **Decided:** no change. The saving is small in practice. A typical screen is about 200 tokens, so 4% is about 8 tokens. Per component the two formats are already close (19.3 against 18.1 tokens in the reliability run); the 2.4× difference in reply length came from what the model built, not the syntax.
+- **Why:**
+  - Positional arguments let a model put values in the wrong order and still be valid, and skipped props need `null`.
+  - Nesting breaks the flat-lines rule (CLAUDE.md constraint 1). A nested line can only be drawn once it is complete, and one bad nested part rejects the whole line.
+  - Named props keep the stream readable and each issue tied to one line.
+- **Revisit if:** a customer has a real token-budget constraint at high volume. The lowest-risk option then would be positional arguments for the first one or two props only.
+- **Follow-up:** re-run the size and reliability comparison after the catalog expansion, when Omni-IR's screens can be as rich as OpenUI's.
+
 ## What I needed from you
 Answered 2026-10-01: "a thorough comparison", with a visual.
 
