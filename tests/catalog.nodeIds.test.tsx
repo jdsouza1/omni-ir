@@ -8,7 +8,19 @@ import { renderOmni } from "./renderHelpers";
 afterEach(cleanup);
 
 const LINES = [
-  "root = Stack([card, badge, divider, skel, actions, media])",
+  "root = Stack([card, badge, divider, skel, actions, media, more])",
+  "more = Stack([pick, toggle, plans, tabs, notice])",
+  '$size = ""',
+  'pick = Select($size, label="Size", options=["S", "M"])',
+  "$on = false",
+  'toggle = Switch($on, label="News")',
+  'plans = Table(["Plan", "Price"], [basic])',
+  'basic = TableRow(["Basic", 12])',
+  "tabs = Tabs([tabA, tabB])",
+  'tabA = Tab("A", [inA])',
+  'inA = Text("In A")',
+  'tabB = Tab("B", [])',
+  'notice = Notice("Saved.", tone="success")',
   "media = Stack([photo, stars, when, items, msg])",
   'photo = Image("cabin-pines", alt="A cabin")',
   "stars = Rating(4.5)",

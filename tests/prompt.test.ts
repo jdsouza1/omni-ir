@@ -59,6 +59,14 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain("A Skeleton is only a placeholder");
   });
 
+  it("explains the Step 10 components: Select and Switch state, one line per table row, Tabs and Notice tones", () => {
+    expect(prompt).toContain("A Select picks one option and edits a text state");
+    expect(prompt).toContain("A Switch turns a setting on or off and edits a true/false state");
+    expect(prompt).toContain("A Table holds only TableRows, one line per row, each with one cell per column");
+    expect(prompt).toContain("Tabs hold only Tab components");
+    expect(prompt).toContain("A Notice shows a short message in a box");
+  });
+
   it("includes at least two examples, and every example parses with no errors, warnings or issues", () => {
     const examples = examplesIn(prompt);
     expect(examples.length).toBeGreaterThanOrEqual(2);

@@ -1,5 +1,6 @@
 // The Trusted Catalog. These components own all styling (class names in omni.css); nothing from the
 // stream can add classes, styles or markup. Text is always rendered as a React text node.
+import { Children, useId, useState, type KeyboardEvent } from "react";
 import type { CatalogProps } from "./types.js";
 
 export function Stack({ id, props, children }: CatalogProps<"Stack">) {
@@ -192,6 +193,150 @@ export function Message({ id, props }: CatalogProps<"Message">) {
     <div data-node-id={id} className={`omni-message omni-message--${props.from}`}>
       <span className="omni-visually-hidden">{props.from === "user" ? "You: " : "Assistant: "}</span>
       {display(props.text)}
+    </div>
+  );
+}
+
+export function Select({ id, props, value, onChange }: CatalogProps<"Select">) {
+  // A value that isn't one of the options shows as nothing chosen.
+  const chosen = props.options.includes(value) ? value : "";
+  return (
+    <label data-node-id={id} className="omni-input">
+      <span className="omni-input__label">{props.label}</span>
+      <select className="omni-input__field omni-select" value={chosen} onChange={(e) => onChange(e.target.value)}>
+        <option value="" disabled>
+          {props.placeholder ?? ""}
+        </option>
+        {props.options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+export function Switch({ id, props, value, onChange }: CatalogProps<"Switch">) {
+  const labelId = useId();
+  return (
+    <div data-node-id={id} className="omni-switch">
+      <span id={labelId} className="omni-switch__label">
+        {props.label}
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={value}
+        aria-labelledby={labelId}
+        className={`omni-switch__track${value ? " omni-switch__track--on" : ""}`}
+        onClick={() => onChange(!value)}
+      >
+        <span className="omni-switch__thumb" aria-hidden="true" />
+      </button>
+    </div>
+  );
+}
+
+// An ARIA table made of divs, like List: placeholders and fallbacks can appear among the rows.
+export function Table({ id, props, children }: CatalogProps<"Table">) {
+  return (
+    <div data-node-id={id} className="omni-table-wrap">
+      <div
+        className="omni-table"
+        role="table"
+        style={{ gridTemplateColumns: `repeat(${props.columns.length}, minmax(max-content, 1fr))` }}
+      >
+        <div className="omni-table__row omni-table__row--head" role="row">
+          {props.columns.map((column, i) => (
+            <span key={i} className="omni-table__heading" role="columnheader">
+              {column}
+            </span>
+          ))}
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export function TableRow({ id, props, locale }: CatalogProps<"TableRow">) {
+  return (
+    <div data-node-id={id} className="omni-table__row" role="row">
+      {props.cells.map((cell, i) => (
+        <span key={i} className={`omni-table__cell${typeof cell === "number" ? " omni-table__cell--number" : ""}`} role="cell">
+          {typeof cell === "number" ? cell.toLocaleString(locale) : cell}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+export function Tabs({ id, tabs, children }: CatalogProps<"Tabs">) {
+  const base = useId();
+  const [picked, setPicked] = useState<string | undefined>(undefined);
+  // The first Tab is open until the viewer picks another; a pick survives the stream growing.
+  const open = picked !== undefined && tabs.some((t) => t.id === picked) ? picked : tabs[0]?.id;
+  const panels = Children.toArray(children);
+  const tabId = (i: number) => `${base}-tab-${i}`;
+  const panelId = (i: number) => `${base}-panel-${i}`;
+
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const current = tabs.findIndex((t) => t.id === open);
+    const next =
+      e.key === "ArrowRight" ? (current + 1) % tabs.length
+      : e.key === "ArrowLeft" ? (current - 1 + tabs.length) % tabs.length
+      : e.key === "Home" ? 0
+      : e.key === "End" ? tabs.length - 1
+      : -1;
+    if (next < 0 || tabs.length === 0) return;
+    e.preventDefault();
+    setPicked(tabs[next]!.id);
+    document.getElementById(tabId(next))?.focus();
+  };
+
+  return (
+    <div data-node-id={id} className="omni-tabs">
+      <div className="omni-tabs__list" role="tablist" onKeyDown={onKeyDown}>
+        {tabs.map((t, i) => (
+          <button
+            key={t.id}
+            id={tabId(i)}
+            type="button"
+            role="tab"
+            aria-selected={t.id === open}
+            aria-controls={panelId(i)}
+            tabIndex={t.id === open ? 0 : -1}
+            className={`omni-tabs__tab${t.id === open ? " omni-tabs__tab--open" : ""}`}
+            onClick={() => setPicked(t.id)}
+          >
+            {t.label ?? "…"}
+          </button>
+        ))}
+      </div>
+      {panels.map((panel, i) => (
+        <div key={tabs[i]?.id ?? i} id={panelId(i)} role="tabpanel" aria-labelledby={tabId(i)} hidden={tabs[i]?.id !== open} className="omni-tabs__panel">
+          {panel}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function Tab({ id, children }: CatalogProps<"Tab">) {
+  // The label is shown by the Tabs above; a Tab draws its content.
+  return (
+    <div data-node-id={id} className="omni-tab">
+      {children}
+    </div>
+  );
+}
+
+export function Notice({ id, props }: CatalogProps<"Notice">) {
+  return (
+    <div data-node-id={id} className={`omni-notice omni-notice--${props.tone ?? "info"}`} role="note">
+      {props.title !== undefined && <strong className="omni-notice__title">{display(props.title)}</strong>}
+      <span className="omni-notice__text">{display(props.text)}</span>
     </div>
   );
 }
