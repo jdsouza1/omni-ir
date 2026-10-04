@@ -1,6 +1,6 @@
 # Omni-IR roadmap
 
-Updated 2026-10-02. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
+Updated 2026-10-04. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
 
 ## Done
 
@@ -45,6 +45,15 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 ## Go-to-market strategy
 
 Added 2026-10-02 from the owner's plan. These phases are business stages, numbered separately from the technical phases above (GTM 1–4). Notes in *italics* record where the work stands.
+
+### Before going to market: confirm the positioning (to do)
+
+Added 2026-10-04; revisit when go-to-market starts. The format comparison ([docs/COMPARISON.md](COMPARISON.md)) found that Omni-IR doesn't win on size (OpenUI Lang is 4–10% smaller) but differs in control and trust: governed actions with checked params, no logic or URLs from the model, a conformance suite and native renderers. In the reliability run, asked for an account-deletion button with no tool for it, Omni-IR left it unwired while OpenUI Lang wired it to an invented action. The assumption that buyers value this enough to choose or pay for it needs confirming before it leads the messaging. In order of cost:
+
+- [ ] **Buyer conversations:** 8–10 short interviews with GTM 3 targets (people who own AI rollouts, security or compliance) and 2–3 agency clients, asking about past behaviour ("Have you blocked or delayed an AI feature over security? What did you need to approve it?"). The assumption holds if several describe the pain unprompted.
+- [ ] **Message test on the landing page:** a control-and-safety headline against a speed or size headline, compared on call-to-action clicks. Needs the GTM 1 lead capture first.
+- [ ] **Demand signals:** how often AI governance, guardrails or LLM security appear in job posts, RFPs and analyst reports, and whether similar projects add governance features.
+- [ ] **A paid pilot:** one agency or enterprise client paying for a governed Trusted Catalog, the strongest confirmation.
 
 ### GTM 1 · Establish the open-source funnel (authority and lead generation)
 
