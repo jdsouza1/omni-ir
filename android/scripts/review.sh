@@ -6,12 +6,18 @@ APP=dev.omniir.demo
 mkdir -p review/screenshots
 adb install -r demo/build/outputs/apk/debug/demo-debug.apk >/dev/null
 adb shell settings put system font_scale 1.0
+# On a slow CI emulator the home app can stall and raise "isn't responding" over every screenshot:
+# don't show system error dialogs, and close any that are already up before each shot.
+adb shell settings put global hide_error_dialogs 1 || true
 
 shot() {
   local name=$1; shift
   adb shell am force-stop "$APP"
+  adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS >/dev/null 2>&1 || true
   adb shell am start -W -n "$APP/.MainActivity" "$@" >/dev/null
   sleep 4
+  adb shell am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS >/dev/null 2>&1 || true
+  sleep 1
   adb exec-out screencap -p > "review/screenshots/$name.png"
   echo "screenshot $name"
 }
