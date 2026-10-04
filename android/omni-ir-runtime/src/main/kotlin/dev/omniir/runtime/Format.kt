@@ -2,6 +2,7 @@
 package dev.omniir.runtime
 
 import dev.omniir.core.Primitive
+import dev.omniir.core.PropValue
 import dev.omniir.core.isIsoDate
 import java.text.NumberFormat
 import java.time.Instant
@@ -36,6 +37,23 @@ public object Format {
     }
     return displayText(value)
   }
+
+  /** A Table's column headings or a TableRow's cells as text; anything else is an empty list. */
+  public fun texts(value: PropValue?): List<String> =
+    (value as? PropValue.ListOf)?.items?.map { (it as? PropValue.Text)?.value ?: "" } ?: emptyList()
+
+  /** A table cell: numbers are aligned to the end of their column. */
+  public data class Cell(val text: String, val isNumber: Boolean)
+
+  /** A TableRow's cells: text as is, numbers in the viewer's locale. */
+  public fun cells(value: PropValue?, locale: Locale): List<Cell> =
+    (value as? PropValue.ListOf)?.items?.map {
+      when (it) {
+        is PropValue.Number -> Cell(NumberFormat.getNumberInstance(locale).format(it.value), true)
+        is PropValue.Text -> Cell(it.value, false)
+        else -> Cell("", false)
+      }
+    } ?: emptyList()
 
   /** A Rating, kept within 0…max. */
   public data class RatingModel(

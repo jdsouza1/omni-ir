@@ -2,6 +2,7 @@
 // isn't drawing (resolving $state, governance, actions). Port of swift/Sources/OmniIRSwiftUI/Model.
 package dev.omniir.runtime
 
+import dev.omniir.core.ComponentType
 import dev.omniir.core.Issue
 import dev.omniir.core.IssueCode
 import dev.omniir.core.Mutation
@@ -138,6 +139,17 @@ public class OmniStore(
 
   /** The text held by an Input's or DateInput's `$key` ("" when it holds anything else). */
   public fun stateText(key: String, doc: OmniDocument = document.value): String = (doc.state[key] as? Primitive.Text)?.value ?: ""
+
+  /** A Switch's `$key`: true only when it holds `true`. */
+  public fun stateBool(key: String, doc: OmniDocument = document.value): Boolean = (doc.state[key] as? Primitive.Bool)?.value == true
+
+  /** A Select's chosen option, or "" when its `$key` holds anything that isn't one of the options. */
+  public fun chosenOption(key: String, options: List<String>, doc: OmniDocument = document.value): String =
+    stateText(key, doc).takeIf { it in options } ?: ""
+
+  /** The labels of a Tabs' children, in order; null for a Tab that hasn't arrived yet. */
+  public fun tabLabels(ids: List<String>, doc: OmniDocument = document.value): List<String?> =
+    ids.map { id -> doc.nodes[id]?.takeIf { it.type == ComponentType.TAB }?.let { (it.props["label"] as? PropValue.Text)?.value } }
 
   /** A local edit (R1): it never calls the backend by itself. */
   public fun setState(key: String, value: Primitive): Unit = synchronized(lock) {

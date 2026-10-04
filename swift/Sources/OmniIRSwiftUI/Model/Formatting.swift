@@ -20,6 +20,32 @@ enum Format {
     return displayText(value)
   }
 
+  // MARK: Tables
+
+  /// A Table's column headings or a TableRow's cells; anything else is an empty list.
+  static func texts(_ value: PropValue?) -> [String] {
+    guard case .list(let items)? = value else { return [] }
+    return items.map { if case .text(let s) = $0 { s } else { "" } }
+  }
+
+  struct Cell: Equatable {
+    let text: String
+    /// Numbers are aligned to the end of their column.
+    let isNumber: Bool
+  }
+
+  /// A TableRow's cells: text as is, numbers in the viewer's locale.
+  static func cells(_ value: PropValue?, locale: Locale) -> [Cell] {
+    guard case .list(let items)? = value else { return [] }
+    return items.map { item in
+      switch item {
+      case .number(let n): Cell(text: n.formatted(.number.locale(locale)), isNumber: true)
+      case .text(let s): Cell(text: s, isNumber: false)
+      default: Cell(text: "", isNumber: false)
+      }
+    }
+  }
+
   // MARK: Rating
 
   struct RatingModel: Equatable {
