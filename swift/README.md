@@ -7,17 +7,17 @@ Native Omni-IR for iPhone, iPad and Mac. A model writes flat, line-oriented Omni
 | `OmniIRCore` | The parser: line buffer, tokenizer, validation, document. Foundation only. | iOS, macOS, Linux, Windows |
 | `OmniIRSwiftUI` | `OmniView` (the renderer), `OmniStore`, McpMutation governance, and `OmniClient` for an Omni-IR server. | iOS 17+, macOS 14+ |
 
-The parser passes the same [conformance suite](../conformance/README.md) as the TypeScript implementation (all 63 cases, with the input split at every chunk size tested), so both treat every stream identically.
+The parser passes the same [conformance suite](../conformance/README.md) as the TypeScript implementation (all 73 cases, with the input split at every chunk size tested), so both treat every stream identically.
 
 ## Install
 
 In Xcode: **File → Add Package Dependencies…**, enter `https://github.com/jdsouza1/omni-ir`, and add `OmniIRSwiftUI` to your app. In a `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/jdsouza1/omni-ir", branch: "main")
+.package(url: "https://github.com/jdsouza1/omni-ir", from: "0.2.0")
 ```
 
-The current release tag (`v0.1.0`) predates the Swift package, so use `main` until the next release.
+`0.2.0` is the first release that includes the Swift package (the `v0.1.0` tag predates it). Use the same version for the server that writes your streams: older parsers reject newer components.
 
 ## Usage
 
