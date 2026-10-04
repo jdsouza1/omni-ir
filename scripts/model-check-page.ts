@@ -44,10 +44,19 @@ export async function bundle(): Promise<{ js: string; css: string }> {
   return { js, css };
 }
 
-export async function renderPage(): Promise<string> {
+/** Step 10 (PLAN-CATALOG.md, C.3): requests that need the new components. `-- --step10` builds the page with these. */
+export const STEP10_REQUESTS = [
+  { id: "account-settings", text: "Account settings with a language choice and on/off switches for email notifications, split into tabs." },
+  { id: "order-history", text: "My last three orders in a table, with their dates, number of items and status." },
+  { id: "shipping-speed", text: "A form to choose a shipping speed (standard, express or overnight) and confirm it." },
+  { id: "maintenance", text: "A warning that the app will be down for maintenance tonight, with a button to contact support." },
+  { id: "plan-compare", text: "Compare three subscription plans by price and features, and let me pick one.", probe: "Asks for a choice the app has no tool for. A good reply shows the table and a choice, but doesn't invent a tool to change the plan." },
+];
+
+export async function renderPage(requests: readonly { id: string; text: string; probe?: string }[] = REQUESTS): Promise<string> {
   const { js, css } = await bundle();
   const firstMessage = `${buildSystemPrompt()}\n\n---\nThose are your instructions for this chat. I'll send screen requests next, one per message. For this first message, reply with just this comment line:\n# ready`;
-  const data = JSON.stringify({ firstMessage, requests: REQUESTS });
+  const data = JSON.stringify({ firstMessage, requests });
   // Replacement functions, not strings: the bundle contains "$'" and similar, which a string would expand.
   return PAGE.replace("/*OMNI_CSS*/", () => css.replace(/<\/(style)/gi, "<\\/$1"))
     .replace("/*OMNI_DATA*/", () => escapeScript(data))
@@ -118,7 +127,7 @@ const PAGE = String.raw`<meta charset="utf-8">
   <header>
     <div class="eyebrow">Free model check</div>
     <h1>How well does Claude write Omni-IR?</h1>
-    <p class="muted">Run nine screen requests in your own Claude.ai chat (free plan is fine, no API key, nothing billed), paste each reply here, and this page checks it with the real Omni-IR parser and renders it with the Trusted Catalog. Nothing you paste leaves this page.</p>
+    <p class="muted">Run the screen requests below in your own Claude.ai chat (free plan is fine, no API key, nothing billed), paste each reply here, and this page checks it with the real Omni-IR parser and renders it with the Trusted Catalog. Nothing you paste leaves this page.</p>
     <div class="facts"><span class="fact">real parser and catalog</span><span class="fact">same tools and pictures as the app</span><span class="fact">replies stay in your browser</span></div>
   </header>
 
@@ -226,6 +235,7 @@ const PAGE = String.raw`<meta charset="utf-8">
 
 if (process.argv[1]?.endsWith("model-check-page.ts")) {
   const out = process.argv[2] ?? "model-check.html";
-  writeFileSync(out, await renderPage());
+  const requests = process.argv.includes("--step10") ? STEP10_REQUESTS : REQUESTS;
+  writeFileSync(out, await renderPage(requests));
   console.log(`wrote ${out}`);
 }
