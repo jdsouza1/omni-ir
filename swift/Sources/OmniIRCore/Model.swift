@@ -50,6 +50,8 @@ public enum PropValue: Sendable, Hashable {
   case ref(String)
   /// McpMutation params.
   case record([String: PropValue])
+  /// A list of plain values, such as a Select's options or a TableRow's cells.
+  case list([PropValue])
 }
 
 /// An accepted component. `props` never contains `children`; they are in `children`, in order.

@@ -56,35 +56,56 @@ internal fun validateDocument(statements: List<Statement>, complete: Boolean): L
     }
   }
 
-  // Inputs edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD date or "".
+  // Inputs and Selects edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD
+  // date or ""; Switches need true or false.
   for (n in nodes) {
-    if (n.type != ComponentType.INPUT && n.type != ComponentType.DATE_INPUT) continue
+    if (n.type !in STATE_EDITORS) continue
     val key = (n.props["value"] as? PropValue.State)?.key ?: continue
     val value = state[key] ?: continue
     val text = (value as? Primitive.Text)?.value
-    val ok = if (n.type == ComponentType.INPUT) text != null else text != null && (text.isEmpty() || isIsoDate(text))
-    if (!ok) {
-      val message = if (n.type == ComponentType.INPUT) "Input \"${n.id}\" is bound to $key, which is not a string"
-      else "DateInput \"${n.id}\" is bound to $key, which is not a YYYY-MM-DD date or \"\""
-      issues += Issue(IssueCode.INPUT_STATE_TYPE, message, n.id)
+    val message = when (n.type) {
+      ComponentType.INPUT, ComponentType.SELECT ->
+        if (text != null) null else "${n.type.wireName} \"${n.id}\" is bound to $key, which is not a string"
+      ComponentType.SWITCH ->
+        if (value is Primitive.Bool) null else "Switch \"${n.id}\" is bound to $key, which is not true or false"
+      else ->
+        if (text != null && (text.isEmpty() || isIsoDate(text))) null
+        else "DateInput \"${n.id}\" is bound to $key, which is not a YYYY-MM-DD date or \"\""
     }
+    if (message != null) issues += Issue(IssueCode.INPUT_STATE_TYPE, message, n.id)
   }
 
-  // A List holds only ListItems, and a ListItem only sits in a List.
-  for (n in nodes) {
-    if (n.type == ComponentType.LIST) {
-      for (child in n.children) {
-        val c = node(child)
-        if (c != null && c.type != ComponentType.LIST_ITEM) {
-          issues += Issue(IssueCode.LIST_MISMATCH, "List \"${n.id}\" can only contain ListItems, not ${c.type.wireName} \"$child\"", n.id)
+  // Containers with one kind of item: a List holds only ListItems, a Table only TableRows and Tabs
+  // only Tab; each item sits only in its container. Reported on whichever line arrives second.
+  for (pair in CONTAINER_PAIRS) {
+    for (n in nodes) {
+      if (n.type == pair.container) {
+        for (child in n.children) {
+          val c = node(child)
+          if (c != null && c.type != pair.item) {
+            issues += Issue(pair.code, "${pair.container.wireName} \"${n.id}\" can only contain ${pair.item.wireName}s, not ${c.type.wireName} \"$child\"", n.id)
+          }
+        }
+      }
+      if (n.type == pair.item) {
+        val parent = parentOf[n.id]
+        val p = parent?.let(::node)
+        if (p != null && p.type != pair.container) {
+          issues += Issue(pair.code, "${pair.item.wireName} \"${n.id}\" must be inside a ${pair.container.wireName}, not ${p.type.wireName} \"$parent\"", n.id)
         }
       }
     }
-    if (n.type == ComponentType.LIST_ITEM) {
-      val parent = parentOf[n.id]
-      val p = parent?.let(::node)
-      if (p != null && p.type != ComponentType.LIST) {
-        issues += Issue(IssueCode.LIST_MISMATCH, "ListItem \"${n.id}\" must be inside a List, not ${p.type.wireName} \"$parent\"", n.id)
+  }
+
+  // A TableRow has one cell per column of its Table.
+  for (n in nodes) {
+    if (n.type != ComponentType.TABLE) continue
+    val columns = (n.props["columns"] as? PropValue.ListOf)?.items?.size ?: continue
+    for (child in n.children) {
+      val row = node(child) ?: continue
+      val cells = (row.props["cells"] as? PropValue.ListOf)?.items?.size ?: continue
+      if (row.type == ComponentType.TABLE_ROW && cells != columns) {
+        issues += Issue(IssueCode.TABLE_MISMATCH, "TableRow \"$child\" has $cells cell(s), but Table \"${n.id}\" has $columns column(s)", child)
       }
     }
   }
@@ -143,3 +164,14 @@ internal fun stateKeys(values: Map<String, PropValue>): List<String> =
 /** `^\d{4}-\d{2}-\d{2}$` with ASCII digits. */
 public fun isIsoDate(s: String): Boolean =
   s.length == 10 && s[4] == '-' && s[7] == '-' && listOf(0, 1, 2, 3, 5, 6, 8, 9).all { s[it] in '0'..'9' }
+
+private val STATE_EDITORS = setOf(ComponentType.INPUT, ComponentType.DATE_INPUT, ComponentType.SELECT, ComponentType.SWITCH)
+
+/** A component that holds only one kind of item, and the issue code for breaking that rule. */
+internal data class ContainerPair(val container: ComponentType, val item: ComponentType, val code: IssueCode)
+
+internal val CONTAINER_PAIRS = listOf(
+  ContainerPair(ComponentType.LIST, ComponentType.LIST_ITEM, IssueCode.LIST_MISMATCH),
+  ContainerPair(ComponentType.TABLE, ComponentType.TABLE_ROW, IssueCode.TABLE_MISMATCH),
+  ContainerPair(ComponentType.TABS, ComponentType.TAB, IssueCode.TABS_MISMATCH),
+)

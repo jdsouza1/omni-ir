@@ -2,7 +2,7 @@
 // which components exist, which props they take, flat syntax, the tool registry and the
 // cross-line document rules. The parser and renderer only use the types exported here.
 import { z } from "zod";
-import type { Issue, RawStatement, RawValue } from "./types.js";
+import type { Issue, IssueCode, RawStatement, RawValue } from "./types.js";
 
 /** Size limits of the protocol (SPEC.md, generated "limits" section). */
 export const LIMITS = {
@@ -20,6 +20,8 @@ export const LIMITS = {
   toolNameLength: 128,
   /** Longest action name. */
   actionNameLength: 64,
+  /** Most columns in a Table, and cells in a TableRow. */
+  tableColumns: 8,
 } as const;
 
 export const MAX_TEXT = LIMITS.text;
@@ -57,6 +59,8 @@ export type NodeRef = z.infer<typeof NodeRef>;
 const Text = z.string().max(MAX_TEXT);
 const TextOrState = z.union([Text, StateRef]);
 const Children = z.array(NodeRef).max(MAX_CHILDREN);
+/** The visible name of a form control or tab. */
+const Label = z.string().min(1).max(200);
 const ActionName = z.string().regex(/^[a-z][A-Za-z0-9_]*$/, "not a valid action name").max(LIMITS.actionNameLength);
 const ToolName = z
   .string()
@@ -186,6 +190,51 @@ export const COMPONENTS = {
     props: z.strictObject({
       text: TextOrState,
       from: z.enum(["user", "assistant"]),
+    }),
+  },
+  Select: {
+    positional: ["value"],
+    props: z.strictObject({
+      /** The text state holding the chosen option; "" (or any value not in options) means nothing chosen. */
+      value: StateRef,
+      label: Label,
+      options: z.array(z.string().min(1).max(200)).min(1).max(50),
+      placeholder: z.string().max(200).optional(),
+    }),
+  },
+  Switch: {
+    positional: ["value"],
+    props: z.strictObject({ value: StateRef, label: Label }),
+  },
+  Table: {
+    positional: ["columns", "children"],
+    props: z.strictObject({
+      columns: z.array(z.string().min(1).max(200)).min(1).max(LIMITS.tableColumns),
+      /** TableRows, one line each. */
+      children: Children,
+    }),
+  },
+  TableRow: {
+    positional: ["cells"],
+    props: z.strictObject({
+      /** One cell per column of its Table; numbers are aligned to the end. */
+      cells: z.array(z.union([Text, z.number().finite()])).min(1).max(LIMITS.tableColumns),
+    }),
+  },
+  Tabs: {
+    positional: ["children"],
+    props: z.strictObject({ children: Children }),
+  },
+  Tab: {
+    positional: ["label", "children"],
+    props: z.strictObject({ label: Label, children: Children }),
+  },
+  Notice: {
+    positional: ["text"],
+    props: z.strictObject({
+      text: TextOrState,
+      tone: z.enum(["info", "success", "warning", "danger"]).optional(),
+      title: TextOrState.optional(),
     }),
   },
 } as const satisfies Record<string, { positional: readonly string[]; props: z.ZodObject }>;
@@ -420,6 +469,13 @@ function fail(err: unknown, id: string): StatementResult {
 // Document-level validation
 // ---------------------------------------------------------------------------
 
+/** Components that hold only one kind of item, and the issue code for breaking that rule. */
+export const CONTAINER_PAIRS = [
+  { container: "List", item: "ListItem", code: "list_mismatch" },
+  { container: "Table", item: "TableRow", code: "table_mismatch" },
+  { container: "Tabs", item: "Tab", code: "tabs_mismatch" },
+] as const satisfies readonly { container: ComponentType; item: ComponentType; code: IssueCode }[];
+
 /** True when a node triggers a backend mutation and therefore must be wrapped by an McpMutation. */
 export function isMutating(node: OmniNode): boolean {
   return node.type === "Button" && node.props.action !== undefined;
@@ -507,14 +563,18 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
     }
   }
 
-  // Inputs edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD date or "".
+  // Inputs and Selects edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD
+  // date or ""; Switches need true or false.
   for (const node of nodes) {
-    if (node.type !== "Input" && node.type !== "DateInput") continue;
+    if (node.type !== "Input" && node.type !== "DateInput" && node.type !== "Select" && node.type !== "Switch") continue;
     const key = node.props.value.key;
     if (!state.has(key)) continue;
     const value = state.get(key);
-    if (node.type === "Input" && typeof value !== "string") {
-      issues.push({ code: "input_state_type", message: `Input "${node.id}" is bound to ${key}, which is not a string`, id: node.id });
+    if ((node.type === "Input" || node.type === "Select") && typeof value !== "string") {
+      issues.push({ code: "input_state_type", message: `${node.type} "${node.id}" is bound to ${key}, which is not a string`, id: node.id });
+    }
+    if (node.type === "Switch" && typeof value !== "boolean") {
+      issues.push({ code: "input_state_type", message: `Switch "${node.id}" is bound to ${key}, which is not true or false`, id: node.id });
     }
     if (node.type === "DateInput" && !(value === "" || (typeof value === "string" && ISO_DATE.test(value)))) {
       issues.push({
@@ -525,21 +585,39 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
     }
   }
 
-  // A List holds only ListItems, and a ListItem only sits in a List.
-  for (const node of nodes) {
-    if (node.type === "List") {
-      for (const child of node.children) {
-        const c = byId.get(child);
-        if (c?.kind === "node" && c.type !== "ListItem") {
-          issues.push({ code: "list_mismatch", message: `List "${node.id}" can only contain ListItems, not ${c.type} "${child}"`, id: node.id });
+  // Containers with one kind of item: a List holds only ListItems, a Table only TableRows and Tabs
+  // only Tab; each item sits only in its container. Reported on whichever line arrives second.
+  for (const pair of CONTAINER_PAIRS) {
+    for (const node of nodes) {
+      if (node.type === pair.container) {
+        for (const child of node.children) {
+          const c = byId.get(child);
+          if (c?.kind === "node" && c.type !== pair.item) {
+            issues.push({ code: pair.code, message: `${pair.container} "${node.id}" can only contain ${pair.item}s, not ${c.type} "${child}"`, id: node.id });
+          }
+        }
+      }
+      if (node.type === pair.item) {
+        const parent = parentOf.get(node.id);
+        const p = parent === undefined ? undefined : byId.get(parent);
+        if (p?.kind === "node" && p.type !== pair.container) {
+          issues.push({ code: pair.code, message: `${pair.item} "${node.id}" must be inside a ${pair.container}, not ${p.type} "${parent}"`, id: node.id });
         }
       }
     }
-    if (node.type === "ListItem") {
-      const parent = parentOf.get(node.id);
-      const p = parent === undefined ? undefined : byId.get(parent);
-      if (p?.kind === "node" && p.type !== "List") {
-        issues.push({ code: "list_mismatch", message: `ListItem "${node.id}" must be inside a List, not ${p.type} "${parent}"`, id: node.id });
+  }
+
+  // A TableRow has one cell per column of its Table.
+  for (const node of nodes) {
+    if (node.type !== "Table") continue;
+    for (const child of node.children) {
+      const row = byId.get(child);
+      if (row?.kind === "node" && row.type === "TableRow" && row.props.cells.length !== node.props.columns.length) {
+        issues.push({
+          code: "table_mismatch",
+          message: `TableRow "${child}" has ${row.props.cells.length} cell(s), but Table "${node.id}" has ${node.props.columns.length} column(s)`,
+          id: child,
+        });
       }
     }
   }

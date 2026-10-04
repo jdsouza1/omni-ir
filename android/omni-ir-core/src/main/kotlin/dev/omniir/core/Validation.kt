@@ -179,6 +179,10 @@ private fun accepts(spec: ValueSpec, value: Value): Boolean = when (spec) {
   is ValueSpec.RefList -> value is Value.Arr &&
     (spec.maxItems == null || value.items.size <= spec.maxItems) &&
     value.items.all { it is Value.Ref && isIdentifier(it.id) }
+  is ValueSpec.ListOf -> value is Value.Arr &&
+    (spec.minItems == null || value.items.size >= spec.minItems) &&
+    (spec.maxItems == null || value.items.size <= spec.maxItems) &&
+    value.items.all { accepts(spec.item, it) }
   is ValueSpec.Record -> value is Value.Obj &&
     value.entries.all { (key, item) -> accepts(spec.key, Value.Text(key)) && key !in Catalog.reservedWords && accepts(spec.value, item) }
 }
@@ -220,6 +224,6 @@ private fun propValue(value: Value): PropValue = when (value) {
   Value.Null -> PropValue.Null
   is Value.Ref -> PropValue.Ref(value.id)
   is Value.State -> PropValue.State(value.key)
-  is Value.Arr -> PropValue.Null // only children are lists, and they are taken out before this
+  is Value.Arr -> PropValue.ListOf(value.items.map(::propValue)) // children are taken out before this
   is Value.Obj -> PropValue.Record(value.entries.associate { it.first to propValue(it.second) })
 }

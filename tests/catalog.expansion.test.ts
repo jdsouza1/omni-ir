@@ -41,7 +41,7 @@ describe("Select", () => {
   });
 
   it("edits text state: a Select bound to a boolean is input_state_type", () => {
-    expect(issues("root = Stack([s])", "$size = true", 's = Select($size, label="Size", options=["S", "M"])')).toEqual(["3:input_state_type"]);
+    expect(issues("root = Stack([s])", "$size = true", 's = Select($size, label="Size", options=["S", "M"])')).toEqual(["3:input_state_type", "1:dangling_ref"]);
     expect(issues("root = Stack([s])", '$size = "M"', 's = Select($size, label="Size", options=["S", "M"])')).toEqual([]);
   });
 
@@ -60,7 +60,7 @@ describe("Switch", () => {
   });
 
   it("edits true/false state: a Switch bound to text is input_state_type", () => {
-    expect(issues("root = Stack([w])", '$news = "yes"', 'w = Switch($news, label="News")')).toEqual(["3:input_state_type"]);
+    expect(issues("root = Stack([w])", '$news = "yes"', 'w = Switch($news, label="News")')).toEqual(["3:input_state_type", "1:dangling_ref"]);
     expect(issues("root = Stack([w])", "$news = false", 'w = Switch($news, label="News")')).toEqual([]);
   });
 });

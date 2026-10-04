@@ -22,6 +22,13 @@ public enum class ComponentType(public val wireName: String) {
   LIST("List"),
   LIST_ITEM("ListItem"),
   MESSAGE("Message"),
+  SELECT("Select"),
+  SWITCH("Switch"),
+  TABLE("Table"),
+  TABLE_ROW("TableRow"),
+  TABS("Tabs"),
+  TAB("Tab"),
+  NOTICE("Notice"),
   ;
 
   public companion object {
@@ -52,8 +59,10 @@ public enum class IssueCode(
   ROOT_AS_CHILD("root_as_child", IssueSeverity.ERROR, IssueStage.LINE, "root is listed as a child."),
   CHILD_NOT_COMPONENT("child_not_component", IssueSeverity.ERROR, IssueStage.LINE, "A children list names an McpMutation."),
   UNKNOWN_ASSET("unknown_asset", IssueSeverity.ERROR, IssueStage.LINE, "An Image or ListItem names a picture that isn't in the app's asset registry."),
-  INPUT_STATE_TYPE("input_state_type", IssueSeverity.ERROR, IssueStage.LINE, "An Input is bound to state that doesn't hold text, or a DateInput to state that isn't a YYYY-MM-DD date or empty."),
+  INPUT_STATE_TYPE("input_state_type", IssueSeverity.ERROR, IssueStage.LINE, "An Input or Select is bound to state that doesn't hold text, a DateInput to state that isn't a YYYY-MM-DD date or empty, or a Switch to state that isn't true or false."),
   LIST_MISMATCH("list_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A List contains something other than ListItems, or a ListItem is outside a List."),
+  TABLE_MISMATCH("table_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns."),
+  TABS_MISMATCH("tabs_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A Tabs contains something other than Tab, or a Tab is outside a Tabs."),
   DUPLICATE_MUTATION("duplicate_mutation", IssueSeverity.ERROR, IssueStage.LINE, "A button that already has an McpMutation gets a second one."),
   DANGLING_REF("dangling_ref", IssueSeverity.ERROR, IssueStage.END, "A referenced component or McpMutation target never arrived."),
   MISSING_STATE("missing_state", IssueSeverity.ERROR, IssueStage.END, "A \$state key is used but never declared."),
@@ -76,6 +85,7 @@ public object Limits {
   public const val STATE_KEY_LENGTH: Int = 65
   public const val TOOL_NAME_LENGTH: Int = 128
   public const val ACTION_NAME_LENGTH: Int = 64
+  public const val TABLE_COLUMNS: Int = 8
 }
 
 internal object Catalog {
@@ -194,6 +204,56 @@ internal object Catalog {
       props = listOf(
         PropSpec("text", required = true, value = ValueSpec.AnyOf(listOf(ValueSpec.TextValue(minLength = null, maxLength = 2000, pattern = null), ValueSpec.State))),
         PropSpec("from", required = true, value = ValueSpec.OneOf(listOf("user", "assistant"))),
+      ),
+    ),
+    ComponentType.SELECT to ComponentSpec(
+      positional = listOf("value"),
+      props = listOf(
+        PropSpec("value", required = true, value = ValueSpec.State),
+        PropSpec("label", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
+        PropSpec("options", required = true, value = ValueSpec.ListOf(item = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null), minItems = 1, maxItems = 50)),
+        PropSpec("placeholder", required = false, value = ValueSpec.TextValue(minLength = null, maxLength = 200, pattern = null)),
+      ),
+    ),
+    ComponentType.SWITCH to ComponentSpec(
+      positional = listOf("value"),
+      props = listOf(
+        PropSpec("value", required = true, value = ValueSpec.State),
+        PropSpec("label", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
+      ),
+    ),
+    ComponentType.TABLE to ComponentSpec(
+      positional = listOf("columns", "children"),
+      props = listOf(
+        PropSpec("columns", required = true, value = ValueSpec.ListOf(item = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null), minItems = 1, maxItems = 8)),
+        PropSpec("children", required = true, value = ValueSpec.RefList(maxItems = 200)),
+      ),
+    ),
+    ComponentType.TABLE_ROW to ComponentSpec(
+      positional = listOf("cells"),
+      props = listOf(
+        PropSpec("cells", required = true, value = ValueSpec.ListOf(item = ValueSpec.AnyOf(listOf(ValueSpec.TextValue(minLength = null, maxLength = 2000, pattern = null), ValueSpec.NumberValue(minimum = null, maximum = null, integer = false))), minItems = 1, maxItems = 8)),
+      ),
+    ),
+    ComponentType.TABS to ComponentSpec(
+      positional = listOf("children"),
+      props = listOf(
+        PropSpec("children", required = true, value = ValueSpec.RefList(maxItems = 200)),
+      ),
+    ),
+    ComponentType.TAB to ComponentSpec(
+      positional = listOf("label", "children"),
+      props = listOf(
+        PropSpec("label", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
+        PropSpec("children", required = true, value = ValueSpec.RefList(maxItems = 200)),
+      ),
+    ),
+    ComponentType.NOTICE to ComponentSpec(
+      positional = listOf("text"),
+      props = listOf(
+        PropSpec("text", required = true, value = ValueSpec.AnyOf(listOf(ValueSpec.TextValue(minLength = null, maxLength = 2000, pattern = null), ValueSpec.State))),
+        PropSpec("tone", required = false, value = ValueSpec.OneOf(listOf("info", "success", "warning", "danger"))),
+        PropSpec("title", required = false, value = ValueSpec.AnyOf(listOf(ValueSpec.TextValue(minLength = null, maxLength = 2000, pattern = null), ValueSpec.State))),
       ),
     ),
   )

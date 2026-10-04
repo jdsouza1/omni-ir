@@ -30,6 +30,8 @@ indirect enum ValueSpec: Sendable {
   case ref
   /// A list of component ids (children).
   case refList(maxItems: Int?)
+  /// A list of plain values, such as a Select's options or a TableRow's cells.
+  case list(item: ValueSpec, minItems: Int?, maxItems: Int?)
   /// An object with checked keys and values (McpMutation params).
   case record(key: ValueSpec, value: ValueSpec)
   /// Any of these.

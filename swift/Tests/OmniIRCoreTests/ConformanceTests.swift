@@ -122,6 +122,7 @@ func json(_ v: PropValue) -> JSON {
   case .state(let key): .object(["state": .string(key)])
   case .ref(let id): .string(id)
   case .record(let r): .object(r.mapValues(json))
+  case .list(let items): .array(items.map(json))
   }
 }
 

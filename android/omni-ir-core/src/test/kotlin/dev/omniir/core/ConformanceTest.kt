@@ -83,6 +83,7 @@ private fun plain(v: PropValue): Any? = when (v) {
   is PropValue.State -> mapOf("state" to v.key)
   is PropValue.Ref -> v.id
   is PropValue.Record -> v.entries.mapValues { plain(it.value) }
+  is PropValue.ListOf -> v.items.map(::plain)
 }
 
 private fun run(case: Case, chunkSize: Int?): Canonical {

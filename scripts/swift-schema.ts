@@ -25,6 +25,7 @@ interface Def {
   pattern?: string;
   minimum?: number;
   maximum?: number;
+  minItems?: number;
   maxItems?: number;
 }
 interface Shape {
@@ -45,6 +46,9 @@ const lit = (s: string) => JSON.stringify(s); // a JSON string is a valid Swift 
 const opt = (n: number | undefined) => (n === undefined ? "nil" : String(n));
 const camel = (s: string) => s.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
 const lowerFirst = (s: string) => s[0]!.toLowerCase() + s.slice(1);
+/** A component's enum case name; a Swift keyword (such as `switch`) is escaped where it is declared. */
+const SWIFT_KEYWORDS = new Set(["switch", "case", "default", "if", "else", "for", "while", "return", "class", "struct", "enum"]);
+const caseDecl = (t: string) => (SWIFT_KEYWORDS.has(lowerFirst(t)) ? `\`${lowerFirst(t)}\`` : lowerFirst(t));
 
 /** One JSON Schema definition as a Swift `ValueSpec` expression. */
 function valueSpec(d: Def): string {
@@ -56,6 +60,7 @@ function valueSpec(d: Def): string {
   if (d.type === "object" && d.properties?.kind?.const === "state") return ".state";
   if (d.type === "object" && d.properties?.kind?.const === "ref") return ".ref";
   if (d.type === "array" && d.items?.properties?.kind?.const === "ref") return `.refList(maxItems: ${opt(d.maxItems)})`;
+  if (d.type === "array" && d.items) return `.list(item: ${valueSpec(d.items)}, minItems: ${opt(d.minItems)}, maxItems: ${opt(d.maxItems)})`;
   if (d.type === "object" && d.propertyNames && typeof d.additionalProperties === "object") {
     return `.record(key: ${valueSpec(d.propertyNames)}, value: ${valueSpec(d.additionalProperties)})`;
   }
@@ -101,7 +106,7 @@ public let omniIRVersion = ${lit(schema.version)}
 
 /// The components in the Trusted Catalog.
 public enum ComponentType: String, Sendable, CaseIterable, Hashable {
-${types.map((t) => `  case ${lowerFirst(t)} = ${lit(t)}`).join("\n")}
+${types.map((t) => `  case ${caseDecl(t)} = ${lit(t)}`).join("\n")}
 }
 
 /// Every error and warning a parser reports.

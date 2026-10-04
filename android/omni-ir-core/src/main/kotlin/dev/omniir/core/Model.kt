@@ -48,6 +48,9 @@ public sealed interface PropValue {
 
   /** McpMutation params. */
   public data class Record(val entries: Map<String, PropValue>) : PropValue
+
+  /** A list of plain values, such as a Select's options or a TableRow's cells. */
+  public data class ListOf(val items: List<PropValue>) : PropValue
 }
 
 /** An accepted component. `props` never contains `children`; they are in `children`, in order. */

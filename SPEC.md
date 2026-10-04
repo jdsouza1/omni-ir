@@ -123,6 +123,12 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.18]** A List MUST contain only ListItems, and a ListItem MUST be a child of a List. Breaking either rule is a `list_mismatch` error, reported on whichever of the two lines arrives second.
 - **[5.19]** A DateInput's first argument is the `$key` it edits, and that state MUST hold a date written `"YYYY-MM-DD"` or the empty string. Anything else is an `input_state_type` error, reported as in [5.12].
 
+### Choices, tables and tabs
+
+- **[5.20]** A Select's first argument is the `$key` it edits, and that state MUST hold text; a Switch's first argument is the `$key` it edits, and that state MUST be `true` or `false`. Anything else is an `input_state_type` error, reported as in [5.12]. A Select's value that isn't one of its `options` is not an error: the Select shows nothing chosen.
+- **[5.21]** A Table MUST contain only TableRows, and a TableRow MUST be a child of a Table. Each TableRow MUST have exactly as many cells as its Table has columns. Breaking any of these is a `table_mismatch` error, reported on whichever of the two lines arrives second.
+- **[5.22]** A Tabs MUST contain only Tab components, and a Tab MUST be a child of a Tabs. Breaking either rule is a `tabs_mismatch` error, reported on whichever of the two lines arrives second.
+
 ### Actions
 
 - **[5.13]** A Button with an `action` triggers a backend action. It MUST be governed by exactly one McpMutation by the end of the stream; otherwise it is an `ungoverned_mutation` error. A second McpMutation for the same Button is a `duplicate_mutation` error.
@@ -306,6 +312,84 @@ Message(text, from)
 |---|---|---|---|
 | `text` | 1 | yes | text (max 2000) \| $state |
 | `from` | named only | yes | "user" \| "assistant" |
+
+### Select
+
+```
+Select(value, label, options, placeholder?)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `value` | 1 | yes | $state |
+| `label` | named only | yes | text (min 1, max 200) |
+| `options` | named only | yes | [text (min 1, max 200), …] (max 50) |
+| `placeholder` | named only | no | text (max 200) |
+
+### Switch
+
+```
+Switch(value, label)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `value` | 1 | yes | $state |
+| `label` | named only | yes | text (min 1, max 200) |
+
+### Table
+
+```
+Table(columns, children)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `columns` | 1 | yes | [text (min 1, max 200), …] (max 8) |
+| `children` | 2 | yes | [id, …] (max 200) |
+
+### TableRow
+
+```
+TableRow(cells)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `cells` | 1 | yes | [text (max 2000) \| number, …] (max 8) |
+
+### Tabs
+
+```
+Tabs(children)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `children` | 1 | yes | [id, …] (max 200) |
+
+### Tab
+
+```
+Tab(label, children)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `label` | 1 | yes | text (min 1, max 200) |
+| `children` | 2 | yes | [id, …] (max 200) |
+
+### Notice
+
+```
+Notice(text, tone?, title?)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `text` | 1 | yes | text (max 2000) \| $state |
+| `tone` | named only | no | "info" \| "success" \| "warning" \| "danger" |
+| `title` | named only | no | text (max 2000) \| $state |
 <!-- /generated:components -->
 
 ### McpMutation
@@ -346,8 +430,10 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 | `root_as_child` | error | when the line arrives | root is listed as a child. |
 | `child_not_component` | error | when the line arrives | A children list names an McpMutation. |
 | `unknown_asset` | error | when the line arrives | An Image or ListItem names a picture that isn't in the app's asset registry. |
-| `input_state_type` | error | when the line arrives | An Input is bound to state that doesn't hold text, or a DateInput to state that isn't a YYYY-MM-DD date or empty. |
+| `input_state_type` | error | when the line arrives | An Input or Select is bound to state that doesn't hold text, a DateInput to state that isn't a YYYY-MM-DD date or empty, or a Switch to state that isn't true or false. |
 | `list_mismatch` | error | when the line arrives | A List contains something other than ListItems, or a ListItem is outside a List. |
+| `table_mismatch` | error | when the line arrives | A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns. |
+| `tabs_mismatch` | error | when the line arrives | A Tabs contains something other than Tab, or a Tab is outside a Tabs. |
 | `duplicate_mutation` | error | when the line arrives | A button that already has an McpMutation gets a second one. |
 | `dangling_ref` | error | at end of stream | A referenced component or McpMutation target never arrived. |
 | `missing_state` | error | at end of stream | A $state key is used but never declared. |
@@ -378,8 +464,14 @@ These rules apply to anything that displays an Omni-IR screen. There are three r
 - *Tested by:* `tests/renderer.test.tsx`, `tests/e2e.payment.test.tsx`.
 
 **Input and state**
-- Typing into an Input or choosing a date in a DateInput MUST update its `$key`, and every component using that key MUST show the new value. Editing state is local and MUST NOT call the backend by itself.
-- *Tested by:* `tests/renderer.test.tsx`, `tests/components.media.test.tsx`.
+- Typing into an Input, choosing a date in a DateInput, choosing an option in a Select or flipping a Switch MUST update its `$key`, and every component using that key MUST show the new value. Editing state is local and MUST NOT call the backend by itself.
+- A Select whose value isn't one of its options MUST show nothing chosen (its `placeholder`, if any).
+- *Tested by:* `tests/renderer.test.tsx`, `tests/components.media.test.tsx`, `tests/components.expansion.test.tsx`.
+
+**Tables and tabs**
+- A Table MUST present its column headings and rows as a table to assistive technology. On a screen too narrow for its columns it SHOULD scroll sideways rather than squeeze or cut off cells. Number cells SHOULD be aligned to the end.
+- Tabs MUST show the first Tab's content until the viewer picks another Tab. Which Tab is open is the viewer's own choice: it is not `$state`, and nothing in the stream changes it. A renderer MUST keep the open Tab while the stream grows. Tabs MUST be reachable and switchable from the keyboard where the platform has one.
+- *Tested by:* `tests/components.expansion.test.tsx`.
 
 **Pictures and accessibility**
 - A renderer MUST take an Image's picture only from the app's asset registry, and MUST NOT load a picture from any location written in the stream. It SHOULD send no referrer when loading pictures.
@@ -445,6 +537,7 @@ Adding to the catalog is a change too. Because the catalog is strict ([5.9]), a 
 | Characters in a $state key, including the $ | 65 |
 | Characters in a tool name | 128 |
 | Characters in a Button action name | 64 |
+| Columns in a Table, and cells in a TableRow | 8 |
 <!-- /generated:limits -->
 
 Individual props have their own limits, listed in section 6.
