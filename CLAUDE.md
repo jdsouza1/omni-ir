@@ -52,5 +52,8 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - CI: `.github/workflows/ci.yml` runs `npm ci`, typecheck, `npm test`, `playground:build` and the package checks (build, pack check, install test) on Node 22 and 24, `swift test` on Linux and macOS plus an iOS simulator build, and the Kotlin parser and runtime tests on Linux (mock model only, no secrets). Node 22.22+ / 24.15+ required.
 - Vite runs with `--configLoader runner` (in the npm scripts and the dev-server test); without it Vite warns about extensionless imports in the config. On Windows, `timeout`/stopping a background task can leave `node.exe` servers running: check and stop leftovers before `npm ci`.
 
+## Open core (owner's decision, 2026-10-04)
+This repository is public and is the open standard. Business material (go-to-market strategy, pricing, client work, delivery tooling, the hosted service) lives in a separate private repository and must never be written here: not in docs, plans, commit messages or examples.
+
 ## License
 Apache-2.0.
