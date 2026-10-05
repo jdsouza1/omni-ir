@@ -37,10 +37,16 @@ gantt
     Bi-directional AST sync tooling :p6, 2027-08-01, 2027-11-01
 ```
 
-Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead of their 2027 dates. Phase 4 starts with a written goal for the AST sync tooling.
+Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead of their 2027 dates. Phase 4 starts with a written goal for the AST sync tooling, after the steps below.
 
-## Not yet scheduled
+## Next, in priority order
 
-- Charts (Step 11): the remaining gap found by the format comparison; a big build on three platforms, so it gets its own plan.
-- Real backend tool handlers with authorization, in place of the stubs.
-- A written goal for the bi-directional AST sync tooling, before that work starts.
+1. **Step 11 · Charts** (plan drafted: PLAN-CHARTS.md). BarChart, LineChart and PieChart with Series and Slice, one line per series. The model sends titles, labels and numbers only; each renderer owns colours, tooltips and animation with a fixed palette checked for colour blindness. Expected to cover 5 of the 7 OpenUI scenarios in the comparison (from 3).
+2. **Step 12 · Transport standard.** Make SPEC.md §10 normative: the exact Server-Sent Events, reconnecting, and how errors and governed actions are reported, with transport conformance cases. Map the same events onto WebSockets, and add an adapter for [AG-UI](https://docs.ag-ui.com/concepts), the event protocol many agent frameworks speak, so they can stream Omni-IR without custom work. Starts with a short research step on the current AG-UI spec.
+3. **Real backend tool handlers with authorization**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 12, since both concern the server side.
+4. **Step 13 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+
+## Later
+
+- **Eject to code**, only when a client asks: export a screen as readable React (then SwiftUI) that keeps calling the same checked tool layer. Built per project when there is demand; the benchmark's React converter is a starting point. Until then, Omni-IR is open source (Apache-2.0), so no one is locked in.
+- **Phase 4 · Bi-directional AST sync**, starting with a written goal (see the timeline above).
