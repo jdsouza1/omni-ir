@@ -14,9 +14,11 @@ export const CHART_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba
 /** Line charts also tell series apart by dash pattern, so colour is never the only cue. */
 const DASHES = ["", "6 4", "2 3", "10 3 2 3", "1 4", "12 4"] as const;
 
-const W = 400;
+const W = 360;
 const H = 220;
-const PAD = { top: 12, right: 12, bottom: 28, left: 52 };
+const PAD = { top: 12, right: 8, bottom: 30, left: 48 };
+/** The pie chart's own square canvas. */
+const PIE = 200;
 
 export function formatValue(value: number, props: ChartFormatProps, locale: string): string {
   try {
@@ -24,6 +26,18 @@ export function formatValue(value: number, props: ChartFormatProps, locale: stri
     // Percent values are percentages already: 62 is 62%.
     if (props.format === "percent") return new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value) + "%";
     return new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(value);
+  } catch {
+    return String(value);
+  }
+}
+
+/** An axis tick, written short: $20K rather than $20,000.00. */
+export function formatTick(value: number, props: ChartFormatProps, locale: string): string {
+  try {
+    const compact = { notation: "compact", maximumFractionDigits: 1 } as const;
+    if (props.format === "currency") return new Intl.NumberFormat(locale, { style: "currency", currency: props.currency ?? "USD", ...compact }).format(value);
+    if (props.format === "percent") return new Intl.NumberFormat(locale, compact).format(value) + "%";
+    return new Intl.NumberFormat(locale, compact).format(value);
   } catch {
     return String(value);
   }
@@ -192,7 +206,7 @@ function XYChart({ kind, id, props, series, children, locale }: CatalogProps<"Ba
           <g key={t}>
             <line x1={PAD.left} x2={W - PAD.right} y1={y(t)} y2={y(t)} className={t === 0 ? "omni-chart__baseline" : "omni-chart__grid"} />
             <text x={PAD.left - 6} y={y(t)} className="omni-chart__tick" textAnchor="end" dominantBaseline="middle">
-              {formatValue(t, props, locale)}
+              {formatTick(t, props, locale)}
             </text>
           </g>
         ))}
@@ -219,9 +233,9 @@ export function PieChart({ id, props, slices, children, locale }: CatalogProps<"
   const [active, setActive] = useState<string>("");
   const arrived = slices.flatMap((s, i) => (s ? [{ ...s, index: i }] : []));
   const total = arrived.reduce((sum, s) => sum + s.value, 0);
-  const cx = W / 2;
-  const cy = H / 2;
-  const r = H / 2 - 12;
+  const cx = PIE / 2;
+  const cy = PIE / 2;
+  const r = PIE / 2 - 4;
   const share = (v: number) => (total > 0 ? `${new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format((v / total) * 100)}%` : "0%");
   let angle = -Math.PI / 2;
   const arcs = arrived.map((s) => {
@@ -262,7 +276,7 @@ export function PieChart({ id, props, slices, children, locale }: CatalogProps<"
         </DataTable>
       }
     >
-      <svg viewBox={`0 0 ${W} ${H}`} className="omni-chart__svg" aria-hidden="true" onMouseLeave={() => setActive("")}>
+      <svg viewBox={`0 0 ${PIE} ${PIE}`} className="omni-chart__svg omni-chart__svg--pie" aria-hidden="true" onMouseLeave={() => setActive("")}>
         {arcs}
       </svg>
     </ChartFrame>
