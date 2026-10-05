@@ -68,7 +68,16 @@ public object Format {
 
   /** An axis tick, written short: $20K rather than $20,000.00. */
   public fun chartTick(value: Double, format: String?, currency: String?, locale: Locale): String {
-    val compact = NumberFormat.getCompactNumberInstance(locale, NumberFormat.Style.SHORT).apply { maximumFractionDigits = 1 }.format(value)
+    // Android's java.text has no compact number format (desktop Java 12+ does), so it's done here:
+    // thousands, millions and billions as K, M and B, with at most one decimal.
+    val magnitude = kotlin.math.abs(value)
+    val (scaled, suffix) = when {
+      magnitude >= 1e9 -> value / 1e9 to "B"
+      magnitude >= 1e6 -> value / 1e6 to "M"
+      magnitude >= 1e3 -> value / 1e3 to "K"
+      else -> value to ""
+    }
+    val compact = NumberFormat.getNumberInstance(locale).apply { maximumFractionDigits = 1 }.format(scaled) + suffix
     return when (format) {
       "currency" -> (try { Currency.getInstance(currency ?: "USD").getSymbol(locale) } catch (e: IllegalArgumentException) { "" }) + compact
       "percent" -> "$compact%"
