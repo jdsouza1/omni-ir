@@ -22,6 +22,12 @@ export const LIMITS = {
   actionNameLength: 64,
   /** Most columns in a Table, and cells in a TableRow. */
   tableColumns: 8,
+  /** Most labels in a BarChart or LineChart, and values in a Series. */
+  chartLabels: 24,
+  /** Most Series in a BarChart or LineChart. */
+  chartSeries: 6,
+  /** Most Slices in a PieChart. */
+  chartSlices: 8,
 } as const;
 
 export const MAX_TEXT = LIMITS.text;
@@ -74,6 +80,20 @@ const AssetName = z
   .regex(ASSET_NAME, "asset names are lowercase letters, digits and hyphens");
 export const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const IsoDate = z.string().regex(ISO_DATE, "dates are written YYYY-MM-DD");
+const CurrencyCode = z.string().regex(/^[A-Z]{3}$/, "currency must be an ISO 4217 code");
+
+// Charts carry data only: a title, labels and numbers. Colours, styles, tooltips and animation are
+// the renderer's, so the props below are all there is.
+const ChartFormat = z.enum(["number", "currency", "percent"]);
+const XYChartProps = z.strictObject({
+  /** Names the chart for everyone, including screen readers. */
+  title: z.string().min(1).max(200),
+  labels: z.array(z.string().min(1).max(60)).min(1).max(LIMITS.chartLabels),
+  /** Series, one line each. */
+  children: z.array(NodeRef).max(LIMITS.chartSeries),
+  format: ChartFormat.optional(),
+  currency: CurrencyCode.optional(),
+});
 
 // ---------------------------------------------------------------------------
 // The Trusted Catalog vocabulary. Every prop is an enum or plain text: there is no
@@ -235,6 +255,39 @@ export const COMPONENTS = {
       text: TextOrState,
       tone: z.enum(["info", "success", "warning", "danger"]).optional(),
       title: TextOrState.optional(),
+    }),
+  },
+  BarChart: {
+    positional: ["title", "labels", "children"],
+    props: XYChartProps,
+  },
+  LineChart: {
+    positional: ["title", "labels", "children"],
+    props: XYChartProps,
+  },
+  PieChart: {
+    positional: ["title", "children"],
+    props: z.strictObject({
+      title: z.string().min(1).max(200),
+      /** Slices, one line each. */
+      children: z.array(NodeRef).max(LIMITS.chartSlices),
+      format: ChartFormat.optional(),
+      currency: CurrencyCode.optional(),
+    }),
+  },
+  Series: {
+    positional: ["name", "values"],
+    props: z.strictObject({
+      name: z.string().min(1).max(200),
+      /** One number per label of its chart. */
+      values: z.array(z.number().finite()).min(1).max(LIMITS.chartLabels),
+    }),
+  },
+  Slice: {
+    positional: ["name", "value"],
+    props: z.strictObject({
+      name: z.string().min(1).max(200),
+      value: z.number().finite().min(0),
     }),
   },
 } as const satisfies Record<string, { positional: readonly string[]; props: z.ZodObject }>;
@@ -471,10 +524,12 @@ function fail(err: unknown, id: string): StatementResult {
 
 /** Components that hold only one kind of item, and the issue code for breaking that rule. */
 export const CONTAINER_PAIRS = [
-  { container: "List", item: "ListItem", code: "list_mismatch" },
-  { container: "Table", item: "TableRow", code: "table_mismatch" },
-  { container: "Tabs", item: "Tab", code: "tabs_mismatch" },
-] as const satisfies readonly { container: ComponentType; item: ComponentType; code: IssueCode }[];
+  { containers: ["List"], item: "ListItem", code: "list_mismatch" },
+  { containers: ["Table"], item: "TableRow", code: "table_mismatch" },
+  { containers: ["Tabs"], item: "Tab", code: "tabs_mismatch" },
+  { containers: ["BarChart", "LineChart"], item: "Series", code: "chart_mismatch" },
+  { containers: ["PieChart"], item: "Slice", code: "chart_mismatch" },
+] as const satisfies readonly { containers: readonly ComponentType[]; item: ComponentType; code: IssueCode }[];
 
 /** True when a node triggers a backend mutation and therefore must be wrapped by an McpMutation. */
 export function isMutating(node: OmniNode): boolean {
@@ -588,21 +643,37 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
   // Containers with one kind of item: a List holds only ListItems, a Table only TableRows and Tabs
   // only Tab; each item sits only in its container. Reported on whichever line arrives second.
   for (const pair of CONTAINER_PAIRS) {
+    const containers: readonly string[] = pair.containers;
     for (const node of nodes) {
-      if (node.type === pair.container) {
+      if (containers.includes(node.type)) {
         for (const child of node.children) {
           const c = byId.get(child);
           if (c?.kind === "node" && c.type !== pair.item) {
-            issues.push({ code: pair.code, message: `${pair.container} "${node.id}" can only contain ${pair.item}s, not ${c.type} "${child}"`, id: node.id });
+            issues.push({ code: pair.code, message: `${node.type} "${node.id}" can only contain ${pair.item}s, not ${c.type} "${child}"`, id: node.id });
           }
         }
       }
       if (node.type === pair.item) {
         const parent = parentOf.get(node.id);
         const p = parent === undefined ? undefined : byId.get(parent);
-        if (p?.kind === "node" && p.type !== pair.container) {
-          issues.push({ code: pair.code, message: `${pair.item} "${node.id}" must be inside a ${pair.container}, not ${p.type} "${parent}"`, id: node.id });
+        if (p?.kind === "node" && !containers.includes(p.type)) {
+          issues.push({ code: pair.code, message: `${pair.item} "${node.id}" must be inside a ${containers.join(" or ")}, not ${p.type} "${parent}"`, id: node.id });
         }
+      }
+    }
+  }
+
+  // A Series has one value per label of its BarChart or LineChart.
+  for (const node of nodes) {
+    if (node.type !== "BarChart" && node.type !== "LineChart") continue;
+    for (const child of node.children) {
+      const series = byId.get(child);
+      if (series?.kind === "node" && series.type === "Series" && series.props.values.length !== node.props.labels.length) {
+        issues.push({
+          code: "chart_mismatch",
+          message: `Series "${child}" has ${series.props.values.length} value(s), but ${node.type} "${node.id}" has ${node.props.labels.length} label(s)`,
+          id: child,
+        });
       }
     }
   }

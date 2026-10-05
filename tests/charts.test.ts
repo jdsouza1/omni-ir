@@ -20,7 +20,8 @@ function issues(...lines: string[]): string[] {
   });
   parser.write(lines.join("\n") + "\n");
   parser.end();
-  return out;
+  // Distinct, as the conformance suite compares them: one line may break two rules with the same code.
+  return [...new Set(out)];
 }
 
 const labels = (n: number) => arr(...Array.from({ length: n }, (_, i) => str(`L${i + 1}`)));

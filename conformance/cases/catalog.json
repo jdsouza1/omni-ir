@@ -3703,6 +3703,1257 @@
           "$s": ""
         }
       }
+    },
+    {
+      "id": "catalog-BarChart",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of BarChart: 6 accepted lines and 49 rejected ones. Generated from schema.json.",
+      "input": [
+        "root = Stack([a1, a2, a3, a4, a5, a6])\n$s = \"\"\na1 = BarChart(\"Hello\", [\"Hello\"], [])\na2 = BarChart(\"Hello\", [\"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\"], [])\na3 = BarChart(\"Hello\", [\"Hello\"], [], format=\"number\")\na4 = BarChart(\"Hello\", [\"Hello\"], [], format=\"currency\")\na5 = BarChart(\"Hello\", [\"Hello\"], [], format=\"percent\")\na6 = BarChart(\"Hello\", [\"Hello\"], [], currency=\"EUR\")\nr1 = BarChart(true, [\"Hello\"], [])\nr2 = BarChart(null, [\"Hello\"], [])\nr3 = BarChart(4, [\"Hello\"], [])\nr4 = BarChart(1.5, [\"Hello\"], [])\nr5 = BarChart($s, [\"Hello\"], [])\nr6 = BarChart([], [\"Hello\"], [])\nr7 = BarChart(other, [\"Hello\"], [])\nr8 = BarChart(\"",
+        {
+          "repeat": "x",
+          "times": 201
+        },
+        "\", [\"Hello\"], [])\nr9 = BarChart(\"\", [\"Hello\"], [])\nr10 = BarChart(labels=[\"Hello\"], children=[])\nr11 = BarChart(\"Hello\", true, [])\nr12 = BarChart(\"Hello\", null, [])\nr13 = BarChart(\"Hello\", \"nope\", [])\nr14 = BarChart(\"Hello\", 4, [])\nr15 = BarChart(\"Hello\", 1.5, [])\nr16 = BarChart(\"Hello\", $s, [])\nr17 = BarChart(\"Hello\", [], [])\nr18 = BarChart(\"Hello\", other, [])\nr19 = BarChart(\"Hello\", [true], [])\nr20 = BarChart(\"Hello\", [\"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\"], [])\nr21 = BarChart(\"Hello\", children=[])\nr22 = BarChart(\"Hello\", [\"Hello\"], true)\nr23 = BarChart(\"Hello\", [\"Hello\"], null)\nr24 = BarChart(\"Hello\", [\"Hello\"], \"nope\")\nr25 = BarChart(\"Hello\", [\"Hello\"], 4)\nr26 = BarChart(\"Hello\", [\"Hello\"], 1.5)\nr27 = BarChart(\"Hello\", [\"Hello\"], $s)\nr28 = BarChart(\"Hello\", [\"Hello\"], other)\nr29 = BarChart(\"Hello\", [\"Hello\"], [c0, c1, c2, c3, c4, c5, c6])\nr30 = BarChart(\"Hello\", [\"Hello\"])\nr31 = BarChart(\"Hello\", [\"Hello\"], [], format=true)\nr32 = BarChart(\"Hello\", [\"Hello\"], [], format=null)\nr33 = BarChart(\"Hello\", [\"Hello\"], [], format=\"nope\")\nr34 = BarChart(\"Hello\", [\"Hello\"], [], format=4)\nr35 = BarChart(\"Hello\", [\"Hello\"], [], format=1.5)\nr36 = BarChart(\"Hello\", [\"Hello\"], [], format=$s)\nr37 = BarChart(\"Hello\", [\"Hello\"], [], format=[])\nr38 = BarChart(\"Hello\", [\"Hello\"], [], format=other)\nr39 = BarChart(\"Hello\", [\"Hello\"], [], currency=true)\nr40 = BarChart(\"Hello\", [\"Hello\"], [], currency=null)\nr41 = BarChart(\"Hello\", [\"Hello\"], [], currency=\"nope\")\nr42 = BarChart(\"Hello\", [\"Hello\"], [], currency=4)\nr43 = BarChart(\"Hello\", [\"Hello\"], [], currency=1.5)\nr44 = BarChart(\"Hello\", [\"Hello\"], [], currency=$s)\nr45 = BarChart(\"Hello\", [\"Hello\"], [], currency=[])\nr46 = BarChart(\"Hello\", [\"Hello\"], [], currency=other)\nr47 = BarChart(\"Hello\", [\"Hello\"], [], currency=\"euro\")\nr48 = BarChart(\"Hello\", [\"Hello\"], [], style=\"color: red\")\nr49 = BarChart(\"Hello\", [\"Hello\"], [], \"extra\")\n"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          },
+          {
+            "line": 25,
+            "code": "invalid_props"
+          },
+          {
+            "line": 26,
+            "code": "invalid_props"
+          },
+          {
+            "line": 27,
+            "code": "invalid_props"
+          },
+          {
+            "line": 28,
+            "code": "invalid_props"
+          },
+          {
+            "line": 29,
+            "code": "invalid_props"
+          },
+          {
+            "line": 30,
+            "code": "invalid_props"
+          },
+          {
+            "line": 31,
+            "code": "invalid_props"
+          },
+          {
+            "line": 32,
+            "code": "invalid_props"
+          },
+          {
+            "line": 33,
+            "code": "invalid_props"
+          },
+          {
+            "line": 34,
+            "code": "invalid_props"
+          },
+          {
+            "line": 35,
+            "code": "invalid_props"
+          },
+          {
+            "line": 36,
+            "code": "invalid_props"
+          },
+          {
+            "line": 37,
+            "code": "invalid_props"
+          },
+          {
+            "line": 38,
+            "code": "invalid_props"
+          },
+          {
+            "line": 39,
+            "code": "invalid_props"
+          },
+          {
+            "line": 40,
+            "code": "invalid_props"
+          },
+          {
+            "line": 41,
+            "code": "invalid_props"
+          },
+          {
+            "line": 42,
+            "code": "invalid_props"
+          },
+          {
+            "line": 43,
+            "code": "invalid_props"
+          },
+          {
+            "line": 44,
+            "code": "invalid_props"
+          },
+          {
+            "line": 45,
+            "code": "invalid_props"
+          },
+          {
+            "line": 46,
+            "code": "invalid_props"
+          },
+          {
+            "line": 47,
+            "code": "invalid_props"
+          },
+          {
+            "line": 48,
+            "code": "invalid_props"
+          },
+          {
+            "line": 49,
+            "code": "invalid_props"
+          },
+          {
+            "line": 50,
+            "code": "invalid_props"
+          },
+          {
+            "line": 51,
+            "code": "invalid_props"
+          },
+          {
+            "line": 52,
+            "code": "invalid_props"
+          },
+          {
+            "line": 53,
+            "code": "invalid_props"
+          },
+          {
+            "line": 54,
+            "code": "invalid_props"
+          },
+          {
+            "line": 55,
+            "code": "invalid_props"
+          },
+          {
+            "line": 56,
+            "code": "invalid_props"
+          },
+          {
+            "line": 57,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6"
+            ]
+          },
+          "a1": {
+            "type": "BarChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ]
+            },
+            "children": []
+          },
+          "a2": {
+            "type": "BarChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello"
+              ]
+            },
+            "children": []
+          },
+          "a3": {
+            "type": "BarChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ],
+              "format": "number"
+            },
+            "children": []
+          },
+          "a4": {
+            "type": "BarChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ],
+              "format": "currency"
+            },
+            "children": []
+          },
+          "a5": {
+            "type": "BarChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ],
+              "format": "percent"
+            },
+            "children": []
+          },
+          "a6": {
+            "type": "BarChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ],
+              "currency": "EUR"
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
+    },
+    {
+      "id": "catalog-LineChart",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of LineChart: 6 accepted lines and 49 rejected ones. Generated from schema.json.",
+      "input": [
+        "root = Stack([a1, a2, a3, a4, a5, a6])\n$s = \"\"\na1 = LineChart(\"Hello\", [\"Hello\"], [])\na2 = LineChart(\"Hello\", [\"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\"], [])\na3 = LineChart(\"Hello\", [\"Hello\"], [], format=\"number\")\na4 = LineChart(\"Hello\", [\"Hello\"], [], format=\"currency\")\na5 = LineChart(\"Hello\", [\"Hello\"], [], format=\"percent\")\na6 = LineChart(\"Hello\", [\"Hello\"], [], currency=\"EUR\")\nr1 = LineChart(true, [\"Hello\"], [])\nr2 = LineChart(null, [\"Hello\"], [])\nr3 = LineChart(4, [\"Hello\"], [])\nr4 = LineChart(1.5, [\"Hello\"], [])\nr5 = LineChart($s, [\"Hello\"], [])\nr6 = LineChart([], [\"Hello\"], [])\nr7 = LineChart(other, [\"Hello\"], [])\nr8 = LineChart(\"",
+        {
+          "repeat": "x",
+          "times": 201
+        },
+        "\", [\"Hello\"], [])\nr9 = LineChart(\"\", [\"Hello\"], [])\nr10 = LineChart(labels=[\"Hello\"], children=[])\nr11 = LineChart(\"Hello\", true, [])\nr12 = LineChart(\"Hello\", null, [])\nr13 = LineChart(\"Hello\", \"nope\", [])\nr14 = LineChart(\"Hello\", 4, [])\nr15 = LineChart(\"Hello\", 1.5, [])\nr16 = LineChart(\"Hello\", $s, [])\nr17 = LineChart(\"Hello\", [], [])\nr18 = LineChart(\"Hello\", other, [])\nr19 = LineChart(\"Hello\", [true], [])\nr20 = LineChart(\"Hello\", [\"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\"], [])\nr21 = LineChart(\"Hello\", children=[])\nr22 = LineChart(\"Hello\", [\"Hello\"], true)\nr23 = LineChart(\"Hello\", [\"Hello\"], null)\nr24 = LineChart(\"Hello\", [\"Hello\"], \"nope\")\nr25 = LineChart(\"Hello\", [\"Hello\"], 4)\nr26 = LineChart(\"Hello\", [\"Hello\"], 1.5)\nr27 = LineChart(\"Hello\", [\"Hello\"], $s)\nr28 = LineChart(\"Hello\", [\"Hello\"], other)\nr29 = LineChart(\"Hello\", [\"Hello\"], [c0, c1, c2, c3, c4, c5, c6])\nr30 = LineChart(\"Hello\", [\"Hello\"])\nr31 = LineChart(\"Hello\", [\"Hello\"], [], format=true)\nr32 = LineChart(\"Hello\", [\"Hello\"], [], format=null)\nr33 = LineChart(\"Hello\", [\"Hello\"], [], format=\"nope\")\nr34 = LineChart(\"Hello\", [\"Hello\"], [], format=4)\nr35 = LineChart(\"Hello\", [\"Hello\"], [], format=1.5)\nr36 = LineChart(\"Hello\", [\"Hello\"], [], format=$s)\nr37 = LineChart(\"Hello\", [\"Hello\"], [], format=[])\nr38 = LineChart(\"Hello\", [\"Hello\"], [], format=other)\nr39 = LineChart(\"Hello\", [\"Hello\"], [], currency=true)\nr40 = LineChart(\"Hello\", [\"Hello\"], [], currency=null)\nr41 = LineChart(\"Hello\", [\"Hello\"], [], currency=\"nope\")\nr42 = LineChart(\"Hello\", [\"Hello\"], [], currency=4)\nr43 = LineChart(\"Hello\", [\"Hello\"], [], currency=1.5)\nr44 = LineChart(\"Hello\", [\"Hello\"], [], currency=$s)\nr45 = LineChart(\"Hello\", [\"Hello\"], [], currency=[])\nr46 = LineChart(\"Hello\", [\"Hello\"], [], currency=other)\nr47 = LineChart(\"Hello\", [\"Hello\"], [], currency=\"euro\")\nr48 = LineChart(\"Hello\", [\"Hello\"], [], style=\"color: red\")\nr49 = LineChart(\"Hello\", [\"Hello\"], [], \"extra\")\n"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          },
+          {
+            "line": 25,
+            "code": "invalid_props"
+          },
+          {
+            "line": 26,
+            "code": "invalid_props"
+          },
+          {
+            "line": 27,
+            "code": "invalid_props"
+          },
+          {
+            "line": 28,
+            "code": "invalid_props"
+          },
+          {
+            "line": 29,
+            "code": "invalid_props"
+          },
+          {
+            "line": 30,
+            "code": "invalid_props"
+          },
+          {
+            "line": 31,
+            "code": "invalid_props"
+          },
+          {
+            "line": 32,
+            "code": "invalid_props"
+          },
+          {
+            "line": 33,
+            "code": "invalid_props"
+          },
+          {
+            "line": 34,
+            "code": "invalid_props"
+          },
+          {
+            "line": 35,
+            "code": "invalid_props"
+          },
+          {
+            "line": 36,
+            "code": "invalid_props"
+          },
+          {
+            "line": 37,
+            "code": "invalid_props"
+          },
+          {
+            "line": 38,
+            "code": "invalid_props"
+          },
+          {
+            "line": 39,
+            "code": "invalid_props"
+          },
+          {
+            "line": 40,
+            "code": "invalid_props"
+          },
+          {
+            "line": 41,
+            "code": "invalid_props"
+          },
+          {
+            "line": 42,
+            "code": "invalid_props"
+          },
+          {
+            "line": 43,
+            "code": "invalid_props"
+          },
+          {
+            "line": 44,
+            "code": "invalid_props"
+          },
+          {
+            "line": 45,
+            "code": "invalid_props"
+          },
+          {
+            "line": 46,
+            "code": "invalid_props"
+          },
+          {
+            "line": 47,
+            "code": "invalid_props"
+          },
+          {
+            "line": 48,
+            "code": "invalid_props"
+          },
+          {
+            "line": 49,
+            "code": "invalid_props"
+          },
+          {
+            "line": 50,
+            "code": "invalid_props"
+          },
+          {
+            "line": 51,
+            "code": "invalid_props"
+          },
+          {
+            "line": 52,
+            "code": "invalid_props"
+          },
+          {
+            "line": 53,
+            "code": "invalid_props"
+          },
+          {
+            "line": 54,
+            "code": "invalid_props"
+          },
+          {
+            "line": 55,
+            "code": "invalid_props"
+          },
+          {
+            "line": 56,
+            "code": "invalid_props"
+          },
+          {
+            "line": 57,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5",
+              "a6"
+            ]
+          },
+          "a1": {
+            "type": "LineChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ]
+            },
+            "children": []
+          },
+          "a2": {
+            "type": "LineChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello",
+                "Hello"
+              ]
+            },
+            "children": []
+          },
+          "a3": {
+            "type": "LineChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ],
+              "format": "number"
+            },
+            "children": []
+          },
+          "a4": {
+            "type": "LineChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ],
+              "format": "currency"
+            },
+            "children": []
+          },
+          "a5": {
+            "type": "LineChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ],
+              "format": "percent"
+            },
+            "children": []
+          },
+          "a6": {
+            "type": "LineChart",
+            "props": {
+              "title": "Hello",
+              "labels": [
+                "Hello"
+              ],
+              "currency": "EUR"
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
+    },
+    {
+      "id": "catalog-PieChart",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of PieChart: 5 accepted lines and 38 rejected ones. Generated from schema.json.",
+      "input": [
+        "root = Stack([a1, a2, a3, a4, a5])\n$s = \"\"\na1 = PieChart(\"Hello\", [])\na2 = PieChart(\"Hello\", [], format=\"number\")\na3 = PieChart(\"Hello\", [], format=\"currency\")\na4 = PieChart(\"Hello\", [], format=\"percent\")\na5 = PieChart(\"Hello\", [], currency=\"EUR\")\nr1 = PieChart(true, [])\nr2 = PieChart(null, [])\nr3 = PieChart(4, [])\nr4 = PieChart(1.5, [])\nr5 = PieChart($s, [])\nr6 = PieChart([], [])\nr7 = PieChart(other, [])\nr8 = PieChart(\"",
+        {
+          "repeat": "x",
+          "times": 201
+        },
+        "\", [])\nr9 = PieChart(\"\", [])\nr10 = PieChart(children=[])\nr11 = PieChart(\"Hello\", true)\nr12 = PieChart(\"Hello\", null)\nr13 = PieChart(\"Hello\", \"nope\")\nr14 = PieChart(\"Hello\", 4)\nr15 = PieChart(\"Hello\", 1.5)\nr16 = PieChart(\"Hello\", $s)\nr17 = PieChart(\"Hello\", other)\nr18 = PieChart(\"Hello\", [c0, c1, c2, c3, c4, c5, c6, c7, c8])\nr19 = PieChart(\"Hello\")\nr20 = PieChart(\"Hello\", [], format=true)\nr21 = PieChart(\"Hello\", [], format=null)\nr22 = PieChart(\"Hello\", [], format=\"nope\")\nr23 = PieChart(\"Hello\", [], format=4)\nr24 = PieChart(\"Hello\", [], format=1.5)\nr25 = PieChart(\"Hello\", [], format=$s)\nr26 = PieChart(\"Hello\", [], format=[])\nr27 = PieChart(\"Hello\", [], format=other)\nr28 = PieChart(\"Hello\", [], currency=true)\nr29 = PieChart(\"Hello\", [], currency=null)\nr30 = PieChart(\"Hello\", [], currency=\"nope\")\nr31 = PieChart(\"Hello\", [], currency=4)\nr32 = PieChart(\"Hello\", [], currency=1.5)\nr33 = PieChart(\"Hello\", [], currency=$s)\nr34 = PieChart(\"Hello\", [], currency=[])\nr35 = PieChart(\"Hello\", [], currency=other)\nr36 = PieChart(\"Hello\", [], currency=\"euro\")\nr37 = PieChart(\"Hello\", [], style=\"color: red\")\nr38 = PieChart(\"Hello\", [], \"extra\")\n"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 8,
+            "code": "invalid_props"
+          },
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          },
+          {
+            "line": 25,
+            "code": "invalid_props"
+          },
+          {
+            "line": 26,
+            "code": "invalid_props"
+          },
+          {
+            "line": 27,
+            "code": "invalid_props"
+          },
+          {
+            "line": 28,
+            "code": "invalid_props"
+          },
+          {
+            "line": 29,
+            "code": "invalid_props"
+          },
+          {
+            "line": 30,
+            "code": "invalid_props"
+          },
+          {
+            "line": 31,
+            "code": "invalid_props"
+          },
+          {
+            "line": 32,
+            "code": "invalid_props"
+          },
+          {
+            "line": 33,
+            "code": "invalid_props"
+          },
+          {
+            "line": 34,
+            "code": "invalid_props"
+          },
+          {
+            "line": 35,
+            "code": "invalid_props"
+          },
+          {
+            "line": 36,
+            "code": "invalid_props"
+          },
+          {
+            "line": 37,
+            "code": "invalid_props"
+          },
+          {
+            "line": 38,
+            "code": "invalid_props"
+          },
+          {
+            "line": 39,
+            "code": "invalid_props"
+          },
+          {
+            "line": 40,
+            "code": "invalid_props"
+          },
+          {
+            "line": 41,
+            "code": "invalid_props"
+          },
+          {
+            "line": 42,
+            "code": "invalid_props"
+          },
+          {
+            "line": 43,
+            "code": "invalid_props"
+          },
+          {
+            "line": 44,
+            "code": "invalid_props"
+          },
+          {
+            "line": 45,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a1",
+              "a2",
+              "a3",
+              "a4",
+              "a5"
+            ]
+          },
+          "a1": {
+            "type": "PieChart",
+            "props": {
+              "title": "Hello"
+            },
+            "children": []
+          },
+          "a2": {
+            "type": "PieChart",
+            "props": {
+              "title": "Hello",
+              "format": "number"
+            },
+            "children": []
+          },
+          "a3": {
+            "type": "PieChart",
+            "props": {
+              "title": "Hello",
+              "format": "currency"
+            },
+            "children": []
+          },
+          "a4": {
+            "type": "PieChart",
+            "props": {
+              "title": "Hello",
+              "format": "percent"
+            },
+            "children": []
+          },
+          "a5": {
+            "type": "PieChart",
+            "props": {
+              "title": "Hello",
+              "currency": "EUR"
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
+    },
+    {
+      "id": "catalog-Series",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of Series: 3 accepted lines and 23 rejected ones. Generated from schema.json.",
+      "input": [
+        "root = Stack([w1, w2, w3])\n$s = \"\"\nw1 = BarChart(\"Chart\", [\"L1\"], [a1])\na1 = Series(\"Hello\", [3])\nw2 = BarChart(\"Chart\", [\"L1\"], [a2])\na2 = Series(\"Hello\", [0.5])\nw3 = BarChart(\"Chart\", [\"L1\", \"L2\", \"L3\", \"L4\", \"L5\", \"L6\", \"L7\", \"L8\", \"L9\", \"L10\", \"L11\", \"L12\", \"L13\", \"L14\", \"L15\", \"L16\", \"L17\", \"L18\", \"L19\", \"L20\", \"L21\", \"L22\", \"L23\", \"L24\"], [a3])\na3 = Series(\"Hello\", [3, 0.5, 3, 0.5, 3, 0.5, 3, 0.5, 3, 0.5, 3, 0.5, 3, 0.5, 3, 0.5, 3, 0.5, 3, 0.5, 3, 0.5, 3, 0.5])\nr1 = Series(true, [3])\nr2 = Series(null, [3])\nr3 = Series(4, [3])\nr4 = Series(1.5, [3])\nr5 = Series($s, [3])\nr6 = Series([], [3])\nr7 = Series(other, [3])\nr8 = Series(\"",
+        {
+          "repeat": "x",
+          "times": 201
+        },
+        "\", [3])\nr9 = Series(\"\", [3])\nr10 = Series(values=[3])\nr11 = Series(\"Hello\", true)\nr12 = Series(\"Hello\", null)\nr13 = Series(\"Hello\", \"nope\")\nr14 = Series(\"Hello\", 4)\nr15 = Series(\"Hello\", 1.5)\nr16 = Series(\"Hello\", $s)\nr17 = Series(\"Hello\", [])\nr18 = Series(\"Hello\", other)\nr19 = Series(\"Hello\", [true])\nr20 = Series(\"Hello\", [\"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\", \"x\"])\nr21 = Series(\"Hello\")\nr22 = Series(\"Hello\", [3], style=\"color: red\")\nr23 = Series(\"Hello\", [3], \"extra\")\n"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          },
+          {
+            "line": 25,
+            "code": "invalid_props"
+          },
+          {
+            "line": 26,
+            "code": "invalid_props"
+          },
+          {
+            "line": 27,
+            "code": "invalid_props"
+          },
+          {
+            "line": 28,
+            "code": "invalid_props"
+          },
+          {
+            "line": 29,
+            "code": "invalid_props"
+          },
+          {
+            "line": 30,
+            "code": "invalid_props"
+          },
+          {
+            "line": 31,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "w1",
+              "w2",
+              "w3"
+            ]
+          },
+          "w1": {
+            "type": "BarChart",
+            "props": {
+              "title": "Chart",
+              "labels": [
+                "L1"
+              ]
+            },
+            "children": [
+              "a1"
+            ]
+          },
+          "a1": {
+            "type": "Series",
+            "props": {
+              "name": "Hello",
+              "values": [
+                3
+              ]
+            },
+            "children": []
+          },
+          "w2": {
+            "type": "BarChart",
+            "props": {
+              "title": "Chart",
+              "labels": [
+                "L1"
+              ]
+            },
+            "children": [
+              "a2"
+            ]
+          },
+          "a2": {
+            "type": "Series",
+            "props": {
+              "name": "Hello",
+              "values": [
+                0.5
+              ]
+            },
+            "children": []
+          },
+          "w3": {
+            "type": "BarChart",
+            "props": {
+              "title": "Chart",
+              "labels": [
+                "L1",
+                "L2",
+                "L3",
+                "L4",
+                "L5",
+                "L6",
+                "L7",
+                "L8",
+                "L9",
+                "L10",
+                "L11",
+                "L12",
+                "L13",
+                "L14",
+                "L15",
+                "L16",
+                "L17",
+                "L18",
+                "L19",
+                "L20",
+                "L21",
+                "L22",
+                "L23",
+                "L24"
+              ]
+            },
+            "children": [
+              "a3"
+            ]
+          },
+          "a3": {
+            "type": "Series",
+            "props": {
+              "name": "Hello",
+              "values": [
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5,
+                3,
+                0.5
+              ]
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
+    },
+    {
+      "id": "catalog-Slice",
+      "rules": [
+        "5.8",
+        "5.9"
+      ],
+      "description": "Every prop of Slice: 2 accepted lines and 20 rejected ones. Generated from schema.json.",
+      "input": [
+        "root = PieChart(\"Chart\", [a1, a2])\n$s = \"\"\na1 = Slice(\"Hello\", 0)\na2 = Slice(\"Hello\", 0.5)\nr1 = Slice(true, 0)\nr2 = Slice(null, 0)\nr3 = Slice(4, 0)\nr4 = Slice(1.5, 0)\nr5 = Slice($s, 0)\nr6 = Slice([], 0)\nr7 = Slice(other, 0)\nr8 = Slice(\"",
+        {
+          "repeat": "x",
+          "times": 201
+        },
+        "\", 0)\nr9 = Slice(\"\", 0)\nr10 = Slice(value=0)\nr11 = Slice(\"Hello\", true)\nr12 = Slice(\"Hello\", null)\nr13 = Slice(\"Hello\", \"nope\")\nr14 = Slice(\"Hello\", $s)\nr15 = Slice(\"Hello\", [])\nr16 = Slice(\"Hello\", other)\nr17 = Slice(\"Hello\", -1)\nr18 = Slice(\"Hello\")\nr19 = Slice(\"Hello\", 0, style=\"color: red\")\nr20 = Slice(\"Hello\", 0, \"extra\")\n"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 5,
+            "code": "invalid_props"
+          },
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "invalid_props"
+          },
+          {
+            "line": 8,
+            "code": "invalid_props"
+          },
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "invalid_props"
+          },
+          {
+            "line": 20,
+            "code": "invalid_props"
+          },
+          {
+            "line": 21,
+            "code": "invalid_props"
+          },
+          {
+            "line": 22,
+            "code": "invalid_props"
+          },
+          {
+            "line": 23,
+            "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "PieChart",
+            "props": {
+              "title": "Chart"
+            },
+            "children": [
+              "a1",
+              "a2"
+            ]
+          },
+          "a1": {
+            "type": "Slice",
+            "props": {
+              "name": "Hello",
+              "value": 0
+            },
+            "children": []
+          },
+          "a2": {
+            "type": "Slice",
+            "props": {
+              "name": "Hello",
+              "value": 0.5
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$s": ""
+        }
+      }
     }
   ]
 }

@@ -29,6 +29,11 @@ public enum class ComponentType(public val wireName: String) {
   TABS("Tabs"),
   TAB("Tab"),
   NOTICE("Notice"),
+  BAR_CHART("BarChart"),
+  LINE_CHART("LineChart"),
+  PIE_CHART("PieChart"),
+  SERIES("Series"),
+  SLICE("Slice"),
   ;
 
   public companion object {
@@ -63,6 +68,7 @@ public enum class IssueCode(
   LIST_MISMATCH("list_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A List contains something other than ListItems, or a ListItem is outside a List."),
   TABLE_MISMATCH("table_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns."),
   TABS_MISMATCH("tabs_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A Tabs contains something other than Tab, or a Tab is outside a Tabs."),
+  CHART_MISMATCH("chart_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A BarChart or LineChart contains something other than Series, a PieChart something other than Slices, a Series or Slice is outside its kind of chart, or a Series' number of values differs from its chart's labels."),
   DUPLICATE_MUTATION("duplicate_mutation", IssueSeverity.ERROR, IssueStage.LINE, "A button that already has an McpMutation gets a second one."),
   DANGLING_REF("dangling_ref", IssueSeverity.ERROR, IssueStage.END, "A referenced component or McpMutation target never arrived."),
   MISSING_STATE("missing_state", IssueSeverity.ERROR, IssueStage.END, "A \$state key is used but never declared."),
@@ -86,6 +92,9 @@ public object Limits {
   public const val TOOL_NAME_LENGTH: Int = 128
   public const val ACTION_NAME_LENGTH: Int = 64
   public const val TABLE_COLUMNS: Int = 8
+  public const val CHART_LABELS: Int = 24
+  public const val CHART_SERIES: Int = 6
+  public const val CHART_SLICES: Int = 8
 }
 
 internal object Catalog {
@@ -254,6 +263,49 @@ internal object Catalog {
         PropSpec("text", required = true, value = ValueSpec.AnyOf(listOf(ValueSpec.TextValue(minLength = null, maxLength = 2000, pattern = null), ValueSpec.State))),
         PropSpec("tone", required = false, value = ValueSpec.OneOf(listOf("info", "success", "warning", "danger"))),
         PropSpec("title", required = false, value = ValueSpec.AnyOf(listOf(ValueSpec.TextValue(minLength = null, maxLength = 2000, pattern = null), ValueSpec.State))),
+      ),
+    ),
+    ComponentType.BAR_CHART to ComponentSpec(
+      positional = listOf("title", "labels", "children"),
+      props = listOf(
+        PropSpec("title", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
+        PropSpec("labels", required = true, value = ValueSpec.ListOf(item = ValueSpec.TextValue(minLength = 1, maxLength = 60, pattern = null), minItems = 1, maxItems = 24)),
+        PropSpec("children", required = true, value = ValueSpec.RefList(maxItems = 6)),
+        PropSpec("format", required = false, value = ValueSpec.OneOf(listOf("number", "currency", "percent"))),
+        PropSpec("currency", required = false, value = ValueSpec.TextValue(minLength = null, maxLength = null, pattern = "^[A-Z]{3}\$")),
+      ),
+    ),
+    ComponentType.LINE_CHART to ComponentSpec(
+      positional = listOf("title", "labels", "children"),
+      props = listOf(
+        PropSpec("title", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
+        PropSpec("labels", required = true, value = ValueSpec.ListOf(item = ValueSpec.TextValue(minLength = 1, maxLength = 60, pattern = null), minItems = 1, maxItems = 24)),
+        PropSpec("children", required = true, value = ValueSpec.RefList(maxItems = 6)),
+        PropSpec("format", required = false, value = ValueSpec.OneOf(listOf("number", "currency", "percent"))),
+        PropSpec("currency", required = false, value = ValueSpec.TextValue(minLength = null, maxLength = null, pattern = "^[A-Z]{3}\$")),
+      ),
+    ),
+    ComponentType.PIE_CHART to ComponentSpec(
+      positional = listOf("title", "children"),
+      props = listOf(
+        PropSpec("title", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
+        PropSpec("children", required = true, value = ValueSpec.RefList(maxItems = 8)),
+        PropSpec("format", required = false, value = ValueSpec.OneOf(listOf("number", "currency", "percent"))),
+        PropSpec("currency", required = false, value = ValueSpec.TextValue(minLength = null, maxLength = null, pattern = "^[A-Z]{3}\$")),
+      ),
+    ),
+    ComponentType.SERIES to ComponentSpec(
+      positional = listOf("name", "values"),
+      props = listOf(
+        PropSpec("name", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
+        PropSpec("values", required = true, value = ValueSpec.ListOf(item = ValueSpec.NumberValue(minimum = null, maximum = null, integer = false), minItems = 1, maxItems = 24)),
+      ),
+    ),
+    ComponentType.SLICE to ComponentSpec(
+      positional = listOf("name", "value"),
+      props = listOf(
+        PropSpec("name", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
+        PropSpec("value", required = true, value = ValueSpec.NumberValue(minimum = 0.0, maximum = null, integer = false)),
       ),
     ),
   )

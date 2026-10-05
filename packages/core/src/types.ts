@@ -38,6 +38,7 @@ export type IssueCode =
   | "list_mismatch"
   | "table_mismatch"
   | "tabs_mismatch"
+  | "chart_mismatch"
   | "duplicate_mutation"
   | "dangling_ref"
   | "missing_state"
@@ -96,6 +97,12 @@ export const ISSUE_CODES = {
     meaning: "A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns.",
   },
   tabs_mismatch: { severity: "error", stage: "line", meaning: "A Tabs contains something other than Tab, or a Tab is outside a Tabs." },
+  chart_mismatch: {
+    severity: "error",
+    stage: "line",
+    meaning:
+      "A BarChart or LineChart contains something other than Series, a PieChart something other than Slices, a Series or Slice is outside its kind of chart, or a Series' number of values differs from its chart's labels.",
+  },
   duplicate_mutation: { severity: "error", stage: "line", meaning: "A button that already has an McpMutation gets a second one." },
   dangling_ref: { severity: "error", stage: "end", meaning: "A referenced component or McpMutation target never arrived." },
   missing_state: { severity: "error", stage: "end", meaning: "A $state key is used but never declared." },

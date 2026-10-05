@@ -22,6 +22,9 @@ const LIMIT_LABELS: Record<keyof typeof LIMITS, string> = {
   toolNameLength: "Characters in a tool name",
   actionNameLength: "Characters in a Button action name",
   tableColumns: "Columns in a Table, and cells in a TableRow",
+  chartLabels: "Labels in a BarChart or LineChart, and values in a Series",
+  chartSeries: "Series in a BarChart or LineChart",
+  chartSlices: "Slices in a PieChart",
 };
 
 const STAGE_LABEL = { line: "when the line arrives", end: "at end of stream", renderer: "in the renderer" } as const;

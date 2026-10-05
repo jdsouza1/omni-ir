@@ -129,6 +129,11 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.21]** A Table MUST contain only TableRows, and a TableRow MUST be a child of a Table. Each TableRow MUST have exactly as many cells as its Table has columns. Breaking any of these is a `table_mismatch` error, reported on whichever of the two lines arrives second.
 - **[5.22]** A Tabs MUST contain only Tab components, and a Tab MUST be a child of a Tabs. Breaking either rule is a `tabs_mismatch` error, reported on whichever of the two lines arrives second.
 
+### Charts
+
+- **[5.23]** A BarChart or LineChart MUST contain only Series, and a PieChart only Slices; a Series MUST be a child of a BarChart or LineChart, and a Slice of a PieChart. Each Series MUST have exactly as many values as its chart has labels. Breaking any of these is a `chart_mismatch` error, reported on whichever of the two lines arrives second.
+- **[5.24]** Charts carry data only: a title, labels, names and numbers, and an optional number `format`. Like every component, a chart, Series or Slice accepts only the props in section 6, so a prop such as `color`, `style`, `animation` or `tooltip` is an `invalid_props` error. A Slice's value MUST NOT be negative.
+
 ### Actions
 
 - **[5.13]** A Button with an `action` triggers a backend action. It MUST be governed by exactly one McpMutation by the end of the stream; otherwise it is an `ungoverned_mutation` error. A second McpMutation for the same Button is a `duplicate_mutation` error.
@@ -390,6 +395,69 @@ Notice(text, tone?, title?)
 | `text` | 1 | yes | text (max 2000) \| $state |
 | `tone` | named only | no | "info" \| "success" \| "warning" \| "danger" |
 | `title` | named only | no | text (max 2000) \| $state |
+
+### BarChart
+
+```
+BarChart(title, labels, children, format?, currency?)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `title` | 1 | yes | text (min 1, max 200) |
+| `labels` | 2 | yes | [text (min 1, max 60), …] (max 24) |
+| `children` | 3 | yes | [id, …] (max 6) |
+| `format` | named only | no | "number" \| "currency" \| "percent" |
+| `currency` | named only | no | 3-letter currency code |
+
+### LineChart
+
+```
+LineChart(title, labels, children, format?, currency?)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `title` | 1 | yes | text (min 1, max 200) |
+| `labels` | 2 | yes | [text (min 1, max 60), …] (max 24) |
+| `children` | 3 | yes | [id, …] (max 6) |
+| `format` | named only | no | "number" \| "currency" \| "percent" |
+| `currency` | named only | no | 3-letter currency code |
+
+### PieChart
+
+```
+PieChart(title, children, format?, currency?)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `title` | 1 | yes | text (min 1, max 200) |
+| `children` | 2 | yes | [id, …] (max 8) |
+| `format` | named only | no | "number" \| "currency" \| "percent" |
+| `currency` | named only | no | 3-letter currency code |
+
+### Series
+
+```
+Series(name, values)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `name` | 1 | yes | text (min 1, max 200) |
+| `values` | 2 | yes | [number, …] (max 24) |
+
+### Slice
+
+```
+Slice(name, value)
+```
+
+| Prop | Position | Required | Values |
+|---|---|---|---|
+| `name` | 1 | yes | text (min 1, max 200) |
+| `value` | 2 | yes | number |
 <!-- /generated:components -->
 
 ### McpMutation
@@ -434,6 +502,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 | `list_mismatch` | error | when the line arrives | A List contains something other than ListItems, or a ListItem is outside a List. |
 | `table_mismatch` | error | when the line arrives | A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns. |
 | `tabs_mismatch` | error | when the line arrives | A Tabs contains something other than Tab, or a Tab is outside a Tabs. |
+| `chart_mismatch` | error | when the line arrives | A BarChart or LineChart contains something other than Series, a PieChart something other than Slices, a Series or Slice is outside its kind of chart, or a Series' number of values differs from its chart's labels. |
 | `duplicate_mutation` | error | when the line arrives | A button that already has an McpMutation gets a second one. |
 | `dangling_ref` | error | at end of stream | A referenced component or McpMutation target never arrived. |
 | `missing_state` | error | at end of stream | A $state key is used but never declared. |
@@ -467,6 +536,12 @@ These rules apply to anything that displays an Omni-IR screen. There are three r
 - Typing into an Input, choosing a date in a DateInput, choosing an option in a Select or flipping a Switch MUST update its `$key`, and every component using that key MUST show the new value. Editing state is local and MUST NOT call the backend by itself.
 - A Select whose value isn't one of its options MUST show nothing chosen (its `placeholder`, if any).
 - *Tested by:* `tests/renderer.test.tsx`, `tests/components.media.test.tsx`, `tests/components.expansion.test.tsx`.
+
+**Charts**
+- A renderer MUST draw charts with its own colours, sizes, axes, legend and any animation; nothing in the stream chooses them. It SHOULD use a palette that stays distinguishable for colour-blind viewers, in light and dark, and MUST NOT rely on colour alone: a chart with two or more Series or any Slices MUST show a legend naming each one.
+- Values shown on hover, focus or tap are written by the renderer from the data, using the chart's `format`. A renderer MUST expose each chart's title and values to assistive technology (for example a data table that screen readers read, or a label on each bar, point or slice).
+- A Series or Slice that hasn't arrived MUST NOT stop the rest of the chart from drawing; the chart grows as they arrive.
+- *Tested by:* `tests/components.charts.test.tsx`.
 
 **Tables and tabs**
 - A Table MUST present its column headings and rows as a table to assistive technology. On a screen too narrow for its columns it SHOULD scroll sideways rather than squeeze or cut off cells. Number cells SHOULD be aligned to the end.
@@ -538,6 +613,9 @@ Adding to the catalog is a change too. Because the catalog is strict ([5.9]), a 
 | Characters in a tool name | 128 |
 | Characters in a Button action name | 64 |
 | Columns in a Table, and cells in a TableRow | 8 |
+| Labels in a BarChart or LineChart, and values in a Series | 24 |
+| Series in a BarChart or LineChart | 6 |
+| Slices in a PieChart | 8 |
 <!-- /generated:limits -->
 
 Individual props have their own limits, listed in section 6.
