@@ -2,7 +2,7 @@
 
 Goal: close the biggest gap the format comparison found (docs/COMPARISON.md): Omni-IR's 15 components can draw none of OpenUI's seven published scenarios, because they need dropdowns, tables, tabs, switches or notices. Add the components that fill the most of that gap, on all three renderers, without loosening any of Omni-IR's rules.
 
-Status: **DONE 2026-10-04** (owner reviewed and approved; merged; ships in `v0.2.0`). **APPROVED 2026-10-04** with the recommendations: all five components (Select, Switch, Table/TableRow, Tabs/Tab, Notice), one line per table row, charts left for their own step, and a screenshot review on all three platforms before merging.
+Status: **DONE 2026-10-04** (owner reviewed and approved; merged; released in `v0.2.0`). **APPROVED 2026-10-04** with the recommendations: all five components (Select, Switch, Table/TableRow, Tabs/Tab, Notice), one line per table row, charts left for their own step, and a screenshot review on all three platforms before merging.
 
 ## Proposal
 
@@ -111,7 +111,7 @@ From 0 of 7 to 3 of 7. The rest mostly need charts, or Markdown. Markdown is del
 **E. After your approval**
 - [x] E.1 Merge; README component list updated (the landing page lists no components, so it needed no change)
 - [x] E.2 Re-run the format comparison with the new components: coverage went from 0 to 3 of OpenUI's 7 scenarios; sizes are unchanged (they compare syntax). The reliability run's nine requests don't need the new components, so it wasn't repeated; the Step 10 model check (5 of 5) covers them.
-- [ ] E.3 `v0.2.0` release (npm, the first Swift tag): a separate go-ahead from you
+- [x] E.3 `v0.2.0` released 2026-10-04 with the owner's go-ahead and approval: `@omni-ir/core` and `@omni-ir/react` 0.2.0 on npm, and the first Swift Package Manager version (checked: resolves and builds from the tag)
 
 **Progress (2026-10-04):** A–D done on `wip/catalog`; waiting for the owner's review.
 - All three parsers pass the 73 conformance cases; 626 tests; CI, the iOS demo and the Android demo pass.
