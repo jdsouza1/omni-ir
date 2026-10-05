@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/jdsouza1/omni-ir/discussions
+    about: Ask how to use Omni-IR, share what you built, or float an idea before writing a proposal.
+  - name: Report a security problem privately
+    url: https://github.com/jdsouza1/omni-ir/security/advisories/new
+    about: Never in a public issue. See SECURITY.md.

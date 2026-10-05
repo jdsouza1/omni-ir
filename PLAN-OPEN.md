@@ -75,11 +75,11 @@ One public website, built from this repository by a GitHub Actions workflow and 
 
 **E. Build and review** *(checkpoint: you review)*
 - [x] E.1 A `site.yml` workflow that builds the whole site on every push and uploads it as a CI artifact (no deploy yet)
-- [ ] E.2 A review of the built site in a preview: every page on desktop and phone, light and dark, the playground working end to end
+- [x] E.2 A review of the built site in a preview: every page on desktop and phone, light and dark, the playground working end to end
 
 **F. Going public, only with your go-ahead**
-- [ ] F.1 Switch on GitHub Pages (deploy from `site.yml` on `main`) and GitHub Discussions; you click the settings, or approve me doing so
-- [ ] F.2 Repository description, homepage and topics; private vulnerability reporting on
+- [x] F.1 Switch on GitHub Pages (deploy from `site.yml` on `main`) and GitHub Discussions; you click the settings, or approve me doing so
+- [x] F.2 Repository description, homepage and topics; private vulnerability reporting on
 - [ ] F.3 The landing page artifact's links pointed at the live site; roadmap and README updated
 
 **Progress (2026-10-05):** A–E.1 done on `wip/open`; waiting for the owner's review of the built site.
