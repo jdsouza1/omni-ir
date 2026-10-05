@@ -60,10 +60,20 @@ enum Format {
   /// An axis tick, written short: $20K rather than $20,000.00.
   static func chartTick(_ value: Double, format: String?, currency: String?, locale: Locale) -> String {
     switch format {
-    case "currency": value.formatted(.currency(code: currency ?? "USD").notation(.compactName).precision(.fractionLength(0...1)).locale(locale))
+    // Compact currency formatting needs macOS 15 / iOS 18, so the symbol and a compact number are joined.
+    case "currency": currencySymbol(currency ?? "USD", locale: locale) + value.formatted(.number.notation(.compactName).precision(.fractionLength(0...1)).locale(locale))
     case "percent": value.formatted(.number.notation(.compactName).precision(.fractionLength(0...1)).locale(locale)) + "%"
     default: value.formatted(.number.notation(.compactName).precision(.fractionLength(0...1)).locale(locale))
     }
+  }
+
+  /// A currency's symbol in this locale ("$" for USD in en_US), or its code if there is none.
+  static func currencySymbol(_ code: String, locale: Locale) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+    formatter.locale = locale
+    formatter.currencyCode = code
+    return formatter.currencySymbol ?? code
   }
 
   /// A slice's share of the whole, as shown in the legend: "52%".
