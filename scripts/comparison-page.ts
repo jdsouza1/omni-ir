@@ -245,7 +245,7 @@ const PAGE = String.raw`<meta charset="utf-8">
     <div class="eyebrow">Omni-IR · Step 9 · format comparison</div>
     <h1>How Omni-IR compares with OpenUI Lang, A2UI and json-render</h1>
     <p class="lede muted">The same 16 screens written in each format, counted with the tokenizer OpenUI's benchmark uses, plus what each format lets a model do. Measured offline on 2026-10-01; nothing here called a paid API.</p>
-    <span class="status">Draft for your review · reliability run done 2026-10-04</span>
+    <span class="status">Reliability run 2026-10-04 · coverage updated for charts 2026-10-05</span>
   </header>
 
   <section aria-labelledby="h-findings">
@@ -254,7 +254,7 @@ const PAGE = String.raw`<meta charset="utf-8">
       <div class="finding"><b>Same class as OpenUI Lang, not smaller</b><p>OpenUI Lang uses {{OUI1}}% fewer tokens on the model-check screens and {{OUI2}}% fewer on its own scenarios: it has positional arguments and inline components.</p></div>
       <div class="finding"><b>Well below the JSON formats</b><p>On the model-check screens Omni-IR uses {{A2UI}}% fewer tokens than A2UI, {{JR}}% fewer than json-render, {{HTML}}% fewer than HTML with Tailwind and {{JSX}}% fewer than React JSX.</p></div>
       <div class="finding"><b>Line formats draw first</b><p>Omni-IR and OpenUI Lang can draw content after about 30–40 tokens. A2UI in one message and JSX show nothing until the reply ends.</p></div>
-      <div class="finding"><b>The catalog gap is narrowing</b><p>With Select, Switch, Table, Tabs and Notice (Step 10), Omni-IR's 22 components draw 3 of OpenUI's 7 scenarios, up from none. The rest need charts or Markdown.</p></div>
+      <div class="finding"><b>The catalog gap is narrowing</b><p>With tables, dropdowns and tabs (Step 10) and bar, line and pie charts (Step 11), Omni-IR's 27 components draw 5 of OpenUI's 7 scenarios, up from none. The rest need an accordion, an image gallery or Markdown.</p></div>
       <div class="finding"><b>Both 9 of 9 valid; the difference is control</b><p>Claude wrote both formats validly every time. Asked to delete an account with no tool for it, Omni-IR left the button unwired; OpenUI Lang wired it to an invented action.</p></div>
     </div>
   </section>
