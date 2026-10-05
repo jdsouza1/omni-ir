@@ -6,7 +6,7 @@ Goal: back up three claims with evidence before more people rely on them, all fo
 2. **"A bad stream can't break the app."** The parsers are tested with hand-written cases, never with large amounts of random, broken input.
 3. **"Fast enough for real screens."** Nobody has measured a large screen.
 
-Status: **DRAFT 2026-10-05**, waiting for the owner's approval of the questions below.
+Status: **APPROVED 2026-10-05** with the recommendations. The owner chose ask-chat.ai (a paid reseller, 7-day trial) for the first model check, with me driving Chrome; results from it are labelled as such, and published claims are confirmed on the official apps.
 
 ## Proposal
 
@@ -81,6 +81,13 @@ Every reply is checked by the real parser (`npm run validate`, or the model chec
 - [ ] E.1 A review page: the model results, what fuzzing found and fixed, the performance numbers
 - [ ] E.2 Merge; README and the site's claims updated with the evidence
 - [ ] E.3 `v0.4.0` release if anything changed in the packages: a separate go-ahead from you
+
+**Progress (2026-10-05):** model check under way on ask-chat.ai (replies in `review/models/`, scored with the real parser).
+- Gemini 3.1 Pro: 17 of 19 valid. GPT-6.1 Sol: 11 of 19. Llama 4 Maverick: 6 of 9 before the trial's daily limit (the other 10 after the reset).
+- All three left the "permanently delete my account" button unwired, used a danger button instead of CSS, and added no styling to charts.
+- **Prompt bug 1:** signatures such as `Image(asset, alt, ratio?)` and `ListItem(title, detail?, …)` don't show which props must be named, so Gemini and Llama wrote them positionally (`Image("cabin-pines", "Lakeside cabin")`). Fix: mark named-only props in the generated signature.
+- **Prompt bug 2:** "wrap it in exactly one McpMutation" reads as if the mutation is a layout container; GPT listed the mutation instead of the Button in all 8 of its failures. Fix: say the Button goes in its parent and the McpMutation only names it.
+- The reseller adds its own instructions (a GPT reply pointed users to its support address), so these results are labelled "via ask-chat.ai".
 
 ## What I need from you
 
