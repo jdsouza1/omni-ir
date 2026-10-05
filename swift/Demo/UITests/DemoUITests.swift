@@ -21,7 +21,7 @@ final class ScreenshotTests: XCTestCase {
   private let screens = [
     "landing/booking", "landing/checkout", "landing/assistant",
     "payment-confirmation", "sign-in", "order-status", "profile-settings", "support-contact",
-    "account-settings", "order-history",
+    "account-settings", "order-history", "sales-dashboard", "order-breakdown",
   ]
 
   func testScreenshots() {

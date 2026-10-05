@@ -19,6 +19,8 @@ const SCREENS: { id: string; keywords: string[] }[] = [
   { id: "payment-confirmation", keywords: ["pay", "payment", "payments", "checkout", "purchase", "confirm", "confirmation", "billing"] },
   { id: "sign-in", keywords: ["login", "log", "signin", "sign", "auth", "authenticate"] },
   { id: "profile-settings", keywords: ["profile", "settings", "account", "preferences"] },
+  { id: "sales-dashboard", keywords: ["sales", "revenue", "analytics", "chart", "charts", "trend", "visitors"] },
+  { id: "order-breakdown", keywords: ["breakdown", "pie", "share", "channel", "channels", "split"] },
   { id: "account-settings", keywords: ["notifications", "notification", "language", "alerts", "toggle", "switch", "tabs"] },
   { id: "order-history", keywords: ["history", "past", "previous", "table", "invoices"] },
   { id: "order-status", keywords: ["order", "orders", "track", "tracking", "shipping", "delivery", "shipment", "package"] },
