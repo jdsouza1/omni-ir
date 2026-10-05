@@ -46,7 +46,7 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval.
 
-1. **Step 13 · Proof and hardening (all free).**
+1. **Step 13 · Proof and hardening (all free)** (plan drafted: [PLAN-HARDENING.md](../PLAN-HARDENING.md)).
    - [ ] Model check on other models: Gemini, ChatGPT and an open model, run in their own chat apps, so no API cost. "Works with any model" is unproven while only Claude has been checked.
    - [ ] Parser fuzz testing: randomly broken input fed to the TypeScript, Swift and Kotlin parsers, which must never crash and must always report the same issues
    - [ ] Performance on large screens: each line currently re-checks the whole document; measure it at hundreds of components and fix if needed
