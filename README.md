@@ -19,6 +19,8 @@ cancel = Button("Cancel", variant="secondary")
 
 `root` comes first, so the card appears immediately and its parts fill in as their lines arrive. `confirm` has an `action`, so it only becomes clickable once its `McpMutation` line names a permitted tool. `cancel` has none, so it can never reach the server.
 
+**Website:** [jdsouza1.github.io/omni-ir](https://jdsouza1.github.io/omni-ir/) · [Try the playground](https://jdsouza1.github.io/omni-ir/playground/) (runs in your browser, free) · [Docs](https://jdsouza1.github.io/omni-ir/docs/) · [Discussions](https://github.com/jdsouza1/omni-ir/discussions)
+
 ## Use it in your app
 
 ```bash

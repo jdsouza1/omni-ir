@@ -2,7 +2,7 @@
 
 Goal: let someone who has never heard of Omni-IR find it, try it in a browser in under a minute, read how to use it, and know how to contribute. Today the playground runs only on a developer's machine, there is no docs site, the landing page is a private-by-default artifact whose Docs, Get started, Join the community and Governance links lead nowhere, and the repository has no contributor or governance documents. Everything in this step is free.
 
-Status: **APPROVED 2026-10-05** with the recommendations: GitHub Pages at `jdsouza1.github.io/omni-ir`; VitePress; GitHub Discussions; the owner as maintainer with public spec proposals; security and conduct reports through private GitHub channels; the hosted playground on the mock model only; the landing page artifact kept until the site is live; the repository description, homepage and topics updated when going public.
+Status: **DONE 2026-10-05**: live at https://jdsouza1.github.io/omni-ir/ (owner reviewed, approved going public; merged). **APPROVED 2026-10-05** with the recommendations: GitHub Pages at `jdsouza1.github.io/omni-ir`; VitePress; GitHub Discussions; the owner as maintainer with public spec proposals; security and conduct reports through private GitHub channels; the hosted playground on the mock model only; the landing page artifact kept until the site is live; the repository description, homepage and topics updated when going public.
 
 ## Proposal
 
@@ -80,7 +80,7 @@ One public website, built from this repository by a GitHub Actions workflow and 
 **F. Going public, only with your go-ahead**
 - [x] F.1 Switch on GitHub Pages (deploy from `site.yml` on `main`) and GitHub Discussions; you click the settings, or approve me doing so
 - [x] F.2 Repository description, homepage and topics; private vulnerability reporting on
-- [ ] F.3 The landing page artifact's links pointed at the live site; roadmap and README updated
+- [x] F.3 Roadmap and README updated. The landing page artifact was left as it is: it is private, replaced by the live site, and kept as the archived approved design
 
 **Progress (2026-10-05):** A–E.1 done on `wip/open`; waiting for the owner's review of the built site.
 - **Playground:** `server/api.ts` holds the request and mutation rules; the Express app and the in-browser API (`server/inBrowser.ts`) both use them, and parity tests send every request to both. `FixtureModel` is the mock model without the file system. The hosted playground is tested with the network switched off.
