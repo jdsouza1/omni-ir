@@ -66,21 +66,27 @@ One public website, built from this repository by a GitHub Actions workflow and 
 - [x] B.3 `npm run playground:static`: the playground built for `/playground/`, with a check that no request leaves the page
 
 **C. Docs site**
-- [ ] C.1 VitePress in `site/docs`: Getting started (web, iOS, Android), the spec, the catalog reference generated from the schema, conformance, the comparison, the roadmap and the changelog
-- [ ] C.2 A test that the docs build, their internal links work, and the generated pages are current
+- [x] C.1 VitePress in `site/docs`: Getting started (web, iOS, Android), the spec, the catalog reference generated from the schema, conformance, the comparison, the roadmap and the changelog
+- [x] C.2 A test that the docs build, their internal links work, and the generated pages are current
 
 **D. Landing page**
-- [ ] D.1 The approved landing page moved into `site/` with its example tabs generated from `fixtures/landing/`
-- [ ] D.2 Its Docs, Get started, Join the community and Governance links pointed at the new pages, and a link to try the playground
+- [x] D.1 The approved landing page moved into `site/` with its example tabs generated from `fixtures/landing/`
+- [x] D.2 Its Docs, Get started, Join the community and Governance links pointed at the new pages, and a link to try the playground
 
 **E. Build and review** *(checkpoint: you review)*
-- [ ] E.1 A `site.yml` workflow that builds the whole site on every push and uploads it as a CI artifact (no deploy yet)
+- [x] E.1 A `site.yml` workflow that builds the whole site on every push and uploads it as a CI artifact (no deploy yet)
 - [ ] E.2 A review of the built site in a preview: every page on desktop and phone, light and dark, the playground working end to end
 
 **F. Going public, only with your go-ahead**
 - [ ] F.1 Switch on GitHub Pages (deploy from `site.yml` on `main`) and GitHub Discussions; you click the settings, or approve me doing so
 - [ ] F.2 Repository description, homepage and topics; private vulnerability reporting on
 - [ ] F.3 The landing page artifact's links pointed at the live site; roadmap and README updated
+
+**Progress (2026-10-05):** A–E.1 done on `wip/open`; waiting for the owner's review of the built site.
+- **Playground:** `server/api.ts` holds the request and mutation rules; the Express app and the in-browser API (`server/inBrowser.ts`) both use them, and parity tests send every request to both. `FixtureModel` is the mock model without the file system. The hosted playground is tested with the network switched off.
+- **Docs:** VitePress with local search (no outside service). Pages come from SPEC.md, the READMEs, the changelog, the roadmap, the comparison and the contributor documents, written once; VitePress fails the build on a dead link.
+- **Landing page:** ported from the design tool's export to a small React page (`site/landing/`) with the same layout, text and styles. The export's runtime (`dc-runtime`, React 18 and Babel from unpkg) was not copied into this Apache-2.0 repo: it is generated third-party code with no licence to redistribute. Its example tabs now come straight from `fixtures/landing/`, checked by the parser when the site builds. Changes: the badge says v0.3 instead of v0.1; "Try the playground" opens the hosted playground; an "Open the full playground" link beside the examples; Docs, Get started, Join the community (GitHub Discussions), Governance and the comparison link point at the site's pages; the design tool's "Made with" badge is gone.
+- 747 tests pass.
 
 ## What I need from you
 

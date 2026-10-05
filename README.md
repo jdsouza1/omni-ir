@@ -110,6 +110,7 @@ To check how well a model follows the protocol without paying for API calls, pas
 | `app/` | The tool registry and image asset registry shared by browser and server |
 | `Package.swift`, `swift/` | The Swift package: `OmniIRCore` (parser) and `OmniIRSwiftUI` (renderer and client), plus the iOS demo app |
 | `android/` | Kotlin: `omni-ir-core` (parser), `omni-ir-runtime` (store, governance, client), `omni-ir-compose` (Compose catalog), plus the Android demo app |
+| `site/` | The public site: landing page and docs (`npm run site:build`) |
 | `fixtures/` | Example screens and failure cases |
 
 The format is specified in [SPEC.md](SPEC.md). Design decisions and build history are in [PLAN.md](PLAN.md), [PLAN-SERVER.md](PLAN-SERVER.md), [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md), [PLAN-SPEC.md](PLAN-SPEC.md), [PLAN-COMPONENTS.md](PLAN-COMPONENTS.md), [PLAN-NPM.md](PLAN-NPM.md), [PLAN-IOS.md](PLAN-IOS.md), [PLAN-ANDROID.md](PLAN-ANDROID.md), [PLAN-CATALOG.md](PLAN-CATALOG.md) and [PLAN-CHARTS.md](PLAN-CHARTS.md).

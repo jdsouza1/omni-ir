@@ -25,6 +25,10 @@
     "playground": "vite --config playground/vite.config.ts --configLoader runner",
     "playground:build": "vite build --config playground/vite.config.ts --configLoader runner",
     "playground:static": "vite build --config playground/vite.config.ts --configLoader runner --mode static",
+    "docs:dev": "tsx scripts/docs.ts && vitepress dev .docs",
+    "docs:build": "tsx scripts/docs.ts && vitepress build .docs",
+    "landing:build": "vite build --config site/landing/vite.config.ts --configLoader runner",
+    "site:build": "node -e \"require('fs').rmSync('dist/site',{recursive:true,force:true})\" && npm run landing:build && npm run playground:static && npm run docs:build",
     "landing:examples": "tsx scripts/landing-examples.ts",
     "spec": "tsx scripts/spec.ts",
     "conformance:build": "tsx conformance/build.ts",
@@ -58,10 +62,13 @@
     "@types/react-dom": "^19.3.0",
     "ajv": "^8.20.0",
     "jsdom": "^30.1.1",
+    "mermaid": "^11.17.2",
     "tiktoken": "^1.0.22",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.1",
+    "vitepress": "^1.6.4",
+    "vitepress-plugin-mermaid": "^2.0.17",
     "vitest": "^5.0.3"
   }
 }

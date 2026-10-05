@@ -1,0 +1,39 @@
+# Builds the public site (PLAN-OPEN.md): the landing page at /, the hosted playground at
+# /playground/ (the mock model running in the browser) and the docs at /docs/, for GitHub Pages
+# at https://jdsouza1.github.io/omni-ir/. The built site is uploaded as the artifact `site` for review.
+# Deploying to Pages is switched on separately, only with the owner's go-ahead (PLAN-OPEN.md, F).
+# Nothing here calls a paid API.
+name: Site
+
+on:
+  push:
+    branches: [main, "wip/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      OMNI_MODEL: mock # never use a paid model in CI
+      OMNI_SITE_BASE: /omni-ir/
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run site:build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: dist/site/
+          retention-days: 14
