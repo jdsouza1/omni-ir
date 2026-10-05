@@ -43,5 +43,4 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 - Charts (Step 11): the remaining gap found by the format comparison; a big build on three platforms, so it gets its own plan.
 - Real backend tool handlers with authorization, in place of the stubs.
-- A check of how well a real model follows the protocol (free manual check with `npm run validate`, or a paid run only with the owner's go-ahead).
 - A written goal for the bi-directional AST sync tooling, before that work starts.
