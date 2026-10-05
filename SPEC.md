@@ -143,13 +143,13 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 
 ## 6. Component catalog (v0.3)
 
-A component has exactly the props listed; any other prop is rejected ([5.9]). "Values" lists what each prop accepts; `$state` means a `$key` reference ([5.11]), and `id` means a component id. The styling of every value (what `"muted"` or `"primary"` looks like) belongs to the renderer.
+A component has exactly the props listed; any other prop is rejected ([5.9]). "Values" lists what each prop accepts; `$state` means a `$key` reference ([5.11]), and `id` means a component id. The styling of every value (what `"muted"` or `"primary"` looks like) belongs to the renderer. In each signature, positional props are written bare in their order, props written `name=…` can only be given by name, and props in [brackets] are optional: `Image(asset, alt=…, [ratio=…])` is written `Image("cabin-pines", alt="A cabin", ratio="16:9")`.
 
 <!-- generated:components -->
 ### Stack
 
 ```
-Stack(children, direction?, gap?, align?)
+Stack(children, [direction=…], [gap=…], [align=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -162,7 +162,7 @@ Stack(children, direction?, gap?, align?)
 ### Card
 
 ```
-Card(children, title?)
+Card(children, [title=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -173,7 +173,7 @@ Card(children, title?)
 ### Heading
 
 ```
-Heading(text, level?)
+Heading(text, [level=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -184,7 +184,7 @@ Heading(text, level?)
 ### Text
 
 ```
-Text(text, format?, currency?, tone?)
+Text(text, [format=…], [currency=…], [tone=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -197,7 +197,7 @@ Text(text, format?, currency?, tone?)
 ### Input
 
 ```
-Input(value, label, placeholder?, lines?)
+Input(value, label=…, [placeholder=…], [lines=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -210,7 +210,7 @@ Input(value, label, placeholder?, lines?)
 ### Button
 
 ```
-Button(label, action?, variant?)
+Button(label, [action=…], [variant=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -230,7 +230,7 @@ No props.
 ### Badge
 
 ```
-Badge(text, tone?)
+Badge(text, [tone=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -241,7 +241,7 @@ Badge(text, tone?)
 ### Skeleton
 
 ```
-Skeleton(lines?)
+Skeleton([lines=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -251,7 +251,7 @@ Skeleton(lines?)
 ### Image
 
 ```
-Image(asset, alt, ratio?)
+Image(asset, alt=…, [ratio=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -263,7 +263,7 @@ Image(asset, alt, ratio?)
 ### Rating
 
 ```
-Rating(value, max?)
+Rating(value, [max=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -274,7 +274,7 @@ Rating(value, max?)
 ### DateInput
 
 ```
-DateInput(value, label, min?, max?)
+DateInput(value, label=…, [min=…], [max=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -297,7 +297,7 @@ List(children)
 ### ListItem
 
 ```
-ListItem(title, detail?, trailing?, image?)
+ListItem(title, [detail=…], [trailing=…], [image=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -310,7 +310,7 @@ ListItem(title, detail?, trailing?, image?)
 ### Message
 
 ```
-Message(text, from)
+Message(text, from=…)
 ```
 
 | Prop | Position | Required | Values |
@@ -321,7 +321,7 @@ Message(text, from)
 ### Select
 
 ```
-Select(value, label, options, placeholder?)
+Select(value, label=…, options=…, [placeholder=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -334,7 +334,7 @@ Select(value, label, options, placeholder?)
 ### Switch
 
 ```
-Switch(value, label)
+Switch(value, label=…)
 ```
 
 | Prop | Position | Required | Values |
@@ -387,7 +387,7 @@ Tab(label, children)
 ### Notice
 
 ```
-Notice(text, tone?, title?)
+Notice(text, [tone=…], [title=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -399,7 +399,7 @@ Notice(text, tone?, title?)
 ### BarChart
 
 ```
-BarChart(title, labels, children, format?, currency?)
+BarChart(title, labels, children, [format=…], [currency=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -413,7 +413,7 @@ BarChart(title, labels, children, format?, currency?)
 ### LineChart
 
 ```
-LineChart(title, labels, children, format?, currency?)
+LineChart(title, labels, children, [format=…], [currency=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -427,7 +427,7 @@ LineChart(title, labels, children, format?, currency?)
 ### PieChart
 
 ```
-PieChart(title, children, format?, currency?)
+PieChart(title, children, [format=…], [currency=…])
 ```
 
 | Prop | Position | Required | Values |

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { createParser, type ParserEvent } from "@omni-ir/core";
-import { COMPONENTS, COMPONENT_TYPES } from "@omni-ir/core";
+import { COMPONENTS, COMPONENT_TYPES, describeComponent } from "@omni-ir/core";
 import { buildSystemPrompt, examplesIn } from "../server/prompt";
 
 describe("buildSystemPrompt", () => {
@@ -57,6 +57,30 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain("Use a tool only for what its name says");
     expect(prompt).toContain("A Rating shows its own number");
     expect(prompt).toContain("A Skeleton is only a placeholder");
+  });
+
+  // Step 13 model check: Gemini and Llama wrote Image("cabin-pines", "Lakeside cabin") from
+  // `Image(asset, alt, ratio?)`; GPT listed the McpMutation in the layout after "wrap it in".
+  it("shows which props must be named, in every component signature", () => {
+    for (const type of COMPONENT_TYPES) {
+      const shape = describeComponent(type);
+      const args = shape.signature.slice(type.length + 1, -1).split(", ").filter(Boolean);
+      expect(args, type).toHaveLength(shape.props.length);
+      const ordered = [...shape.props].sort((a, b) => (a.position ?? Infinity) - (b.position ?? Infinity));
+      ordered.forEach((p, i) => {
+        const bare = p.position === null ? `${p.name}=…` : p.name;
+        expect(args[i], `${type}.${p.name}`).toBe(p.required ? bare : `[${bare}]`);
+      });
+      expect(prompt).toContain(shape.signature);
+    }
+    expect(prompt).toContain("Image(asset, alt=…, [ratio=…])");
+    expect(prompt).toContain("must be given by name");
+  });
+
+  it("says the Button, not its McpMutation, goes in the layout, and that there are no expressions", () => {
+    expect(prompt).toContain("The McpMutation is never listed as a child");
+    expect(prompt).not.toContain("Wrap it in");
+    expect(prompt).toContain("no expressions");
   });
 
   it("explains the Step 10 components: Select and Switch state, one line per table row, Tabs and Notice tones", () => {
