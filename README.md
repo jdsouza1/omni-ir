@@ -49,6 +49,7 @@ Open http://localhost:5173, then pick an example or describe a screen. The playg
 | `npm test` | Raw-HTML guard and all tests (no network) |
 | `npm run typecheck` | TypeScript, strict |
 | `npm run playground` | The Interactive Playground with the API, on :5173 |
+| `npm run playground:static` | The playground as static files, with the API running in the browser (the hosted version) |
 | `npm run server` | The API server alone, on :8787 |
 | `npm run demo` | Stream a fixture in the terminal; `-- --server "prompt"` streams from the running server |
 | `npm run validate -- file.omni` | Check Omni-IR (e.g. a model's reply): errors by line, then the rendered HTML |
@@ -109,6 +110,7 @@ To check how well a model follows the protocol without paying for API calls, pas
 | `app/` | The tool registry and image asset registry shared by browser and server |
 | `Package.swift`, `swift/` | The Swift package: `OmniIRCore` (parser) and `OmniIRSwiftUI` (renderer and client), plus the iOS demo app |
 | `android/` | Kotlin: `omni-ir-core` (parser), `omni-ir-runtime` (store, governance, client), `omni-ir-compose` (Compose catalog), plus the Android demo app |
+| `site/` | The public site: landing page and docs (`npm run site:build`) |
 | `fixtures/` | Example screens and failure cases |
 
 The format is specified in [SPEC.md](SPEC.md). Design decisions and build history are in [PLAN.md](PLAN.md), [PLAN-SERVER.md](PLAN-SERVER.md), [PLAN-PLAYGROUND.md](PLAN-PLAYGROUND.md), [PLAN-SPEC.md](PLAN-SPEC.md), [PLAN-COMPONENTS.md](PLAN-COMPONENTS.md), [PLAN-NPM.md](PLAN-NPM.md), [PLAN-IOS.md](PLAN-IOS.md), [PLAN-ANDROID.md](PLAN-ANDROID.md), [PLAN-CATALOG.md](PLAN-CATALOG.md) and [PLAN-CHARTS.md](PLAN-CHARTS.md).
@@ -118,6 +120,10 @@ The format is specified in [SPEC.md](SPEC.md). Design decisions and build histor
 What is done and what is planned, with dates: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 - Bi-directional AST sync tooling
+
+## Contributing
+
+Contributions are welcome: bugs, spec proposals, new components, other implementations and docs. Start with [CONTRIBUTING.md](CONTRIBUTING.md). How the spec changes and who decides: [GOVERNANCE.md](GOVERNANCE.md). Please follow the [code of conduct](CODE_OF_CONDUCT.md), and report security problems privately as described in [SECURITY.md](SECURITY.md).
 
 ## License
 

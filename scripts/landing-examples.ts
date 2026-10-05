@@ -1,4 +1,5 @@
 // npm run landing:examples -- <landing-page.html> <out.html>
+// npx tsx scripts/landing-examples.ts --json <out.json>   (the site build: the tabs as JSON)
 //
 // Regenerates the landing page's example tabs (the EXAMPLES data in its script) from
 // fixtures/landing/*.omni and fixtures/landing/landing.json, so the page always shows real Omni-IR.
@@ -10,8 +11,8 @@
 //   3. Publish landing.html to the same artifact URL.
 // The card mock-ups on the page are hand-made HTML. If you add or rename a card part, add a matching
 // element with box-shadow `{{ r_<part> }}` to the page; the script refuses parts the page lacks.
-import { readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
@@ -118,6 +119,13 @@ export function replaceExamples(template: string, tabs: LandingTab[]): string {
 // CLI
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   const [input, output] = process.argv.slice(2);
+  if (input === "--json" && output) {
+    const tabs = loadLandingTabs(resolve("."));
+    mkdirSync(dirname(resolve(output)), { recursive: true });
+    writeFileSync(output, JSON.stringify(tabs));
+    console.log(`wrote ${output}: ${tabs.map((t) => t.label).join(", ")}`);
+    process.exit(0);
+  }
   if (!input || !output) {
     console.error("usage: npm run landing:examples -- <landing-page.html> <out.html>");
     process.exit(2);

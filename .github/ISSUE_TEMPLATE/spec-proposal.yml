@@ -1,0 +1,42 @@
+name: Spec proposal
+description: Propose a change to the format (grammar, document rules or catalog)
+labels: [spec proposal]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Changes to the format start here, before any code. How proposals are decided: [GOVERNANCE.md](https://github.com/jdsouza1/omni-ir/blob/main/GOVERNANCE.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What a model or an app can't do today, with a real example.
+    validations:
+      required: true
+  - type: textarea
+    id: lines
+    attributes:
+      label: The proposed lines
+      description: What a model would write. Omni-IR is flat `id = Component(...)` and `$key = value` lines only.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: rules
+    attributes:
+      label: Rules and conformance cases
+      description: The SPEC.md rules this adds or changes, and the cases that would test them (including what must be rejected).
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility
+      description: What happens to existing streams, and to older parsers and renderers that meet the new lines.
+  - type: checkboxes
+    id: principles
+    attributes:
+      label: Principles
+      options:
+        - label: The model still sends intent only (no HTML, CSS, styling props or code)
+          required: true
+        - label: Any action that changes data is still governed by an McpMutation
+          required: true

@@ -2,12 +2,12 @@
 // Server-Sent Events. The server relays text and never trusts it: validation happens in the
 // browser's parser and schema, the trusted zone.
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
-import { z } from "zod";
 import { ASSETS, type AssetRegistry } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { createParser } from "@omni-ir/core";
 import type { ToolRegistry } from "@omni-ir/core";
 import type { ServerConfig } from "./config";
+import { describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MutateBody, runMutation, sseEvent } from "./api";
 import { ModelError, type Model } from "./models/types";
 import { STUB_HANDLERS, type ToolHandler } from "./tools/handlers";
 
@@ -27,19 +27,6 @@ export interface AppOptions {
   /** Clock, injectable for rate-limit tests. */
   now?: () => number;
 }
-
-const GenerateBody = z.strictObject({ prompt: z.string().trim().min(1).max(2000) });
-
-// `params` is checked as a plain object here and by the tool's own schema below. (z.record is not
-// used: it silently drops a "__proto__" key instead of rejecting it.)
-const MutateBody = z.strictObject({
-  tool: z.string().min(1).max(128),
-  params: z.custom<Record<string, unknown>>(
-    (v) => typeof v === "object" && v !== null && !Array.isArray(v),
-    "params must be an object",
-  ),
-});
-const RESERVED_KEYS = ["__proto__", "constructor", "prototype"];
 
 const RATE_WINDOW_MS = 60_000;
 
@@ -69,7 +56,7 @@ export function createApp({
   app.post("/api/generate", async (req, res) => {
     const body = GenerateBody.safeParse(req.body);
     if (!body.success) {
-      return sendError(res, 400, "invalid_request", body.error.issues.map((i) => `${i.path.join(".") || "body"}: ${i.message}`).join("; "));
+      return sendError(res, 400, "invalid_request", describeIssues(body.error));
     }
     const limit = allow(req.ip ?? "unknown");
     if (!limit.ok) {
@@ -92,7 +79,7 @@ export function createApp({
     let chars = 0;
 
     const send = (event: string, data: unknown) => {
-      if (!clientGone && !res.writableEnded) res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+      if (!clientGone && !res.writableEnded) res.write(sseEvent(event, data));
     };
     const heartbeat = setInterval(() => {
       if (!clientGone && !res.writableEnded) res.write(": ping\n\n");
@@ -136,13 +123,12 @@ export function createApp({
       } else if (timedOut) {
         entry.outcome = "timeout";
         send("error", { code: "timeout", message: "The model took too long to respond.", retryable: true });
-      } else if (err instanceof ModelError) {
-        Object.assign(entry, { outcome: "error", code: err.code });
-        send("error", { code: err.code, message: err.message, retryable: err.retryable });
       } else {
-        // Unknown errors may contain internals: log them, send only a generic message.
-        Object.assign(entry, { outcome: "error", code: "model_error", error: err instanceof Error ? err.message : String(err) });
-        send("error", { code: "model_error", message: "Generation failed.", retryable: true });
+        const event = generateError(err);
+        Object.assign(entry, { outcome: "error", code: event.code });
+        // Unknown errors may contain internals: logged here, while the browser gets a generic message.
+        if (!(err instanceof ModelError)) entry.error = err instanceof Error ? err.message : String(err);
+        send("error", event);
       }
     } finally {
       clearInterval(heartbeat);
@@ -158,7 +144,7 @@ export function createApp({
   app.post("/api/mutate", async (req, res) => {
     const body = MutateBody.safeParse(req.body);
     if (!body.success) {
-      return sendError(res, 400, "invalid_request", body.error.issues.map((i) => `${i.path.join(".") || "body"}: ${i.message}`).join("; "));
+      return sendError(res, 400, "invalid_request", describeIssues(body.error));
     }
     const { tool, params } = body.data;
     const entry = { event: "mutate", tool: tool.slice(0, 128) };
@@ -168,31 +154,9 @@ export function createApp({
       log({ ...entry, outcome: "rate_limited" });
       return sendError(res, 429, "rate_limited", "Too many requests; try again shortly.", true);
     }
-    const schema = Object.hasOwn(tools, tool) ? tools[tool] : undefined;
-    const handler = Object.hasOwn(handlers, tool) ? handlers[tool] : undefined;
-    if (schema === undefined || handler === undefined) {
-      log({ ...entry, outcome: "unknown_tool" });
-      return sendError(res, 403, "unknown_tool", `"${tool}" is not a permitted action.`);
-    }
-
-    const reserved = RESERVED_KEYS.filter((key) => Object.hasOwn(params, key));
-    const parsed = reserved.length === 0 ? schema.safeParse(params) : null;
-    if (parsed === null || !parsed.success) {
-      const issues = parsed
-        ? parsed.error.issues.map((i) => ({ path: i.path.join("."), message: i.message }))
-        : reserved.map((key) => ({ path: key, message: "reserved key" }));
-      log({ ...entry, outcome: "invalid_params", paths: issues.map((i) => i.path) });
-      return res.status(422).json({ error: { code: "invalid_params", message: "The action's details are not valid.", retryable: false, issues } });
-    }
-
-    try {
-      const result = await handler(parsed.data as Record<string, unknown>);
-      log({ ...entry, outcome: "ok" });
-      return res.json({ ok: true, tool, result });
-    } catch (err) {
-      log({ ...entry, outcome: "tool_failed", error: err instanceof Error ? err.message : String(err) });
-      return sendError(res, 500, "tool_failed", "The action could not be completed.", true);
-    }
+    const answer = await runMutation(tool, params, tools, handlers);
+    log({ ...entry, outcome: answer.outcome, ...answer.detail });
+    return res.status(answer.status).json(answer.body);
   });
 
   app.use((_req, res) => sendError(res, 404, "not_found", "Not found."));
@@ -200,7 +164,7 @@ export function createApp({
   // Malformed JSON, oversized bodies and anything else thrown before a handler responds.
   app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     const status = typeof err === "object" && err !== null && "status" in err ? Number(err.status) : 500;
-    if (status >= 400 && status < 500) return sendError(res, 400, "invalid_request", "The request body must be JSON: {\"prompt\": \"…\"}.");
+    if (status >= 400 && status < 500) return res.status(400).json(INVALID_JSON);
     log({ event: "server_error", error: err instanceof Error ? err.message : String(err) });
     return sendError(res, 500, "server_error", "Something went wrong.");
   });
@@ -209,7 +173,7 @@ export function createApp({
 }
 
 function sendError(res: Response, status: number, code: string, message: string, retryable = false) {
-  res.status(status).json({ error: { code, message, retryable } });
+  res.status(status).json(errorBody(code, message, retryable));
 }
 
 /** Allow the configured origin only; answer preflight requests directly. */

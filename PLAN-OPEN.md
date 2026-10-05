@@ -2,7 +2,7 @@
 
 Goal: let someone who has never heard of Omni-IR find it, try it in a browser in under a minute, read how to use it, and know how to contribute. Today the playground runs only on a developer's machine, there is no docs site, the landing page is a private-by-default artifact whose Docs, Get started, Join the community and Governance links lead nowhere, and the repository has no contributor or governance documents. Everything in this step is free.
 
-Status: **DRAFT 2026-10-05**, waiting for the owner's approval of the questions below.
+Status: **APPROVED 2026-10-05** with the recommendations: GitHub Pages at `jdsouza1.github.io/omni-ir`; VitePress; GitHub Discussions; the owner as maintainer with public spec proposals; security and conduct reports through private GitHub channels; the hosted playground on the mock model only; the landing page artifact kept until the site is live; the repository description, homepage and topics updated when going public.
 
 ## Proposal
 
@@ -56,32 +56,38 @@ One public website, built from this repository by a GitHub Actions workflow and 
 ## Task checklist
 
 **A. Contributor and governance documents**
-- [ ] A.1 CONTRIBUTING.md, GOVERNANCE.md, CODE_OF_CONDUCT.md (Contributor Covenant) and SECURITY.md
-- [ ] A.2 Issue templates (bug, spec proposal, new component) and a pull request template that asks for tests and, for spec changes, conformance cases
-- [ ] A.3 README links to all of them
+- [x] A.1 CONTRIBUTING.md, GOVERNANCE.md, CODE_OF_CONDUCT.md (Contributor Covenant) and SECURITY.md
+- [x] A.2 Issue templates (bug, spec proposal, new component) and a pull request template that asks for tests and, for spec changes, conformance cases
+- [x] A.3 README links to all of them
 
 **B. The playground in the browser** *(tests first)*
-- [ ] B.1 Failing tests: the in-browser API answers generate and mutate like the server (routes, `demo: …` variants, tool checks, rejected mutations)
-- [ ] B.2 The in-browser API, sharing the server's mock routes, fixtures and tool checks rather than copying them
-- [ ] B.3 `npm run playground:static`: the playground built for `/playground/`, with a check that no request leaves the page
+- [x] B.1 Failing tests: the in-browser API answers generate and mutate like the server (routes, `demo: …` variants, tool checks, rejected mutations)
+- [x] B.2 The in-browser API, sharing the server's mock routes, fixtures and tool checks rather than copying them
+- [x] B.3 `npm run playground:static`: the playground built for `/playground/`, with a check that no request leaves the page
 
 **C. Docs site**
-- [ ] C.1 VitePress in `site/docs`: Getting started (web, iOS, Android), the spec, the catalog reference generated from the schema, conformance, the comparison, the roadmap and the changelog
-- [ ] C.2 A test that the docs build, their internal links work, and the generated pages are current
+- [x] C.1 VitePress in `site/docs`: Getting started (web, iOS, Android), the spec, the catalog reference generated from the schema, conformance, the comparison, the roadmap and the changelog
+- [x] C.2 A test that the docs build, their internal links work, and the generated pages are current
 
 **D. Landing page**
-- [ ] D.1 The approved landing page moved into `site/` with its example tabs generated from `fixtures/landing/`
-- [ ] D.2 Its Docs, Get started, Join the community and Governance links pointed at the new pages, and a link to try the playground
+- [x] D.1 The approved landing page moved into `site/` with its example tabs generated from `fixtures/landing/`
+- [x] D.2 Its Docs, Get started, Join the community and Governance links pointed at the new pages, and a link to try the playground
 
 **E. Build and review** *(checkpoint: you review)*
-- [ ] E.1 A `site.yml` workflow that builds the whole site on every push and uploads it as a CI artifact (no deploy yet)
-- [ ] E.2 A review of the built site in a preview: every page on desktop and phone, light and dark, the playground working end to end
+- [x] E.1 A `site.yml` workflow that builds the whole site on every push and uploads it as a CI artifact (no deploy yet)
+- [x] E.2 A review of the built site in a preview: every page on desktop and phone, light and dark, the playground working end to end
 
 **F. Going public, only with your go-ahead**
-- [ ] F.1 Switch on GitHub Pages (deploy from `site.yml` on `main`) and GitHub Discussions; you click the settings, or approve me doing so
-- [ ] F.2 Repository description, homepage and topics; private vulnerability reporting on
+- [x] F.1 Switch on GitHub Pages (deploy from `site.yml` on `main`) and GitHub Discussions; you click the settings, or approve me doing so
+- [x] F.2 Repository description, homepage and topics; private vulnerability reporting on
 - [ ] F.3 The landing page artifact's links pointed at the live site; roadmap and README updated
+
+**Progress (2026-10-05):** A–E.1 done on `wip/open`; waiting for the owner's review of the built site.
+- **Playground:** `server/api.ts` holds the request and mutation rules; the Express app and the in-browser API (`server/inBrowser.ts`) both use them, and parity tests send every request to both. `FixtureModel` is the mock model without the file system. The hosted playground is tested with the network switched off.
+- **Docs:** VitePress with local search (no outside service). Pages come from SPEC.md, the READMEs, the changelog, the roadmap, the comparison and the contributor documents, written once; VitePress fails the build on a dead link.
+- **Landing page:** ported from the design tool's export to a small React page (`site/landing/`) with the same layout, text and styles. The export's runtime (`dc-runtime`, React 18 and Babel from unpkg) was not copied into this Apache-2.0 repo: it is generated third-party code with no licence to redistribute. Its example tabs now come straight from `fixtures/landing/`, checked by the parser when the site builds. Changes: the badge says v0.3 instead of v0.1; "Try the playground" opens the hosted playground; an "Open the full playground" link beside the examples; Docs, Get started, Join the community (GitHub Discussions), Governance and the comparison link point at the site's pages; the design tool's "Made with" badge is gone.
+- 747 tests pass.
 
 ## What I need from you
 
-Your answers to questions 1–8 (or "go with the recommendations").
+Answered 2026-10-05: "go with the recommendations for step 12".
