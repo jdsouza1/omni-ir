@@ -27,7 +27,7 @@
     "playground:static": "vite build --config playground/vite.config.ts --configLoader runner --mode static",
     "docs:dev": "tsx scripts/docs.ts && vitepress dev .docs",
     "docs:build": "tsx scripts/docs.ts && vitepress build .docs",
-    "landing:build": "vite build --config site/landing/vite.config.ts --configLoader runner",
+    "landing:build": "tsx scripts/landing-examples.ts --json dist/landing-examples.json && vite build --config site/landing/vite.config.ts --configLoader runner",
     "site:build": "node -e \"require('fs').rmSync('dist/site',{recursive:true,force:true})\" && npm run landing:build && npm run playground:static && npm run docs:build",
     "landing:examples": "tsx scripts/landing-examples.ts",
     "spec": "tsx scripts/spec.ts",
