@@ -147,6 +147,24 @@ public class OmniStore(
   public fun chosenOption(key: String, options: List<String>, doc: OmniDocument = document.value): String =
     stateText(key, doc).takeIf { it in options } ?: ""
 
+  /** A chart's Series that have arrived, in order, with their position among the chart's children. */
+  public fun chartSeries(ids: List<String>, doc: OmniDocument = document.value): List<ChartSeries> =
+    ids.mapIndexedNotNull { index, id ->
+      val node = doc.nodes[id]?.takeIf { it.type == ComponentType.SERIES } ?: return@mapIndexedNotNull null
+      val name = (node.props["name"] as? PropValue.Text)?.value ?: return@mapIndexedNotNull null
+      val values = (node.props["values"] as? PropValue.ListOf)?.items?.mapNotNull { (it as? PropValue.Number)?.value } ?: return@mapIndexedNotNull null
+      ChartSeries(id, index, name, values)
+    }
+
+  /** A pie chart's Slices that have arrived, in order, with their position among its children. */
+  public fun chartSlices(ids: List<String>, doc: OmniDocument = document.value): List<ChartSlice> =
+    ids.mapIndexedNotNull { index, id ->
+      val node = doc.nodes[id]?.takeIf { it.type == ComponentType.SLICE } ?: return@mapIndexedNotNull null
+      val name = (node.props["name"] as? PropValue.Text)?.value ?: return@mapIndexedNotNull null
+      val value = (node.props["value"] as? PropValue.Number)?.value ?: return@mapIndexedNotNull null
+      ChartSlice(id, index, name, value)
+    }
+
   /** The labels of a Tabs' children, in order; null for a Tab that hasn't arrived yet. */
   public fun tabLabels(ids: List<String>, doc: OmniDocument = document.value): List<String?> =
     ids.map { id -> doc.nodes[id]?.takeIf { it.type == ComponentType.TAB }?.let { (it.props["label"] as? PropValue.Text)?.value } }
@@ -218,3 +236,9 @@ public fun displayText(value: Primitive): String = when (value) {
 /** A number as JavaScript's `String(n)` writes it: no ".0" on whole numbers. */
 internal fun jsNumberText(n: Double): String =
   if (n.isFinite() && n == Math.rint(n) && kotlin.math.abs(n) < 1e21) n.toLong().toString() else n.toString()
+
+/** A Series that has arrived; [index] is its position among the chart's children (its colour). */
+public data class ChartSeries(val id: String, val index: Int, val name: String, val values: List<Double>)
+
+/** A Slice that has arrived; [index] is its position among the pie chart's children. */
+public data class ChartSlice(val id: String, val index: Int, val name: String, val value: Double)

@@ -52,6 +52,11 @@ struct NodeView: View {
     case .tabs: TabsView(node: node, store: store)
     case .tab: VStack(alignment: .leading, spacing: 12) { Children(ids: node.children, stretch: true) }
     case .notice: notice
+    case .barChart: XYChartView(node: node, store: store, line: false)
+    case .lineChart: XYChartView(node: node, store: store, line: true)
+    case .pieChart: PieChartView(node: node, store: store)
+    // A Series or Slice is drawn by its chart; on its own (which the parser rejects) it shows nothing.
+    case .series, .slice: EmptyView()
     }
   }
 

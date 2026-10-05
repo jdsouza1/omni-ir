@@ -46,6 +46,32 @@ enum Format {
     }
   }
 
+  // MARK: Charts
+
+  /// A chart value in its `format`: a number, money, or a percentage (62 means 62%).
+  static func chartValue(_ value: Double, format: String?, currency: String?, locale: Locale) -> String {
+    switch format {
+    case "currency": value.formatted(.currency(code: currency ?? "USD").locale(locale))
+    case "percent": value.formatted(.number.precision(.fractionLength(0...1)).locale(locale)) + "%"
+    default: value.formatted(.number.precision(.fractionLength(0...2)).locale(locale))
+    }
+  }
+
+  /// An axis tick, written short: $20K rather than $20,000.00.
+  static func chartTick(_ value: Double, format: String?, currency: String?, locale: Locale) -> String {
+    switch format {
+    case "currency": value.formatted(.currency(code: currency ?? "USD").notation(.compactName).precision(.fractionLength(0...1)).locale(locale))
+    case "percent": value.formatted(.number.notation(.compactName).precision(.fractionLength(0...1)).locale(locale)) + "%"
+    default: value.formatted(.number.notation(.compactName).precision(.fractionLength(0...1)).locale(locale))
+    }
+  }
+
+  /// A slice's share of the whole, as shown in the legend: "52%".
+  static func share(_ value: Double, of total: Double, locale: Locale) -> String {
+    let percent = total > 0 ? value / total * 100 : 0
+    return percent.formatted(.number.precision(.fractionLength(0...1)).locale(locale)) + "%"
+  }
+
   // MARK: Rating
 
   struct RatingModel: Equatable {

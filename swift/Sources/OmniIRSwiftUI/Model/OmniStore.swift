@@ -136,6 +136,28 @@ public final class OmniStore {
     return options.contains(value) ? value : ""
   }
 
+  /// A chart's Series that have arrived, in order, with their position among the chart's children
+  /// (so each keeps its colour as the others arrive).
+  public func chartSeries(_ ids: [String]) -> [ChartSeries] {
+    ids.enumerated().compactMap { index, id in
+      guard let node = document.nodes[id], node.type == .series, case .text(let name)? = node.props["name"],
+        case .list(let items)? = node.props["values"]
+      else { return nil }
+      let values = items.compactMap { if case .number(let n) = $0 { n } else { nil } }
+      return ChartSeries(id: id, index: index, name: name, values: values)
+    }
+  }
+
+  /// A pie chart's Slices that have arrived, in order, with their position among its children.
+  public func chartSlices(_ ids: [String]) -> [ChartSlice] {
+    ids.enumerated().compactMap { index, id in
+      guard let node = document.nodes[id], node.type == .slice, case .text(let name)? = node.props["name"],
+        case .number(let value)? = node.props["value"]
+      else { return nil }
+      return ChartSlice(id: id, index: index, name: name, value: value)
+    }
+  }
+
   /// The labels of a Tabs' children, in order; nil for a Tab that hasn't arrived yet.
   public func tabLabels(_ ids: [String]) -> [String?] {
     ids.map { id in
@@ -209,6 +231,21 @@ public func displayText(_ value: Primitive) -> String {
   case .bool(let b): b ? "true" : "false"
   case .null: ""
   }
+}
+
+public struct ChartSeries: Equatable, Identifiable, Sendable {
+  public let id: String
+  /// Position among the chart's children: picks the colour and line pattern.
+  public let index: Int
+  public let name: String
+  public let values: [Double]
+}
+
+public struct ChartSlice: Equatable, Identifiable, Sendable {
+  public let id: String
+  public let index: Int
+  public let name: String
+  public let value: Double
 }
 
 /// A number as JavaScript's `String(n)` writes it: no ".0" on whole numbers.

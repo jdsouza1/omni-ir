@@ -55,6 +55,49 @@ public object Format {
       }
     } ?: emptyList()
 
+  /** A chart value in its `format`: a number, money, or a percentage (62 means 62%). */
+  public fun chartValue(value: Double, format: String?, currency: String?, locale: Locale): String = when (format) {
+    "currency" -> try {
+      NumberFormat.getCurrencyInstance(locale).apply { this.currency = Currency.getInstance(currency ?: "USD") }.format(value)
+    } catch (e: IllegalArgumentException) {
+      NumberFormat.getNumberInstance(locale).format(value)
+    }
+    "percent" -> NumberFormat.getNumberInstance(locale).apply { maximumFractionDigits = 1 }.format(value) + "%"
+    else -> NumberFormat.getNumberInstance(locale).apply { maximumFractionDigits = 2 }.format(value)
+  }
+
+  /** An axis tick, written short: $20K rather than $20,000.00. */
+  public fun chartTick(value: Double, format: String?, currency: String?, locale: Locale): String {
+    val compact = NumberFormat.getCompactNumberInstance(locale, NumberFormat.Style.SHORT).apply { maximumFractionDigits = 1 }.format(value)
+    return when (format) {
+      "currency" -> (try { Currency.getInstance(currency ?: "USD").getSymbol(locale) } catch (e: IllegalArgumentException) { "" }) + compact
+      "percent" -> "$compact%"
+      else -> compact
+    }
+  }
+
+  /** A slice's share of the whole, as shown in the legend: "52%". */
+  public fun share(value: Double, total: Double, locale: Locale): String =
+    NumberFormat.getNumberInstance(locale).apply { maximumFractionDigits = 1 }.format(if (total > 0) value / total * 100 else 0.0) + "%"
+
+  /** Round axis ticks from the lowest to the highest value, including 0 (as the web renderer draws them). */
+  public fun niceTicks(min: Double, max: Double, count: Int = 4): List<Double> {
+    val lo = minOf(0.0, min)
+    val hi = maxOf(0.0, max)
+    if (hi == lo) return listOf(lo, lo + 1)
+    val raw = (hi - lo) / count
+    val mag = Math.pow(10.0, Math.floor(Math.log10(raw)))
+    val step = listOf(1.0, 2.0, 2.5, 5.0, 10.0).map { it * mag }.firstOrNull { it >= raw } ?: (10 * mag)
+    val ticks = mutableListOf<Double>()
+    var t = Math.floor(lo / step) * step
+    while (t < hi + step - 1e-9) {
+      ticks += Math.round(t / step) * step
+      t += step
+    }
+    if (ticks.last() < hi) ticks += ticks.last() + step
+    return ticks
+  }
+
   /** A Rating, kept within 0…max. */
   public data class RatingModel(
     val value: Double,
