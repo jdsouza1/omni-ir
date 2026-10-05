@@ -43,11 +43,32 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 ## Next, in priority order
 
-1. **Step 12 · Transport standard.** Make SPEC.md §10 normative: the exact Server-Sent Events, reconnecting, and how errors and governed actions are reported, with transport conformance cases. Map the same events onto WebSockets, and add an adapter for [AG-UI](https://docs.ag-ui.com/concepts), the event protocol many agent frameworks speak, so they can stream Omni-IR without custom work. Starts with a short research step on the current AG-UI spec.
-2. **Real backend tool handlers with authorization**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 12, since both concern the server side.
-3. **Step 13 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval.
+
+1. **Step 12 · Open to outsiders.** Today the playground runs only locally and the landing page's Docs, Get started, Join the community and Governance links lead nowhere.
+   - [ ] Host the playground publicly with the mock model running in the browser (a static build, so no server and no API cost)
+   - [ ] A docs site built from SPEC.md, the READMEs and a getting-started guide
+   - [ ] The landing page as a public web page, with its four placeholder links pointing at real pages
+   - [ ] CONTRIBUTING.md, a GOVERNANCE.md (how the spec changes and who decides), issue and pull request templates
+   - Going public (hosting, enabling Discussions) only with the owner's go-ahead.
+2. **Step 13 · Proof and hardening (all free).**
+   - [ ] Model check on other models: Gemini, ChatGPT and an open model, run in their own chat apps, so no API cost. "Works with any model" is unproven while only Claude has been checked.
+   - [ ] Parser fuzz testing: randomly broken input fed to the TypeScript, Swift and Kotlin parsers, which must never crash and must always report the same issues
+   - [ ] Performance on large screens: each line currently re-checks the whole document; measure it at hundreds of components and fix if needed
+3. **Step 14 · Transport standard and stream versions.** Make SPEC.md §10 normative: the exact Server-Sent Events, reconnecting, and how errors and governed actions are reported, with transport conformance cases. Map the same events onto WebSockets, and add an adapter for [AG-UI](https://docs.ag-ui.com/concepts), the event protocol many agent frameworks speak, so they can stream Omni-IR without custom work. Starts with a short research step on the current AG-UI spec.
+   - [ ] An optional version marker as a stream's first line, so a client can say "this stream needs 0.3" instead of rejecting unknown lines one by one (listed under "Not yet specified" in SPEC.md)
+4. **Real backend tool handlers with authorization and persistence**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 14, since both concern the server side.
+5. **Step 15 · Themes and languages.**
+   - [ ] A design-token layer: brand colours, fonts and corner radius set by the app, never by the model, on web, iOS and Android
+   - [ ] A dark theme for the web catalog (it is light-only today)
+   - [ ] The renderers' own text ("Choose a date", "Component failed to load") translated, following the platform's locale
+6. **Step 16 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+7. **Step 17 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
 
 ## Later
 
+- **Android on Maven Central.** Needs a free Sonatype account and a signing key, created by the owner; until then apps include the modules from this repository.
+- **Accessibility audit with real screen readers** (VoiceOver, TalkBack, NVDA) on real devices, beyond today's automated checks.
+- **External security review** of the parsers and governance, once fuzz testing is in place. Only with the owner's go-ahead, since it may cost money.
 - **Eject to code**, only when a client asks: export a screen as readable React (then SwiftUI) that keeps calling the same checked tool layer. Built per project when there is demand; the benchmark's React converter is a starting point. Until then, Omni-IR is open source (Apache-2.0), so no one is locked in.
 - **Phase 4 · Bi-directional AST sync**, starting with a written goal (see the timeline above).
