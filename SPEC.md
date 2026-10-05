@@ -463,7 +463,7 @@ Slice(name, value)
 ### McpMutation
 
 ```
-McpMutation(target, tool, params?)
+McpMutation(target, tool=…, [params=…])
 ```
 
 | Prop | Position | Required | Values |

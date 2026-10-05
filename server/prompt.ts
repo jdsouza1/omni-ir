@@ -72,7 +72,7 @@ Write \`root = …\` first and its parts after it; referring to an id before its
 ## Components
 ${COMPONENT_TYPES.map(componentBlock).join("\n\n")}
 
-McpMutation(target, tool, params?)
+McpMutation(target, tool=…, [params=…])
   target: id of the Button it governs
   tool: one of the tools below
   params: {name: value or $state, …}

@@ -164,7 +164,7 @@ Slice(name, value)
   name: text
   value: number
 
-McpMutation(target, tool, params?)
+McpMutation(target, tool=…, [params=…])
   target: id of the Button it governs
   tool: one of the tools below
   params: {name: value or $state, …}

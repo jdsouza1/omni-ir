@@ -75,6 +75,7 @@ describe("buildSystemPrompt", () => {
     }
     expect(prompt).toContain("Image(asset, alt=…, [ratio=…])");
     expect(prompt).toContain("must be given by name");
+    expect(prompt).toContain("McpMutation(target, tool=…, [params=…])");
   });
 
   it("says the Button, not its McpMutation, goes in the layout, and that there are no expressions", () => {
