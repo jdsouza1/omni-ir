@@ -1,5 +1,6 @@
 // Step 11: BarChart, LineChart, PieChart, Series and Slice (PLAN-CHARTS.md). Protocol rules only;
 // rendering is covered in components.charts.test.tsx.
+import { readFileSync } from "node:fs";
 import { createParser, validateStatement } from "@omni-ir/core";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
@@ -121,5 +122,20 @@ describe("chart document rules", () => {
 
   it("charts never call the backend: an McpMutation can only target a Button with an action", () => {
     expect(issues('root = PieChart("T", [])', 'm = McpMutation(root, tool="profile.update", params={})')).toContain("2:mutation_target_not_interactive");
+  });
+});
+
+describe("model check, charts (docs/model-check-2026-10-04-charts.md)", () => {
+  const doc = readFileSync("docs/model-check-2026-10-04-charts.md", "utf8");
+  const block = doc.slice(doc.indexOf("```" + "\n## ") + 4, doc.lastIndexOf("\n" + "```"));
+  const replies = block.split(/^## /m).filter(Boolean);
+
+  it.each(replies.map((r) => [r.slice(0, r.indexOf("\n")), r.slice(r.indexOf("\n") + 1)]))("the %s reply is valid", (_, text) => {
+    expect(issues(text)).toEqual([]);
+  });
+
+  it("records all five replies, and none styles a chart", () => {
+    expect(replies).toHaveLength(5);
+    expect(block).not.toMatch(/\b(color|style|animation|tooltip)=/);
   });
 });
