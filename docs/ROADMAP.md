@@ -45,7 +45,7 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval.
 
-1. **Step 12 · Open to outsiders.** Today the playground runs only locally and the landing page's Docs, Get started, Join the community and Governance links lead nowhere.
+1. **Step 12 · Open to outsiders** (plan drafted: [PLAN-OPEN.md](../PLAN-OPEN.md)). Today the playground runs only locally and the landing page's Docs, Get started, Join the community and Governance links lead nowhere.
    - [ ] Host the playground publicly with the mock model running in the browser (a static build, so no server and no API cost)
    - [ ] A docs site built from SPEC.md, the READMEs and a getting-started guide
    - [ ] The landing page as a public web page, with its four placeholder links pointing at real pages
