@@ -2,7 +2,7 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
-## Unreleased (0.3.0)
+## 0.3.0 (2026-10-05)
 
 ### Added
 - **Charts:** `BarChart` and `LineChart` (values across categories or over time, holding `Series`) and `PieChart` (parts of a whole, holding `Slice`). Each series or slice is its own line, so a chart fills in as the stream arrives. Charts carry a title, labels, numbers and an optional `format` (`number`, `currency` or `percent`) only: colours, line styles, legends and value readouts belong to the renderer. Web (SVG, no library), SwiftUI (Swift Charts) and Compose (Canvas), each with a hidden data table or accessibility descriptions. The catalog now has 27 components plus McpMutation.

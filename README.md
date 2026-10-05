@@ -2,7 +2,7 @@
 
 **A line-oriented streaming protocol for generative UI.** An AI model describes a screen in short, flat lines of Omni-IR; a trusted client parses each line as it streams in and renders it with its own components. The model never writes HTML, CSS or code, and can only trigger backend actions the app has explicitly allowed.
 
-> **Status: early (v0.2).** The parser, schema, streaming server and playground work and are tested, with renderers for the web (React), iPhone and iPad (SwiftUI) and Android (Jetpack Compose). The format is defined in [SPEC.md](SPEC.md), with a [conformance suite](conformance/README.md) that all three parsers pass. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+> **Status: early (v0.3).** The parser, schema, streaming server and playground work and are tested, with renderers for the web (React), iPhone and iPad (SwiftUI) and Android (Jetpack Compose). The format is defined in [SPEC.md](SPEC.md), with a [conformance suite](conformance/README.md) that all three parsers pass. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ```
 root = Card([title, amount, note, actions])
@@ -90,7 +90,7 @@ The same screens in each format; sizes are counted offline the way OpenUI's benc
 
 ## Components
 
-`Stack`, `Card`, `Heading`, `Text`, `Input` (one line, or several with `lines`), `DateInput`, `Select`, `Switch`, `Button`, `Divider`, `Badge`, `Notice`, `Skeleton`, `Image`, `Rating`, `List`, `ListItem`, `Table`, `TableRow`, `Tabs`, `Tab`, `Message`, `BarChart`, `LineChart`, `PieChart`, `Series`, `Slice`, plus `McpMutation` for governed actions. Select, Switch, Table, Tabs and Notice are new in 0.2.0; the charts are new since then (unreleased, coming in 0.3.0). Charts carry data only: the model sends a title, labels and numbers, and each renderer chooses the colours, legend and readouts. Images come only from the app's asset registry (`app/assets.ts`), named by the model, never as URLs. `npm run prompt:print` shows every prop and allowed value, generated from the schema.
+`Stack`, `Card`, `Heading`, `Text`, `Input` (one line, or several with `lines`), `DateInput`, `Select`, `Switch`, `Button`, `Divider`, `Badge`, `Notice`, `Skeleton`, `Image`, `Rating`, `List`, `ListItem`, `Table`, `TableRow`, `Tabs`, `Tab`, `Message`, `BarChart`, `LineChart`, `PieChart`, `Series`, `Slice`, plus `McpMutation` for governed actions. Select, Switch, Table, Tabs and Notice are new in 0.2.0, the charts in 0.3.0. Charts carry data only: the model sends a title, labels and numbers, and each renderer chooses the colours, legend and readouts. Images come only from the app's asset registry (`app/assets.ts`), named by the model, never as URLs. `npm run prompt:print` shows every prop and allowed value, generated from the schema.
 
 ## Using a real model (optional, costs money)
 
