@@ -1,6 +1,6 @@
 # Omni-IR roadmap
 
-Updated 2026-10-04. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
+Updated 2026-10-05. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
 
 ## Done
 
@@ -9,7 +9,7 @@ Updated 2026-10-04. Planned dates for the remaining work are kept from the origi
 | 1 · Core spec | Syntax spec v0.1 draft | [SPEC.md](../SPEC.md) |
 | 1 · Core spec | Zod validation schemas | `packages/core/src/schema.ts` |
 | 1 · Core spec | Zod schemas and parser published on npm as [`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) 0.1.0 | `packages/core/` |
-| 1 · Core spec | Conformance suite (73 cases, including one per component) | [conformance/](../conformance/README.md) |
+| 1 · Core spec | Conformance suite (80 cases, including one per component) | [conformance/](../conformance/README.md) |
 | 2 · Web reference | Streaming parser in TypeScript, written test-first | `packages/core/` |
 | 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `packages/react/` |
 | 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |
@@ -20,6 +20,7 @@ Updated 2026-10-04. Planned dates for the remaining work are kept from the origi
 | 2 · Web reference | React Catalog SDK published on npm as [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) 0.1.0, with approved, token-free releases | `packages/react/`, `.github/workflows/release.yml` |
 | Since then | Comparison with OpenUI Lang, A2UI, json-render, HTML and React: size, streaming, coverage, capabilities and a reliability run (both formats 9 of 9) | [docs/COMPARISON.md](COMPARISON.md), `benchmarks/` |
 | Since then | Catalog expansion: Select, Switch, Table/TableRow, Tabs/Tab and Notice on web, iOS and Android | [PLAN-CATALOG.md](../PLAN-CATALOG.md) |
+| Since then | Charts: BarChart, LineChart and PieChart with Series and Slice on web, iOS and Android; the comparison's coverage of OpenUI's scenarios went from 3 of 7 to 5 (unreleased, for 0.3.0) | [PLAN-CHARTS.md](../PLAN-CHARTS.md) |
 | Release | `v0.2.0` (2026-10-04): both npm packages and the first Swift Package Manager version; see [CHANGELOG.md](../CHANGELOG.md) | `.github/workflows/release.yml` |
 
 ## Planned
@@ -41,10 +42,9 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 ## Next, in priority order
 
-1. **Step 11 · Charts** (plan drafted: PLAN-CHARTS.md). BarChart, LineChart and PieChart with Series and Slice, one line per series. The model sends titles, labels and numbers only; each renderer owns colours, tooltips and animation with a fixed palette checked for colour blindness. Expected to cover 5 of the 7 OpenUI scenarios in the comparison (from 3).
-2. **Step 12 · Transport standard.** Make SPEC.md §10 normative: the exact Server-Sent Events, reconnecting, and how errors and governed actions are reported, with transport conformance cases. Map the same events onto WebSockets, and add an adapter for [AG-UI](https://docs.ag-ui.com/concepts), the event protocol many agent frameworks speak, so they can stream Omni-IR without custom work. Starts with a short research step on the current AG-UI spec.
-3. **Real backend tool handlers with authorization**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 12, since both concern the server side.
-4. **Step 13 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+1. **Step 12 · Transport standard.** Make SPEC.md §10 normative: the exact Server-Sent Events, reconnecting, and how errors and governed actions are reported, with transport conformance cases. Map the same events onto WebSockets, and add an adapter for [AG-UI](https://docs.ag-ui.com/concepts), the event protocol many agent frameworks speak, so they can stream Omni-IR without custom work. Starts with a short research step on the current AG-UI spec.
+2. **Real backend tool handlers with authorization**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 12, since both concern the server side.
+3. **Step 13 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
 
 ## Later
 

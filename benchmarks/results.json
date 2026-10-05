@@ -812,9 +812,7 @@
       "name": "chart-with-data",
       "set": "openui",
       "components": 11,
-      "noCounterpart": [
-        "BarChart"
-      ],
+      "noCounterpart": [],
       "tokens": {
         "omni-ir": 247,
         "openui-lang": 231,
@@ -968,11 +966,7 @@
       "name": "dashboard",
       "set": "openui",
       "components": 47,
-      "noCounterpart": [
-        "BarChart",
-        "PieChart",
-        "LineChart"
-      ],
+      "noCounterpart": [],
       "tokens": {
         "omni-ir": 1280,
         "openui-lang": 1224,
