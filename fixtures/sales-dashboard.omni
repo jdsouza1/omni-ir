@@ -1,0 +1,10 @@
+# Omni-IR: a sales dashboard, with sales by month as a bar chart and weekly visitors as a line chart.
+root = Card([title, summary, sales, visits])
+title = Heading("Sales dashboard")
+summary = Notice("September sales were up 12% on August.", tone="success")
+sales = BarChart("Sales by month", ["Jul", "Aug", "Sep"], [online, store], format="currency")
+online = Series("Online", [12400, 15100, 18300])
+store = Series("In store", [9800, 11200, 9500])
+visits = LineChart("Weekly visitors", ["W1", "W2", "W3", "W4"], [web, app])
+web = Series("Website", [3200, 3550, 3400, 4100])
+app = Series("App", [1800, 2100, 2650, 2900])

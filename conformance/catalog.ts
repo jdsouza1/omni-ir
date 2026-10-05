@@ -203,22 +203,31 @@ function catalogCase(type: string, shape: ComponentShape): ConformanceCase {
 
   // Items sit in their own kind of container. A TableRow gets a Table of its own with one column per
   // cell, since a row must match its table's columns.
-  const parent = type === "ListItem" ? "List" : type === "Tab" ? "Tabs" : "Stack";
+  const parent = type === "ListItem" ? "List" : type === "Tab" ? "Tabs" : type === "Slice" ? "PieChart" : "Stack";
   const ids = accepted.map((_, i) => `a${i + 1}`);
-  const wrapped = type === "TableRow";
+  // A TableRow gets a Table of its own with one column per cell, and a Series a BarChart with one
+  // label per value, since each must match its container.
+  const wrapped = type === "TableRow" || type === "Series";
   const topIds = wrapped ? accepted.map((_, i) => `w${i + 1}`) : ids;
   // A Switch edits true/false state; everything else that takes $state edits text.
   const stateValue = type === "Switch" ? false : "";
-  const lines: InputPart[][] = [[`root = ${parent}([${topIds.join(", ")}])`], [`${STATE_KEY} = ${JSON.stringify(stateValue)}`]];
+  const rootProps: Record<string, unknown> = parent === "PieChart" ? { title: "Chart" } : {};
+  const rootArgs = parent === "PieChart" ? '"Chart", ' : "";
+  const lines: InputPart[][] = [[`root = ${parent}(${rootArgs}[${topIds.join(", ")}])`], [`${STATE_KEY} = ${JSON.stringify(stateValue)}`]];
   const nodes: Record<string, { type: string; props: Record<string, unknown>; children: string[] }> = {
-    root: { type: parent, props: {}, children: topIds },
+    root: { type: parent, props: rootProps, children: topIds },
   };
   accepted.forEach(({ values, governed }, i) => {
-    if (wrapped) {
+    if (wrapped && type === "TableRow") {
       const cells = (values.get("cells")?.value as unknown[] | undefined) ?? [];
       const columns = cells.map((_, c) => `C${c + 1}`);
       lines.push([`${topIds[i]} = Table(${JSON.stringify(columns).replace(/,/g, ", ")}, [${ids[i]}])`]);
       nodes[topIds[i]!] = { type: "Table", props: { columns }, children: [ids[i]!] };
+    } else if (wrapped) {
+      const values_ = (values.get("values")?.value as unknown[] | undefined) ?? [];
+      const labels = values_.map((_, c) => `L${c + 1}`);
+      lines.push([`${topIds[i]} = BarChart("Chart", ${JSON.stringify(labels).replace(/,/g, ", ")}, [${ids[i]}])`]);
+      nodes[topIds[i]!] = { type: "BarChart", props: { title: "Chart", labels }, children: [ids[i]!] };
     }
     lines.push([`${ids[i]} = `, ...call(values)]);
     if (governed) lines.push([`g${i + 1} = McpMutation(${ids[i]}, tool="payments.confirm")`]);

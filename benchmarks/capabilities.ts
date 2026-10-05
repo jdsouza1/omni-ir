@@ -25,7 +25,7 @@ export const CAPABILITIES: readonly Row[] = [
   {
     question: "Who defines the components",
     cells: [
-      { text: "A fixed catalog in the spec: 22 components plus McpMutation", source: "SPEC.md §6" },
+      { text: "A fixed catalog in the spec: 27 components plus McpMutation", source: "SPEC.md §6" },
       { text: "The app's library (Zod schemas); 53 components in its benchmark library", source: OPENUI_SPEC },
       { text: "The catalog named in createSurface: the basic catalog or the app's own", source: A2UI_PROTOCOL },
       { text: "The app's catalog (Zod schemas)", source: JR },
@@ -113,7 +113,7 @@ export const CAPABILITIES: readonly Row[] = [
   {
     question: "Shared tests for other implementations",
     cells: [
-      { text: "73 language-neutral conformance cases", source: "conformance/" },
+      { text: "80 language-neutral conformance cases", source: "conformance/" },
       { text: "None published that we found" },
       { text: "Spec test cases (specification/v0_9/test)", source: "a2ui-project/a2ui" },
       { text: "None published that we found" },
@@ -156,7 +156,7 @@ export const CAPABILITIES: readonly Row[] = [
 export const NO_COUNTERPART: Record<"omni" | "openui", readonly string[]> = {
   // OpenUI components Omni-IR's catalog has nothing for (asked of OpenUI's scenarios).
   openui: [
-    "BarChart", "LineChart", "AreaChart", "PieChart", "RadarChart", "RadialChart", "HorizontalBarChart",
+    "AreaChart", "RadarChart", "RadialChart", "HorizontalBarChart",
     "SingleStackedBarChart", "ScatterChart", "RadioGroup", "CheckBoxGroup", "Slider",
     "Accordion", "Carousel", "Steps", "ImageGallery", "MarkDownRenderer", "CodeBlock",
   ],

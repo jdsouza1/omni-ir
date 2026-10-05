@@ -109,3 +109,19 @@
 .omni-notice--warning { border-left-color: #b7791f; background: #fff4d6; }
 .omni-notice--danger { border-left-color: #c62828; background: #fde4e4; }
 .omni-notice__title { font-weight: 600; }
+
+/* Charts: the catalog draws everything; the stream supplies a title, labels and numbers. */
+.omni-chart { margin: 0; display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+.omni-chart__title { font-weight: 600; }
+.omni-chart__plot { width: 100%; }
+.omni-chart__svg { display: block; width: 100%; height: auto; overflow: visible; }
+.omni-chart__svg--pie { max-width: 14rem; margin: 0 auto; }
+.omni-chart__grid { stroke: #e3e5e8; stroke-width: 1; }
+.omni-chart__baseline { stroke: #9aa0aa; stroke-width: 1; }
+.omni-chart__tick { font-size: 13px; fill: #5b616e; font-variant-numeric: tabular-nums; }
+.omni-chart__mark { cursor: default; outline: none; }
+.omni-chart__mark:focus-visible { stroke: #1f2329; stroke-width: 2; }
+.omni-chart__legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; font-size: 0.85rem; color: #3c4048; }
+.omni-chart__legend li { display: inline-flex; align-items: center; gap: 0.4rem; }
+.omni-chart__share { color: #5b616e; font-variant-numeric: tabular-nums; }
+.omni-chart__readout { margin: 0; min-height: 1.25rem; font-size: 0.85rem; color: #3c4048; font-variant-numeric: tabular-nums; }

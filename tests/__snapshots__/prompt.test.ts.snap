@@ -30,6 +30,7 @@ Write \`root = …\` first and its parts after it; referring to an id before its
 - A Select picks one option and edits a text state: declare \`$size = ""\` and write \`size = Select($size, label="Size", options=["Small", "Large"])\`. A Switch turns a setting on or off and edits a true/false state: \`$news = false\` and \`news = Switch($news, label="Email me order updates")\`. A Select's state starts as \`""\` (nothing chosen) or exactly one of its options. Like an Input, neither calls the backend; send their values through McpMutation params.
 - A Table holds only TableRows, one line per row, each with one cell per column: \`orders = Table(["Order", "Total"], [r1])\` and \`r1 = TableRow(["A1B2-7731", 42.5])\`.
 - Tabs hold only Tab components, and each Tab has a label and its own children: \`tabs = Tabs([profileTab, alertsTab])\` and \`profileTab = Tab("Profile", [name, bio])\`.
+- Charts: a BarChart compares values across categories, a LineChart shows change over time, a PieChart shows parts of a whole. Each Series or Slice goes on its own line, and a Series has one number per label: \`sales = BarChart("Sales by month", ["Jul", "Aug"], [online])\` and \`online = Series("Online", [1200, 1500])\`; \`split = PieChart("Orders by channel", [web])\` and \`web = Slice("Website", 62)\`. Charts carry a title, labels and numbers only (and an optional \`format\`): the app chooses colours, styles and animation.
 - A Notice shows a short message in a box: \`tone="warning"\` or \`"danger"\` for problems, \`"success"\` when something worked, \`"info"\` otherwise.
 - Use only the components, tools and images listed here. If a request needs something that isn't available, build the closest screen you can with what is.
 - Use a tool only for what its name says. If no tool fits an action, use a Button without \`action\` and say in a Text that it isn't available here.
@@ -133,6 +134,34 @@ Notice(text, tone?, title?)
   text: text | $state
   tone: "info" | "success" | "warning" | "danger"
   title: text | $state
+
+BarChart(title, labels, children, format?, currency?)
+  title: text
+  labels: [text, …]
+  children: [id, …]
+  format: "number" | "currency" | "percent"
+  currency: 3-letter currency code
+
+LineChart(title, labels, children, format?, currency?)
+  title: text
+  labels: [text, …]
+  children: [id, …]
+  format: "number" | "currency" | "percent"
+  currency: 3-letter currency code
+
+PieChart(title, children, format?, currency?)
+  title: text
+  children: [id, …]
+  format: "number" | "currency" | "percent"
+  currency: 3-letter currency code
+
+Series(name, values)
+  name: text
+  values: [number, …]
+
+Slice(name, value)
+  name: text
+  value: number
 
 McpMutation(target, tool, params?)
   target: id of the Button it governs

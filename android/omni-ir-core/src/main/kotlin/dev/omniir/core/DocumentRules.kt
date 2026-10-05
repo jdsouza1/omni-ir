@@ -79,20 +79,34 @@ internal fun validateDocument(statements: List<Statement>, complete: Boolean): L
   // only Tab; each item sits only in its container. Reported on whichever line arrives second.
   for (pair in CONTAINER_PAIRS) {
     for (n in nodes) {
-      if (n.type == pair.container) {
+      if (n.type in pair.containers) {
         for (child in n.children) {
           val c = node(child)
           if (c != null && c.type != pair.item) {
-            issues += Issue(pair.code, "${pair.container.wireName} \"${n.id}\" can only contain ${pair.item.wireName}s, not ${c.type.wireName} \"$child\"", n.id)
+            issues += Issue(pair.code, "${n.type.wireName} \"${n.id}\" can only contain ${pair.item.wireName}s, not ${c.type.wireName} \"$child\"", n.id)
           }
         }
       }
       if (n.type == pair.item) {
         val parent = parentOf[n.id]
         val p = parent?.let(::node)
-        if (p != null && p.type != pair.container) {
-          issues += Issue(pair.code, "${pair.item.wireName} \"${n.id}\" must be inside a ${pair.container.wireName}, not ${p.type.wireName} \"$parent\"", n.id)
+        if (p != null && p.type !in pair.containers) {
+          val names = pair.containers.joinToString(" or ") { it.wireName }
+          issues += Issue(pair.code, "${pair.item.wireName} \"${n.id}\" must be inside a $names, not ${p.type.wireName} \"$parent\"", n.id)
         }
+      }
+    }
+  }
+
+  // A Series has one value per label of its BarChart or LineChart.
+  for (n in nodes) {
+    if (n.type != ComponentType.BAR_CHART && n.type != ComponentType.LINE_CHART) continue
+    val labels = (n.props["labels"] as? PropValue.ListOf)?.items?.size ?: continue
+    for (child in n.children) {
+      val series = node(child) ?: continue
+      val values = (series.props["values"] as? PropValue.ListOf)?.items?.size ?: continue
+      if (series.type == ComponentType.SERIES && values != labels) {
+        issues += Issue(IssueCode.CHART_MISMATCH, "Series \"$child\" has $values value(s), but ${n.type.wireName} \"${n.id}\" has $labels label(s)", child)
       }
     }
   }
@@ -168,10 +182,12 @@ public fun isIsoDate(s: String): Boolean =
 private val STATE_EDITORS = setOf(ComponentType.INPUT, ComponentType.DATE_INPUT, ComponentType.SELECT, ComponentType.SWITCH)
 
 /** A component that holds only one kind of item, and the issue code for breaking that rule. */
-internal data class ContainerPair(val container: ComponentType, val item: ComponentType, val code: IssueCode)
+internal data class ContainerPair(val containers: Set<ComponentType>, val item: ComponentType, val code: IssueCode)
 
 internal val CONTAINER_PAIRS = listOf(
-  ContainerPair(ComponentType.LIST, ComponentType.LIST_ITEM, IssueCode.LIST_MISMATCH),
-  ContainerPair(ComponentType.TABLE, ComponentType.TABLE_ROW, IssueCode.TABLE_MISMATCH),
-  ContainerPair(ComponentType.TABS, ComponentType.TAB, IssueCode.TABS_MISMATCH),
+  ContainerPair(setOf(ComponentType.LIST), ComponentType.LIST_ITEM, IssueCode.LIST_MISMATCH),
+  ContainerPair(setOf(ComponentType.TABLE), ComponentType.TABLE_ROW, IssueCode.TABLE_MISMATCH),
+  ContainerPair(setOf(ComponentType.TABS), ComponentType.TAB, IssueCode.TABS_MISMATCH),
+  ContainerPair(setOf(ComponentType.BAR_CHART, ComponentType.LINE_CHART), ComponentType.SERIES, IssueCode.CHART_MISMATCH),
+  ContainerPair(setOf(ComponentType.PIE_CHART), ComponentType.SLICE, IssueCode.CHART_MISMATCH),
 )

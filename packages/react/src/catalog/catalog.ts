@@ -22,6 +22,7 @@ import {
   Tabs,
   Text,
 } from "./components.js";
+import { BarChart, LineChart, PieChart, Series, Slice } from "./charts.js";
 import type { Catalog } from "./types.js";
 
 /** The default Trusted Catalog. `satisfies Catalog` makes a missing component a compile error. */
@@ -48,4 +49,9 @@ export const DEFAULT_CATALOG = {
   Tabs,
   Tab,
   Notice,
+  BarChart,
+  LineChart,
+  PieChart,
+  Series,
+  Slice,
 } satisfies Catalog;

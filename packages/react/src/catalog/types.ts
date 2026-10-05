@@ -23,6 +23,11 @@ export interface InteractionProps {
   Switch: { value: boolean; onChange: (value: boolean) => void };
   /** Each Tab child's label, in order; undefined while that Tab's line hasn't arrived. */
   Tabs: { tabs: readonly { id: string; label: string | undefined }[] };
+  /** Each Series child's data, in order; undefined while that Series' line hasn't arrived. */
+  BarChart: { series: readonly ({ id: string; name: string; values: readonly number[] } | undefined)[] };
+  LineChart: { series: readonly ({ id: string; name: string; values: readonly number[] } | undefined)[] };
+  /** Each Slice child's data, in order; undefined while that Slice's line hasn't arrived. */
+  PieChart: { slices: readonly ({ id: string; name: string; value: number } | undefined)[] };
   /** Undefined when the renderer's asset registry doesn't have the named image. */
   Image: { picture: Picture | undefined };
   ListItem: { picture: Picture | undefined };
@@ -35,6 +40,12 @@ export interface InteractionProps {
     /** The governing tool, rendered as data-mcp-tool. */
     mcpTool: string | undefined;
   };
+}
+
+/** How a chart writes its values (its `format` and `currency` props). */
+export interface ChartFormatProps {
+  format?: "number" | "currency" | "percent" | undefined;
+  currency?: string | undefined;
 }
 
 export type CatalogProps<K extends ComponentType> = {

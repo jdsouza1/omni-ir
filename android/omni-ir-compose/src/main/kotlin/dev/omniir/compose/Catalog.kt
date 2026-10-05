@@ -109,6 +109,11 @@ internal fun NodeContent(node: OmniNode, context: RenderContext) {
     ComponentType.TABS -> TabsView(node, context)
     ComponentType.TAB -> Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) { ColumnChildren(node.children, stretch = true) }
     ComponentType.NOTICE -> NoticeView(props)
+    ComponentType.BAR_CHART -> XYChartView(node, context, line = false, locale = locale())
+    ComponentType.LINE_CHART -> XYChartView(node, context, line = true, locale = locale())
+    ComponentType.PIE_CHART -> PieChartView(node, context, locale = locale())
+    // A Series or Slice is drawn by its chart; on its own (which the parser rejects) it shows nothing.
+    ComponentType.SERIES, ComponentType.SLICE -> Unit
   }
 }
 

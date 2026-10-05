@@ -66,6 +66,8 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain("A Table holds only TableRows, one line per row, each with one cell per column");
     expect(prompt).toContain("Tabs hold only Tab components");
     expect(prompt).toContain("A Notice shows a short message in a box");
+    expect(prompt).toContain("a BarChart compares values across categories");
+    expect(prompt).toContain("Charts carry a title, labels and numbers only");
   });
 
   it("includes at least two examples, and every example parses with no errors, warnings or issues", () => {

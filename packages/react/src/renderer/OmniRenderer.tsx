@@ -120,6 +120,22 @@ const MemoNode = memo(function Node({
     return <Component {...base} value={props.value === true} onChange={onChange} />;
   }
 
+  if (node.type === "BarChart" || node.type === "LineChart") {
+    return (
+      <ChildData ids={node.children} read={(n) => (n.type === "Series" ? { id: n.id, name: n.props.name, values: n.props.values } : undefined)}>
+        {(series) => <Component {...base} series={series} />}
+      </ChildData>
+    );
+  }
+
+  if (node.type === "PieChart") {
+    return (
+      <ChildData ids={node.children} read={(n) => (n.type === "Slice" ? { id: n.id, name: n.props.name, value: n.props.value } : undefined)}>
+        {(slices) => <Component {...base} slices={slices} />}
+      </ChildData>
+    );
+  }
+
   if (node.type === "Tabs") {
     return <TabLabels ids={node.children}>{(tabs) => <Component {...base} tabs={tabs} />}</TabLabels>;
   }
@@ -151,6 +167,24 @@ function TabLabels({ ids, children }: { ids: readonly string[]; children: (tabs:
   const joined = useSyncExternalStore(store.subscribe, read, read);
   const labels = useMemo(() => JSON.parse(joined) as (string | null)[], [joined]);
   return <>{children(ids.map((id, i) => ({ id, label: labels[i] ?? undefined })))}</>;
+}
+
+/**
+ * Charts draw their Series or Slices, which arrive on their own lines. This subscribes to those
+ * children's data only (a joined string, so unrelated changes don't re-render the chart).
+ */
+function ChildData<T>({ ids, read, children }: { ids: readonly string[]; read: (node: OmniNode) => T | undefined; children: (data: (T | undefined)[]) => ReactNode }) {
+  const { store } = useOmni();
+  const get = () => {
+    const nodes = store.getSnapshot().nodes;
+    return JSON.stringify(ids.map((id) => {
+      const n = nodes.get(id);
+      return n === undefined ? null : (read(n) ?? null);
+    }));
+  };
+  const joined = useSyncExternalStore(store.subscribe, get, get);
+  const data = useMemo(() => (JSON.parse(joined) as (T | null)[]).map((d) => d ?? undefined), [joined]);
+  return <>{children(data)}</>;
 }
 
 function resolveProps(props: object, keys: readonly string[], values: readonly Primitive[]): Record<string, unknown> {

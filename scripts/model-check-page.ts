@@ -53,6 +53,15 @@ export const STEP10_REQUESTS = [
   { id: "plan-compare", text: "Compare three subscription plans by price and features, and let me pick one.", probe: "Asks for a choice the app has no tool for. A good reply shows the table and a choice, but doesn't invent a tool to change the plan." },
 ];
 
+/** Step 11 (PLAN-CHARTS.md, C.3): requests that need charts. `-- --step11` builds the page with these. */
+export const STEP11_REQUESTS = [
+  { id: "revenue", text: "Monthly revenue for the last six months as a chart." },
+  { id: "visitors", text: "Website visitors over the last four weeks, compared with app users." },
+  { id: "customers", text: "Where our customers come from, as a pie chart." },
+  { id: "regions", text: "Quarterly sales for two regions, with a short summary of how they're doing." },
+  { id: "styled-chart", text: "A bar chart of sales where the bars are red, animated, and show a custom tooltip with each region manager's name.", probe: "Asks for styling a chart can't have. A good reply draws the plain chart and says colours, animation and custom tooltips aren't available." },
+];
+
 export async function renderPage(requests: readonly { id: string; text: string; probe?: string }[] = REQUESTS): Promise<string> {
   const { js, css } = await bundle();
   const firstMessage = `${buildSystemPrompt()}\n\n---\nThose are your instructions for this chat. I'll send screen requests next, one per message. For this first message, reply with just this comment line:\n# ready`;
@@ -235,7 +244,7 @@ const PAGE = String.raw`<meta charset="utf-8">
 
 if (process.argv[1]?.endsWith("model-check-page.ts")) {
   const out = process.argv[2] ?? "model-check.html";
-  const requests = process.argv.includes("--step10") ? STEP10_REQUESTS : REQUESTS;
+  const requests = process.argv.includes("--step11") ? STEP11_REQUESTS : process.argv.includes("--step10") ? STEP10_REQUESTS : REQUESTS;
   writeFileSync(out, await renderPage(requests));
   console.log(`wrote ${out}`);
 }

@@ -22,7 +22,7 @@ shot() {
   echo "screenshot $name"
 }
 
-screens=(landing/booking landing/checkout landing/assistant payment-confirmation sign-in order-status profile-settings support-contact account-settings order-history)
+screens=(landing/booking landing/checkout landing/assistant payment-confirmation sign-in order-status profile-settings support-contact account-settings order-history sales-dashboard order-breakdown)
 for appearance in light dark; do
   for s in "${screens[@]}"; do shot "${s//\//-}-$appearance" --es fixture "$s" --es appearance "$appearance" --es instant true; done
 done
@@ -55,4 +55,6 @@ adb shell pkill -INT screenrecord || true
 wait "$recorder" || true
 sleep 2
 adb pull /sdcard/streaming.mp4 review/streaming.mp4 >/dev/null
+# Any crash during the run, for the review artifact.
+adb logcat -d -b crash > review/crash.log 2>/dev/null || true
 ls -la review review/screenshots

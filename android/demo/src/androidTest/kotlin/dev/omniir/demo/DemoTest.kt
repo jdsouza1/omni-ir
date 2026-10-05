@@ -5,6 +5,7 @@ package dev.omniir.demo
 import android.content.Intent
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -54,6 +55,17 @@ class DemoTest {
     waitUntilDone()
     compose.onNodeWithText("Pay now").assertIsNotEnabled()
     compose.onNodeWithText("Cancel").assertIsEnabled()
+  }
+
+  /** Charts draw, and each is read to TalkBack as its title followed by its values. */
+  @Test
+  fun chartsDraw() {
+    for ((fixture, title) in listOf("sales-dashboard" to "Sales by month", "sales-dashboard" to "Weekly visitors", "order-breakdown" to "Share of 1,240 orders")) {
+      launch("fixture" to fixture, "instant" to "true").use {
+        waitUntilDone()
+        compose.waitUntil(10_000) { compose.onAllNodes(hasContentDescription(title, substring = true)).fetchSemanticsNodes().isNotEmpty() }
+      }
+    }
   }
 
   /** End to end with the Express server (free mock model), when CI passes its URL. */

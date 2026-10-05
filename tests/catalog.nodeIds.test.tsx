@@ -9,7 +9,14 @@ afterEach(cleanup);
 
 const LINES = [
   "root = Stack([card, badge, divider, skel, actions, media, more])",
-  "more = Stack([pick, toggle, plans, tabs, notice])",
+  "more = Stack([pick, toggle, plans, tabs, notice, charts])",
+  "charts = Stack([sales, trend, split])",
+  'sales = BarChart("Sales", ["Jul", "Aug"], [online])',
+  'online = Series("Online", [1, 2])',
+  'trend = LineChart("Visits", ["W1", "W2"], [visits])',
+  'visits = Series("Visits", [3, 4])',
+  'split = PieChart("Channels", [web])',
+  'web = Slice("Website", 62)',
   '$size = ""',
   'pick = Select($size, label="Size", options=["S", "M"])',
   "$on = false",

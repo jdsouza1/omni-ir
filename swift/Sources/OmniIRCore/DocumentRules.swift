@@ -92,15 +92,26 @@ func validateDocument(_ statements: [Statement], complete: Bool) -> [Issue] {
   // only Tab; each item sits only in its container. Reported on whichever line arrives second.
   for pair in containerPairs {
     for n in nodes {
-      if n.type == pair.container {
+      if pair.containers.contains(n.type) {
         for child in n.children {
           if let c = node(child), c.type != pair.item {
-            issues.append(Issue(code: pair.code, message: "\(pair.container.rawValue) \"\(n.id)\" can only contain \(pair.item.rawValue)s, not \(c.type.rawValue) \"\(child)\"", id: n.id))
+            issues.append(Issue(code: pair.code, message: "\(n.type.rawValue) \"\(n.id)\" can only contain \(pair.item.rawValue)s, not \(c.type.rawValue) \"\(child)\"", id: n.id))
           }
         }
       }
-      if n.type == pair.item, let parent = parentOf[n.id], let p = node(parent), p.type != pair.container {
-        issues.append(Issue(code: pair.code, message: "\(pair.item.rawValue) \"\(n.id)\" must be inside a \(pair.container.rawValue), not \(p.type.rawValue) \"\(parent)\"", id: n.id))
+      if n.type == pair.item, let parent = parentOf[n.id], let p = node(parent), !pair.containers.contains(p.type) {
+        let names = pair.containers.map(\.rawValue).joined(separator: " or ")
+        issues.append(Issue(code: pair.code, message: "\(pair.item.rawValue) \"\(n.id)\" must be inside a \(names), not \(p.type.rawValue) \"\(parent)\"", id: n.id))
+      }
+    }
+  }
+
+  // A Series has one value per label of its BarChart or LineChart.
+  for n in nodes where n.type == .barChart || n.type == .lineChart {
+    guard case .list(let labels)? = n.props["labels"] else { continue }
+    for child in n.children {
+      if let series = node(child), series.type == .series, case .list(let values)? = series.props["values"], values.count != labels.count {
+        issues.append(Issue(code: .chartMismatch, message: "Series \"\(child)\" has \(values.count) value(s), but \(n.type.rawValue) \"\(n.id)\" has \(labels.count) label(s)", id: child))
       }
     }
   }
@@ -172,10 +183,12 @@ func stateKeys(_ values: [String: PropValue]) -> [String] {
 
 /// `^\d{4}-\d{2}-\d{2}$` with ASCII digits.
 /// Components that hold only one kind of item, and the issue code for breaking that rule.
-let containerPairs: [(container: ComponentType, item: ComponentType, code: IssueCode)] = [
-  (.list, .listItem, .listMismatch),
-  (.table, .tableRow, .tableMismatch),
-  (.tabs, .tab, .tabsMismatch),
+let containerPairs: [(containers: [ComponentType], item: ComponentType, code: IssueCode)] = [
+  ([.list], .listItem, .listMismatch),
+  ([.table], .tableRow, .tableMismatch),
+  ([.tabs], .tab, .tabsMismatch),
+  ([.barChart, .lineChart], .series, .chartMismatch),
+  ([.pieChart], .slice, .chartMismatch),
 ]
 
 func isISODate(_ s: String) -> Bool {

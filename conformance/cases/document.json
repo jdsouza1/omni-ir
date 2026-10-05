@@ -683,6 +683,86 @@
       }
     },
     {
+      "id": "chart-children",
+      "rules": [
+        "5.23"
+      ],
+      "description": "Bar and line charts hold only Series with one value per label, a pie chart only Slices, whichever line arrives first; a Series or Slice sits only in its kind of chart.",
+      "input": "root = Stack([bars, line, pie, loose])\nbars = BarChart(\"Sales\", [\"Jul\", \"Aug\"], [a, b, w])\na = Series(\"Online\", [120, 150])\nb = Series(\"In store\", [90])\nw = Slice(\"Wrong\", 1)\nearly = Series(\"Visitors\", [1, 2, 3])\nline = LineChart(\"Visits\", [\"W1\", \"W2\"], [early])\npie = PieChart(\"Channels\", [web, s])\nweb = Slice(\"Website\", 62)\ns = Series(\"Wrong\", [1])\nloose = Slice(\"Alone\", 5)\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 4,
+            "code": "chart_mismatch"
+          },
+          {
+            "line": 5,
+            "code": "chart_mismatch"
+          },
+          {
+            "line": 7,
+            "code": "chart_mismatch"
+          },
+          {
+            "line": 10,
+            "code": "chart_mismatch"
+          },
+          {
+            "line": 11,
+            "code": "chart_mismatch"
+          },
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 2,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 8,
+            "code": "dangling_ref"
+          }
+        ]
+      }
+    },
+    {
+      "id": "chart-data-only",
+      "rules": [
+        "5.24"
+      ],
+      "description": "A chart carries data only: styling props on a chart, Series or Slice are rejected, as is a negative Slice.",
+      "input": "root = Stack([bars, pie])\nbars = BarChart(\"Sales\", [\"Jul\"], [a], color=\"red\")\nbars = BarChart(\"Sales\", [\"Jul\"], [a], format=\"currency\", currency=\"USD\")\na = Series(\"Online\", [120], style=\"dashed\")\na = Series(\"Online\", [120])\npie = PieChart(\"Channels\", [web], animation=\"spin\")\npie = PieChart(\"Channels\", [web, app], format=\"percent\")\nweb = Slice(\"Website\", 62, tooltip=\"62% of orders\")\nweb = Slice(\"Website\", 62)\napp = Slice(\"App\", -5)\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "invalid_props"
+          },
+          {
+            "line": 4,
+            "code": "invalid_props"
+          },
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 8,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "dangling_ref"
+          }
+        ]
+      }
+    },
+    {
       "id": "rating-max",
       "rules": [
         "5.9"

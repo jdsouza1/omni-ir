@@ -1,6 +1,6 @@
 # Omni-IR — Step 11: charts
 
-Goal: close the largest gap left by the format comparison (docs/COMPARISON.md). Two of the four OpenUI scenarios Omni-IR still can't draw need charts, and dashboards are central to the agency work. Add bar, line and pie charts to the protocol and all three renderers, keeping Omni-IR's rules: data only from the stream, every visual choice made by the renderer.
+Goal: close the largest gap left by the format comparison (docs/COMPARISON.md). Two of the four OpenUI scenarios Omni-IR still can't draw need charts, and dashboards are one of the most common things people ask a generative UI for. Add bar, line and pie charts to the protocol and all three renderers, keeping Omni-IR's rules: data only from the stream, every visual choice made by the renderer.
 
 Status: **APPROVED 2026-10-04** with the recommendations: bar, line and pie charts with Series and Slice; Android charts drawn on a Compose Canvas (no library); no `$state` in chart data for now; a screenshot review on all three platforms before merging. Added at the owner's request: conformance cases proving style, colour, animation and tooltip props are rejected, and a styling probe in the model check.
 
@@ -83,27 +83,33 @@ From 3 of 7 to 5 of 7. The remaining two need Markdown, which Omni-IR deliberate
 ## Task checklist
 
 **A. Protocol, tests first** *(checkpoint: failing tests)*
-- [ ] A.1 Failing tests for each component's props and limits, the parent rules, values per label, slice values of 0 or more, and rejection of styling props (`color`, `style`, `animation`, `tooltip`)
-- [ ] A.2 Add the components and rules to `schema.ts`. Regenerate `schema.json`, SPEC.md, the conformance cases, and the Swift and Kotlin catalogs. Write the hand-written SPEC rules and conformance cases, including a case where styling props on charts are rejected
-- [ ] A.3 The Swift and Kotlin parsers implement the new rules and pass every conformance case
+- [x] A.1 Failing tests for each component's props and limits, the parent rules, values per label, slice values of 0 or more, and rejection of styling props (`color`, `style`, `animation`, `tooltip`)
+- [x] A.2 Add the components and rules to `schema.ts`. Regenerate `schema.json`, SPEC.md, the conformance cases, and the Swift and Kotlin catalogs. Write the hand-written SPEC rules and conformance cases, including a case where styling props on charts are rejected
+- [x] A.3 The Swift and Kotlin parsers implement the new rules and pass every conformance case
 
 **B. Renderers**
-- [ ] B.1 React: SVG bar, line and pie charts with axes, a legend, values on hover and focus, a hidden data table, and a fixed palette checked for colour blindness in light and dark
-- [ ] B.2 SwiftUI: Swift Charts with the same palette and accessibility labels
-- [ ] B.3 Compose: Canvas drawing with the same palette, plus TalkBack semantics
+- [x] B.1 React: SVG bar, line and pie charts with axes, a legend, values on hover and focus, a hidden data table, and a fixed palette checked for colour blindness in light and dark
+- [x] B.2 SwiftUI: Swift Charts with the same palette and accessibility labels
+- [x] B.3 Compose: Canvas drawing with the same palette, plus TalkBack semantics
 
 **C. Model and examples**
-- [ ] C.1 System prompt: the chart components and when to use each one
-- [ ] C.2 Example screens: a sales dashboard (bar and line) and an order breakdown (pie), in the mock model, the playground and both demo apps
-- [ ] C.3 Free model check: chart requests, plus a probe asking for red animated bars with custom tooltips (a good reply draws the plain chart and says styling isn't available), run in your Claude.ai chat
+- [x] C.1 System prompt: the chart components and when to use each one
+- [x] C.2 Example screens: a sales dashboard (bar and line) and an order breakdown (pie), in the mock model, the playground and both demo apps
+- [x] C.3 Free model check: chart requests, plus a probe asking for red animated bars with custom tooltips (a good reply draws the plain chart and says styling isn't available), run in your Claude.ai chat
 
 **D. Review** *(checkpoint: you review)*
-- [ ] D.1 Web (live), iPhone and Android screenshots on a review page
+- [x] D.1 Web (live), iPhone and Android screenshots on a review page
 
 **E. After your approval**
-- [ ] E.1 Merge; README component list and CHANGELOG updated
-- [ ] E.2 Re-run the comparison's coverage (expected: 5 of OpenUI's 7 scenarios)
+- [x] E.1 Merge; README component list and CHANGELOG updated
+- [x] E.2 Re-run the comparison's coverage: 5 of OpenUI's 7 scenarios (from 3), as expected
 - [ ] E.3 `v0.3.0` release: a separate go-ahead from you
+
+**Progress (2026-10-05):** A–E.2 done; merged to main with the owner's approval of the review.
+- All three parsers pass the 80 conformance cases; 705 tests; CI, the iOS demo and the Android demo pass.
+- Model check: 5 of 5 valid, and the styling probe drew a plain chart (docs/model-check-2026-10-04-charts.md).
+- Review page: https://claude.ai/artifact/KZ844v1sSQTFiW1wzPBesC
+- Fixed during review: compact axis ticks used APIs missing on Android (`getCompactNumberInstance`, a crash) and before iOS 18 (a build failure); both now join the currency symbol to a compact number written in the project. The Android demo's UI tests now check that the chart screens draw, and the review run saves crash logs.
 
 ## What I needed from you
 

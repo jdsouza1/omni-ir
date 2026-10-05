@@ -178,4 +178,28 @@ a = Tab("Profile", [])
     store.write("b = Tab(\"Alerts\", [])\n")
     assertEquals(listOf("Profile", "Alerts"), store.tabLabels(listOf("a", "b")))
   }
+
+  @Test
+  fun `charts - series and slices as they arrive keeping their places, values, ticks and shares in the chart's format`() {
+    val store = OmniStore(tools)
+    store.write(
+      """root = Stack([sales, pie])
+sales = BarChart("Sales", ["Jul", "Aug"], [a, b], format="currency")
+b = Series("In store", [900, 1100])
+pie = PieChart("Channels", [web, app])
+web = Slice("Website", 52)
+""",
+    )
+    assertEquals(listOf(ChartSeries("b", 1, "In store", listOf(900.0, 1100.0))), store.chartSeries(listOf("a", "b")))
+    assertEquals(listOf(ChartSlice("web", 0, "Website", 52.0)), store.chartSlices(listOf("web", "app")))
+    assertEquals("€1,500.00", Format.chartValue(1500.0, "currency", "EUR", us))
+    assertEquals("62%", Format.chartValue(62.0, "percent", null, us))
+    assertEquals("$20K", Format.chartTick(20000.0, "currency", null, us))
+    assertEquals("2.5K", Format.chartTick(2500.0, null, null, us))
+    assertEquals("1.2M", Format.chartTick(1_200_000.0, null, null, us))
+    assertEquals("-5K", Format.chartTick(-5000.0, null, null, us))
+    assertEquals("40%", Format.chartTick(40.0, "percent", null, us))
+    assertEquals("25%", Format.share(31.0, 124.0, us))
+    assertEquals(listOf(0.0, 500.0, 1000.0, 1500.0, 2000.0), Format.niceTicks(900.0, 1800.0))
+  }
 }

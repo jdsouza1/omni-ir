@@ -150,6 +150,26 @@ struct OmniStoreTests {
     #expect(store.tabLabels(["a", "b"]) == ["Profile", "Alerts"])
   }
 
+  @Test("charts: series and slices as they arrive, keeping their places; values, ticks and shares in the chart's format")
+  func charts() {
+    let store = OmniStore(tools: tools)
+    store.write("""
+      root = Stack([sales, pie])
+      sales = BarChart("Sales", ["Jul", "Aug"], [a, b], format="currency")
+      b = Series("In store", [900, 1100])
+      pie = PieChart("Channels", [web, app])
+      web = Slice("Website", 52)
+
+      """)
+    #expect(store.chartSeries(["a", "b"]) == [ChartSeries(id: "b", index: 1, name: "In store", values: [900, 1100])])
+    #expect(store.chartSlices(["web", "app"]) == [ChartSlice(id: "web", index: 0, name: "Website", value: 52)])
+    let us = Locale(identifier: "en_US")
+    #expect(Format.chartValue(1500, format: "currency", currency: "EUR", locale: us) == "€1,500.00")
+    #expect(Format.chartValue(62, format: "percent", currency: nil, locale: us) == "62%")
+    #expect(Format.chartTick(20000, format: "currency", currency: nil, locale: us) == "$20K")
+    #expect(Format.share(31, of: 124, locale: us) == "25%")
+  }
+
   @Test("ratings are kept within 0…max and read as \"Rated x out of max\"")
   func ratings() {
     let us = Locale(identifier: "en_US")
