@@ -5,11 +5,10 @@
 // TODO(real backend): replace each stub with a real call, and add authorization: check that the
 // signed-in user may perform this action on this resource (e.g. owns order A1B2-7731). Schema
 // validation says the request is well-formed, not that it is allowed.
-import { randomUUID } from "node:crypto";
-
 export type ToolHandler = (params: Record<string, unknown>) => Promise<Record<string, unknown>>;
 
-const id = (prefix: string) => `${prefix}_${randomUUID().slice(0, 8)}`;
+// globalThis.crypto, not node:crypto, so the hosted playground can run these stubs in the browser.
+const id = (prefix: string) => `${prefix}_${globalThis.crypto.randomUUID().slice(0, 8)}`;
 
 export const STUB_HANDLERS: Readonly<Record<string, ToolHandler>> = {
   "payments.confirm": async ({ amount }) => ({ stub: true, receiptId: id("rcpt"), status: "confirmed", amount }),

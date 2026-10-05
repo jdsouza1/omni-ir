@@ -61,9 +61,9 @@ One public website, built from this repository by a GitHub Actions workflow and 
 - [x] A.3 README links to all of them
 
 **B. The playground in the browser** *(tests first)*
-- [ ] B.1 Failing tests: the in-browser API answers generate and mutate like the server (routes, `demo: …` variants, tool checks, rejected mutations)
-- [ ] B.2 The in-browser API, sharing the server's mock routes, fixtures and tool checks rather than copying them
-- [ ] B.3 `npm run playground:static`: the playground built for `/playground/`, with a check that no request leaves the page
+- [x] B.1 Failing tests: the in-browser API answers generate and mutate like the server (routes, `demo: …` variants, tool checks, rejected mutations)
+- [x] B.2 The in-browser API, sharing the server's mock routes, fixtures and tool checks rather than copying them
+- [x] B.3 `npm run playground:static`: the playground built for `/playground/`, with a check that no request leaves the page
 
 **C. Docs site**
 - [ ] C.1 VitePress in `site/docs`: Getting started (web, iOS, Android), the spec, the catalog reference generated from the schema, conformance, the comparison, the roadmap and the changelog

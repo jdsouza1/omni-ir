@@ -40,7 +40,7 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 ## Commands
 - `npm test` — raw-HTML guard + all tests (no network). `npm run typecheck`.
 - `npm run server` — Express on :8787 with the free mock model.
-- `npm run playground` — the playground on :5173 (mock model, no key). `npm run playground:build` → `dist/playground`.
+- `npm run playground` — the playground on :5173 (mock model, no key). `npm run playground:build` → `dist/playground`. `npm run playground:static` → `dist/site/playground`: the hosted playground, with the API answered in the browser (`server/inBrowser.ts`, `playground/inBrowserApi.ts`; `server/api.ts` holds the rules both share, `FixtureModel` the mock model without the file system).
 - `npm run demo` (local fixture) · `npm run demo -- --server "contact support"` (from the running server).
 - `npm run spec` (or `-- --check`) — regenerate SPEC.md's generated sections. `npm run schema:export` (or `-- --check`) — write `conformance/schema.json`, the language-neutral catalog other renderers generate from. `npm run conformance:build` — write `conformance/cases/*.json` from `conformance/build.ts` (the `catalog` cases are generated from `schema.json`, so export first).
 - `npm run bench` (or `-- --check`) — the format comparison, offline. `npm run reliability:page -- out.html` and `npm run comparison:page -- out.html` — the reliability check and review pages (`review/` is git-ignored).

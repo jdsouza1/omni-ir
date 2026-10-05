@@ -52,10 +52,13 @@ function omniApi(): Plugin {
   };
 }
 
-export default defineConfig({
+// `--mode static` builds the hosted playground: no server, the API answered in the browser
+// (inBrowserApi.ts), relative paths so it can be served from any folder of the site.
+export default defineConfig(({ mode }) => ({
   root: resolve("playground"),
-  plugins: [omniApi()],
+  base: mode === "static" ? "./" : "/",
+  plugins: mode === "static" ? [] : [omniApi()],
   resolve: { alias: WORKSPACE_ALIASES },
   server: { port: 5173, strictPort: false },
-  build: { outDir: resolve("dist/playground"), emptyOutDir: true },
-});
+  build: { outDir: resolve(mode === "static" ? "dist/site/playground" : "dist/playground"), emptyOutDir: true, target: "es2022" },
+}));

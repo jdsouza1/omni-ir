@@ -49,6 +49,7 @@ Open http://localhost:5173, then pick an example or describe a screen. The playg
 | `npm test` | Raw-HTML guard and all tests (no network) |
 | `npm run typecheck` | TypeScript, strict |
 | `npm run playground` | The Interactive Playground with the API, on :5173 |
+| `npm run playground:static` | The playground as static files, with the API running in the browser (the hosted version) |
 | `npm run server` | The API server alone, on :8787 |
 | `npm run demo` | Stream a fixture in the terminal; `-- --server "prompt"` streams from the running server |
 | `npm run validate -- file.omni` | Check Omni-IR (e.g. a model's reply): errors by line, then the rendered HTML |

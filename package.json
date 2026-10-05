@@ -24,6 +24,7 @@
     "prompt:print": "tsx scripts/prompt-print.ts",
     "playground": "vite --config playground/vite.config.ts --configLoader runner",
     "playground:build": "vite build --config playground/vite.config.ts --configLoader runner",
+    "playground:static": "vite build --config playground/vite.config.ts --configLoader runner --mode static",
     "landing:examples": "tsx scripts/landing-examples.ts",
     "spec": "tsx scripts/spec.ts",
     "conformance:build": "tsx conformance/build.ts",
