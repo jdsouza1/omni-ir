@@ -2,7 +2,7 @@
 
 Goal: let someone who has never heard of Omni-IR find it, try it in a browser in under a minute, read how to use it, and know how to contribute. Today the playground runs only on a developer's machine, there is no docs site, the landing page is a private-by-default artifact whose Docs, Get started, Join the community and Governance links lead nowhere, and the repository has no contributor or governance documents. Everything in this step is free.
 
-Status: **DRAFT 2026-10-05**, waiting for the owner's approval of the questions below.
+Status: **APPROVED 2026-10-05** with the recommendations: GitHub Pages at `jdsouza1.github.io/omni-ir`; VitePress; GitHub Discussions; the owner as maintainer with public spec proposals; security and conduct reports through private GitHub channels; the hosted playground on the mock model only; the landing page artifact kept until the site is live; the repository description, homepage and topics updated when going public.
 
 ## Proposal
 
@@ -56,9 +56,9 @@ One public website, built from this repository by a GitHub Actions workflow and 
 ## Task checklist
 
 **A. Contributor and governance documents**
-- [ ] A.1 CONTRIBUTING.md, GOVERNANCE.md, CODE_OF_CONDUCT.md (Contributor Covenant) and SECURITY.md
-- [ ] A.2 Issue templates (bug, spec proposal, new component) and a pull request template that asks for tests and, for spec changes, conformance cases
-- [ ] A.3 README links to all of them
+- [x] A.1 CONTRIBUTING.md, GOVERNANCE.md, CODE_OF_CONDUCT.md (Contributor Covenant) and SECURITY.md
+- [x] A.2 Issue templates (bug, spec proposal, new component) and a pull request template that asks for tests and, for spec changes, conformance cases
+- [x] A.3 README links to all of them
 
 **B. The playground in the browser** *(tests first)*
 - [ ] B.1 Failing tests: the in-browser API answers generate and mutate like the server (routes, `demo: …` variants, tool checks, rejected mutations)
@@ -84,4 +84,4 @@ One public website, built from this repository by a GitHub Actions workflow and 
 
 ## What I need from you
 
-Your answers to questions 1–8 (or "go with the recommendations").
+Answered 2026-10-05: "go with the recommendations for step 12".

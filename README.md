@@ -119,6 +119,10 @@ What is done and what is planned, with dates: [docs/ROADMAP.md](docs/ROADMAP.md)
 
 - Bi-directional AST sync tooling
 
+## Contributing
+
+Contributions are welcome: bugs, spec proposals, new components, other implementations and docs. Start with [CONTRIBUTING.md](CONTRIBUTING.md). How the spec changes and who decides: [GOVERNANCE.md](GOVERNANCE.md). Please follow the [code of conduct](CODE_OF_CONDUCT.md), and report security problems privately as described in [SECURITY.md](SECURITY.md).
+
 ## License
 
 [Apache-2.0](LICENSE)

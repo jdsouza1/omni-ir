@@ -1,0 +1,24 @@
+name: New component
+description: Ask for a component the catalog doesn't have
+labels: [component]
+body:
+  - type: textarea
+    id: screen
+    attributes:
+      label: The screen that needs it
+      description: What the user is trying to do, and why the current components (`npm run prompt:print` lists them) can't draw it.
+    validations:
+      required: true
+  - type: textarea
+    id: lines
+    attributes:
+      label: What the model would write
+      description: The component's line, with its positional arguments and props.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: renderers
+    attributes:
+      label: How it would look and behave
+      description: On the web, iOS and Android, including keyboard and screen reader use. Visual choices belong to the renderer, never the model.

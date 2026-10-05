@@ -1,0 +1,38 @@
+name: Bug
+description: Something parses, renders or behaves differently from the spec
+labels: [bug]
+body:
+  - type: textarea
+    id: stream
+    attributes:
+      label: The stream
+      description: The lines of Omni-IR that show the problem (trimmed to the smallest stream that still does).
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened
+      description: Quote the SPEC.md rule if you know which one applies.
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      multiple: true
+      options:
+        - "@omni-ir/core (TypeScript parser)"
+        - "@omni-ir/react (web renderer)"
+        - Swift parser or SwiftUI renderer
+        - Kotlin parser or Compose renderer
+        - Server or playground
+        - SPEC.md or conformance cases
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: "0.3.0"
