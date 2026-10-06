@@ -2,7 +2,7 @@
 
 Goal: today only the text format is standard. How a screen travels from a server to an app, how errors and dropped connections are reported, and which version a stream needs are described only by the reference server, "informative" in SPEC.md §10. Anyone building a second server or client has to copy our code instead of a spec. This step makes the transport a standard with its own conformance cases, maps it onto WebSockets and onto AG-UI (the event protocol many agent frameworks speak), and lets a stream say which version it needs.
 
-Status: **APPROVED 2026-10-06** with the recommendations, after a review of each decision's pros, cons and trade-offs (below), which changed two things: WebSockets are specified but not built, and two safety rules were added (an "update the app" notice, and AG-UI updates may only add lines). All work is free: mock model only, no paid API, nothing published without a separate go-ahead.
+Status: **DONE 2026-10-06** (owner reviewed the review page and approved the merge; unreleased, for `v0.5.0`). **APPROVED 2026-10-06** with the recommendations, after a review of each decision's pros, cons and trade-offs (below), which changed two things: WebSockets are specified but not built, and two safety rules were added (an "update the app" notice, and AG-UI updates may only add lines). All work is free: mock model only, no paid API, nothing published without a separate go-ahead.
 
 ## Research: AG-UI today (2026-10-06)
 
@@ -136,5 +136,5 @@ Work on branch `wip/transport`. Each part starts with failing tests (constraint 
 **G. Docs and review** *(checkpoint: you review)*
 - [x] G.1 Docs site: a "Transport" page and a "Use with AG-UI" guide; README, landing page and CHANGELOG
 - [x] G.2 A review page: the transport rules, the case results on all three platforms, an AG-UI run (https://claude.ai/artifact/U5yMAzDoSksr43WKhuNB7P)
-- [ ] G.3 Merge with your approval
+- [x] G.3 Merged with your approval (2026-10-06)
 - [ ] G.4 `v0.5.0` release: a separate go-ahead from you
