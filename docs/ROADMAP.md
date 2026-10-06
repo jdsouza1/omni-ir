@@ -23,6 +23,7 @@ Updated 2026-10-05. Planned dates for the remaining work are kept from the origi
 | Since then | Charts: BarChart, LineChart and PieChart with Series and Slice on web, iOS and Android; the comparison's coverage of OpenUI's scenarios went from 3 of 7 to 5 | [PLAN-CHARTS.md](../PLAN-CHARTS.md) |
 | Release | `v0.2.0` (2026-10-04): both npm packages and the first Swift Package Manager version; see [CHANGELOG.md](../CHANGELOG.md) | `.github/workflows/release.yml` |
 | Since then | Open to outsiders: a public website with the playground running in the browser, a docs site, the landing page, and contributor, governance, conduct and security documents; GitHub Discussions on | [jdsouza1.github.io/omni-ir](https://jdsouza1.github.io/omni-ir/), [PLAN-OPEN.md](../PLAN-OPEN.md) |
+| Since then | Proof and hardening: a cross-model check (Gemini, GPT, Llama) that fixed two prompt problems; fuzz testing on all three parsers with a 2,000-stream cross-language corpus and a weekly long run; adversarial security tests; linear-time parsing (20,000 components: 58 s to 0.4 s); new limits on nesting and document size. Four real problems found and fixed | [PLAN-HARDENING.md](../PLAN-HARDENING.md), [model check](model-check-2026-10-05-models.md) |
 | Release | `v0.3.0` (2026-10-05): the charts, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
 
 ## Planned
@@ -46,11 +47,7 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval.
 
-1. **Step 13 · Proof and hardening (all free)** (plan drafted: [PLAN-HARDENING.md](../PLAN-HARDENING.md)).
-   - [ ] Model check on other models: Gemini, ChatGPT and an open model, run in their own chat apps, so no API cost. "Works with any model" is unproven while only Claude has been checked.
-   - [ ] Parser fuzz testing: randomly broken input fed to the TypeScript, Swift and Kotlin parsers, which must never crash and must always report the same issues
-   - [ ] Adversarial boundary tests (free): look-alike and misspelled tool names rejected at the parser, the browser and the server; a corpus of hostile model output (markup, smuggled URLs, `__proto__`, mismatched mutations, huge streams) run through all three parsers; attacks that combine several inputs at once. Omni-IR treats all model output as hostile, so these cover every model at once.
-   - [ ] Performance on large screens: each line currently re-checks the whole document; measure it at hundreds of components and fix if needed
+1. **Confirm the cross-model results on the official apps.** Step 13 checked Gemini, GPT and Llama through a reseller; a few requests on gemini.google.com and chatgpt.com (signed in by the owner, no API cost) before "works with any model" goes on the website.
 2. **Step 14 · Transport standard and stream versions.** Make SPEC.md §10 normative: the exact Server-Sent Events, reconnecting, and how errors and governed actions are reported, with transport conformance cases. Map the same events onto WebSockets, and add an adapter for [AG-UI](https://docs.ag-ui.com/concepts), the event protocol many agent frameworks speak, so they can stream Omni-IR without custom work. Starts with a short research step on the current AG-UI spec.
    - [ ] An optional version marker as a stream's first line, so a client can say "this stream needs 0.3" instead of rejecting unknown lines one by one (listed under "Not yet specified" in SPEC.md)
 3. **Real backend tool handlers with authorization and persistence**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 14, since both concern the server side. Comes with security work that only makes sense once real data is involved:
