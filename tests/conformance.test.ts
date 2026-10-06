@@ -3,30 +3,13 @@ import { readFileSync, readdirSync } from "node:fs";
 import { z } from "zod";
 import { CASES, renderCaseFiles, type ConformanceCase, type InputPart } from "../conformance/build";
 import { createParser } from "@omni-ir/core";
-import type { OmniDocument } from "@omni-ir/core";
+import { canonical } from "./canonical";
 
 const files = readdirSync("conformance/cases").filter((f) => f.endsWith(".json"));
 const cases: ConformanceCase[] = files.flatMap((f) => (JSON.parse(readFileSync(`conformance/cases/${f}`, "utf8")) as { cases: ConformanceCase[] }).cases);
 
 function expand(input: string | InputPart[]): string {
   return typeof input === "string" ? input : input.map((p) => (typeof p === "string" ? p : p.repeat.repeat(p.times))).join("");
-}
-
-/** The canonical, language-neutral view of a parse (see conformance/README.md). */
-function canonical(doc: OmniDocument, issues: { line: number | null; code: string }[]) {
-  const value = (v: unknown): unknown =>
-    v !== null && typeof v === "object" && (v as { kind?: string }).kind === "state" ? { state: (v as { key: string }).key } : v;
-  const props = (p: object) => Object.fromEntries(Object.entries(p).map(([k, v]) => [k, value(v)]));
-  const distinct = [...new Map(issues.map((i) => [`${i.line}:${i.code}`, i])).values()];
-  return {
-    issues: distinct.sort((a, b) => (a.line ?? Infinity) - (b.line ?? Infinity) || a.code.localeCompare(b.code)),
-    nodes: Object.fromEntries([...doc.nodes].map(([id, n]) => [id, { type: n.type, props: props(n.props), children: [...n.children] }])),
-    state: { ...doc.state },
-    mutations: Object.fromEntries(
-      [...doc.mutations].map(([target, m]) => [target, { id: m.id, tool: m.tool, params: props(m.params) }]),
-    ),
-    missing: [...doc.missing].sort(),
-  };
 }
 
 function run(c: ConformanceCase, chunkSize: number | null) {

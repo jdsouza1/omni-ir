@@ -64,7 +64,7 @@ Every reply is checked by the real parser (`npm run validate`, or the model chec
 - [x] A.3 Results document and comparison updated; prompt rules added for any repeated slip, with the prompt test updated
 
 **B. Fuzz testing** *(tests first)*
-- [ ] B.1 fast-check properties for the TypeScript parser: never throws, issues well-formed, chunking never matters, valid fixtures survive random splits
+- [x] B.1 fast-check properties for the TypeScript parser: never throws, issues well-formed, chunking never matters, valid fixtures survive random splits
 - [ ] B.2 The differential corpus (`fuzz/`): generated streams with the TypeScript results; Swift and Kotlin tests that must match them
 - [ ] B.3 Seeded no-crash runs in Swift and Kotlin
 - [ ] B.4 A weekly workflow with a long random run, saving any failure as a case
