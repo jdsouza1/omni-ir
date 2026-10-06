@@ -5,24 +5,36 @@
 //
 // What it leaves out, because the browser is the visitor's own: rate limits, the generation
 // timeout, CORS and logging. It runs only the free FixtureModel in the hosted playground.
+//
+// Actions run against an in-memory store with the demo data, as one pretend demo visitor
+// (PLAN-BACKEND.md decision 7): the same rules as the server, nothing leaving the browser.
 import type { ToolRegistry } from "@omni-ir/core";
 import { TOOLS } from "../app/tools";
 import { describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MARKER_CHUNK, MutateBody, runMutation, sseEvent, versionError } from "./api";
 import { ModelError, type Model } from "./models/types";
-import { STUB_HANDLERS, type ToolHandler } from "./tools/handlers";
+import { createDevMailer } from "./backend/auth";
+import { createMemoryStore } from "./backend/memoryStore";
+import { DEMO_VISITOR_EMAIL, seedDemo } from "./backend/seed";
+import type { Store } from "./backend/types";
+import { HANDLERS, type ToolHandler } from "./tools/handlers";
 
 export interface InBrowserApiOptions {
   model: Model;
   /** Tools it will run; defaults to the shared registry. */
   tools?: ToolRegistry;
-  /** Handler per tool; defaults to the stubs. */
+  /** Handler per tool; defaults to the reference handlers. */
   handlers?: Readonly<Record<string, ToolHandler>>;
+  /** Where actions keep their data; defaults to memory with the demo data. */
+  store?: Store;
 }
 
 // The Express app's body limit (express.json({ limit: "16kb" })).
 const MAX_BODY_BYTES = 16 * 1024;
 
-export function createInBrowserApi({ model, tools = TOOLS, handlers = STUB_HANDLERS }: InBrowserApiOptions): typeof globalThis.fetch {
+export function createInBrowserApi({ model, tools = TOOLS, handlers = HANDLERS, store: givenStore }: InBrowserApiOptions): typeof globalThis.fetch {
+  const store = givenStore ?? createMemoryStore();
+  const ready = givenStore ? Promise.resolve() : seedDemo(store);
+  const mailer = createDevMailer();
   return async (input, init = {}) => {
     // Like fetch: a request cancelled before it is answered rejects.
     if (init.signal?.aborted) throw new DOMException("The request was cancelled.", "AbortError");
@@ -30,7 +42,8 @@ export function createInBrowserApi({ model, tools = TOOLS, handlers = STUB_HANDL
     const { pathname: path, searchParams } = new URL(url, "http://in-browser");
     const method = (init.method ?? "GET").toUpperCase();
 
-    if (method === "GET" && path === "/api/health") return json(200, { ok: true, model: model.kind });
+    if (method === "GET" && path === "/api/health") return json(200, { ok: true, model: model.kind, auth: "demo" });
+    if (method === "GET" && path === "/api/auth/me") return json(200, { user: { email: DEMO_VISITOR_EMAIL }, demo: true });
     if (method !== "POST" || (path !== "/api/generate" && path !== "/api/mutate")) return json(404, errorBody("not_found", "Not found."));
 
     const raw = typeof init.body === "string" ? init.body : "";
@@ -45,7 +58,13 @@ export function createInBrowserApi({ model, tools = TOOLS, handlers = STUB_HANDL
     if (path === "/api/mutate") {
       const parsed = MutateBody.safeParse(body);
       if (!parsed.success) return json(400, errorBody("invalid_request", describeIssues(parsed.error)));
-      const answer = await runMutation(parsed.data.tool, parsed.data.params, tools, handlers);
+      await ready;
+      const user = await store.users.ensure(DEMO_VISITOR_EMAIL);
+      const idempotencyKey = new Headers(init.headers).get("idempotency-key");
+      const answer = await runMutation(
+        { tool: parsed.data.tool, params: parsed.data.params, user, idempotencyKey },
+        { tools, handlers, ctx: { store, mailer, now: Date.now(), publicUrl: "https://example.invalid" } },
+      );
       return json(answer.status, answer.body);
     }
 

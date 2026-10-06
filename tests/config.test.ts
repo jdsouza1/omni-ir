@@ -13,6 +13,9 @@ describe("loadConfig", () => {
       dailyCap: 50,
       mockSpeed: "realistic",
       trustProxy: false,
+      auth: "magic-link",
+      publicUrl: "http://localhost:5173",
+      dbPath: null,
     });
     expect(warnings).toEqual([]);
   });

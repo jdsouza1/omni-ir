@@ -17,7 +17,8 @@ async function createOmniApp(load: Load) {
     load(resolve("server/config.ts")),
     load(resolve("server/models/index.ts")),
   ])) as [typeof import("../server/app.ts"), typeof import("../server/config.ts"), typeof import("../server/models/index.ts")];
-  const { config, warnings } = loadConfig();
+  // The playground acts as the labelled demo visitor unless OMNI_AUTH says otherwise (PLAN-BACKEND.md).
+  const { config, warnings } = loadConfig({ OMNI_AUTH: "demo", ...process.env });
   for (const warning of warnings) console.warn(`warning: ${warning}`);
   const model = createModel(config);
   console.log(`Omni-IR API mounted at /api (model: ${model.kind})`);

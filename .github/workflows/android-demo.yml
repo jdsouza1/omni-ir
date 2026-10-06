@@ -45,6 +45,7 @@ jobs:
       - name: Start the Omni-IR server (free mock model)
         env:
           OMNI_MODEL: mock # never a paid model in CI
+          OMNI_AUTH: demo # the demo app acts as the demo visitor; there is no sign-in screen
         run: |
           npm ci
           nohup npm run server:start > server.log 2>&1 &

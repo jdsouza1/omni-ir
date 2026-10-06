@@ -180,7 +180,7 @@ describe("other routes", () => {
   it("GET /api/health reports the model kind", async () => {
     server = await startServer({ model: new MockModel({ speed: "instant" }) });
     const response = await fetch(`${server.url}/api/health`);
-    expect(await response.json()).toEqual({ ok: true, model: "mock" });
+    expect(await response.json()).toEqual({ ok: true, model: "mock", auth: "demo" });
   });
 
   it("unknown routes return a JSON 404", async () => {

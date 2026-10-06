@@ -13,7 +13,7 @@ export function ActionsPanel({ actions }: { actions: readonly ActionEntry[] }) {
     <section className="pg-panel" aria-label="Actions">
       <h2 className="pg-panel-title">Actions</h2>
       {actions.length === 0 ? (
-        <p className="pg-muted">Click a button in the preview to see what happens. Governed actions go to the server's stub handlers.</p>
+        <p className="pg-muted">Click a button in the preview to see what happens. Governed actions go to the server's handlers, which run them as a pretend demo visitor: nothing is really paid, booked or sent.</p>
       ) : (
         <ol className="pg-actions" role="log" aria-live="polite">
           {actions.map((a) => (

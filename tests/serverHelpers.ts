@@ -13,7 +13,8 @@ export interface SseEvent {
 export async function startServer(
   options: Omit<Partial<AppOptions>, "config" | "model"> & { model: Model; config?: Partial<ServerConfig> },
 ) {
-  const config: ServerConfig = { ...loadConfig({}).config, mockSpeed: "instant", ...options.config };
+  // Tests that don't sign anyone in act as the demo visitor; tests of sign-in pass auth: "magic-link".
+  const config: ServerConfig = { ...loadConfig({}).config, mockSpeed: "instant", auth: "demo", ...options.config };
   const logs: Record<string, unknown>[] = [];
   const app = createApp({ log: (e) => logs.push(e), ...options, config });
   const server: Server = await new Promise((resolve) => {

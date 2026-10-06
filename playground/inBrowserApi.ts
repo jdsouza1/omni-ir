@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-// The hosted playground's API: the free mock model and the stub tools, running in the browser,
+// The hosted playground's API: the free mock model and the tool handlers (as a pretend demo visitor), running in the browser,
 // with every fixture bundled in. Used only by the static build (`npm run playground:static`).
 import { createInBrowserApi } from "../server/inBrowser";
 import { FixtureModel } from "../server/models/fixtureModel";
