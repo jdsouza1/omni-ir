@@ -112,6 +112,12 @@ public class OmniParser(
       is LineEvent.Overflow -> reject(listOf(Issue(IssueCode.LINE_TOO_LONG, "line is longer than the limit (${event.length} characters seen)")), event.number)
       is LineEvent.Line -> {
         val line = event.number
+        if (line == 1 && isNewerMarker(event.text)) {
+          val placed = Issue(IssueCode.NEWER_VERSION, "the stream was written for a newer Omni-IR version than this parser's (${majorMinor()})", line = line)
+          reported += placed
+          onEvent?.invoke(ParserEvent.Warning(placed))
+          document = document.copy(newerVersion = true, revision = document.revision + 1)
+        }
         when (val parsed = parseLine(event.text)) {
           LineResult.Empty -> return
           is LineResult.Error -> reject(listOf(parsed.issue), line)

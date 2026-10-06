@@ -98,6 +98,8 @@ public struct OmniDocument: Sendable {
   /// After the end of the stream: references that never arrived.
   public var missing: Set<String> = []
   public var complete = false
+  /// Line 1 was a version marker for a newer Omni-IR version than this one (SPEC.md [3.9]).
+  public var newerVersion = false
 
   public init() {}
 }

@@ -128,8 +128,6 @@ func errorResponseOutcome(status: Int, body: [UInt8]) -> GenerateOutcome {
   return .error(code: "server_error", message: "Request failed (\(status)).", retryable: status >= 500)
 }
 
-/// "MAJOR.MINOR" of this package's version, sent with each request ([10.1]).
-let requestVersion = omniIRVersion.split(separator: ".").prefix(2).joined(separator: ".")
 
 func errorOutcome(_ payload: [String: Any]?) -> GenerateOutcome {
   .error(
@@ -174,7 +172,7 @@ public struct OmniClient: Sendable {
   @MainActor
   public func generate(_ prompt: String, into store: OmniStore) async -> GenerateOutcome {
     var components = URLComponents(url: baseURL.appendingPathComponent("api/generate"), resolvingAgainstBaseURL: false)
-    components?.queryItems = [URLQueryItem(name: "version", value: requestVersion)]
+    components?.queryItems = [URLQueryItem(name: "version", value: majorMinor())]
     var request = URLRequest(url: components?.url ?? baseURL.appendingPathComponent("api/generate"))
     request.httpMethod = "POST"
     request.timeoutInterval = idleTimeout  // URLSession's timeout is the longest wait between bytes

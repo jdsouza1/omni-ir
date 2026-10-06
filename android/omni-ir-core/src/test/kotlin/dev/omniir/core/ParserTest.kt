@@ -9,6 +9,18 @@ private val tools: ToolRegistry = mapOf("payments.confirm" to Tool.acceptsAnythi
 
 class ParserTest {
   @Test
+  fun `a marker for a newer version flags the document, so the renderer can ask for an update`() {
+    val newer = OmniParser(tools)
+    newer.write("# omni-ir 99.0\nroot = Divider()\n")
+    newer.end()
+    assertTrue(newer.document.newerVersion && newer.document.complete)
+    assertEquals(setOf("root"), newer.document.nodes.keys)
+    val same = OmniParser(tools)
+    same.write("# omni-ir ${majorMinor()}\nroot = Divider()\n")
+    assertEquals(false, same.document.newerVersion)
+  }
+
+  @Test
   fun `reports pending references and resolves them as their lines arrive`() {
     val parser = OmniParser(tools)
     val events = mutableListOf<ParserEvent>()

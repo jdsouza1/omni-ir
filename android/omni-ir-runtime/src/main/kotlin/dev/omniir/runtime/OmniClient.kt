@@ -3,7 +3,7 @@
 // server checks again. Port of packages/react/src/client. Uses only the JDK's HTTP classes.
 package dev.omniir.runtime
 
-import dev.omniir.core.OMNI_IR_VERSION
+import dev.omniir.core.majorMinor
 import dev.omniir.core.Primitive
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +43,7 @@ public class OmniClient(
    */
   public suspend fun generate(prompt: String, store: OmniStore): GenerateOutcome = withContext(Dispatchers.IO) {
     val connection = try {
-      open("api/generate?version=" + OMNI_IR_VERSION.split(".").take(2).joinToString("."), Json.obj(mapOf("prompt" to prompt)), accept = "text/event-stream")
+      open("api/generate?version=" + majorMinor(), Json.obj(mapOf("prompt" to prompt)), accept = "text/event-stream")
     } catch (e: IOException) {
       return@withContext GenerateOutcome.Failed("network_error", "Could not reach the server.", retryable = true)
     }

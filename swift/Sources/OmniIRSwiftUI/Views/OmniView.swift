@@ -22,8 +22,29 @@ public struct OmniView: View {
   }
 
   public var body: some View {
-    NodeSlot(id: "root")
-      .environment(\.omniContext, context)
+    Group {
+      // The marker is line 1, so the notice appears before anything else and never moves the screen.
+      if context.store.document.newerVersion {
+        VStack(alignment: .leading, spacing: 12) {
+          VersionNotice()
+          NodeSlot(id: "root")
+        }
+      } else {
+        NodeSlot(id: "root")
+      }
+    }
+    .environment(\.omniContext, context)
+  }
+}
+
+/// The stream was written for a newer Omni-IR version (SPEC.md section 8): say the app needs an update.
+private struct VersionNotice: View {
+  var body: some View {
+    Text("This screen was made for a newer version of the app. The app needs an update to show all of it.")
+      .font(.footnote)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(10)
+      .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
   }
 }
 

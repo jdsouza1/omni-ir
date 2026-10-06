@@ -81,6 +81,7 @@ public enum class IssueCode(
   NODE_CRASHED("node_crashed", IssueSeverity.ERROR, IssueStage.RENDERER, "A component failed while rendering. Only its own slot shows a fallback."),
   HANDLER_FAILED("handler_failed", IssueSeverity.ERROR, IssueStage.RENDERER, "An action's handler failed or the server refused it."),
   UNKNOWN_ESCAPE("unknown_escape", IssueSeverity.WARNING, IssueStage.LINE, "A backslash sequence other than \\\", \\\\ or \\n was kept as literal text. The line is still accepted."),
+  NEWER_VERSION("newer_version", IssueSeverity.WARNING, IssueStage.LINE, "The version marker on line 1 names a newer Omni-IR version than the parser's. The rest of the stream is processed as usual."),
 }
 
 /** Size limits of the protocol. */

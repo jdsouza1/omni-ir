@@ -5,6 +5,7 @@ import { DocumentIndex, validateDocument, validateStatement, type Statement, typ
 import { createStore, type OmniDocument, type OmniStore } from "./store.js";
 import { parseLine } from "./tokenizer.js";
 import type { Issue } from "./types.js";
+import { isNewerMarker, majorMinor } from "./version.js";
 
 export type ParserEvent =
   | { type: "node"; id: string; line: number }
@@ -53,6 +54,12 @@ export function createParser(options: ParserOptions): OmniParser {
     if (event.kind === "overflow") {
       reject([{ code: "line_too_long", message: `line is longer than the limit (${event.length} characters seen)` }], line);
       return;
+    }
+
+    if (line === 1 && isNewerMarker(event.text)) {
+      const message = `the stream was written for a newer Omni-IR version than this parser's (${majorMinor()})`;
+      emit({ type: "warning", issue: { code: "newer_version", message, line } });
+      store.markNewerVersion?.();
     }
 
     const parsed = parseLine(event.text);

@@ -47,9 +47,23 @@ export function OmniRenderer({
   return (
     <OmniContext.Provider value={value}>
       <div className="omni-root">
+        <VersionNotice />
         <NodeSlot id={ROOT_ID} />
       </div>
     </OmniContext.Provider>
+  );
+}
+
+/** When the stream was written for a newer version, say so above the screen (SPEC.md section 8). */
+function VersionNotice() {
+  const { store } = useOmni();
+  const getNewer = () => store.getSnapshot().newerVersion;
+  const newer = useSyncExternalStore(store.subscribe, getNewer, getNewer);
+  if (!newer) return null;
+  return (
+    <p className="omni-version-notice" role="status">
+      This screen was made for a newer version of the app. The app needs an update to show all of it.
+    </p>
   );
 }
 

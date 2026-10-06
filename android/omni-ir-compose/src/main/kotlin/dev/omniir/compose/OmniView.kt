@@ -60,8 +60,29 @@ public fun OmniView(
   val scope = rememberCoroutineScope()
   val context = RenderContext(store, document, actions, pictures, onMutation, onEvent, scope)
   CompositionLocalProvider(LocalRender provides context) {
-    Box(modifier) { NodeSlot("root") }
+    // The marker is line 1, so the notice appears before anything else and never moves the screen.
+    if (document.newerVersion) {
+      Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        VersionNotice()
+        NodeSlot("root")
+      }
+    } else {
+      Box(modifier) { NodeSlot("root") }
+    }
   }
+}
+
+/** The stream was written for a newer Omni-IR version (SPEC.md section 8): say the app needs an update. */
+@Composable
+private fun VersionNotice() {
+  Text(
+    "This screen was made for a newer version of the app. The app needs an update to show all of it.",
+    style = MaterialTheme.typography.bodySmall,
+    modifier = Modifier
+      .fillMaxWidth()
+      .background(MaterialTheme.colorScheme.tertiaryContainer, RoundedCornerShape(10.dp))
+      .padding(10.dp),
+  )
 }
 
 internal class RenderContext(

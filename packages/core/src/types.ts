@@ -52,7 +52,8 @@ export type IssueCode =
   | "node_crashed"
   | "handler_failed"
   // warnings
-  | "unknown_escape";
+  | "unknown_escape"
+  | "newer_version";
 
 export interface IssueInfo {
   severity: "error" | "warning";
@@ -131,6 +132,11 @@ export const ISSUE_CODES = {
     severity: "warning",
     stage: "line",
     meaning: "A backslash sequence other than \\\", \\\\ or \\n was kept as literal text. The line is still accepted.",
+  },
+  newer_version: {
+    severity: "warning",
+    stage: "line",
+    meaning: "The version marker on line 1 names a newer Omni-IR version than the parser's. The rest of the stream is processed as usual.",
   },
 } as const satisfies Record<IssueCode, IssueInfo>;
 

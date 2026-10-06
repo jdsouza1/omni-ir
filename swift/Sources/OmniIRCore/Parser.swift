@@ -94,6 +94,13 @@ public final class OmniParser {
     case .overflow(let line, let length):
       reject([Issue(code: .lineTooLong, message: "line is longer than the limit (\(length) characters seen)")], line: line)
     case .line(let text, let line):
+      if line == 1 && isNewerMarker(text) {
+        let warning = Issue(
+          code: .newerVersion, message: "the stream was written for a newer Omni-IR version than this parser's (\(majorMinor()))", line: line)
+        issues.append(warning)
+        onEvent?(.warning(warning))
+        document.newerVersion = true
+      }
       switch parseLine(text) {
       case .empty:
         return

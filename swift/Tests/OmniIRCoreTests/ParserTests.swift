@@ -6,6 +6,18 @@ private let tools: ToolRegistry = ["payments.confirm": .acceptsAnything]
 
 @Suite("Parser")
 struct ParserTests {
+  @Test("a marker for a newer version flags the document, so the renderer can ask for an update")
+  func newerVersion() {
+    let newer = OmniParser(tools: tools)
+    newer.write("# omni-ir 99.0\nroot = Divider()\n")
+    newer.end()
+    #expect(newer.document.newerVersion && newer.document.complete)
+    #expect(Set(newer.document.nodes.keys) == ["root"])
+    let same = OmniParser(tools: tools)
+    same.write("# omni-ir \(majorMinor())\nroot = Divider()\n")
+    #expect(!same.document.newerVersion)
+  }
+
   @Test("reports pending references and resolves them as their lines arrive")
   func pendingAndResolved() {
     let parser = OmniParser(tools: tools)

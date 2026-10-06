@@ -519,6 +519,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 | `node_crashed` | error | in the renderer | A component failed while rendering. Only its own slot shows a fallback. |
 | `handler_failed` | error | in the renderer | An action's handler failed or the server refused it. |
 | `unknown_escape` | warning | when the line arrives | A backslash sequence other than \", \\ or \n was kept as literal text. The line is still accepted. |
+| `newer_version` | warning | when the line arrives | The version marker on line 1 names a newer Omni-IR version than the parser's. The rest of the stream is processed as usual. |
 <!-- /generated:issues -->
 
 ## 8. Renderer requirements
