@@ -95,7 +95,7 @@ Omni-IR's security doesn't depend on a model resisting jailbreaks: the spec trea
 **E. Review and release** *(checkpoint: you review)*
 - [x] E.1 A review page: the model results, what fuzzing found and fixed, the performance numbers (https://claude.ai/artifact/PXY4dH4uN37YBxjJHHJ1yv)
 - [x] E.2 Merge (approved 2026-10-06); the conformance counts and performance are in the README, the docs and the CHANGELOG. The "works with any model" claim stayed off the site until the official-app check, done 2026-10-06 on the official Gemini app (5 of 5 valid)
-- [ ] E.3 `v0.4.0` release if anything changed in the packages: a separate go-ahead from you
+- [x] E.3 `v0.4.0` released 2026-10-06 with the owner's go-ahead and approval: `@omni-ir/core` and `@omni-ir/react` 0.4.0 on npm (with provenance), and Swift Package Manager (checked: resolves and builds from the tag)
 
 **Progress (2026-10-05):** A done via ask-chat.ai: [docs/model-check-2026-10-05-models.md](docs/model-check-2026-10-05-models.md). Run 1 (original prompt): Gemini 3.1 Pro 17/19, GPT-6.1 Sol 11/19, Llama 4 Maverick 14/19, every safety probe passed. Two prompt problems found and fixed (signatures now show named props, `Image(asset, alt=…, [ratio=…])`; the McpMutation is never a child). Run 2 (fixed prompt, earlier failures plus probes): 6/6, 12/12, 6/8. Confirmed 2026-10-06 on the official Gemini app: 5 of 5 valid, and the same distinctive choices as the reseller's Gemini (see the model-check write-up). GPT and Llama results stay labelled as reached through the reseller.
 
