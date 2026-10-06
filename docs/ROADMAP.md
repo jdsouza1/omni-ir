@@ -49,10 +49,14 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
 1. **Step 13 · Proof and hardening (all free)** (plan drafted: [PLAN-HARDENING.md](../PLAN-HARDENING.md)).
    - [ ] Model check on other models: Gemini, ChatGPT and an open model, run in their own chat apps, so no API cost. "Works with any model" is unproven while only Claude has been checked.
    - [ ] Parser fuzz testing: randomly broken input fed to the TypeScript, Swift and Kotlin parsers, which must never crash and must always report the same issues
+   - [ ] Adversarial boundary tests (free): look-alike and misspelled tool names rejected at the parser, the browser and the server; a corpus of hostile model output (markup, smuggled URLs, `__proto__`, mismatched mutations, huge streams) run through all three parsers; attacks that combine several inputs at once. Omni-IR treats all model output as hostile, so these cover every model at once.
    - [ ] Performance on large screens: each line currently re-checks the whole document; measure it at hundreds of components and fix if needed
 2. **Step 14 · Transport standard and stream versions.** Make SPEC.md §10 normative: the exact Server-Sent Events, reconnecting, and how errors and governed actions are reported, with transport conformance cases. Map the same events onto WebSockets, and add an adapter for [AG-UI](https://docs.ag-ui.com/concepts), the event protocol many agent frameworks speak, so they can stream Omni-IR without custom work. Starts with a short research step on the current AG-UI spec.
    - [ ] An optional version marker as a stream's first line, so a client can say "this stream needs 0.3" instead of rejecting unknown lines one by one (listed under "Not yet specified" in SPEC.md)
-3. **Real backend tool handlers with authorization and persistence**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 14, since both concern the server side.
+3. **Real backend tool handlers with authorization and persistence**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 14, since both concern the server side. Comes with security work that only makes sense once real data is involved:
+   - [ ] Personal-data exposure checks: a handler never returns another user's data, and nothing personal leaks between sessions
+   - [ ] Optional automated LLM red teaming with Promptfoo (OWASP LLM Top 10, attacker models generating jailbreaks and indirect injections, run against each supported model). It calls paid model APIs, so only as a capped manual run with the owner's go-ahead, never in CI
+   - [ ] A human red team for chained attacks before real handlers go live, with the owner's go-ahead (an outside hire)
 4. **Step 15 · Themes and languages.**
    - [ ] A design-token layer: brand colours, fonts and corner radius set by the app, never by the model, on web, iOS and Android
    - [ ] A dark theme for the web catalog (it is light-only today)
@@ -64,6 +68,6 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
 
 - **Android on Maven Central.** Needs a free Sonatype account and a signing key, created by the owner; until then apps include the modules from this repository.
 - **Accessibility audit with real screen readers** (VoiceOver, TalkBack, NVDA) on real devices, beyond today's automated checks.
-- **External security review** of the parsers and governance, once fuzz testing is in place. Only with the owner's go-ahead, since it may cost money.
+- **External security review** of the parsers and governance, once fuzz testing and the adversarial boundary tests are in place. Only with the owner's go-ahead, since it may cost money. The human red team in item 3 above can cover it.
 - **Eject to code**, only when a client asks: export a screen as readable React (then SwiftUI) that keeps calling the same checked tool layer. Built per project when there is demand; the benchmark's React converter is a starting point. Until then, Omni-IR is open source (Apache-2.0), so no one is locked in.
 - **Phase 4 · Bi-directional AST sync**, starting with a written goal (see the timeline above).

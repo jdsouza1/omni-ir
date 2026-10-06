@@ -6,7 +6,7 @@ Goal: back up three claims with evidence before more people rely on them, all fo
 2. **"A bad stream can't break the app."** The parsers are tested with hand-written cases, never with large amounts of random, broken input.
 3. **"Fast enough for real screens."** Nobody has measured a large screen.
 
-Status: **APPROVED 2026-10-05** with the recommendations. The owner chose ask-chat.ai (a paid reseller, 7-day trial) for the first model check, with me driving Chrome; results from it are labelled as such, and published claims are confirmed on the official apps.
+Status: **APPROVED 2026-10-05** with the recommendations; **extended the same day** at the owner's request with adversarial boundary tests (2b, B.5). The owner chose ask-chat.ai (a paid reseller, 7-day trial) for the first model check, with me driving Chrome; results from it are labelled as such, and published claims are confirmed on the official apps.
 
 ## Proposal
 
@@ -25,6 +25,20 @@ Every reply is checked by the real parser (`npm run validate`, or the model chec
 - **All three parsers agree:** a fixed corpus of a few thousand generated streams is run through the TypeScript, Swift and Kotlin parsers, and their results must match exactly. This is a *differential* test, separate from the conformance suite: conformance cases are written from the spec, while the corpus only checks that the three implementations agree. Any disagreement is settled by the spec, and becomes a new conformance case.
 - **Swift and Kotlin get their own no-crash runs** with a seeded generator, since a crash there takes down the app (no error boundaries in SwiftUI or Compose).
 - CI runs a fixed seed on every push, and a longer random run once a week (free on a public repo), saving any failing stream as a test case.
+
+**2b. Adversarial boundary tests** *(added 2026-10-05 at the owner's request, from a red-teaming proposal)*
+
+Omni-IR's security doesn't depend on a model resisting jailbreaks: the spec treats everything a model writes as untrusted, possibly hostile. So the question these tests answer is not "can a model be tricked?" (often it can) but "when a tricked or malicious model sends the worst output it can, does the boundary still hold?" That is the same for every model, so one set of tests covers Gemini, ChatGPT, open models and any future model. All free and deterministic, in CI.
+
+- **Tool-name spoofing:** look-alike tool names must never reach a handler. Homoglyphs (`pаyments.confirm` with a Cyrillic а), zero-width and invisible characters, full-width letters, case changes (`Payments.confirm`), typosquats (`payment.confirm`, `payments.confirm2`, `payments..confirm`), trailing spaces and dots. Checked at all three layers: the parser, the browser's mutation handler and the server's `/api/mutate`.
+- **A hostile-output corpus:** streams a jailbroken or injected model might write, each with the expected outcome. Script and markup in every text prop, URLs and `javascript:` in picture names, `__proto__` and `constructor` in params and ids, a mutation that governs a different button than it claims, two mutations for one button, `$state` names that collide with built-ins, a million-component stream, instructions aimed at the user ("type your password below"). Run through the TypeScript, Swift and Kotlin parsers, with the expected result written from the spec.
+- **Coordinated multi-input attacks:** several fields working together, the way real attacks do. For example, injected instructions in one Input's default text plus a governed button whose params send that field to a tool, or a forged `/api/mutate` request that combines a valid tool with params lifted from another tool. Checked end to end through the in-browser API and the Express server.
+- **Model-written attacks, recorded:** the replies already collected from Gemini, GPT and Llama that tried unsafe things (Llama's `+` concatenation, `settings.update` with foreign params) become permanent test cases.
+
+**Not in this step, by design** (added to the roadmap instead):
+- **Automated LLM red teaming with Promptfoo** (OWASP LLM Top 10 plugins, attacker models generating jailbreaks and indirect injections against each target model). Promptfoo is free and open source, but it generates attacks and calls the target models through paid APIs, so it can't run in CI under the cost rule. Planned as an optional, capped manual run with the owner's go-ahead, after the boundary tests, to measure how often each model *tries* something unsafe.
+- **Personal-data exposure audits.** Omni-IR keeps no user data today; this belongs with real tool handlers and persistence.
+- **A human red team** for chained attacks (a series of harmless-looking actions that add up to a breach). Most valuable once real tool handlers with authorization exist, and it is an outside hire, so the owner decides when.
 
 **3. Performance on large screens.**
 
@@ -68,6 +82,7 @@ Every reply is checked by the real parser (`npm run validate`, or the model chec
 - [ ] B.2 The differential corpus (`fuzz/`): generated streams with the TypeScript results; Swift and Kotlin tests that must match them
 - [ ] B.3 Seeded no-crash runs in Swift and Kotlin
 - [ ] B.4 A weekly workflow with a long random run, saving any failure as a case
+- [ ] B.5 Adversarial boundary tests: tool-name spoofing at all three layers; a hostile-output corpus run through all three parsers; coordinated multi-input attacks end to end; the unsafe model replies from the model check kept as cases
 
 **C. Performance** *(tests first)*
 - [ ] C.1 Measurements at 50 to 5,000 components on all three platforms, written up
