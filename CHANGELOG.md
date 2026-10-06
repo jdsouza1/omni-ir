@@ -2,7 +2,7 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
-## Unreleased
+## 0.5.0 (2026-10-06)
 
 ### Added
 - **The transport is a standard** (SPEC.md section 10, rules [10.1]–[10.20], no longer informative): the request, the error body and its codes, the events and the terminal event, keep-alive pings, what a client does with each event and when the connection drops, no resumption, the action endpoint's answers, and rate limits behind a proxy. Any client now works with any server that follows it.
@@ -16,6 +16,11 @@ All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-
 ### Changed
 - The reference server's streams start with the version marker line, so the screen's line numbers are one higher than the model's text.
 - Clients ignore every event after the first `done` or `error` ([10.8]).
+
+### Compatibility
+- **Mixing versions:** 0.5 clients send `?version=0.5`, which 0.4 servers ignore. A 0.5 server answers `unsupported_version` only to a client that asks for another version; 0.4 clients ask for none. As before, use the same version for the server and the apps.
+- **Line numbers:** the reference server's streams start with the version marker, so issues in a model's text are reported one line lower than before. Code that compares a received stream with the model's text should expect the marker line first.
+- **TypeScript:** `OmniDocument` has a new field, `newerVersion`; a custom `OmniStore` may implement the new optional `markNewerVersion()`. **Swift and Kotlin:** `OmniDocument.newerVersion` (default false), and `OmniClient` takes an optional idle timeout.
 
 ## 0.4.0 (2026-10-06)
 
