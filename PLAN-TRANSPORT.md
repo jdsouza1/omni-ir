@@ -129,12 +129,12 @@ Work on branch `wip/transport`. Each part starts with failing tests (constraint 
 - [ ] E.3 `POST /api/ag-ui` in the Express server; an end-to-end test comparing the screen with the SSE result
 - [ ] E.4 Package checks: the new entry point in the build, pack check and install test
 
-**G. Rate limits behind a proxy** *(tests first)*
-- [ ] G.1 `OMNI_TRUST_PROXY` in the server config, off by default; tests for no proxy, a trusted proxy and a forged header
-- [ ] G.2 §10's rate-limit rule; the deployment docs say when to set it
+**F. Rate limits behind a proxy** *(tests first)*
+- [ ] F.1 `OMNI_TRUST_PROXY` in the server config, off by default; tests for no proxy, a trusted proxy and a forged header
+- [ ] F.2 §10's rate-limit rule; the deployment docs say when to set it
 
-**F. Docs and review** *(checkpoint: you review)*
-- [ ] F.1 Docs site: a "Transport" page and a "Use with AG-UI" guide; README, landing page and CHANGELOG
-- [ ] F.2 A review page: the transport rules, the case results on all three platforms, an AG-UI run
-- [ ] F.3 Merge with your approval
-- [ ] F.4 `v0.5.0` release: a separate go-ahead from you
+**G. Docs and review** *(checkpoint: you review)*
+- [ ] G.1 Docs site: a "Transport" page and a "Use with AG-UI" guide; README, landing page and CHANGELOG
+- [ ] G.2 A review page: the transport rules, the case results on all three platforms, an AG-UI run
+- [ ] G.3 Merge with your approval
+- [ ] G.4 `v0.5.0` release: a separate go-ahead from you
