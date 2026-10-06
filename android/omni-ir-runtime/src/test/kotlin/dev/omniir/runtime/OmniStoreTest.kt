@@ -104,6 +104,18 @@ class OmniStoreTest {
     assertEquals(RendererEvent.Press("cancel"), events[1])
     assertFalse(store.isRunning("pay"))
   }
+
+  // PLAN-HARDENING.md B.5: a hostile stream governs a Button that has no action. The line is reported
+  // at the end of the stream (mutation_target_not_interactive), and pressing the Button never runs the tool.
+  @Test
+  fun `an McpMutation on a Button without an action never runs its tool`() = runTest {
+    val store = OmniStore(tools)
+    store.write("root = Stack([cancel])\ncancel = Button(\"Cancel\")\nm = McpMutation(cancel, tool=\"payments.confirm\", params={amount: 5})\n")
+    store.end()
+    val events = mutableListOf<RendererEvent>()
+    store.press("cancel", { error("a Button without an action must never reach the backend") }, { events += it })
+    assertEquals(listOf<RendererEvent>(RendererEvent.Press("cancel")), events)
+  }
 }
 
 class FormatTest {

@@ -2,6 +2,23 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+### Changed
+- **Negative zero is the number 0** ([4.9]): `-0`, `-0.0`, `-0e5` and underflow such as `-1e-400` are read as 0 by every parser, so no renderer shows "-0". Found by the new differential fuzz corpus, where the Kotlin parser kept -0.
+- **Nesting limit** ([4.13]): lists, objects and calls nest at most 8 levels inside a value; deeper is a `syntax` error. Found by fuzzing: lists nested about 9,000 deep overflowed the Kotlin parser's stack, which would crash an Android app. Every parser now stops before recursing that far. New limit `nestingDepth` in `conformance/schema.json`.
+- **Tool names are compared exactly** ([5.14], wording only): a malformed name (a look-alike letter from another alphabet, an invisible or full-width character, a space, an upper-case first letter) is `invalid_props`, a well-formed unregistered one is `unknown_tool`. Conformance suite: 85 cases, including `tool-name-spoofing` and `hostile-output`.
+- **Document size limit** ([5.25]): a stream may define at most 1,000 components (McpMutations included) and 1,000 `$state` keys. A line past either limit is a new `document_too_large` error and is rejected; the screen keeps what it has. New limits `components` and `stateKeys` in `conformance/schema.json`. Keeps a runaway or hostile stream from making a client hold or draw an unbounded screen.
+- **System prompt:** component signatures now show which props must be named and which are optional (`Image(asset, alt=…, [ratio=…])`, also in SPEC.md); the McpMutation rule says the Button, not the mutation, goes in the layout; values have no expressions. Found by checking Gemini, GPT and Llama.
+
+### Performance
+- **Parsing is linear in the length of a stream** on every platform. Each line used to re-check the whole document and copy the document's maps, so time grew with the square of the screen: 5,000 components took 9.6 s in TypeScript. A new incremental index checks only what each line touches (tests compare it with the whole-document check on every line of thousands of fuzz streams), and the stores no longer copy on every line. 20,000 components: TypeScript 0.4 s (was 58 s), Kotlin 0.13 s, Swift through `OmniStore` 0.9 s (was 13.7 s, debug build). Budgets in CI fail if it goes back.
+- **TypeScript:** an `OmniDocument` snapshot's maps are now shared with later snapshots and grow in place; read snapshots through selectors (as the renderers do), and copy a map if you need it frozen. **Kotlin:** `OmniDocument` has a new `revision` field, so documents from different moments never compare equal. **Swift:** `OmniStore.document` and `issues` are read from the parser instead of copied.
+
+### Added
+- **Fuzz testing:** fast-check properties for the TypeScript parser, and a differential corpus of 2,000 generated streams (`fuzz/corpus.json`) that the Swift and Kotlin parsers must parse exactly as TypeScript does, and seeded no-crash fuzzing inside the Swift and Kotlin test suites (random bytes, token soup, edited fixtures, extreme lines).
+- **Adversarial boundary tests** (`tests/security.test.tsx`): look-alike tool names refused by the parser, the browser and the server; hostile output rendered as plain text with nothing loaded, linked or styled; forged requests that mix tools, add keys or change types refused; the unsafe replies from the cross-model check kept as tests.
+
 ## 0.3.0 (2026-10-05)
 
 ### Added

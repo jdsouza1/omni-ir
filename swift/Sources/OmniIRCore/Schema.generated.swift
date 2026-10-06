@@ -55,6 +55,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
   case listMismatch = "list_mismatch"
   case tableMismatch = "table_mismatch"
   case tabsMismatch = "tabs_mismatch"
+  case documentTooLarge = "document_too_large"
   case chartMismatch = "chart_mismatch"
   case duplicateMutation = "duplicate_mutation"
   case danglingRef = "dangling_ref"
@@ -88,6 +89,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .listMismatch: .error
     case .tableMismatch: .error
     case .tabsMismatch: .error
+    case .documentTooLarge: .error
     case .chartMismatch: .error
     case .duplicateMutation: .error
     case .danglingRef: .error
@@ -123,6 +125,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .listMismatch: .line
     case .tableMismatch: .line
     case .tabsMismatch: .line
+    case .documentTooLarge: .line
     case .chartMismatch: .line
     case .duplicateMutation: .line
     case .danglingRef: .end
@@ -159,6 +162,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .listMismatch: "A List contains something other than ListItems, or a ListItem is outside a List."
     case .tableMismatch: "A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns."
     case .tabsMismatch: "A Tabs contains something other than Tab, or a Tab is outside a Tabs."
+    case .documentTooLarge: "The line would define a component or $state key beyond the document size limits."
     case .chartMismatch: "A BarChart or LineChart contains something other than Series, a PieChart something other than Slices, a Series or Slice is outside its kind of chart, or a Series' number of values differs from its chart's labels."
     case .duplicateMutation: "A button that already has an McpMutation gets a second one."
     case .danglingRef: "A referenced component or McpMutation target never arrived."
@@ -188,6 +192,9 @@ public enum Limits {
   public static let chartLabels = 24
   public static let chartSeries = 6
   public static let chartSlices = 8
+  public static let nestingDepth = 8
+  public static let components = 1000
+  public static let stateKeys = 1000
 }
 
 enum Catalog {

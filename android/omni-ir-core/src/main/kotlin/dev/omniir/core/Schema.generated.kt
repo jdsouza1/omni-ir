@@ -68,6 +68,7 @@ public enum class IssueCode(
   LIST_MISMATCH("list_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A List contains something other than ListItems, or a ListItem is outside a List."),
   TABLE_MISMATCH("table_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns."),
   TABS_MISMATCH("tabs_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A Tabs contains something other than Tab, or a Tab is outside a Tabs."),
+  DOCUMENT_TOO_LARGE("document_too_large", IssueSeverity.ERROR, IssueStage.LINE, "The line would define a component or \$state key beyond the document size limits."),
   CHART_MISMATCH("chart_mismatch", IssueSeverity.ERROR, IssueStage.LINE, "A BarChart or LineChart contains something other than Series, a PieChart something other than Slices, a Series or Slice is outside its kind of chart, or a Series' number of values differs from its chart's labels."),
   DUPLICATE_MUTATION("duplicate_mutation", IssueSeverity.ERROR, IssueStage.LINE, "A button that already has an McpMutation gets a second one."),
   DANGLING_REF("dangling_ref", IssueSeverity.ERROR, IssueStage.END, "A referenced component or McpMutation target never arrived."),
@@ -95,6 +96,9 @@ public object Limits {
   public const val CHART_LABELS: Int = 24
   public const val CHART_SERIES: Int = 6
   public const val CHART_SLICES: Int = 8
+  public const val NESTING_DEPTH: Int = 8
+  public const val COMPONENTS: Int = 1000
+  public const val STATE_KEYS: Int = 1000
 }
 
 internal object Catalog {

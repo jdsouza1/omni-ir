@@ -262,6 +262,8 @@ private func jsNumber(_ text: String) -> Double {
   if mantissa.hasPrefix(".") { mantissa = "0" + mantissa }
   if mantissa.hasSuffix(".") { mantissa += "0" }
   let value = Double(mantissa + exponent) ?? .nan
+  // Negative zero ("-0", or underflow such as -1e-400) is the number 0 [4.9].
+  if value == 0 { return 0 }
   return negative ? -value : value
 }
 
@@ -270,6 +272,8 @@ private func jsNumber(_ text: String) -> Double {
 private struct TokenParser {
   let tokens: [Token]
   var i = 0
+  /// Lists, objects and calls open inside the current value [4.13].
+  var depth = 0
 
   init(tokens: [Token]) {
     self.tokens = tokens
@@ -326,22 +330,35 @@ private struct TokenParser {
     case .state(let key, _):
       i += 1
       return .state(key)
-    case .ident(let name, _):
+    case .ident(let name, let col):
       i += 1
       if name == "true" || name == "false" { return .boolean(name == "true") }
       if name == "null" { return .null }
       if isPunct("(") {
+        try enter(col)
+        defer { depth -= 1 }
         _ = try argumentList()  // parsed for well-formedness, then rejected by validation
         return .call(name)
       }
       return .ident(name)
     case .punct(let p, let col):
-      if p == "[" { return try array() }
-      if p == "{" { return try object() }
+      if p == "[" || p == "{" {
+        try enter(col)
+        defer { depth -= 1 }
+        return p == "[" ? try array() : try object()
+      }
       throw LineError(code: .syntax, message: "unexpected \"\(p)\"", col: col)
     case .eof(let col):
       throw LineError(code: .syntax, message: "line ended where a value was expected", col: col)
     }
+  }
+
+  /// Go one nesting level deeper, refusing to go past the limit before recursing [4.13]. The caller undoes it with `defer`.
+  private mutating func enter(_ col: Int) throws {
+    if depth >= Limits.nestingDepth {
+      throw LineError(code: .syntax, message: "values may nest at most (Limits.nestingDepth) levels deep", col: col)
+    }
+    depth += 1
   }
 
   private mutating func array() throws -> RawValue {

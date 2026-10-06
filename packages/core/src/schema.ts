@@ -28,6 +28,12 @@ export const LIMITS = {
   chartSeries: 6,
   /** Most Slices in a PieChart. */
   chartSlices: 8,
+  /** Deepest nesting of lists, objects and calls inside one value. */
+  nestingDepth: 8,
+  /** Most components (McpMutations included) one stream may define. */
+  components: 1000,
+  /** Most $state keys one stream may declare. */
+  stateKeys: 1000,
 } as const;
 
 export const MAX_TEXT = LIMITS.text;
@@ -561,9 +567,12 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
   for (const s of statements) {
     if (s.kind === "state") {
       if (state.has(s.key)) issues.push({ code: "duplicate_id", message: `${s.key} is assigned more than once`, id: s.key });
+      else if (state.size >= LIMITS.stateKeys) issues.push(tooLarge(s.key));
       else state.set(s.key, s.value);
     } else if (byId.has(s.id)) {
       issues.push({ code: "duplicate_id", message: `"${s.id}" is assigned more than once`, id: s.id });
+    } else if (byId.size >= LIMITS.components) {
+      issues.push(tooLarge(s.id));
     } else {
       byId.set(s.id, s);
     }
@@ -756,4 +765,196 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
   }
 
   return issues;
+}
+
+/** A line that would define a component or $state key past the document size limits [5.25]. */
+function tooLarge(id: string): Issue {
+  return id.startsWith("$")
+    ? { code: "document_too_large", message: `a stream may declare at most ${LIMITS.stateKeys} $state keys`, id }
+    : { code: "document_too_large", message: `a stream may define at most ${LIMITS.components} components, McpMutations included`, id };
+}
+
+/** The streaming rules a bound input breaks with this state value, if any. */
+function inputStateIssue(node: OmniNode, value: Primitive | undefined): Issue | undefined {
+  if ((node.type === "Input" || node.type === "Select") && typeof value !== "string") {
+    return { code: "input_state_type", message: `${node.type} "${node.id}" is bound to ${node.props.value.key}, which is not a string`, id: node.id };
+  }
+  if (node.type === "Switch" && typeof value !== "boolean") {
+    return { code: "input_state_type", message: `Switch "${node.id}" is bound to ${node.props.value.key}, which is not true or false`, id: node.id };
+  }
+  if (node.type === "DateInput" && !(value === "" || (typeof value === "string" && ISO_DATE.test(value)))) {
+    return { code: "input_state_type", message: `DateInput "${node.id}" is bound to ${node.props.value.key}, which is not a YYYY-MM-DD date or ""`, id: node.id };
+  }
+  return undefined;
+}
+
+const isBoundInput = (node: OmniNode) => node.type === "Input" || node.type === "DateInput" || node.type === "Select" || node.type === "Switch";
+
+/**
+ * The streaming rules, checked incrementally (PLAN-HARDENING.md C.2). For a document whose statements
+ * so far are consistent, `check(s)` returns exactly what `validateDocument([...added, s], { complete:
+ * false })` would, but only looks at what `s` touches: its id, its children, its parent, its state
+ * keys and the Button it governs. That keeps a long stream linear instead of quadratic. A test
+ * compares the two on every line of thousands of fuzz streams.
+ */
+export class DocumentIndex {
+  private readonly byId = new Map<string, OmniNode | MutationStatement>();
+  private readonly state = new Map<string, Primitive>();
+  /** Child id -> the defined node that lists it. */
+  private readonly parentOf = new Map<string, string>();
+  /** State key -> the Inputs, DateInputs, Selects and Switches bound to it. */
+  private readonly boundTo = new Map<string, OmniNode[]>();
+  /** Buttons that already have an McpMutation. */
+  private readonly governed = new Set<string>();
+
+  check(s: Statement): Issue[] {
+    if (s.kind === "state") {
+      if (this.state.has(s.key)) return [{ code: "duplicate_id", message: `${s.key} is assigned more than once`, id: s.key }];
+      if (this.state.size >= LIMITS.stateKeys) return [tooLarge(s.key)];
+      return (this.boundTo.get(s.key) ?? []).flatMap((node) => inputStateIssue(node, s.value) ?? []);
+    }
+    if (this.byId.has(s.id)) return [{ code: "duplicate_id", message: `"${s.id}" is assigned more than once`, id: s.id }];
+    if (this.byId.size >= LIMITS.components) return [tooLarge(s.id)];
+    return s.kind === "mutation" ? this.checkMutation(s) : this.checkNode(s);
+  }
+
+  add(s: Statement): void {
+    if (s.kind === "state") {
+      this.state.set(s.key, s.value);
+      return;
+    }
+    this.byId.set(s.id, s);
+    if (s.kind === "mutation") {
+      this.governed.add(s.target);
+      return;
+    }
+    for (const child of this.claimedChildren(s).claimed) this.parentOf.set(child, s.id);
+    if (isBoundInput(s)) {
+      const key = s.props.value.key;
+      this.boundTo.set(key, [...(this.boundTo.get(key) ?? []), s]);
+    }
+  }
+
+  private checkMutation(m: MutationStatement): Issue[] {
+    const issues: Issue[] = [];
+    // A node listed this id as a child before it arrived; now it turns out to be an McpMutation.
+    const lister = this.parentOf.get(m.id);
+    if (lister !== undefined) issues.push({ code: "child_not_component", message: `"${m.id}" is an McpMutation, not a component`, id: lister });
+    if (this.governed.has(m.target)) {
+      const existing = [...this.byId.values()].find((x) => x.kind === "mutation" && x.target === m.target);
+      issues.push({ code: "duplicate_mutation", message: `"${m.target}" is already governed by "${existing?.id ?? "another McpMutation"}"`, id: m.id });
+    }
+    return issues;
+  }
+
+  /** The tree-shape rules for a new node's children list, as validateDocument applies them. */
+  private claimedChildren(node: OmniNode): { claimed: string[]; issues: Issue[] } {
+    const issues: Issue[] = [];
+    const claimed: string[] = [];
+    const seen = new Set<string>();
+    for (const child of node.children) {
+      if (seen.has(child)) {
+        issues.push({ code: "duplicate_child", message: `"${child}" appears twice in ${node.id}'s children`, id: node.id });
+        continue;
+      }
+      seen.add(child);
+      if (child === ROOT_ID) {
+        issues.push({ code: "root_as_child", message: `"${ROOT_ID}" cannot be a child`, id: node.id });
+        continue;
+      }
+      if (this.byId.get(child)?.kind === "mutation") {
+        issues.push({ code: "child_not_component", message: `"${child}" is an McpMutation, not a component`, id: node.id });
+        continue;
+      }
+      const existing = this.parentOf.get(child);
+      if (existing !== undefined) {
+        issues.push({
+          code: "multiple_parents",
+          message: `"${child}" already belongs to "${existing}" and cannot also be a child of "${node.id}"`,
+          id: node.id,
+        });
+        continue;
+      }
+      claimed.push(child);
+    }
+    return { claimed, issues };
+  }
+
+  private checkNode(node: OmniNode): Issue[] {
+    const { claimed, issues } = this.claimedChildren(node);
+    const parentOf = (id: string) => (claimed.includes(id) ? node.id : this.parentOf.get(id));
+    const lookup = (id: string) => (id === node.id ? node : this.byId.get(id));
+
+    // Cycles: every new edge starts at this node, so a cycle exists only if one of its new children
+    // is the node itself or one of its ancestors.
+    const ancestors = new Set<string>([node.id]);
+    for (let p = this.parentOf.get(node.id); p !== undefined && !ancestors.has(p); p = this.parentOf.get(p)) ancestors.add(p);
+    if (claimed.some((child) => ancestors.has(child))) {
+      issues.push({ code: "cycle", message: `"${node.id}" contains itself through its children`, id: node.id });
+    }
+
+    if (isBoundInput(node) && this.state.has(node.props.value.key)) {
+      const issue = inputStateIssue(node, this.state.get(node.props.value.key));
+      if (issue) issues.push(issue);
+    }
+
+    // Containers with one kind of item, seen from the new node as a container, as an item, and as the
+    // new parent of items it claims.
+    const parent = parentOf(node.id);
+    const parentNode = parent === undefined ? undefined : lookup(parent);
+    for (const pair of CONTAINER_PAIRS) {
+      const containers: readonly string[] = pair.containers;
+      if (containers.includes(node.type)) {
+        for (const child of node.children) {
+          const c = lookup(child);
+          if (c?.kind === "node" && c.type !== pair.item) {
+            issues.push({ code: pair.code, message: `${node.type} "${node.id}" can only contain ${pair.item}s, not ${c.type} "${child}"`, id: node.id });
+          }
+        }
+      }
+      if (parentNode?.kind === "node" && parentNode.id !== node.id && containers.includes(parentNode.type) && node.type !== pair.item) {
+        issues.push({ code: pair.code, message: `${parentNode.type} "${parentNode.id}" can only contain ${pair.item}s, not ${node.type} "${node.id}"`, id: parentNode.id });
+      }
+      if (node.type === pair.item && parentNode?.kind === "node" && !containers.includes(parentNode.type)) {
+        issues.push({ code: pair.code, message: `${pair.item} "${node.id}" must be inside a ${containers.join(" or ")}, not ${parentNode.type} "${parent}"`, id: node.id });
+      }
+      for (const child of claimed) {
+        const c = this.byId.get(child);
+        if (c?.kind === "node" && c.type === pair.item && !containers.includes(node.type)) {
+          issues.push({ code: pair.code, message: `${pair.item} "${child}" must be inside a ${containers.join(" or ")}, not ${node.type} "${node.id}"`, id: child });
+        }
+      }
+    }
+
+    // A Series has one value per label of its chart; a TableRow one cell per column of its Table.
+    const seriesIssue = (chart: OmniNode, series: OmniNode): Issue | undefined =>
+      (chart.type === "BarChart" || chart.type === "LineChart") && series.type === "Series" && series.props.values.length !== chart.props.labels.length
+        ? {
+            code: "chart_mismatch",
+            message: `Series "${series.id}" has ${series.props.values.length} value(s), but ${chart.type} "${chart.id}" has ${chart.props.labels.length} label(s)`,
+            id: series.id,
+          }
+        : undefined;
+    const rowIssue = (table: OmniNode, row: OmniNode): Issue | undefined =>
+      table.type === "Table" && row.type === "TableRow" && row.props.cells.length !== table.props.columns.length
+        ? {
+            code: "table_mismatch",
+            message: `TableRow "${row.id}" has ${row.props.cells.length} cell(s), but Table "${table.id}" has ${table.props.columns.length} column(s)`,
+            id: row.id,
+          }
+        : undefined;
+    for (const child of node.children) {
+      const c = lookup(child);
+      if (c?.kind === "node") {
+        const issue = seriesIssue(node, c) ?? rowIssue(node, c);
+        if (issue) issues.push(issue);
+      }
+    }
+    if (parentNode?.kind === "node" && parentNode.id !== node.id && parentNode.children.includes(node.id)) {
+      const issue = seriesIssue(parentNode, node) ?? rowIssue(parentNode, node);
+      if (issue) issues.push(issue);
+    }
+
+    return issues;
+  }
 }

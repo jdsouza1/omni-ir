@@ -88,6 +88,14 @@ enum CaseFiles {
   }
 
   static let cases: [ConformanceCase] = (try? load()) ?? []
+
+  /// The differential corpus (fuzz/corpus.json): generated streams with the TypeScript parser's results.
+  static func loadCorpus() throws -> [ConformanceCase] {
+    struct File: Decodable { let cases: [ConformanceCase] }
+    return try JSONDecoder().decode(File.self, from: Data(contentsOf: repoRoot.appendingPathComponent("fuzz/corpus.json"))).cases
+  }
+
+  static let corpus: [ConformanceCase] = (try? loadCorpus()) ?? []
 }
 
 // MARK: - Canonical result
@@ -172,6 +180,24 @@ struct ConformanceTests {
     for size in [1, 5, 13] {
       #expect(run(c, chunkSize: size) == whole, "chunks of \(size) bytes")
     }
+    #expect(whole.issues == Set(c.expect.issues), "issues")
+    if let nodes = c.expect.nodes { #expect(whole.nodes == nodes, "nodes") }
+    if let state = c.expect.state { #expect(whole.state == state, "state") }
+    if let mutations = c.expect.mutations { #expect(whole.mutations == mutations, "mutations") }
+    if let missing = c.expect.missing { #expect(whole.missing == missing, "missing") }
+  }
+
+  // PLAN-HARDENING.md B.2: the Swift parser must reach exactly the TypeScript parser's result on
+  // every generated stream. A disagreement is settled by SPEC.md and becomes a conformance case.
+  @Test("loads the fuzz corpus")
+  func loadsCorpus() throws {
+    #expect(try CaseFiles.loadCorpus().count >= 1000)
+  }
+
+  @Test("agrees with the TypeScript parser on the fuzz corpus", arguments: CaseFiles.corpus)
+  func agrees(_ c: ConformanceCase) {
+    let whole = run(c, chunkSize: nil)
+    #expect(run(c, chunkSize: 7) == whole, "chunks of 7 bytes")
     #expect(whole.issues == Set(c.expect.issues), "issues")
     if let nodes = c.expect.nodes { #expect(whole.nodes == nodes, "nodes") }
     if let state = c.expect.state { #expect(whole.state == state, "state") }

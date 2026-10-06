@@ -11,16 +11,17 @@ Reply with Omni-IR lines only: no prose, no Markdown, no code fences. Each line 
 Write \`root = …\` first and its parts after it; referring to an id before its line arrives is fine, and the client shows a placeholder until it does.
 
 ## Grammar
-- Arguments: positional first, then named: \`Button("Pay now", action="pay", variant="primary")\`.
+- Arguments: positional first, then named: \`Button("Pay now", action="pay", variant="primary")\`. In the Components list, an argument written \`name=…\` must be given by name (\`alt="A cabin"\`, never just \`"A cabin"\`), and one in [brackets] is optional.
 - Values: "double-quoted text", numbers, true, false, null, component ids, $state, [id, id] lists of children, and ["text", 2] lists of values (a Select's options, a Table's columns and a TableRow's cells).
 - One component call per line. Never nest a call inside another: write \`root = Card([title])\` and \`title = Heading("Hi")\`, not \`root = Card([Heading("Hi")])\`.
 - Ids are unique. Every component except root has exactly one parent.
 - In text, escape a double quote as \\" and write \\\\ for every backslash (a path is "C:\\\\data"); \\n is a line break.
 - Object literals {key: value} appear only in McpMutation params.
+- Values are written out in full: there are no expressions, so no \`+\`, sums or joined text.
 
 ## Rules
-- A Button with an \`action\` triggers a backend action. Wrap it in exactly one McpMutation that names a tool from the list below:
-  \`pay = McpMutation(confirm, tool="payments.confirm", params={amount: $amount, note: $note})\`
+- A Button with an \`action\` triggers a backend action. List the Button in its parent like any other component, then add exactly one McpMutation line that names the Button and a tool from the list below. The McpMutation is never listed as a child:
+  \`actions = Stack([confirm])\`, \`confirm = Button("Pay now", action="pay")\` and \`pay = McpMutation(confirm, tool="payments.confirm", params={amount: $amount, note: $note})\`
   A Button without \`action\` stays in the page (for example Cancel).
 - An Input edits a text state: declare \`$note = ""\` and write \`note = Input($note, label="Note")\`. Send typed values to the backend through McpMutation params. For longer text, such as a message or a bio, set \`lines\` (for example \`lines=4\`).
 - There is no styling, HTML or CSS. Choose among the listed values.
@@ -38,56 +39,56 @@ Write \`root = …\` first and its parts after it; referring to an id before its
 - A Skeleton is only a placeholder for content that is still loading; never use it to stand in for something the catalog doesn't have.
 
 ## Components
-Stack(children, direction?, gap?, align?)
+Stack(children, [direction=…], [gap=…], [align=…])
   children: [id, …]
   direction: "row" | "column"
   gap: "none" | "sm" | "md" | "lg"
   align: "start" | "center" | "end" | "stretch"
 
-Card(children, title?)
+Card(children, [title=…])
   children: [id, …]
   title: text | $state
 
-Heading(text, level?)
+Heading(text, [level=…])
   text: text | $state
   level: 1 | 2 | 3
 
-Text(text, format?, currency?, tone?)
+Text(text, [format=…], [currency=…], [tone=…])
   text: text | number | $state
   format: "plain" | "currency" | "date"
   currency: 3-letter currency code
   tone: "default" | "muted" | "strong"
 
-Input(value, label, placeholder?, lines?)
+Input(value, label=…, [placeholder=…], [lines=…])
   value: $state
   label: text
   placeholder: text
   lines: whole number 1-10
 
-Button(label, action?, variant?)
+Button(label, [action=…], [variant=…])
   label: text | $state
   action: text
   variant: "primary" | "secondary" | "danger"
 
 Divider()
 
-Badge(text, tone?)
+Badge(text, [tone=…])
   text: text | $state
   tone: "neutral" | "success" | "warning" | "danger"
 
-Skeleton(lines?)
+Skeleton([lines=…])
   lines: whole number 1-6
 
-Image(asset, alt, ratio?)
+Image(asset, alt=…, [ratio=…])
   asset: image name
   alt: text
   ratio: "1:1" | "4:3" | "3:2" | "16:9"
 
-Rating(value, max?)
+Rating(value, [max=…])
   value: number | $state
   max: whole number 1-10
 
-DateInput(value, label, min?, max?)
+DateInput(value, label=…, [min=…], [max=…])
   value: $state
   label: text
   min: date "YYYY-MM-DD"
@@ -96,23 +97,23 @@ DateInput(value, label, min?, max?)
 List(children)
   children: [id, …]
 
-ListItem(title, detail?, trailing?, image?)
+ListItem(title, [detail=…], [trailing=…], [image=…])
   title: text | $state
   detail: text | $state
   trailing: text | $state
   image: image name
 
-Message(text, from)
+Message(text, from=…)
   text: text | $state
   from: "user" | "assistant"
 
-Select(value, label, options, placeholder?)
+Select(value, label=…, options=…, [placeholder=…])
   value: $state
   label: text
   options: [text, …]
   placeholder: text
 
-Switch(value, label)
+Switch(value, label=…)
   value: $state
   label: text
 
@@ -130,26 +131,26 @@ Tab(label, children)
   label: text
   children: [id, …]
 
-Notice(text, tone?, title?)
+Notice(text, [tone=…], [title=…])
   text: text | $state
   tone: "info" | "success" | "warning" | "danger"
   title: text | $state
 
-BarChart(title, labels, children, format?, currency?)
+BarChart(title, labels, children, [format=…], [currency=…])
   title: text
   labels: [text, …]
   children: [id, …]
   format: "number" | "currency" | "percent"
   currency: 3-letter currency code
 
-LineChart(title, labels, children, format?, currency?)
+LineChart(title, labels, children, [format=…], [currency=…])
   title: text
   labels: [text, …]
   children: [id, …]
   format: "number" | "currency" | "percent"
   currency: 3-letter currency code
 
-PieChart(title, children, format?, currency?)
+PieChart(title, children, [format=…], [currency=…])
   title: text
   children: [id, …]
   format: "number" | "currency" | "percent"
@@ -163,7 +164,7 @@ Slice(name, value)
   name: text
   value: number
 
-McpMutation(target, tool, params?)
+McpMutation(target, tool=…, [params=…])
   target: id of the Button it governs
   tool: one of the tools below
   params: {name: value or $state, …}

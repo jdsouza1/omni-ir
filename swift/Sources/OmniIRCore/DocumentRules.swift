@@ -13,10 +13,12 @@ func validateDocument(_ statements: [Statement], complete: Bool) -> [Issue] {
     switch s {
     case .state(let key, let value):
       if state[key] != nil { issues.append(Issue(code: .duplicateId, message: "\(key) is assigned more than once", id: key)) }
+      else if state.count >= Limits.stateKeys { issues.append(tooLarge(key)) }
       else { state[key] = value }
     case .node, .mutation:
       let id = s.definedId
       if byId[id] != nil { issues.append(Issue(code: .duplicateId, message: "\"\(id)\" is assigned more than once", id: id)) }
+      else if byId.count >= Limits.components { issues.append(tooLarge(id)) }
       else {
         byId[id] = s
         order.append(id)
@@ -169,6 +171,13 @@ func validateDocument(_ statements: [Statement], complete: Bool) -> [Issue] {
   }
 
   return issues
+}
+
+/// A line that would define a component or `$key` past the document size limits [5.25].
+func tooLarge(_ id: String) -> Issue {
+  id.hasPrefix("$")
+    ? Issue(code: .documentTooLarge, message: "a stream may declare at most \(Limits.stateKeys) $state keys", id: id)
+    : Issue(code: .documentTooLarge, message: "a stream may define at most \(Limits.components) components, McpMutations included", id: id)
 }
 
 /// True when a component triggers a backend action, so it must be governed by an McpMutation.

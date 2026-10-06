@@ -13,7 +13,10 @@
     "tableColumns": 8,
     "chartLabels": 24,
     "chartSeries": 6,
-    "chartSlices": 8
+    "chartSlices": 8,
+    "nestingDepth": 8,
+    "components": 1000,
+    "stateKeys": 1000
   },
   "reservedWords": [
     "true",
@@ -1547,6 +1550,11 @@
       "severity": "error",
       "stage": "line",
       "meaning": "A Tabs contains something other than Tab, or a Tab is outside a Tabs."
+    },
+    "document_too_large": {
+      "severity": "error",
+      "stage": "line",
+      "meaning": "The line would define a component or $state key beyond the document size limits."
     },
     "chart_mismatch": {
       "severity": "error",

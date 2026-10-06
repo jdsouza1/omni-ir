@@ -98,6 +98,18 @@ struct OmniStoreTests {
     #expect(!store.isRunning("pay"))
   }
 
+  // PLAN-HARDENING.md B.5: a hostile stream governs a Button that has no action. The line is reported
+  // at the end of the stream (mutation_target_not_interactive), and pressing the Button never runs the tool.
+  @Test("an McpMutation on a Button without an action never runs its tool")
+  func mutationOnPlainButton() async {
+    let store = OmniStore(tools: tools)
+    store.write("root = Stack([cancel])\ncancel = Button(\"Cancel\")\nm = McpMutation(cancel, tool=\"payments.confirm\", params={amount: 5})\n")
+    store.end()
+    var events: [RendererEvent] = []
+    await store.press("cancel", onMutation: { _ in Testing.Issue.record("a Button without an action must never reach the backend") }, report: { events.append($0) })
+    #expect(events == [.press(id: "cancel")])
+  }
+
   @Test("text formats: currency, a date-only value on its own day in every time zone, other text as is")
   func formats() {
     let us = Locale(identifier: "en_US")

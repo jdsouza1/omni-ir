@@ -87,10 +87,11 @@ escape        = "\" , any character ;
 - **[4.6]** Any other backslash sequence, such as `\d`, is kept as literal text (the backslash and the character) and reported as an `unknown_escape` warning. The line is still accepted.
 - **[4.7]** A string without its closing quote is an `unterminated_string` error. A string whose last character before the end of the line is an escaped quote (`\"`) is unterminated.
 - **[4.8]** Inside a string every character is text: `#`, `$`, `,`, `(`, `)`, `[`, `]`, `{`, `}` and `=` have no special meaning. Outside a string, `#` starts a comment that runs to the end of the line.
-- **[4.9]** A number MUST NOT be followed directly by a letter, digit or underscore (`1abc` is a `syntax` error). Numbers are decimal and MAY use an exponent. A number too large to represent as a finite 64-bit float, such as `1e999`, is an `invalid_props` error wherever it's used.
+- **[4.9]** A number MUST NOT be followed directly by a letter, digit or underscore (`1abc` is a `syntax` error). Numbers are decimal and MAY use an exponent. A number too large to represent as a finite 64-bit float, such as `1e999`, is an `invalid_props` error wherever it's used. Negative zero, in any spelling (`-0`, `-0.0`, `-0e5`) or from a value too small to represent (`-1e-400`), is the number 0.
 - **[4.10]** An id MUST be an identifier (`1abc = …` is a `syntax` error) and MUST NOT be one of the reserved words `true`, `false`, `null`, `__proto__`, `constructor` or `prototype` (an `invalid_props` error). In a value, `true`, `false` and `null` are literals, not ids.
 - **[4.11]** Lists and objects follow the grammar above. Where each kind of value is allowed is set by the catalog (section 6): lists of ids only for children, objects only for McpMutation params.
 - **[4.12]** A call inside another statement's values, such as `root = Card([Heading("Hi")])`, is a `not_flat` error. Every component MUST be defined on its own line and referred to by id.
+- **[4.13]** Lists, objects and calls inside a value MUST NOT be nested more than 8 levels deep (`[[1]]` is 2 levels); deeper nesting is a `syntax` error. The catalog never needs more than 2, and the limit lets a parser reject runaway nesting before it uses unbounded memory or stack.
 
 The known limit of [4.5]: a Windows path written as `"C:\new"` contains the valid escape `\n` and becomes a line break. Models SHOULD be told to write `\\` for every backslash.
 
@@ -105,6 +106,8 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.5]** A component MUST NOT contain itself through its children (`cycle`), and `root` MUST NOT be anyone's child (`root_as_child`).
 - **[5.6]** A children list MUST name components only. Naming an McpMutation is a `child_not_component` error.
 - **[5.7]** A line rejected with an error has no effect, as if it had never been sent. For example, a later reference to the id it would have defined is still pending, and becomes `dangling_ref` if nothing else defines it.
+
+- **[5.25]** A stream MAY define at most 1,000 components (McpMutations included) and declare at most 1,000 `$state` keys. A line that would define one more is a `document_too_large` error, checked before the other document rules for that line; like any rejected line it has no effect ([5.7]), so the screen keeps everything it already has. A duplicate id is still `duplicate_id`. The limits keep a runaway or hostile stream from making a client hold or draw an unbounded screen; no real screen comes close.
 
 ### Props
 
@@ -137,19 +140,19 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 ### Actions
 
 - **[5.13]** A Button with an `action` triggers a backend action. It MUST be governed by exactly one McpMutation by the end of the stream; otherwise it is an `ungoverned_mutation` error. A second McpMutation for the same Button is a `duplicate_mutation` error.
-- **[5.14]** An McpMutation's `tool` MUST be in the app's tool registry. Otherwise the line is an `unknown_tool` error and is rejected, so its Button stays ungoverned.
+- **[5.14]** An McpMutation's `tool` MUST be exactly a name in the app's tool registry, compared character by character. A value that isn't shaped like a tool name (ASCII, dot-separated segments that start with a lower-case letter), such as one with a look-alike letter from another alphabet, an invisible or full-width character, a space or an upper-case first letter, is an `invalid_props` error; a well-formed name the registry doesn't have, such as a misspelling, is an `unknown_tool` error. Either way the line is rejected, so its Button stays ungoverned.
 - **[5.15]** An McpMutation's `target` MUST be a Button with an `action`. A target that never arrives is `dangling_ref`; a target without an action is `mutation_target_not_interactive`.
 - **[5.16]** McpMutation `params` is an object whose keys are identifiers (not reserved words) and whose values are literals or `$key` references. A component id as a value, a repeated key or a reserved key is an `invalid_props` error.
 
 ## 6. Component catalog (v0.3)
 
-A component has exactly the props listed; any other prop is rejected ([5.9]). "Values" lists what each prop accepts; `$state` means a `$key` reference ([5.11]), and `id` means a component id. The styling of every value (what `"muted"` or `"primary"` looks like) belongs to the renderer.
+A component has exactly the props listed; any other prop is rejected ([5.9]). "Values" lists what each prop accepts; `$state` means a `$key` reference ([5.11]), and `id` means a component id. The styling of every value (what `"muted"` or `"primary"` looks like) belongs to the renderer. In each signature, positional props are written bare in their order, props written `name=…` can only be given by name, and props in [brackets] are optional: `Image(asset, alt=…, [ratio=…])` is written `Image("cabin-pines", alt="A cabin", ratio="16:9")`.
 
 <!-- generated:components -->
 ### Stack
 
 ```
-Stack(children, direction?, gap?, align?)
+Stack(children, [direction=…], [gap=…], [align=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -162,7 +165,7 @@ Stack(children, direction?, gap?, align?)
 ### Card
 
 ```
-Card(children, title?)
+Card(children, [title=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -173,7 +176,7 @@ Card(children, title?)
 ### Heading
 
 ```
-Heading(text, level?)
+Heading(text, [level=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -184,7 +187,7 @@ Heading(text, level?)
 ### Text
 
 ```
-Text(text, format?, currency?, tone?)
+Text(text, [format=…], [currency=…], [tone=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -197,7 +200,7 @@ Text(text, format?, currency?, tone?)
 ### Input
 
 ```
-Input(value, label, placeholder?, lines?)
+Input(value, label=…, [placeholder=…], [lines=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -210,7 +213,7 @@ Input(value, label, placeholder?, lines?)
 ### Button
 
 ```
-Button(label, action?, variant?)
+Button(label, [action=…], [variant=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -230,7 +233,7 @@ No props.
 ### Badge
 
 ```
-Badge(text, tone?)
+Badge(text, [tone=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -241,7 +244,7 @@ Badge(text, tone?)
 ### Skeleton
 
 ```
-Skeleton(lines?)
+Skeleton([lines=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -251,7 +254,7 @@ Skeleton(lines?)
 ### Image
 
 ```
-Image(asset, alt, ratio?)
+Image(asset, alt=…, [ratio=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -263,7 +266,7 @@ Image(asset, alt, ratio?)
 ### Rating
 
 ```
-Rating(value, max?)
+Rating(value, [max=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -274,7 +277,7 @@ Rating(value, max?)
 ### DateInput
 
 ```
-DateInput(value, label, min?, max?)
+DateInput(value, label=…, [min=…], [max=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -297,7 +300,7 @@ List(children)
 ### ListItem
 
 ```
-ListItem(title, detail?, trailing?, image?)
+ListItem(title, [detail=…], [trailing=…], [image=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -310,7 +313,7 @@ ListItem(title, detail?, trailing?, image?)
 ### Message
 
 ```
-Message(text, from)
+Message(text, from=…)
 ```
 
 | Prop | Position | Required | Values |
@@ -321,7 +324,7 @@ Message(text, from)
 ### Select
 
 ```
-Select(value, label, options, placeholder?)
+Select(value, label=…, options=…, [placeholder=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -334,7 +337,7 @@ Select(value, label, options, placeholder?)
 ### Switch
 
 ```
-Switch(value, label)
+Switch(value, label=…)
 ```
 
 | Prop | Position | Required | Values |
@@ -387,7 +390,7 @@ Tab(label, children)
 ### Notice
 
 ```
-Notice(text, tone?, title?)
+Notice(text, [tone=…], [title=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -399,7 +402,7 @@ Notice(text, tone?, title?)
 ### BarChart
 
 ```
-BarChart(title, labels, children, format?, currency?)
+BarChart(title, labels, children, [format=…], [currency=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -413,7 +416,7 @@ BarChart(title, labels, children, format?, currency?)
 ### LineChart
 
 ```
-LineChart(title, labels, children, format?, currency?)
+LineChart(title, labels, children, [format=…], [currency=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -427,7 +430,7 @@ LineChart(title, labels, children, format?, currency?)
 ### PieChart
 
 ```
-PieChart(title, children, format?, currency?)
+PieChart(title, children, [format=…], [currency=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -463,7 +466,7 @@ Slice(name, value)
 ### McpMutation
 
 ```
-McpMutation(target, tool, params?)
+McpMutation(target, tool=…, [params=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -502,6 +505,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 | `list_mismatch` | error | when the line arrives | A List contains something other than ListItems, or a ListItem is outside a List. |
 | `table_mismatch` | error | when the line arrives | A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns. |
 | `tabs_mismatch` | error | when the line arrives | A Tabs contains something other than Tab, or a Tab is outside a Tabs. |
+| `document_too_large` | error | when the line arrives | The line would define a component or $state key beyond the document size limits. |
 | `chart_mismatch` | error | when the line arrives | A BarChart or LineChart contains something other than Series, a PieChart something other than Slices, a Series or Slice is outside its kind of chart, or a Series' number of values differs from its chart's labels. |
 | `duplicate_mutation` | error | when the line arrives | A button that already has an McpMutation gets a second one. |
 | `dangling_ref` | error | at end of stream | A referenced component or McpMutation target never arrived. |
@@ -616,6 +620,9 @@ Adding to the catalog is a change too. Because the catalog is strict ([5.9]), a 
 | Labels in a BarChart or LineChart, and values in a Series | 24 |
 | Series in a BarChart or LineChart | 6 |
 | Slices in a PieChart | 8 |
+| Levels of lists, objects and calls nested inside one value ([4.13]) | 8 |
+| Components one stream may define, McpMutations included ([5.25]) | 1,000 |
+| $state keys one stream may declare ([5.25]) | 1,000 |
 <!-- /generated:limits -->
 
 Individual props have their own limits, listed in section 6.

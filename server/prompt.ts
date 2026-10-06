@@ -42,16 +42,17 @@ Reply with Omni-IR lines only: no prose, no Markdown, no code fences. Each line 
 Write \`root = …\` first and its parts after it; referring to an id before its line arrives is fine, and the client shows a placeholder until it does.
 
 ## Grammar
-- Arguments: positional first, then named: \`Button("Pay now", action="pay", variant="primary")\`.
+- Arguments: positional first, then named: \`Button("Pay now", action="pay", variant="primary")\`. In the Components list, an argument written \`name=…\` must be given by name (\`alt="A cabin"\`, never just \`"A cabin"\`), and one in [brackets] is optional.
 - Values: "double-quoted text", numbers, true, false, null, component ids, $state, [id, id] lists of children, and ["text", 2] lists of values (a Select's options, a Table's columns and a TableRow's cells).
 - One component call per line. Never nest a call inside another: write \`root = Card([title])\` and \`title = Heading("Hi")\`, not \`root = Card([Heading("Hi")])\`.
 - Ids are unique. Every component except root has exactly one parent.
 - In text, escape a double quote as \\" and write \\\\ for every backslash (a path is "C:\\\\data"); \\n is a line break.
 - Object literals {key: value} appear only in McpMutation params.
+- Values are written out in full: there are no expressions, so no \`+\`, sums or joined text.
 
 ## Rules
-- A Button with an \`action\` triggers a backend action. Wrap it in exactly one McpMutation that names a tool from the list below:
-  \`pay = McpMutation(confirm, tool="payments.confirm", params={amount: $amount, note: $note})\`
+- A Button with an \`action\` triggers a backend action. List the Button in its parent like any other component, then add exactly one McpMutation line that names the Button and a tool from the list below. The McpMutation is never listed as a child:
+  \`actions = Stack([confirm])\`, \`confirm = Button("Pay now", action="pay")\` and \`pay = McpMutation(confirm, tool="payments.confirm", params={amount: $amount, note: $note})\`
   A Button without \`action\` stays in the page (for example Cancel).
 - An Input edits a text state: declare \`$note = ""\` and write \`note = Input($note, label="Note")\`. Send typed values to the backend through McpMutation params. For longer text, such as a message or a bio, set \`lines\` (for example \`lines=4\`).
 - There is no styling, HTML or CSS. Choose among the listed values.
@@ -71,7 +72,7 @@ Write \`root = …\` first and its parts after it; referring to an id before its
 ## Components
 ${COMPONENT_TYPES.map(componentBlock).join("\n\n")}
 
-McpMutation(target, tool, params?)
+McpMutation(target, tool=…, [params=…])
   target: id of the Button it governs
   tool: one of the tools below
   params: {name: value or $state, …}

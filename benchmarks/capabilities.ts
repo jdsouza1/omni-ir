@@ -113,7 +113,7 @@ export const CAPABILITIES: readonly Row[] = [
   {
     question: "Shared tests for other implementations",
     cells: [
-      { text: "80 language-neutral conformance cases", source: "conformance/" },
+      { text: "85 language-neutral conformance cases", source: "conformance/" },
       { text: "None published that we found" },
       { text: "Spec test cases (specification/v0_9/test)", source: "a2ui-project/a2ui" },
       { text: "None published that we found" },

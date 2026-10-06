@@ -46,10 +46,20 @@ public enum Governance: Equatable, Sendable {
 @MainActor
 @Observable
 public final class OmniStore {
-  /// Everything accepted so far.
-  public private(set) var document = OmniDocument()
+  /// Everything accepted so far. Read from the parser rather than copied into the store: a copy
+  /// shared the parser's dictionaries, so the next line copied them all and a long stream became
+  /// quadratic (PLAN-HARDENING.md C.2). Views observe it through `revision`.
+  public var document: OmniDocument {
+    _ = revision
+    return parser.document
+  }
   /// Every parser error and warning so far, in order.
-  public private(set) var issues: [Issue] = []
+  public var issues: [Issue] {
+    _ = revision
+    return parser.issues
+  }
+  /// Changes whenever the document or the issues do; reading `document` or `issues` observes it.
+  private var revision = 0
   /// The tools a screen may call, each with its params check.
   public let tools: ToolRegistry
   /// Names of the pictures the app provides.
@@ -88,8 +98,7 @@ public final class OmniStore {
   }
 
   private func sync() {
-    document = parser.document
-    issues = parser.issues
+    revision &+= 1
   }
 
   // MARK: Reading for display

@@ -34,7 +34,7 @@ export interface PropShape {
 
 export interface ComponentShape {
   type: ComponentType;
-  /** `Stack(children, direction?, gap?, align?)` */
+  /** `Stack(children, [direction=…], [gap=…], [align=…])`: positional props bare, named ones `name=…`, optional ones in brackets. */
   signature: string;
   props: PropShape[];
 }
@@ -46,7 +46,14 @@ export function describeComponent(type: ComponentType): ComponentShape {
   const positional = spec.positional as readonly string[];
   const entries = Object.entries(schema.properties ?? {});
   const named = entries.map(([name]) => name).filter((name) => !positional.includes(name));
-  const signature = `${type}(${[...positional, ...named].map((n) => (required.has(n) ? n : `${n}?`)).join(", ")})`;
+  // Positional props bare, the rest as `name=…` (they must be given by name); optional ones in
+  // brackets: `Image(asset, alt=…, [ratio=…])`. A model check found `alt?`-style signatures were
+  // read as "pass these in order".
+  const arg = (n: string, byName: boolean) => {
+    const bare = byName ? `${n}=…` : n;
+    return required.has(n) ? bare : `[${bare}]`;
+  };
+  const signature = `${type}(${[...positional.map((n) => arg(n, false)), ...named.map((n) => arg(n, true))].join(", ")})`;
   return {
     type,
     signature,
