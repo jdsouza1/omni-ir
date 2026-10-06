@@ -82,7 +82,7 @@ Omni-IR's security doesn't depend on a model resisting jailbreaks: the spec trea
 - [x] B.2 The differential corpus (`fuzz/`): generated streams with the TypeScript results; Swift and Kotlin tests that must match them
 - [x] B.3 Seeded no-crash runs in Swift and Kotlin
 - [x] B.4 A weekly workflow with a long random run, saving any failure as a case
-- [ ] B.5 Adversarial boundary tests: tool-name spoofing at all three layers; a hostile-output corpus run through all three parsers; coordinated multi-input attacks end to end; the unsafe model replies from the model check kept as cases
+- [x] B.5 Adversarial boundary tests: tool-name spoofing at all three layers; a hostile-output corpus run through all three parsers; coordinated multi-input attacks end to end; the unsafe model replies from the model check kept as cases
 
 **C. Performance** *(tests first)*
 - [ ] C.1 Measurements at 50 to 5,000 components on all three platforms, written up

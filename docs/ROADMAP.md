@@ -9,7 +9,7 @@ Updated 2026-10-05. Planned dates for the remaining work are kept from the origi
 | 1 · Core spec | Syntax spec v0.1 draft | [SPEC.md](../SPEC.md) |
 | 1 · Core spec | Zod validation schemas | `packages/core/src/schema.ts` |
 | 1 · Core spec | Zod schemas and parser published on npm as [`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) 0.1.0 | `packages/core/` |
-| 1 · Core spec | Conformance suite (82 cases, including one per component) | [conformance/](../conformance/README.md) |
+| 1 · Core spec | Conformance suite (84 cases, including one per component) | [conformance/](../conformance/README.md) |
 | 2 · Web reference | Streaming parser in TypeScript, written test-first | `packages/core/` |
 | 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `packages/react/` |
 | 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |

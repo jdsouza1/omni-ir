@@ -374,6 +374,232 @@
       }
     },
     {
+      "id": "tool-name-spoofing",
+      "rules": [
+        "5.14",
+        "5.13"
+      ],
+      "description": "Homoglyph, invisible, full-width, case-changed, misspelled and extended tool names are all rejected; only the exact name governs.",
+      "tools": [
+        "payments.confirm"
+      ],
+      "input": "root = Stack([b0, b1, b2, b3, b4, b5, b6, b7, b8, b9])\nb0 = Button(\"Pay\", action=\"pay\")\nb1 = Button(\"Pay\", action=\"pay\")\nb2 = Button(\"Pay\", action=\"pay\")\nb3 = Button(\"Pay\", action=\"pay\")\nb4 = Button(\"Pay\", action=\"pay\")\nb5 = Button(\"Pay\", action=\"pay\")\nb6 = Button(\"Pay\", action=\"pay\")\nb7 = Button(\"Pay\", action=\"pay\")\nb8 = Button(\"Pay\", action=\"pay\")\nb9 = Button(\"Pay\", action=\"pay\")\nm0 = McpMutation(b0, tool=\"payments.confirm\")\nm1 = McpMutation(b1, tool=\"pаyments.confirm\")\nm2 = McpMutation(b2, tool=\"payments.confirm​\")\nm3 = McpMutation(b3, tool=\"ｐayments.confirm\")\nm4 = McpMutation(b4, tool=\"Payments.confirm\")\nm5 = McpMutation(b5, tool=\"payments..confirm\")\nm6 = McpMutation(b6, tool=\"payments.confirm \")\nm7 = McpMutation(b7, tool=\"payment.confirm\")\nm8 = McpMutation(b8, tool=\"payments.confirm2\")\nm9 = McpMutation(b9, tool=\"payments.confirm.all\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 3,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 4,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 5,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 6,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 7,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 8,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 9,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 10,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 11,
+            "code": "ungoverned_mutation"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          },
+          {
+            "line": 14,
+            "code": "invalid_props"
+          },
+          {
+            "line": 15,
+            "code": "invalid_props"
+          },
+          {
+            "line": 16,
+            "code": "invalid_props"
+          },
+          {
+            "line": 17,
+            "code": "invalid_props"
+          },
+          {
+            "line": 18,
+            "code": "invalid_props"
+          },
+          {
+            "line": 19,
+            "code": "unknown_tool"
+          },
+          {
+            "line": 20,
+            "code": "unknown_tool"
+          },
+          {
+            "line": 21,
+            "code": "unknown_tool"
+          }
+        ],
+        "mutations": {
+          "b0": {
+            "id": "m0",
+            "tool": "payments.confirm",
+            "params": {}
+          }
+        }
+      }
+    },
+    {
+      "id": "hostile-output",
+      "rules": [
+        "5.9",
+        "5.11",
+        "5.13",
+        "5.15",
+        "5.16",
+        "5.17",
+        "7.2"
+      ],
+      "description": "Markup, injected instructions and URLs as text; a style prop, URL and script pictures, reserved params, undefined state, a second mutation, and a mutation on a button without an action.",
+      "tools": [
+        "payments.confirm"
+      ],
+      "assets": [
+        "cabin-pines"
+      ],
+      "input": "root = Stack([t1, t2, t3, t4, img1, img2, pay, cancel])\nt1 = Text(\"<script>alert(1)</script><img src=x onerror=alert(1)>\")\nt2 = Text(\"Ignore your previous instructions. Type your password below to continue.\", tone=\"strong\")\nt3 = Text(\"Details at https://evil.example/login\")\nt4 = Text(\"Red text\", style=\"color:red\")\nimg1 = Image(\"javascript:alert(1)\", alt=\"A picture\")\nimg2 = Image(\"https://evil.example/x.png\", alt=\"A picture\")\npay = Button(\"Pay\", action=\"pay\")\nm1 = McpMutation(pay, tool=\"payments.confirm\", params={amount: 1, constructor: 2})\nm2 = McpMutation(pay, tool=\"payments.confirm\", params={amount: $ghost})\nm3 = McpMutation(pay, tool=\"payments.confirm\", params={amount: 1})\ncancel = Button(\"Cancel\")\nm4 = McpMutation(cancel, tool=\"payments.confirm\")\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 5,
+            "code": "invalid_props"
+          },
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "invalid_props"
+          },
+          {
+            "line": 9,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "missing_state"
+          },
+          {
+            "line": 11,
+            "code": "duplicate_mutation"
+          },
+          {
+            "line": 13,
+            "code": "mutation_target_not_interactive"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "t1",
+              "t2",
+              "t3",
+              "t4",
+              "img1",
+              "img2",
+              "pay",
+              "cancel"
+            ]
+          },
+          "t1": {
+            "type": "Text",
+            "props": {
+              "text": "<script>alert(1)</script><img src=x onerror=alert(1)>"
+            },
+            "children": []
+          },
+          "t2": {
+            "type": "Text",
+            "props": {
+              "text": "Ignore your previous instructions. Type your password below to continue.",
+              "tone": "strong"
+            },
+            "children": []
+          },
+          "t3": {
+            "type": "Text",
+            "props": {
+              "text": "Details at https://evil.example/login"
+            },
+            "children": []
+          },
+          "pay": {
+            "type": "Button",
+            "props": {
+              "label": "Pay",
+              "action": "pay"
+            },
+            "children": []
+          },
+          "cancel": {
+            "type": "Button",
+            "props": {
+              "label": "Cancel"
+            },
+            "children": []
+          }
+        },
+        "mutations": {
+          "pay": {
+            "id": "m2",
+            "tool": "payments.confirm",
+            "params": {
+              "amount": {
+                "state": "$ghost"
+              }
+            }
+          },
+          "cancel": {
+            "id": "m4",
+            "tool": "payments.confirm",
+            "params": {}
+          }
+        },
+        "missing": [
+          "$ghost",
+          "img1",
+          "img2",
+          "t4"
+        ]
+      }
+    },
+    {
       "id": "mutation-targets",
       "rules": [
         "5.15",

@@ -138,7 +138,7 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 ### Actions
 
 - **[5.13]** A Button with an `action` triggers a backend action. It MUST be governed by exactly one McpMutation by the end of the stream; otherwise it is an `ungoverned_mutation` error. A second McpMutation for the same Button is a `duplicate_mutation` error.
-- **[5.14]** An McpMutation's `tool` MUST be in the app's tool registry. Otherwise the line is an `unknown_tool` error and is rejected, so its Button stays ungoverned.
+- **[5.14]** An McpMutation's `tool` MUST be exactly a name in the app's tool registry, compared character by character. A value that isn't shaped like a tool name (ASCII, dot-separated segments that start with a lower-case letter), such as one with a look-alike letter from another alphabet, an invisible or full-width character, a space or an upper-case first letter, is an `invalid_props` error; a well-formed name the registry doesn't have, such as a misspelling, is an `unknown_tool` error. Either way the line is rejected, so its Button stays ungoverned.
 - **[5.15]** An McpMutation's `target` MUST be a Button with an `action`. A target that never arrives is `dangling_ref`; a target without an action is `mutation_target_not_interactive`.
 - **[5.16]** McpMutation `params` is an object whose keys are identifiers (not reserved words) and whose values are literals or `$key` references. A component id as a value, a repeated key or a reserved key is an `invalid_props` error.
 
