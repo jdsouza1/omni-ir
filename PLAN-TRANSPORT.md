@@ -135,6 +135,6 @@ Work on branch `wip/transport`. Each part starts with failing tests (constraint 
 
 **G. Docs and review** *(checkpoint: you review)*
 - [x] G.1 Docs site: a "Transport" page and a "Use with AG-UI" guide; README, landing page and CHANGELOG
-- [ ] G.2 A review page: the transport rules, the case results on all three platforms, an AG-UI run
+- [x] G.2 A review page: the transport rules, the case results on all three platforms, an AG-UI run (https://claude.ai/artifact/U5yMAzDoSksr43WKhuNB7P)
 - [ ] G.3 Merge with your approval
 - [ ] G.4 `v0.5.0` release: a separate go-ahead from you
