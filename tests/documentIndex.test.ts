@@ -68,6 +68,18 @@ describe("DocumentIndex agrees with validateDocument", () => {
     );
   });
 
+  it("past the document size limits [5.25]", () => {
+    compare(
+      [
+        "root = Divider()",
+        ...Array.from({ length: 1005 }, (_, k) => `c${k} = Divider()`),
+        "c0 = Divider()",
+        ...Array.from({ length: 1005 }, (_, k) => `$s${k} = ${k}`),
+        "$s0 = 1",
+      ].join("\n"),
+    );
+  });
+
   it("on thousands of generated and edited streams", () => {
     fc.assert(
       fc.property(fc.oneof(stream, mutatedFixture(fixtureTexts())), (text) => compare(text)),

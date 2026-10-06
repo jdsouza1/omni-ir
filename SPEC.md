@@ -107,6 +107,8 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.6]** A children list MUST name components only. Naming an McpMutation is a `child_not_component` error.
 - **[5.7]** A line rejected with an error has no effect, as if it had never been sent. For example, a later reference to the id it would have defined is still pending, and becomes `dangling_ref` if nothing else defines it.
 
+- **[5.25]** A stream MAY define at most 1,000 components (McpMutations included) and declare at most 1,000 `$state` keys. A line that would define one more is a `document_too_large` error, checked before the other document rules for that line; like any rejected line it has no effect ([5.7]), so the screen keeps everything it already has. A duplicate id is still `duplicate_id`. The limits keep a runaway or hostile stream from making a client hold or draw an unbounded screen; no real screen comes close.
+
 ### Props
 
 - **[5.8]** Positional arguments fill the component's positional props in order (the Position column in section 6). Giving more positional arguments than the component has, giving a prop both positionally and by name, or naming the same prop twice is an `invalid_props` error.
@@ -503,6 +505,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 | `list_mismatch` | error | when the line arrives | A List contains something other than ListItems, or a ListItem is outside a List. |
 | `table_mismatch` | error | when the line arrives | A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns. |
 | `tabs_mismatch` | error | when the line arrives | A Tabs contains something other than Tab, or a Tab is outside a Tabs. |
+| `document_too_large` | error | when the line arrives | The line would define a component or $state key beyond the document size limits. |
 | `chart_mismatch` | error | when the line arrives | A BarChart or LineChart contains something other than Series, a PieChart something other than Slices, a Series or Slice is outside its kind of chart, or a Series' number of values differs from its chart's labels. |
 | `duplicate_mutation` | error | when the line arrives | A button that already has an McpMutation gets a second one. |
 | `dangling_ref` | error | at end of stream | A referenced component or McpMutation target never arrived. |
@@ -618,6 +621,8 @@ Adding to the catalog is a change too. Because the catalog is strict ([5.9]), a 
 | Series in a BarChart or LineChart | 6 |
 | Slices in a PieChart | 8 |
 | Levels of lists, objects and calls nested inside one value ([4.13]) | 8 |
+| Components one stream may define, McpMutations included ([5.25]) | 1,000 |
+| $state keys one stream may declare ([5.25]) | 1,000 |
 <!-- /generated:limits -->
 
 Individual props have their own limits, listed in section 6.

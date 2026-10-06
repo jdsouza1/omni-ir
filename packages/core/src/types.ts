@@ -40,6 +40,7 @@ export type IssueCode =
   | "tabs_mismatch"
   | "chart_mismatch"
   | "duplicate_mutation"
+  | "document_too_large"
   | "dangling_ref"
   | "missing_state"
   | "missing_root"
@@ -97,6 +98,11 @@ export const ISSUE_CODES = {
     meaning: "A Table contains something other than TableRows, a TableRow is outside a Table, or a row's cell count differs from the table's columns.",
   },
   tabs_mismatch: { severity: "error", stage: "line", meaning: "A Tabs contains something other than Tab, or a Tab is outside a Tabs." },
+  document_too_large: {
+    severity: "error",
+    stage: "line",
+    meaning: "The line would define a component or $state key beyond the document size limits.",
+  },
   chart_mismatch: {
     severity: "error",
     stage: "line",

@@ -30,6 +30,10 @@ export const LIMITS = {
   chartSlices: 8,
   /** Deepest nesting of lists, objects and calls inside one value. */
   nestingDepth: 8,
+  /** Most components (McpMutations included) one stream may define. */
+  components: 1000,
+  /** Most $state keys one stream may declare. */
+  stateKeys: 1000,
 } as const;
 
 export const MAX_TEXT = LIMITS.text;
@@ -563,9 +567,12 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
   for (const s of statements) {
     if (s.kind === "state") {
       if (state.has(s.key)) issues.push({ code: "duplicate_id", message: `${s.key} is assigned more than once`, id: s.key });
+      else if (state.size >= LIMITS.stateKeys) issues.push(tooLarge(s.key));
       else state.set(s.key, s.value);
     } else if (byId.has(s.id)) {
       issues.push({ code: "duplicate_id", message: `"${s.id}" is assigned more than once`, id: s.id });
+    } else if (byId.size >= LIMITS.components) {
+      issues.push(tooLarge(s.id));
     } else {
       byId.set(s.id, s);
     }
@@ -760,6 +767,13 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
   return issues;
 }
 
+/** A line that would define a component or $state key past the document size limits [5.25]. */
+function tooLarge(id: string): Issue {
+  return id.startsWith("$")
+    ? { code: "document_too_large", message: `a stream may declare at most ${LIMITS.stateKeys} $state keys`, id }
+    : { code: "document_too_large", message: `a stream may define at most ${LIMITS.components} components, McpMutations included`, id };
+}
+
 /** The streaming rules a bound input breaks with this state value, if any. */
 function inputStateIssue(node: OmniNode, value: Primitive | undefined): Issue | undefined {
   if ((node.type === "Input" || node.type === "Select") && typeof value !== "string") {
@@ -796,9 +810,11 @@ export class DocumentIndex {
   check(s: Statement): Issue[] {
     if (s.kind === "state") {
       if (this.state.has(s.key)) return [{ code: "duplicate_id", message: `${s.key} is assigned more than once`, id: s.key }];
+      if (this.state.size >= LIMITS.stateKeys) return [tooLarge(s.key)];
       return (this.boundTo.get(s.key) ?? []).flatMap((node) => inputStateIssue(node, s.value) ?? []);
     }
     if (this.byId.has(s.id)) return [{ code: "duplicate_id", message: `"${s.id}" is assigned more than once`, id: s.id }];
+    if (this.byId.size >= LIMITS.components) return [tooLarge(s.id)];
     return s.kind === "mutation" ? this.checkMutation(s) : this.checkNode(s);
   }
 

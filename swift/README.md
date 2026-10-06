@@ -7,7 +7,7 @@ Native Omni-IR for iPhone, iPad and Mac. A model writes flat, line-oriented Omni
 | `OmniIRCore` | The parser: line buffer, tokenizer, validation, document. Foundation only. | iOS, macOS, Linux, Windows |
 | `OmniIRSwiftUI` | `OmniView` (the renderer), `OmniStore`, McpMutation governance, and `OmniClient` for an Omni-IR server. | iOS 17+, macOS 14+ |
 
-The parser passes the same [conformance suite](../conformance/README.md) as the TypeScript implementation (all 84 cases, with the input split at every chunk size tested), so both treat every stream identically.
+The parser passes the same [conformance suite](../conformance/README.md) as the TypeScript implementation (all 85 cases, with the input split at every chunk size tested), so both treat every stream identically.
 
 ## Install
 

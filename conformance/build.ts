@@ -457,6 +457,31 @@ export const CASES: Record<string, ConformanceCase[]> = {
       },
     },
     {
+      // PLAN-HARDENING.md D: a runaway or hostile stream can't make a client hold or draw an
+      // unbounded screen. Exactly 1,000 is fine; the 1,001st is rejected, and nothing already shown changes.
+      id: "document-size-limit",
+      rules: ["5.25", "5.7"],
+      description: "At most 1,000 components (McpMutations included) and 1,000 state keys; a line past either limit is document_too_large.",
+      input: [
+        lines(
+          "root = Stack([b])",
+          'b = Button("Pay", action="pay")',
+          'm = McpMutation(b, tool="payments.confirm")',
+          ...Array.from({ length: 997 }, (_, k) => `c${k} = Divider()`),
+          "extra = Divider()",
+          'n = McpMutation(b, tool="payments.confirm")',
+          "b = Divider()",
+          ...Array.from({ length: 1000 }, (_, k) => `$s${k} = ${k}`),
+          "$extra = 1",
+          "$s0 = 2",
+        ),
+      ].join(""),
+      expect: {
+        issues: [i(1001, "document_too_large"), i(1002, "document_too_large"), i(1003, "duplicate_id"), i(2004, "document_too_large"), i(2005, "duplicate_id")],
+        missing: [],
+      },
+    },
+    {
       id: "mutation-targets",
       rules: ["5.15", "7.2"],
       description: "A target without an action, and a target that never arrives.",

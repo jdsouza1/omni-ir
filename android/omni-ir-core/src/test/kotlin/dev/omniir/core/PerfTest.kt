@@ -34,14 +34,16 @@ class PerfTest {
     return (System.nanoTime() - start) / 1_000_000 to parser
   }
 
+  // Since [5.25] a stream holds at most 1,000 components: the rest of a 20,000-line stream must be
+  // rejected just as cheaply.
   @Test
-  fun `parses a 20,000-component stream line by line in under 5 seconds`() {
+  fun `parses a 20,000-line stream in under 5 seconds, keeping the first 1,000 components`() {
     parse(1000) // warm up
     for (n in listOf(1000, 5000)) println("perf: $n components in ${parse(n).first} ms")
     val (ms, parser) = parse(20_000)
     println("perf: 20000 components in $ms ms")
-    assertEquals(emptyList(), parser.issues)
-    assertTrue(parser.document.nodes.size >= 20_000)
+    assertEquals(1000, parser.document.nodes.size)
+    assertTrue(parser.issues.count { it.code == IssueCode.DOCUMENT_TOO_LARGE } > 19_000)
     assertTrue(ms < 5_000, "took $ms ms")
   }
 }

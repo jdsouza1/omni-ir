@@ -9,11 +9,13 @@ import { TOOLS } from "../app/tools";
 import { screen, time } from "../scripts/perf";
 
 describe("performance budgets", () => {
-  it("parses a 20,000-component stream line by line in under 5 seconds", () => {
+  // Since [5.25] a stream holds at most 1,000 components: the rest of a 20,000-line stream must be
+  // rejected just as cheaply.
+  it("parses a 20,000-line stream in under 5 seconds, keeping the first 1,000 components", () => {
     time(200); // warm up
     const result = time(20_000);
-    expect(result.issues).toBe(0);
-    expect(result.components).toBeGreaterThanOrEqual(20_000);
+    expect(result.components).toBe(1_000);
+    expect(result.issues).toBeGreaterThan(19_000);
     expect(result.totalMs).toBeLessThan(5_000);
   }, 60_000);
 

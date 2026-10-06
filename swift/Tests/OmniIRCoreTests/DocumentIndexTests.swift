@@ -59,7 +59,9 @@ struct DocumentIndexTests {
     #expect(corpus.count + files.count > 2000)
   }
 
-  @Test("parses a 20,000-component stream line by line in under 5 seconds")
+  // Since [5.25] a stream holds at most 1,000 components: the rest of a 20,000-line stream must be
+  // rejected just as cheaply.
+  @Test("parses a 20,000-line stream in under 5 seconds, keeping the first 1,000 components")
   func budget() {
     func parse(_ n: Int) -> (Duration, OmniParser) {
       let parser = OmniParser(tools: ["payments.confirm": Tool.acceptsAnything])
@@ -75,8 +77,8 @@ struct DocumentIndexTests {
     for n in [1000, 5000] { print("perf: \(n) components in \(parse(n).0)") }
     let (elapsed, parser) = parse(20_000)
     print("perf: 20000 components in \(elapsed)")
-    #expect(parser.issues.isEmpty)
-    #expect(parser.document.nodes.count >= 20_000)
+    #expect(parser.document.nodes.count == 1000)
+    #expect(parser.issues.filter { $0.code == .documentTooLarge }.count > 19_000)
     #expect(elapsed < .seconds(5))
   }
 }

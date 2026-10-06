@@ -47,12 +47,15 @@ struct DocumentIndex {
     switch s {
     case .state(let key, let value):
       if state[key] != nil { return [Issue(code: .duplicateId, message: "\(key) is assigned more than once", id: key)] }
+      if state.count >= Limits.stateKeys { return [tooLarge(key)] }
       return (boundTo[key] ?? []).compactMap { inputStateIssue($0, key: key, value: value) }
     case .node(let n):
       if byId[n.id] != nil { return [Issue(code: .duplicateId, message: "\"\(n.id)\" is assigned more than once", id: n.id)] }
+      if byId.count >= Limits.components { return [tooLarge(n.id)] }
       return checkNode(n)
     case .mutation(let m):
       if byId[m.id] != nil { return [Issue(code: .duplicateId, message: "\"\(m.id)\" is assigned more than once", id: m.id)] }
+      if byId.count >= Limits.components { return [tooLarge(m.id)] }
       return checkMutation(m)
     }
   }

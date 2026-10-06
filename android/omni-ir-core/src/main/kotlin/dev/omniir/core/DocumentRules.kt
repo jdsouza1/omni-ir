@@ -14,9 +14,12 @@ internal fun validateDocument(statements: List<Statement>, complete: Boolean): L
   for (s in statements) {
     if (s is Statement.State) {
       if (s.key in state) issues += Issue(IssueCode.DUPLICATE_ID, "${s.key} is assigned more than once", s.key)
+      else if (state.size >= Limits.STATE_KEYS) issues += tooLarge(s.key)
       else state[s.key] = s.value
     } else if (s.definedId in byId) {
       issues += Issue(IssueCode.DUPLICATE_ID, "\"${s.definedId}\" is assigned more than once", s.definedId)
+    } else if (byId.size >= Limits.COMPONENTS) {
+      issues += tooLarge(s.definedId)
     } else {
       byId[s.definedId] = s
     }
@@ -167,6 +170,11 @@ internal fun validateDocument(statements: List<Statement>, complete: Boolean): L
 
   return issues
 }
+
+/** A line that would define a component or `$key` past the document size limits [5.25]. */
+internal fun tooLarge(id: String): Issue =
+  if (id.startsWith("$")) Issue(IssueCode.DOCUMENT_TOO_LARGE, "a stream may declare at most ${Limits.STATE_KEYS} \$state keys", id)
+  else Issue(IssueCode.DOCUMENT_TOO_LARGE, "a stream may define at most ${Limits.COMPONENTS} components, McpMutations included", id)
 
 /** True when a component triggers a backend action, so it must be governed by an McpMutation. */
 public fun isMutating(node: OmniNode): Boolean = node.type == ComponentType.BUTTON && "action" in node.props

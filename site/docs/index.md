@@ -19,7 +19,7 @@ features:
   - title: Governed actions
     details: A button that changes data stays disabled until an McpMutation names a tool from your registry, and its params are checked by the parser, the client and the server.
   - title: One spec, three platforms
-    details: TypeScript, Swift and Kotlin parsers pass the same 84 conformance cases. Native renderers for React, SwiftUI and Jetpack Compose.
+    details: TypeScript, Swift and Kotlin parsers pass the same 85 conformance cases. Native renderers for React, SwiftUI and Jetpack Compose.
   - title: Data, not pixels
     details: The model sends titles, labels and values. Colours, fonts, spacing and animation always belong to your app.
 ---

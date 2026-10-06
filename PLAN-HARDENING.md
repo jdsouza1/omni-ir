@@ -90,7 +90,7 @@ Omni-IR's security doesn't depend on a model resisting jailbreaks: the spec trea
 - [x] C.3 Performance budgets in CI
 
 **D. Screen size limit** *(only if you approve question 4)*
-- [ ] D.1 Failing tests, then the limit in the schema, SPEC.md rule and issue code, conformance cases, and the Swift and Kotlin parsers
+- [x] D.1 Failing tests, then the limit in the schema, SPEC.md rule and issue code, conformance cases, and the Swift and Kotlin parsers
 
 **E. Review and release** *(checkpoint: you review)*
 - [ ] E.1 A review page: the model results, what fuzzing found and fixed, the performance numbers
@@ -108,6 +108,8 @@ Omni-IR's security doesn't depend on a model resisting jailbreaks: the spec trea
 | 20,000 | 57.8 s | 434 ms | 132 ms | 13.7 s / 0.93 s |
 
 Two causes, both quadratic: every line re-ran the whole-document check, and the stores copied the document's maps on every line (Swift through copy-on-write while `OmniStore` kept its own copy). Fixed with `DocumentIndex` in all three parsers (equivalence tests against `validateDocument` on every line of the corpus) and stores that grow in place. React rendering of a stream is still somewhat superlinear, because each line wakes every mounted component's selector: 200, 1,000 and 2,000 components take 0.13, 0.6 and 1.7 s in jsdom. Acceptable at real sizes, and bounded by D. Budgets: 20,000 components parse in under 5 s on every platform; 1,000 stream and render in under 10 s in jsdom.
+
+**Progress (D, 2026-10-05):** owner chose 1,000. SPEC.md [5.25], issue code `document_too_large`, limits `components` and `stateKeys` (generated into Swift and Kotlin), conformance case `document-size-limit` (85 cases) in all three parsers, and the equivalence tests cover streams past the limit. The performance budgets now stream 20,000 lines and check that the first 1,000 components are kept and the rest are rejected cheaply (Kotlin 28 ms, Swift 0.8 s debug, TypeScript well under the 5 s budget).
 
 ## What I need from you
 

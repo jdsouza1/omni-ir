@@ -26,7 +26,8 @@ private func storeScreen(_ n: Int) -> [String] {
 @MainActor
 @Suite("Store performance")
 struct StorePerfTests {
-  @Test("streams a 20,000-component screen through OmniStore in under 5 seconds")
+  // Since [5.25] a stream holds at most 1,000 components: the rest must be rejected just as cheaply.
+  @Test("streams a 20,000-line screen through OmniStore in under 5 seconds, keeping 1,000 components")
   func budget() {
     func run(_ n: Int) -> (Duration, OmniStore) {
       let store = OmniStore(tools: ["payments.confirm": Tool.acceptsAnything])
@@ -44,8 +45,8 @@ struct StorePerfTests {
     for n in [1000, 5000] { print("perf (store): \(n) components in \(run(n).0)") }
     let (elapsed, store) = run(20_000)
     print("perf (store): 20000 components in \(elapsed)")
-    #expect(store.issues.isEmpty)
-    #expect(store.document.nodes.count >= 20_000)
+    #expect(store.document.nodes.count == 1000)
+    #expect(store.issues.filter { $0.code == .documentTooLarge }.count > 19_000)
     #expect(elapsed < .seconds(5))
   }
 }

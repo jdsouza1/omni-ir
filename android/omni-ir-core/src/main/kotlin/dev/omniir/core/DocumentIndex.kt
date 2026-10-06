@@ -47,9 +47,11 @@ internal class DocumentIndex {
   fun check(s: Statement): List<Issue> {
     if (s is Statement.State) {
       if (s.key in state) return listOf(Issue(IssueCode.DUPLICATE_ID, "${s.key} is assigned more than once", s.key))
+      if (state.size >= Limits.STATE_KEYS) return listOf(tooLarge(s.key))
       return boundTo[s.key].orEmpty().mapNotNull { inputStateIssue(it, s.key, s.value) }
     }
     if (s.definedId in byId) return listOf(Issue(IssueCode.DUPLICATE_ID, "\"${s.definedId}\" is assigned more than once", s.definedId))
+    if (byId.size >= Limits.COMPONENTS) return listOf(tooLarge(s.definedId))
     return when (s) {
       is Statement.MutationStatement -> checkMutation(s.mutation)
       is Statement.Node -> checkNode(s.node)
