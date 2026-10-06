@@ -1,6 +1,9 @@
 // Reactive document store, shaped for React's useSyncExternalStore.
 // Every change produces a new snapshot object, but node objects are shared between snapshots:
 // only the node a new line defines is a new object (R3), so memoized components can skip the rest.
+// The maps and sets inside a snapshot are shared too, and grow in place as lines arrive: copying
+// them on every line made a long stream quadratic (PLAN-HARDENING.md C.2). Read a snapshot through
+// selectors, as the renderers do; copy a map if you need it frozen.
 import { stateKeysOf, type MutationStatement, type OmniNode, type Primitive, type Statement } from "./schema.js";
 
 export interface OmniDocument {
@@ -46,6 +49,11 @@ const EMPTY: OmniDocument = {
 
 export function createStore(): OmniStore {
   let doc = EMPTY;
+  // Owned by this store and shared by its snapshots (see the note at the top).
+  const nodes = new Map<string, OmniNode>();
+  const mutations = new Map<string, MutationStatement>();
+  const pending = new Set<string>();
+  let state: Record<string, Primitive> = {};
   const listeners = new Set<() => void>();
 
   function commit(next: OmniDocument) {
@@ -62,8 +70,6 @@ export function createStore(): OmniStore {
     },
 
     apply(statement) {
-      let { nodes, mutations, state } = doc;
-      const pending = new Set(doc.pending);
       const result: ApplyResult = { pending: [], resolved: [] };
 
       const define = (id: string) => {
@@ -71,13 +77,13 @@ export function createStore(): OmniStore {
       };
 
       if (statement.kind === "state") {
-        state = { ...state, [statement.key]: statement.value };
+        state[statement.key] = statement.value;
         define(statement.key);
       } else if (statement.kind === "node") {
-        nodes = new Map(nodes).set(statement.id, statement);
+        nodes.set(statement.id, statement);
         define(statement.id);
       } else {
-        mutations = new Map(mutations).set(statement.target, statement);
+        mutations.set(statement.target, statement);
       }
 
       if (statement.kind !== "state") {
@@ -103,7 +109,9 @@ export function createStore(): OmniStore {
     setState(key, value) {
       if (!Object.hasOwn(doc.state, key)) throw new Error(`OmniStore: state ${key} is not declared`);
       if (Object.is(doc.state[key], value)) return;
-      commit({ ...doc, state: { ...doc.state, [key]: value } });
+      // An edit gets a new state object, so a component holding the old one sees the change.
+      state = { ...state, [key]: value };
+      commit({ ...doc, state });
     },
   };
 }

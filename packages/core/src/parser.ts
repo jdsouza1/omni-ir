@@ -1,7 +1,7 @@
 // Streaming parser: chunks → lines (R2) → raw statements (R4) → schema validation → store.
 // A bad line is reported and skipped; it never stops the stream.
 import { LineBuffer, type LineEvent } from "./lineBuffer.js";
-import { validateDocument, validateStatement, type Statement, type ToolRegistry } from "./schema.js";
+import { DocumentIndex, validateDocument, validateStatement, type Statement, type ToolRegistry } from "./schema.js";
 import { createStore, type OmniDocument, type OmniStore } from "./store.js";
 import { parseLine } from "./tokenizer.js";
 import type { Issue } from "./types.js";
@@ -36,6 +36,7 @@ export function createParser(options: ParserOptions): OmniParser {
   const ctx = { tools: options.tools, assets: Object.keys(options.assets ?? {}) };
   const buffer = new LineBuffer(options.maxLineLength === undefined ? {} : { maxLineLength: options.maxLineLength });
   const accepted: Statement[] = [];
+  const index = new DocumentIndex();
   const lineOf = new Map<string, number>();
   const listeners = new Set<(event: ParserEvent) => void>();
   let endIssues: Issue[] | null = null;
@@ -63,12 +64,13 @@ export function createParser(options: ParserOptions): OmniParser {
     if (!result.ok) return reject(result.issues, line);
     const statement = result.statement;
 
-    // The accepted statements are always consistent, so any new issue is caused by this line.
-    // Checking the whole list each time is O(n) per line, which is fine for UI-sized documents.
-    const conflicts = validateDocument([...accepted, statement], { complete: false });
+    // The accepted statements are always consistent, so any new issue is caused by this line. The
+    // index checks only what the line touches, so a long stream stays linear (PLAN-HARDENING.md C.2).
+    const conflicts = index.check(statement);
     if (conflicts.length > 0) return reject(conflicts, line);
 
     accepted.push(statement);
+    index.add(statement);
     const id = statement.kind === "state" ? statement.key : statement.id;
     lineOf.set(id, line);
     const { pending, resolved } = store.apply(statement);
