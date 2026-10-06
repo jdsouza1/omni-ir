@@ -151,6 +151,6 @@ Work on branch `wip/backend`. Each part starts with failing tests (constraint 4)
 
 **G. Docs and review** *(checkpoint: you review)*
 - [x] G.1 SPEC.md section 9; a "Running real actions" guide; CHANGELOG; the roadmap renumbered (themes 16, app-defined components 17, live screens 18)
-- [ ] G.2 A review page: the attack tests and their results, a signed-in run end to end
+- [x] G.2 A review page: the attack tests and their results, a signed-in run end to end (https://claude.ai/artifact/VYzk5YJTqvDWLhiWoNVRnc)
 - [ ] G.3 Merge with your approval
 - [ ] G.4 `v0.6.0` release: a separate go-ahead from you
