@@ -52,16 +52,20 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval.
 
-1. **Step 16 · Themes and languages.**
-   - [ ] A design-token layer: brand colours, fonts and corner radius set by the app, never by the model, on web, iOS and Android
-   - [ ] A dark theme for the web catalog (it is light-only today)
-   - [ ] The renderers' own text ("Choose a date", "Component failed to load") translated, following the platform's locale
+1. **Step 16 · Themes and the renderer's own words** (plan approved 2026-10-06, leaner: [PLAN-THEMES.md](../PLAN-THEMES.md); translations and mobile theming settings wait for demand).
+   - [ ] Brand colours, font and corner radius set by the app (never the model) as design tokens; CSS variables on the web, shared defaults on iOS and Android
+   - [ ] A dark theme for the web catalog (light only today), with contrast tests
+   - [ ] The renderers' own words in English, replaceable by the app; blocked actions show a plain sentence
 2. **Step 17 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
    - [ ] Pictures looked up by the app when the screen is drawn (for example `product-123`), for shops and user pictures that can't all be registered in advance; the model still never writes a URL
    - [ ] Keep the system prompt small as the catalog grows: send only the components a request is likely to need, and measure the cost and the time to the first line
 3. **Step 18 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
 
 ## Later
+
+- **Built-in translations** of the renderers' own words, when apps in other languages ask (Step 16 makes each language just another table).
+- **A theming setting on iOS and Android** (`OmniTheme`) for apps that want Omni-IR screens to differ from their system or Material look; the token names are already fixed.
+- **Right-to-left languages** (Arabic, Hebrew): mirrored layouts tested on all three platforms.
 
 - **Automated LLM red teaming with Promptfoo** (optional; OWASP LLM Top 10, attacker models generating jailbreaks and indirect injections, run against each supported model). It calls paid model APIs, so only as a capped manual run with the owner's go-ahead, never in CI
 - **A human red team** for chained attacks before real handlers handle real data, with the owner's go-ahead (an outside hire).
