@@ -1,0 +1,123 @@
+# The weekly long fuzz run (PLAN-HARDENING.md, B.4). Normal CI fuzzes with a fixed seed, so every push
+# checks the same streams; this run uses a new seed each week and far more runs, to keep exploring.
+# If anything fails, it opens an issue with the seed and the command that reproduces it, and keeps the
+# log. A failing stream becomes a conformance case once understood. Free on a public repo; nothing
+# here calls a paid API. Start it by hand from the Actions tab with any seed and size.
+name: Fuzz (weekly)
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: Seed (blank for a new one)
+        required: false
+      runs:
+        description: Runs per TypeScript property
+        required: false
+        default: "100000"
+
+permissions:
+  contents: read
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    outputs:
+      seed: ${{ steps.pick.outputs.seed }}
+    steps:
+      - id: pick
+        run: echo "seed=${{ inputs.seed || github.run_id }}" >> "$GITHUB_OUTPUT"
+
+  typescript:
+    needs: seed
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      FUZZ_SEED: ${{ needs.seed.outputs.seed }}
+      FUZZ_RUNS: ${{ inputs.runs || '100000' }}
+      OMNI_MODEL: mock
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:fuzz 2>&1 | tee fuzz-typescript.log
+        shell: bash -o pipefail {0}
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fuzz-typescript
+          path: fuzz-typescript.log
+
+  swift:
+    needs: seed
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      FUZZ_SEED: ${{ needs.seed.outputs.seed }}
+      FUZZ_RUNS: "20000"
+    steps:
+      - uses: actions/checkout@v7
+      - run: swift test --filter FuzzTests 2>&1 | tee fuzz-swift.log
+        shell: bash -o pipefail {0}
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fuzz-swift
+          path: fuzz-swift.log
+
+  kotlin:
+    needs: seed
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      FUZZ_SEED: ${{ needs.seed.outputs.seed }}
+      FUZZ_RUNS: "20000"
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+      # --rerun: the seed and size come from the environment, which Gradle doesn't track as an input.
+      - run: ./gradlew :omni-ir-core:test --tests "dev.omniir.core.FuzzTest" --rerun --console=plain 2>&1 | tee ../fuzz-kotlin.log
+        shell: bash -o pipefail {0}
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fuzz-kotlin
+          path: |
+            fuzz-kotlin.log
+            android/omni-ir-core/build/reports/tests/
+
+  report:
+    needs: [seed, typescript, swift, kotlin]
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          SEED: ${{ needs.seed.outputs.seed }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh issue create --repo "$GITHUB_REPOSITORY" \
+            --title "Weekly fuzz run failed (seed $SEED)" \
+            --label bug \
+            --body "The weekly fuzz run found a failure: $RUN_URL (logs are attached to the run).
+
+          Reproduce locally with the same seed:
+          - TypeScript: \`FUZZ_SEED=$SEED FUZZ_RUNS=100000 npm run test:fuzz\`
+          - Swift: \`FUZZ_SEED=$SEED FUZZ_RUNS=20000 swift test --filter FuzzTests\`
+          - Kotlin: \`cd android && FUZZ_SEED=$SEED FUZZ_RUNS=20000 ./gradlew :omni-ir-core:test --tests dev.omniir.core.FuzzTest --rerun\`
+
+          Once understood, add the smallest failing stream to \`conformance/build.ts\` as a case, written from SPEC.md, and fix every parser that disagrees."

@@ -12,6 +12,8 @@ import { parseCanonical, type Canonical } from "./canonical";
 const numRuns = Number(process.env.FUZZ_RUNS ?? 1000);
 const seed = Number(process.env.FUZZ_SEED ?? 20261005);
 const options = { numRuns, seed, endOnFailure: false };
+/** Two minutes for the CI run; scales up for the weekly long run (.github/workflows/fuzz.yml). */
+const timeout = Math.max(120_000, numRuns * 30);
 const registry = { tools: FUZZ_TOOLS, assets: FUZZ_ASSETS };
 const encoder = new TextEncoder();
 const fixtures = fixtureTexts();
@@ -35,7 +37,7 @@ describe("fuzz: the parser never breaks", () => {
       }),
       options,
     );
-  }, 120_000);
+  }, timeout);
 
   it("arbitrary text, including lone surrogates and control characters", () => {
     fc.assert(
@@ -44,7 +46,7 @@ describe("fuzz: the parser never breaks", () => {
       }),
       options,
     );
-  }, 120_000);
+  }, timeout);
 
   it("arbitrary bytes, including invalid UTF-8, split anywhere", () => {
     fc.assert(
@@ -54,7 +56,7 @@ describe("fuzz: the parser never breaks", () => {
       }),
       options,
     );
-  }, 120_000);
+  }, timeout);
 
   it("real fixtures with random edits: no exception, well-formed issues", () => {
     fc.assert(
@@ -63,7 +65,7 @@ describe("fuzz: the parser never breaks", () => {
       }),
       options,
     );
-  }, 120_000);
+  }, timeout);
 });
 
 describe("fuzz: lines at the edges [4.13]", () => {
@@ -85,7 +87,7 @@ describe("fuzz: lines at the edges [4.13]", () => {
     );
     const nine = parseCanonical([`$a = ${"[".repeat(9)}1${"]".repeat(9)}\n`], registry);
     expect(nine.issues).toContainEqual({ line: 1, code: "syntax" });
-  }, 120_000);
+  }, timeout);
 });
 
 describe("fuzz: how the stream is split never matters [3.3]", () => {
@@ -97,7 +99,7 @@ describe("fuzz: how the stream is split never matters [3.3]", () => {
       }),
       options,
     );
-  }, 120_000);
+  }, timeout);
 
   it("every fixture, split at random bytes, still parses exactly as when whole", () => {
     fc.assert(
