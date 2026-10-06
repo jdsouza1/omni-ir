@@ -1,6 +1,6 @@
 # Omni-IR Specification
 
-**Version 0.3 (draft)** · Apache-2.0
+**Version 0.4 (draft)** · Apache-2.0
 
 Omni-IR is a text format that an AI model writes to describe a user interface, one short line at a time, and that a trusted client renders with its own components as the lines arrive. This document says exactly what a stream may contain and how a conforming parser and renderer must treat it. It describes what is implemented and tested in this repository; nothing here is aspirational.
 
@@ -144,7 +144,7 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.15]** An McpMutation's `target` MUST be a Button with an `action`. A target that never arrives is `dangling_ref`; a target without an action is `mutation_target_not_interactive`.
 - **[5.16]** McpMutation `params` is an object whose keys are identifiers (not reserved words) and whose values are literals or `$key` references. A component id as a value, a repeated key or a reserved key is an `invalid_props` error.
 
-## 6. Component catalog (v0.3)
+## 6. Component catalog (v0.4)
 
 A component has exactly the props listed; any other prop is rejected ([5.9]). "Values" lists what each prop accepts; `$state` means a `$key` reference ([5.11]), and `id` means a component id. The styling of every value (what `"muted"` or `"primary"` looks like) belongs to the renderer. In each signature, positional props are written bare in their order, props written `name=…` can only be given by name, and props in [brackets] are optional: `Image(asset, alt=…, [ratio=…])` is written `Image("cabin-pines", alt="A cabin", ratio="16:9")`.
 
@@ -602,7 +602,7 @@ What the app must still handle:
 
 ## 12. Versioning and limits
 
-This is version 0.3, a draft. Until version 1.0, any change MAY be incompatible; changes are listed in CHANGELOG.md. A stream doesn't declare its version in v0.3.
+This is version 0.4, a draft. Until version 1.0, any change MAY be incompatible; changes are listed in CHANGELOG.md. A stream doesn't declare its version in v0.4.
 
 Adding to the catalog is a change too. Because the catalog is strict ([5.9]), a parser built for an older version rejects a new component (`unknown_component`), a new prop or a new allowed value (`invalid_props`), and its renderer shows a fallback in that place. A server SHOULD therefore ask a model only for what its clients' version accepts. The reference server generates its system prompt from its own schema, so a server and its clients stay compatible by using the same version.
 
@@ -694,6 +694,6 @@ Issues reported:
 ## Not yet specified
 
 - Data-driven lists. A List's items are written out one by one; there are no loops or bindings to collections.
-- A way to update or remove a component after its line has arrived. In v0.3 an id can't be reassigned ([5.3]).
+- A way to update or remove a component after its line has arrived. In v0.4 an id can't be reassigned ([5.3]).
 - A version marker inside the stream.
 - Renderers other than the web reference renderer.

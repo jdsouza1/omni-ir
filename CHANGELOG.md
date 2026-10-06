@@ -2,7 +2,7 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
-## Unreleased
+## 0.4.0 (2026-10-06)
 
 ### Changed
 - **Negative zero is the number 0** ([4.9]): `-0`, `-0.0`, `-0e5` and underflow such as `-1e-400` are read as 0 by every parser, so no renderer shows "-0". Found by the new differential fuzz corpus, where the Kotlin parser kept -0.
@@ -18,6 +18,10 @@ All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-
 ### Added
 - **Fuzz testing:** fast-check properties for the TypeScript parser, and a differential corpus of 2,000 generated streams (`fuzz/corpus.json`) that the Swift and Kotlin parsers must parse exactly as TypeScript does, and seeded no-crash fuzzing inside the Swift and Kotlin test suites (random bytes, token soup, edited fixtures, extreme lines).
 - **Adversarial boundary tests** (`tests/security.test.tsx`): look-alike tool names refused by the parser, the browser and the server; hostile output rendered as plain text with nothing loaded, linked or styled; forged requests that mix tools, add keys or change types refused; the unsafe replies from the cross-model check kept as tests.
+
+### Compatibility
+- **Streams that were accepted before can now be rejected:** values nested deeper than 8 levels (`syntax`), and lines past 1,000 components or 1,000 state keys (`document_too_large`). Real screens are far below both limits. Older parsers don't know `document_too_large`; use the same version for the server that writes streams and the apps that render them.
+- **TypeScript:** code that kept an old `OmniDocument` snapshot and read its maps later will see later additions; copy the map to keep it frozen. **Kotlin:** `OmniDocument` has a new `revision` field (default 0), so two documents from different moments never compare equal.
 
 ## 0.3.0 (2026-10-05)
 
