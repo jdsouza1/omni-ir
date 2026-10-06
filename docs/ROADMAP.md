@@ -9,7 +9,7 @@ Updated 2026-10-06. Planned dates for the remaining work are kept from the origi
 | 1 · Core spec | Syntax spec v0.1 draft | [SPEC.md](../SPEC.md) |
 | 1 · Core spec | Zod validation schemas | `packages/core/src/schema.ts` |
 | 1 · Core spec | Zod schemas and parser published on npm as [`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) 0.1.0 | `packages/core/` |
-| 1 · Core spec | Conformance suite (85 cases, including one per component) | [conformance/](../conformance/README.md) |
+| 1 · Core spec | Conformance suite (96 cases, including one per component, and 21 transport cases) | [conformance/](../conformance/README.md) |
 | 2 · Web reference | Streaming parser in TypeScript, written test-first | `packages/core/` |
 | 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `packages/react/` |
 | 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |
@@ -48,7 +48,7 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval.
 
-1. **Step 14 · Transport standard and stream versions.** Make SPEC.md §10 normative: the exact Server-Sent Events, reconnecting, and how errors and governed actions are reported, with transport conformance cases. Map the same events onto WebSockets, and add an adapter for [AG-UI](https://docs.ag-ui.com/concepts), the event protocol many agent frameworks speak, so they can stream Omni-IR without custom work. Starts with a short research step on the current AG-UI spec.
+1. **Step 14 · Transport standard and stream versions.** Make SPEC.md §10 normative: the exact Server-Sent Events, reconnecting, and how errors and governed actions are reported, with transport conformance cases. Map the same events onto WebSockets, and add an adapter for [AG-UI](https://docs.ag-ui.com/concepts), the event protocol many agent frameworks speak, so they can stream Omni-IR without custom work. Plan approved 2026-10-06: [PLAN-TRANSPORT.md](../PLAN-TRANSPORT.md) (WebSockets specified, not built).
    - [ ] An optional version marker as a stream's first line, so a client can say "this stream needs 0.3" instead of rejecting unknown lines one by one (listed under "Not yet specified" in SPEC.md)
 2. **Real backend tool handlers with authorization and persistence**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 14, since both concern the server side. Comes with security work that only makes sense once real data is involved:
    - [ ] Personal-data exposure checks: a handler never returns another user's data, and nothing personal leaks between sessions
@@ -59,6 +59,8 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - [ ] A dark theme for the web catalog (it is light-only today)
    - [ ] The renderers' own text ("Choose a date", "Component failed to load") translated, following the platform's locale
 4. **Step 16 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+   - [ ] Pictures looked up by the app when the screen is drawn (for example `product-123`), for shops and user pictures that can't all be registered in advance; the model still never writes a URL
+   - [ ] Keep the system prompt small as the catalog grows: send only the components a request is likely to need, and measure the cost and the time to the first line
 5. **Step 17 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
 
 ## Later

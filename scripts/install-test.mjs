@@ -67,6 +67,7 @@ const issues = parser.end();
   write(
     "render.mjs",
     `import { createParser, COMPONENT_TYPES } from "@omni-ir/core";
+import { AgUiEncoder, createAgUiReader } from "@omni-ir/core/ag-ui";
 import { OmniRenderer, DEFAULT_CATALOG } from "@omni-ir/react";
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
@@ -80,6 +81,12 @@ expect(html.includes('data-node-id="root"'), "node ids");
 expect(html.includes('src="/img/cabin.jpg"') && html.includes('alt="A cabin"'), "image from the registry");
 expect(/<button[^>]*>Pay \\$42\\.50<\\/button>/.test(html), "governed button");
 expect(COMPONENT_TYPES.every((t) => t in DEFAULT_CATALOG), "catalog covers every component");
+// The AG-UI entry point: a screen through the encoder and the reader.
+const encoder = new AgUiEncoder({ threadId: "t", runId: "r", messageId: "m" });
+const viaAgUi = createParser({ tools, assets });
+const reader = createAgUiReader(viaAgUi);
+for (const event of [...encoder.start(), ...encoder.write('root = Heading("Over AG-UI")\\n'), ...encoder.finish()]) reader.feed(event);
+expect(viaAgUi.getSnapshot().nodes.get("root")?.props.text === "Over AG-UI" && reader.outcome?.status === "done", "@omni-ir/core/ag-ui round trip");
 console.log("render: ok (" + html.length + " chars of HTML)");
 `,
   );
@@ -87,6 +94,7 @@ console.log("render: ok (" + html.length + " chars of HTML)");
   write(
     "src/app.tsx",
     `import { createParser, type Issue } from "@omni-ir/core";
+import { createAgUiReader, type AgUiReader } from "@omni-ir/core/ag-ui";
 import { DEFAULT_CATALOG, OmniRenderer, createMutationHandler, generate, type Catalog, type MutationCall } from "@omni-ir/react";
 import "@omni-ir/react/omni.css";
 import { z } from "zod";
@@ -95,6 +103,7 @@ const checked: Issue[] = issues;
 const catalog: Catalog = { ...DEFAULT_CATALOG };
 const onMutation: (call: MutationCall) => Promise<void> = createMutationHandler();
 export const pending = generate("a payment confirmation", { parser });
+export const reader: AgUiReader = createAgUiReader(createParser({ tools, assets }));
 export function Screen() {
   return <OmniRenderer store={parser.store} tools={tools} assets={assets} catalog={catalog} onMutation={onMutation} />;
 }

@@ -6,6 +6,7 @@ Language-neutral test cases for any Omni-IR parser, such as a Swift or Kotlin im
 - `cases/catalog.json`: one case per component, generated from `schema.json`, checking every prop's accepted and rejected values.
 - `schema.json`: the catalog as language-neutral data (components, positional arguments, props as JSON Schema, limits, reserved words, rules across props, issue codes), exported from the TypeScript schema with `npm run schema:export`. Generate your implementation's catalog from it.
 - `build.ts`: the source the JSON files are generated from (`npm run conformance:build`). Edit cases here, not in the JSON.
+- `transport/`: cases for the transport's clients (section 10), described below.
 - Three implementations in this repo run the whole suite: TypeScript (`tests/conformance.test.ts`), Swift (`swift/Tests/OmniIRCoreTests`) and Kotlin (`android/omni-ir-core/src/test`).
 
 ## Case format
@@ -51,3 +52,23 @@ Language-neutral test cases for any Omni-IR parser, such as a Swift or Kotlin im
 ## Not covered here
 
 Renderer behaviour (section 8) and actions (section 9) depend on the platform's UI toolkit, so they're tested by each renderer's own tests. In this repo, see the test files listed in those sections of SPEC.md.
+
+## Transport cases
+
+`transport/sse.json` holds cases for a **client** of the transport in SPEC.md section 10: what it must do with a server's answer to a request for a screen. Each case is a response and the expected result:
+
+```json
+{
+  "id": "sse-after-terminal",
+  "rules": ["10.8"],
+  "description": "Everything after the first terminal event is ignored.",
+  "response": { "status": 200, "body": ["event: chunk\ndata: {\"text\":\"a = Divider()\\n\"}\n\n", "event: done\ndata: {…}\n\n", "…"] },
+  "expect": { "written": "a = Divider()\n", "ended": true, "outcome": { "status": "done", "stopReason": "end_turn", "model": "mock", "ms": 12 } }
+}
+```
+
+- **`response`**: the HTTP status and the body as UTF-8 text (a list of parts is joined in order).
+- **`written`**: everything the client wrote to its parser, joined. **`ended`**: whether it ended the parser.
+- **`outcome`**: `done` or `error`. Only the fields given are compared, and messages never are.
+
+Feed the body to the client's stream handling whole and in reads of 1, 5 and 13 bytes; the result MUST be the same each time ([10.6]). Three clients in this repo run them: TypeScript (`tests/transport.conformance.test.ts`), Swift (`swift/Tests/OmniIRSwiftUITests/TransportConformanceTests.swift`) and Kotlin (`android/omni-ir-runtime/src/test`). The server's side of section 10 is tested by `tests/server.transport.test.ts`, and AG-UI by `tests/agui.test.ts`.

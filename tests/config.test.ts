@@ -12,6 +12,7 @@ describe("loadConfig", () => {
       rateLimitPerMinute: 10,
       dailyCap: 50,
       mockSpeed: "realistic",
+      trustProxy: false,
     });
     expect(warnings).toEqual([]);
   });

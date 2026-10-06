@@ -88,6 +88,8 @@ public data class OmniDocument(
   /** After the end of the stream: references that never arrived. */
   public val missing: Set<String> = emptySet(),
   public val complete: Boolean = false,
+  /** Line 1 was a version marker for a newer Omni-IR version than this one (SPEC.md [3.9]). */
+  public val newerVersion: Boolean = false,
   /** Increases with every change, so two documents from different moments never compare equal. */
   public val revision: Long = 0,
 )

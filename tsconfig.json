@@ -19,6 +19,7 @@
     // Dev and tests use the packages' TypeScript source; the published builds use packages/*/tsconfig.build.json.
     "paths": {
       "@omni-ir/core": ["./packages/core/src/index.ts"],
+      "@omni-ir/core/ag-ui": ["./packages/core/src/agui.ts"],
       "@omni-ir/react": ["./packages/react/src/index.ts"]
     }
   },

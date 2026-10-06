@@ -175,6 +175,234 @@
           }
         }
       }
+    },
+    {
+      "id": "version-marker-newer",
+      "rules": [
+        "3.9"
+      ],
+      "description": "A marker for a newer version is one newer_version warning on line 1; the rest of the stream is processed as usual.",
+      "input": "# omni-ir 99.0\nroot = Stack([a])\na = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "newer_version"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a"
+            ]
+          },
+          "a": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-newer-minor",
+      "rules": [
+        "3.9"
+      ],
+      "description": "Versions compare by MAJOR, then MINOR, as numbers: 0.999 is newer than 0.5 (not a decimal fraction).",
+      "input": "# omni-ir 0.999\nroot = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "newer_version"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-spacing",
+      "rules": [
+        "3.9",
+        "3.2"
+      ],
+      "description": "Spaces and tabs around # and at the end, a CRLF ending, and numbers of any length are all one marker.",
+      "input": " \t#\tomni-ir   123456789012345678901234567890.0 \t\r\nroot = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "newer_version"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-older",
+      "rules": [
+        "3.9"
+      ],
+      "description": "A marker for an older version gives no issue.",
+      "input": "# omni-ir 0.0\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-not-line-1",
+      "rules": [
+        "3.9",
+        "3.6"
+      ],
+      "description": "The same text on any line but line 1 is an ordinary comment, even after a blank first line.",
+      "input": "\n# omni-ir 99.0\nroot = Divider()\n# omni-ir 99.0\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-no-minor",
+      "rules": [
+        "3.9",
+        "3.6"
+      ],
+      "description": "\"# omni-ir 99\" is not in the marker's form, so it is an ordinary comment.",
+      "input": "# omni-ir 99\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-patch",
+      "rules": [
+        "3.9",
+        "3.6"
+      ],
+      "description": "\"# omni-ir 99.0.1\" is not in the marker's form, so it is an ordinary comment.",
+      "input": "# omni-ir 99.0.1\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-case",
+      "rules": [
+        "3.9",
+        "3.6"
+      ],
+      "description": "\"# Omni-IR 99.0\" is not in the marker's form, so it is an ordinary comment.",
+      "input": "# Omni-IR 99.0\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-no-space",
+      "rules": [
+        "3.9",
+        "3.6"
+      ],
+      "description": "\"# omni-ir99.0\" is not in the marker's form, so it is an ordinary comment.",
+      "input": "# omni-ir99.0\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-trailing-text",
+      "rules": [
+        "3.9",
+        "3.6"
+      ],
+      "description": "\"# omni-ir 99.0 beta\" is not in the marker's form, so it is an ordinary comment.",
+      "input": "# omni-ir 99.0 beta\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-sign",
+      "rules": [
+        "3.9",
+        "3.6"
+      ],
+      "description": "\"# omni-ir +99.0\" is not in the marker's form, so it is an ordinary comment.",
+      "input": "# omni-ir +99.0\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
     }
   ]
 }

@@ -17,6 +17,11 @@ export interface ServerConfig {
   dailyCap: number;
   /** "instant" for tests, "realistic" for demos. */
   mockSpeed: "instant" | "realistic";
+  /**
+   * Which proxies may report the client's address (Express's "trust proxy"): false (none, the
+   * default), a number of hops, or addresses and subnets such as "loopback" or "10.0.0.0/8" ([10.15]).
+   */
+  trustProxy: false | number | string[];
 }
 
 export class ConfigError extends Error {}
@@ -30,6 +35,13 @@ const Env = z.object({
   OMNI_RATE_LIMIT_PER_MIN: z.coerce.number().int().positive().default(10),
   OMNI_DAILY_CAP: z.coerce.number().int().nonnegative().default(50),
   OMNI_MOCK_SPEED: z.enum(["instant", "realistic"]).default("realistic"),
+  // "true" would trust every hop, so any client could forge its address with X-Forwarded-For.
+  OMNI_TRUST_PROXY: z
+    .string()
+    .trim()
+    .refine((v) => v !== "true", "true would trust a header anyone can write; give the number of proxies or their addresses")
+    .transform((v): false | number | string[] => (v === "false" ? false : /^\d+$/.test(v) ? Number(v) : v.split(",").map((a) => a.trim()).filter(Boolean)))
+    .default(false),
 });
 
 export function loadConfig(env: Record<string, string | undefined> = process.env): {
@@ -53,6 +65,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     rateLimitPerMinute: e.OMNI_RATE_LIMIT_PER_MIN,
     dailyCap: e.OMNI_DAILY_CAP,
     mockSpeed: e.OMNI_MOCK_SPEED,
+    trustProxy: e.OMNI_TRUST_PROXY,
   };
 
   const warnings: string[] = [];

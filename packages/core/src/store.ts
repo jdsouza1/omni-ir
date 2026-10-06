@@ -18,6 +18,8 @@ export interface OmniDocument {
   /** After end of stream: references that never arrived. */
   readonly missing: ReadonlySet<string>;
   readonly complete: boolean;
+  /** Line 1 was a version marker for a newer Omni-IR version than this one ([3.9]). */
+  readonly newerVersion: boolean;
 }
 
 export interface ApplyResult {
@@ -30,6 +32,8 @@ export interface ApplyResult {
 export interface OmniStore {
   getSnapshot(): OmniDocument;
   subscribe(listener: () => void): () => void;
+  /** Record that the stream needs a newer version ([3.9]). Called by the parser only. */
+  markNewerVersion?(): void;
   /** Add an already-validated statement. Called by the parser only. */
   apply(statement: Statement): ApplyResult;
   /** End of stream: every still-pending reference becomes missing. */
@@ -45,6 +49,7 @@ const EMPTY: OmniDocument = {
   pending: new Set(),
   missing: new Set(),
   complete: false,
+  newerVersion: false,
 };
 
 export function createStore(): OmniStore {
@@ -99,6 +104,10 @@ export function createStore(): OmniStore {
 
       commit({ ...doc, nodes, mutations, state, pending });
       return result;
+    },
+
+    markNewerVersion() {
+      if (!doc.newerVersion) commit({ ...doc, newerVersion: true });
     },
 
     finish() {

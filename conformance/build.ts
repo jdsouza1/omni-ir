@@ -6,6 +6,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { catalogCases } from "./catalog";
+import { renderTransportFiles, TRANSPORT_CASES } from "./transport";
 
 export type InputPart = string | { repeat: string; times: number };
 export interface ExpectedIssue {
@@ -93,6 +94,59 @@ export const CASES: Record<string, ConformanceCase[]> = {
       input: lines("root = Stack([a, b])", "a = Text('bad')", "b = Divider()", "a = Divider()"),
       expect: { issues: [i(2, "syntax")], nodes: { root: node("Stack", {}, ["a", "b"]), a: node("Divider"), b: node("Divider") } },
     },
+    // Version markers [3.9]. The versions are chosen to be newer or older than any parser this suite
+    // is used with (MINOR 999, MAJOR 99, 0.0), so the cases don't change with each release.
+    {
+      id: "version-marker-newer",
+      rules: ["3.9"],
+      description: "A marker for a newer version is one newer_version warning on line 1; the rest of the stream is processed as usual.",
+      input: lines("# omni-ir 99.0", "root = Stack([a])", "a = Divider()"),
+      expect: { issues: [i(1, "newer_version")], nodes: { root: node("Stack", {}, ["a"]), a: node("Divider") } },
+    },
+    {
+      id: "version-marker-newer-minor",
+      rules: ["3.9"],
+      description: "Versions compare by MAJOR, then MINOR, as numbers: 0.999 is newer than 0.5 (not a decimal fraction).",
+      input: lines("# omni-ir 0.999", "root = Divider()"),
+      expect: { issues: [i(1, "newer_version")], nodes: { root: node("Divider") } },
+    },
+    {
+      id: "version-marker-spacing",
+      rules: ["3.9", "3.2"],
+      description: "Spaces and tabs around # and at the end, a CRLF ending, and numbers of any length are all one marker.",
+      input: " \t#\tomni-ir   123456789012345678901234567890.0 \t\r\nroot = Divider()\n",
+      expect: { issues: [i(1, "newer_version")], nodes: { root: node("Divider") } },
+    },
+    {
+      id: "version-marker-older",
+      rules: ["3.9"],
+      description: "A marker for an older version gives no issue.",
+      input: lines("# omni-ir 0.0", "root = Divider()"),
+      expect: { issues: [], nodes: { root: node("Divider") } },
+    },
+    {
+      id: "version-marker-not-line-1",
+      rules: ["3.9", "3.6"],
+      description: "The same text on any line but line 1 is an ordinary comment, even after a blank first line.",
+      input: lines("", "# omni-ir 99.0", "root = Divider()", "# omni-ir 99.0"),
+      expect: { issues: [], nodes: { root: node("Divider") } },
+    },
+    ...[
+      ["version-marker-no-minor", "# omni-ir 99"],
+      ["version-marker-patch", "# omni-ir 99.0.1"],
+      ["version-marker-case", "# Omni-IR 99.0"],
+      ["version-marker-no-space", "# omni-ir99.0"],
+      ["version-marker-trailing-text", "# omni-ir 99.0 beta"],
+      ["version-marker-sign", "# omni-ir +99.0"],
+    ].map(
+      ([id, marker]): ConformanceCase => ({
+        id: id!,
+        rules: ["3.9", "3.6"],
+        description: `"${marker}" is not in the marker's form, so it is an ordinary comment.`,
+        input: lines(marker!, "root = Divider()"),
+        expect: { issues: [], nodes: { root: node("Divider") } },
+      }),
+    ),
   ],
 
   grammar: [
@@ -711,4 +765,8 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   mkdirSync(dir, { recursive: true });
   for (const [name, text] of Object.entries(renderCaseFiles())) writeFileSync(join(dir, name), text);
   console.log(`wrote ${Object.values(CASES).flat().length} cases to conformance/cases/`);
+  const transport = resolve("conformance", "transport");
+  mkdirSync(transport, { recursive: true });
+  for (const [name, text] of Object.entries(renderTransportFiles())) writeFileSync(join(transport, name), text);
+  console.log(`wrote ${TRANSPORT_CASES.length} transport cases to conformance/transport/`);
 }

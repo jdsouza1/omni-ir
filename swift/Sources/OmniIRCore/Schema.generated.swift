@@ -68,6 +68,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
   case nodeCrashed = "node_crashed"
   case handlerFailed = "handler_failed"
   case unknownEscape = "unknown_escape"
+  case newerVersion = "newer_version"
 
   public var severity: IssueSeverity {
     switch self {
@@ -102,6 +103,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .nodeCrashed: .error
     case .handlerFailed: .error
     case .unknownEscape: .warning
+    case .newerVersion: .warning
     }
   }
 
@@ -138,6 +140,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .nodeCrashed: .renderer
     case .handlerFailed: .renderer
     case .unknownEscape: .line
+    case .newerVersion: .line
     }
   }
 
@@ -175,6 +178,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .nodeCrashed: "A component failed while rendering. Only its own slot shows a fallback."
     case .handlerFailed: "An action's handler failed or the server refused it."
     case .unknownEscape: "A backslash sequence other than \\\", \\\\ or \\n was kept as literal text. The line is still accepted."
+    case .newerVersion: "The version marker on line 1 names a newer Omni-IR version than the parser's. The rest of the stream is processed as usual."
     }
   }
 }

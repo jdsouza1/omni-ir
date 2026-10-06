@@ -5,9 +5,10 @@ import express, { type Express, type NextFunction, type Request, type Response }
 import { ASSETS, type AssetRegistry } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { createParser } from "@omni-ir/core";
+import { AgUiEncoder } from "@omni-ir/core/ag-ui";
 import type { ToolRegistry } from "@omni-ir/core";
 import type { ServerConfig } from "./config";
-import { describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MutateBody, runMutation, sseEvent } from "./api";
+import { AgUiRunInput, describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MARKER_CHUNK, MutateBody, promptOf, runMutation, sseEvent, versionError } from "./api";
 import { ModelError, type Model } from "./models/types";
 import { STUB_HANDLERS, type ToolHandler } from "./tools/handlers";
 
@@ -30,6 +31,16 @@ export interface AppOptions {
 
 const RATE_WINDOW_MS = 60_000;
 
+/** How one route writes a generation's stream: each hook gets `send`, which writes one frame. */
+interface StreamOutput {
+  /** The log entry's event name. */
+  route: string;
+  start(send: (frame: string) => void): void;
+  text(send: (frame: string) => void, text: string): void;
+  done(send: (frame: string) => void, done: { stopReason: string; model: string; ms: number }): void;
+  error(send: (frame: string) => void, error: { code: string; message: string; retryable: boolean }): void;
+}
+
 export function createApp({
   config,
   model,
@@ -42,6 +53,8 @@ export function createApp({
 }: AppOptions): Express {
   const app = express();
   app.disable("x-powered-by");
+  // Read the client's address from X-Forwarded-For only when a trusted proxy wrote it ([10.15]).
+  app.set("trust proxy", config.trustProxy);
   app.use(cors(config.corsOrigin));
   app.use(express.json({ limit: "16kb" }));
 
@@ -53,11 +66,53 @@ export function createApp({
     res.json({ ok: true, model: model.kind });
   });
 
+  /** The version a client asked for ([10.1]): null when none, "" when the query isn't one string. */
+  const requestedVersion = (req: Request) =>
+    typeof req.query.version === "string" ? req.query.version : req.query.version === undefined ? null : "";
+
   app.post("/api/generate", async (req, res) => {
     const body = GenerateBody.safeParse(req.body);
     if (!body.success) {
       return sendError(res, 400, "invalid_request", describeIssues(body.error));
     }
+    const refused = versionError(requestedVersion(req));
+    if (refused) return res.status(400).json(refused);
+    await stream(req, res, body.data.prompt, {
+      route: "generate",
+      start: (send) => send(sseEvent("chunk", { text: MARKER_CHUNK })),
+      text: (send, text) => send(sseEvent("chunk", { text })),
+      done: (send, done) => send(sseEvent("done", done)),
+      error: (send, error) => send(sseEvent("error", error)),
+    });
+  });
+
+  // The same screen over AG-UI 1.0 ([10.18]): AG-UI's run input in, AG-UI events out, each event one
+  // `data:` field. Only the screen travels here; governed actions still go to /api/mutate ([10.20]).
+  app.post("/api/ag-ui", async (req, res) => {
+    const input = AgUiRunInput.safeParse(req.body);
+    const prompt = input.success ? promptOf(input.data) : null;
+    if (!input.success || prompt === null) {
+      return sendError(res, 400, "invalid_request", input.success ? "The run input needs a last user message with text (1-2000 characters)." : describeIssues(input.error));
+    }
+    const refused = versionError(requestedVersion(req));
+    if (refused) return res.status(400).json(refused);
+    const encoder = new AgUiEncoder({ threadId: input.data.threadId, runId: input.data.runId, messageId: `${input.data.runId}-screen` });
+    const events = (list: ReturnType<AgUiEncoder["start"]>) => list.map((event) => `data: ${JSON.stringify(event)}\n\n`).join("");
+    await stream(req, res, prompt, {
+      route: "ag-ui",
+      start: (send) => send(events(encoder.start())),
+      text: (send, text) => send(events(encoder.write(text))),
+      done: (send) => send(events(encoder.finish())),
+      error: (send, error) => send(events(encoder.fail(error.message, error.code))),
+    });
+  });
+
+  /**
+   * Run the model for one request and stream its text as Server-Sent Events in the given format:
+   * rate limit, heartbeat, timeout, abort on disconnect, and a log entry. The output never changes
+   * what the model wrote; the client's parser decides what is valid.
+   */
+  async function stream(req: Request, res: Response, prompt: string, output: StreamOutput) {
     const limit = allow(req.ip ?? "unknown");
     if (!limit.ok) {
       res.setHeader("Retry-After", String(limit.retryAfterSeconds));
@@ -78,8 +133,8 @@ export function createApp({
     let chunks = 0;
     let chars = 0;
 
-    const send = (event: string, data: unknown) => {
-      if (!clientGone && !res.writableEnded) res.write(sseEvent(event, data));
+    const send = (frame: string) => {
+      if (frame !== "" && !clientGone && !res.writableEnded) res.write(frame);
     };
     const heartbeat = setInterval(() => {
       if (!clientGone && !res.writableEnded) res.write(": ping\n\n");
@@ -96,7 +151,7 @@ export function createApp({
     });
 
     // Observer: parses the same text server-side purely to log how well the model followed the
-    // protocol. It never changes what is forwarded; the browser's parser is the one that matters.
+    // protocol. It never changes what is forwarded; the client's parser is the one that matters.
     const observer = createParser({ tools, assets });
     const parse = { errors: {} as Record<string, number>, warnings: {} as Record<string, number> };
     observer.subscribe((e) => {
@@ -104,31 +159,33 @@ export function createApp({
       if (e.type === "warning") parse.warnings[e.issue.code] = (parse.warnings[e.issue.code] ?? 0) + 1;
     });
 
-    const entry: Record<string, unknown> = { event: "generate", model: model.kind, promptChars: body.data.prompt.length };
+    const entry: Record<string, unknown> = { event: output.route, model: model.kind, promptChars: prompt.length };
+    output.start(send);
+    observer.write(MARKER_CHUNK);
     try {
-      const result = await model.generate(body.data.prompt, {
+      const result = await model.generate(prompt, {
         signal: controller.signal,
         onText: (text) => {
           chunks++;
           chars += text.length;
-          send("chunk", { text });
+          output.text(send, text);
           observer.write(text);
         },
       });
-      send("done", { stopReason: result.stopReason, model: result.model, ms: now() - started });
+      output.done(send, { stopReason: result.stopReason, model: result.model, ms: now() - started });
       Object.assign(entry, { outcome: "done", stopReason: result.stopReason, usage: result.usage });
     } catch (err) {
       if (clientGone) {
         entry.outcome = "client_disconnected";
       } else if (timedOut) {
         entry.outcome = "timeout";
-        send("error", { code: "timeout", message: "The model took too long to respond.", retryable: true });
+        output.error(send, { code: "timeout", message: "The model took too long to respond.", retryable: true });
       } else {
         const event = generateError(err);
         Object.assign(entry, { outcome: "error", code: event.code });
-        // Unknown errors may contain internals: logged here, while the browser gets a generic message.
+        // Unknown errors may contain internals: logged here, while the client gets a generic message.
         if (!(err instanceof ModelError)) entry.error = err instanceof Error ? err.message : String(err);
-        send("error", event);
+        output.error(send, event);
       }
     } finally {
       clearInterval(heartbeat);
@@ -137,7 +194,7 @@ export function createApp({
       observer.end();
       log({ ...entry, ms: now() - started, chunks, chars, parse: { ...parse, components: observer.getSnapshot().nodes.size } });
     }
-  });
+  }
 
   // Governed actions from McpMutationBoundary. The server re-checks the tool and params itself:
   // the browser's checks can be bypassed by anyone who posts here directly.

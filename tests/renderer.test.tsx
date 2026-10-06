@@ -246,3 +246,21 @@ describe("stable keys and crash isolation (R3, R7)", () => {
     consoleError.mockRestore();
   });
 });
+
+describe("versions (SPEC.md section 8)", () => {
+  const notice = /needs an update/i;
+
+  it("tells the person the app needs an update when the stream was written for a newer version, and still shows the screen", () => {
+    renderOmni({ lines: ["# omni-ir 99.0", "root = Card([t])", 't = Text("Shown anyway")'] });
+    expect(screen.getByRole("status").textContent).toMatch(notice);
+    expect(screen.getByText("Shown anyway")).toBeTruthy();
+  });
+
+  it("shows no notice for this version, an older one, or no marker", () => {
+    for (const first of ["# omni-ir 0.0", "# just a comment", 'root = Text("x")']) {
+      renderOmni({ lines: [first, 'root = Text("x")'] });
+      expect(screen.queryByText(notice), first).toBeNull();
+      cleanup();
+    }
+  });
+});
