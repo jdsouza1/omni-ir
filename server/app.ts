@@ -7,7 +7,7 @@ import { TOOLS } from "../app/tools";
 import { createParser } from "@omni-ir/core";
 import type { ToolRegistry } from "@omni-ir/core";
 import type { ServerConfig } from "./config";
-import { describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MutateBody, runMutation, sseEvent } from "./api";
+import { describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MARKER_CHUNK, MutateBody, runMutation, sseEvent, versionError } from "./api";
 import { ModelError, type Model } from "./models/types";
 import { STUB_HANDLERS, type ToolHandler } from "./tools/handlers";
 
@@ -42,6 +42,8 @@ export function createApp({
 }: AppOptions): Express {
   const app = express();
   app.disable("x-powered-by");
+  // Read the client's address from X-Forwarded-For only when a trusted proxy wrote it ([10.15]).
+  app.set("trust proxy", config.trustProxy);
   app.use(cors(config.corsOrigin));
   app.use(express.json({ limit: "16kb" }));
 
@@ -58,6 +60,9 @@ export function createApp({
     if (!body.success) {
       return sendError(res, 400, "invalid_request", describeIssues(body.error));
     }
+    const version = typeof req.query.version === "string" ? req.query.version : req.query.version === undefined ? null : "";
+    const refused = versionError(version);
+    if (refused) return res.status(400).json(refused);
     const limit = allow(req.ip ?? "unknown");
     if (!limit.ok) {
       res.setHeader("Retry-After", String(limit.retryAfterSeconds));
@@ -105,6 +110,8 @@ export function createApp({
     });
 
     const entry: Record<string, unknown> = { event: "generate", model: model.kind, promptChars: body.data.prompt.length };
+    send("chunk", { text: MARKER_CHUNK });
+    observer.write(MARKER_CHUNK);
     try {
       const result = await model.generate(body.data.prompt, {
         signal: controller.signal,

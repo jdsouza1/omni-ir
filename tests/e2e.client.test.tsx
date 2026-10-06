@@ -26,7 +26,7 @@ function setup(onMutation?: (call: MutationCall) => void | Promise<void>) {
   return { ...h, parser, parserEvents };
 }
 
-async function run(prompt: string, parser: ReturnType<typeof createParser>, init: { signal?: AbortSignal; fetch?: typeof fetch } = {}) {
+async function run(prompt: string, parser: ReturnType<typeof createParser>, init: { signal?: AbortSignal; fetch?: typeof fetch; idleTimeoutMs?: number } = {}) {
   let outcome!: GenerateOutcome;
   await act(async () => {
     outcome = await generate(prompt, { parser, baseUrl: server?.url ?? "http://127.0.0.1:1", ...init });
@@ -113,6 +113,49 @@ describe("generate(): streaming a screen from the server", () => {
     expect(outcome).toMatchObject({ status: "error", code: "connection_lost", retryable: true });
     expect(h.parser.getSnapshot().nodes.has("root")).toBe(true);
     expect(h.parser.getSnapshot().complete).toBe(true);
+  });
+
+  it("reports connection_lost when no bytes arrive for the idle timeout, and closes the response [10.10]", async () => {
+    const h = setup();
+    let cancelled = false;
+    const stalled: typeof fetch = async () =>
+      new Response(
+        new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode('event: chunk\ndata: {"text":"root = Divider()\\n"}\n\n'));
+          },
+          cancel() {
+            cancelled = true;
+          },
+        }),
+        { status: 200, headers: { "content-type": "text/event-stream" } },
+      );
+    const outcome = await run("x", h.parser, { fetch: stalled, idleTimeoutMs: 50 });
+    expect(outcome).toMatchObject({ status: "error", code: "connection_lost", retryable: true });
+    expect(h.parser.getSnapshot().nodes.has("root")).toBe(true);
+    expect(h.parser.getSnapshot().complete).toBe(true);
+    expect(cancelled).toBe(true);
+  });
+
+  it("keeps waiting while pings arrive more often than the idle timeout [10.10]", async () => {
+    const h = setup();
+    const encoder = new TextEncoder();
+    const pinging: typeof fetch = async () =>
+      new Response(
+        new ReadableStream({
+          async start(controller) {
+            for (let i = 0; i < 6; i++) {
+              controller.enqueue(encoder.encode(": ping\n\n"));
+              await new Promise((r) => setTimeout(r, 20));
+            }
+            controller.enqueue(encoder.encode('event: chunk\ndata: {"text":"root = Divider()\\n"}\n\nevent: done\ndata: {"stopReason":"end_turn","model":"fake","ms":1}\n\n'));
+            controller.close();
+          },
+        }),
+        { status: 200, headers: { "content-type": "text/event-stream" } },
+      );
+    const outcome = await run("x", h.parser, { fetch: pinging, idleTimeoutMs: 60 });
+    expect(outcome).toMatchObject({ status: "done" });
   });
 
   it("parses SSE events split across network reads, including CRLF framing", async () => {

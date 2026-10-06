@@ -57,6 +57,7 @@ class ServerEventTest {
 class ClientTest {
   private lateinit var server: HttpServer
   private val mutateBodies = mutableListOf<String>()
+  private val generateQueries = mutableListOf<String?>()
   private lateinit var client: OmniClient
 
   @BeforeEach
@@ -64,6 +65,7 @@ class ClientTest {
     server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
     server.createContext("/api/generate") { exchange ->
       val prompt = String(exchange.requestBody.readBytes())
+      generateQueries += exchange.requestURI.query
       exchange.responseHeaders.add("content-type", "text/event-stream")
       if (prompt.contains("rate limit")) {
         val body = """{"error":{"code":"rate_limited","message":"Too many requests.","retryable":true}}""".toByteArray()
@@ -72,6 +74,14 @@ class ClientTest {
         return@createContext
       }
       exchange.sendResponseHeaders(200, 0)
+      if (prompt.contains("stall")) {
+        exchange.responseBody.use { out ->
+          out.write("event: chunk\ndata: ${Json.obj(mapOf("text" to "root = Divider()\n"))}\n\n".toByteArray())
+          out.flush()
+          Thread.sleep(1500)
+        }
+        return@createContext
+      }
       exchange.responseBody.use { out ->
         val lines = listOf("root = Card([title, pay])\n", "title = Heading(\"Confirm payment\")\n", "pay = Button(\"Pay\", action=\"pay\")\n", "payM = McpMutation(pay, tool=\"payments.confirm\", params={amount: 42.5})\n")
         for (line in lines) {
@@ -114,6 +124,21 @@ class ClientTest {
     val store = store()
     assertEquals(CONNECTION_LOST, client.generate("cut off", store))
     assertTrue(store.document.value.complete)
+  }
+
+  @Test
+  fun `no bytes for the idle timeout is a lost connection, and the store is still ended (10_10)`() = runBlocking {
+    val store = store()
+    val impatient = OmniClient("http://127.0.0.1:${server.address.port}", idleTimeoutMillis = 200)
+    assertEquals(CONNECTION_LOST, impatient.generate("stall", store))
+    assertTrue(store.document.value.complete)
+    assertEquals(setOf("root"), store.document.value.nodes.keys)
+  }
+
+  @Test
+  fun `the request carries this version, MAJOR dot MINOR (10_1)`() = runBlocking {
+    client.generate("a payment", store())
+    assertEquals("version=" + dev.omniir.core.OMNI_IR_VERSION.split(".").take(2).joinToString("."), generateQueries.single())
   }
 
   @Test

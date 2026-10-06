@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { MockModel } from "../server/models/mock";
 import { ModelError } from "../server/models/types";
+import { MARKER_CHUNK } from "../server/api";
 import { FakeModel, readSse, startServer, textOf, waitForAbort } from "./serverHelpers";
 
 const fixture = (name: string) => readFileSync(resolve("fixtures", name), "utf8");
@@ -22,7 +23,7 @@ describe("POST /api/generate with the mock model", () => {
     expect(response.headers.get("cache-control")).toContain("no-cache");
 
     const { events } = await readSse(response);
-    expect(textOf(events)).toBe(fixture("payment-confirmation.omni"));
+    expect(textOf(events)).toBe(MARKER_CHUNK + fixture("payment-confirmation.omni"));
     const done = events.at(-1)!;
     expect(done.event).toBe("done");
     expect(done.data).toMatchObject({ stopReason: "end_turn", model: "mock" });
@@ -55,11 +56,11 @@ describe("POST /api/generate: SSE framing", () => {
     });
     server = await startServer({ model });
     const { events } = await readSse(await server.generate({ prompt: "x" }));
-    expect(textOf(events)).toBe(pieces.join(""));
-    expect(events.filter((e) => e.event === "chunk")).toHaveLength(pieces.length);
+    expect(textOf(events)).toBe(MARKER_CHUNK + pieces.join(""));
+    expect(events.filter((e) => e.event === "chunk")).toHaveLength(pieces.length + 1);
   });
 
-  it("sends heartbeat comments while the model has produced nothing yet", async () => {
+  it("sends heartbeat comments while the model has produced nothing yet [10.10]", async () => {
     const model = new FakeModel(async ({ onText }) => {
       await sleep(120);
       onText("root = Divider()\n");
@@ -159,12 +160,12 @@ describe("POST /api/generate: request validation and limits", () => {
     server = await startServer({ model: new MockModel({ speed: "instant" }) });
     const clean = await readSse(await server.generate({ prompt: "a payment confirmation" }));
     const bad = await readSse(await server.generate({ prompt: "demo: unknown tool" }));
-    expect(textOf(bad.events)).toBe(fixture("variants/unknown-tool.omni")); // forwarded unchanged
+    expect(textOf(bad.events)).toBe(MARKER_CHUNK + fixture("variants/unknown-tool.omni")); // forwarded unchanged
 
     const [first, second] = server.logs.filter((l) => l.event === "generate");
     expect(first!.parse).toEqual({ errors: {}, warnings: {}, components: 10 });
     expect(second!.parse).toMatchObject({ errors: { unknown_tool: 1, ungoverned_mutation: 1 } });
-    expect(textOf(clean.events)).toBe(fixture("payment-confirmation.omni"));
+    expect(textOf(clean.events)).toBe(MARKER_CHUNK + fixture("payment-confirmation.omni"));
   });
 
   it("never logs prompt text", async () => {

@@ -47,6 +47,7 @@ payIt = McpMutation(pay, tool="payments.confirm", params={amount: $amount, note:
 - **[3.6]** A line that is empty, contains only spaces and tabs, or whose first non-space character is `#` is ignored.
 - **[3.7]** A line longer than the line length limit (section 12) is reported as `line_too_long` and skipped. Processing resumes with the next line. A parser SHOULD NOT keep an over-long line in memory while waiting for its end.
 - **[3.8]** An issue in one line never stops the stream. Later lines are processed normally.
+- **[3.9]** If line 1 is a comment of the form `# omni-ir MAJOR.MINOR` (spaces or tabs MAY appear before and after `#` and at the end of the line, and MUST separate `omni-ir` from the version; MAJOR and MINOR are whole numbers of any length), it is the **version marker**: the Omni-IR version the stream was written for. A parser built for a lower version (comparing MAJOR, then MINOR, as numbers) MUST report a `newer_version` warning on line 1 and process the rest of the stream as usual. The same text on any other line, or in any other form, is an ordinary comment. Parsers older than 0.5 treat the marker as a comment, as [3.6] requires.
 
 ## 4. Grammar
 
@@ -559,6 +560,10 @@ These rules apply to anything that displays an Omni-IR screen. There are three r
 - A Rating MUST expose its value and maximum as text, such as "Rated 4.96 out of 5". A Message SHOULD tell assistive technology who sent it.
 - *Tested by:* `tests/components.media.test.tsx`.
 
+**Versions**
+- When the parser reports `newer_version` ([3.9]), a renderer SHOULD tell the person, near the screen, that the app needs an update to show all of it.
+- *Tested by:* `tests/renderer.test.tsx`.
+
 **Failures**
 - A failure in one component MUST NOT break the rest of the screen.
 - Where the platform can catch a component that fails while rendering (as React's error boundaries do), the renderer MUST replace only that component with a fallback, and SHOULD retry it when its data changes.
@@ -574,16 +579,64 @@ These rules apply to anything that displays an Omni-IR screen. There are three r
 - A Button without an `action` never contacts the backend.
 - *Tested by:* `tests/renderer.test.tsx`, `tests/server.mutate.test.ts`, `tests/e2e.client.test.tsx`.
 
-## 10. Transport (informative)
+## 10. Transport
 
-This section describes the reference server in this repository. It isn't required: an app MAY carry Omni-IR over any transport, because only the text format must be compatible.
+Sections 3 to 7 define the text. This section defines how a server sends that text to a client, so that any client works with any server. An app MAY carry Omni-IR between its own server and its own clients in any other way; a server or client that says it supports the Omni-IR transport MUST follow these rules. The **server** is what produces the stream (it usually asks a model); the **client** receives it and feeds a parser. The reference server (`server/`) and the clients in `@omni-ir/react` (`generate()`), `OmniIRSwiftUI` and `omni-ir-runtime` (`OmniClient`) follow them. Language-neutral cases for clients are in `conformance/transport/`.
 
-- `POST /api/generate` with `{"prompt": "…"}` answers with Server-Sent Events. Each event's data is JSON:
-  - `event: chunk` · `{"text": "…"}`, the next piece of Omni-IR text
-  - `event: done` · `{"stopReason": "end_turn" | "max_tokens" | "refusal", "model": "…", "ms": 1234}`
-  - `event: error` · `{"code": "…", "message": "…", "retryable": true | false}`
-  - A comment line `: ping` is sent while nothing else is, to keep the connection open.
-- `POST /api/mutate` with `{"tool": "…", "params": {…}}` answers `200` with `{"ok": true, "tool": "…", "result": {…}}`, `403` for an unknown tool, `422` with `issues` for invalid params, `400` for a malformed request, `429` when rate limited and `500` when the tool fails.
+**Requesting a screen**
+- **[10.1]** A client asks for a screen with an HTTP `POST` to the server's generate endpoint (`/api/generate` in the reference server), a JSON body `{"prompt": "…"}`, `Content-Type: application/json` and `Accept: text/event-stream`. It MAY add the query parameter `version=MAJOR.MINOR`, the Omni-IR version its parser was built for. The version is in the query, not the body, so servers older than 0.5 ignore it.
+- **[10.2]** A server that can't start the stream answers with an HTTP error status and the body `{"error": {"code": "…", "message": "…", "retryable": true | false}}`. It uses these codes:
+
+  | Status | Code | Meaning |
+  |---|---|---|
+  | 400 | `invalid_request` | The body isn't a valid request. |
+  | 400 | `unsupported_version` | The server can't write a stream for the requested `version` ([10.12]). |
+  | 429 | `rate_limited` | Too many requests; the `Retry-After` header gives the seconds to wait ([10.15]). |
+  | 500 | `server_error` | Anything else. |
+
+- **[10.3]** A client that gets an error status MUST NOT write anything to the parser. It reports the body's `error`; if the body isn't in that form, it reports `server_error`, retryable when the status is 500 or above.
+
+**The stream**
+- **[10.4]** Otherwise the server answers `200` with `Content-Type: text/event-stream`, and the body is a stream of [Server-Sent Events](https://html.spec.whatwg.org/multipage/server-sent-events.html). The server MUST end lines with `\n`, and MUST write each event as an `event:` line with the event's name, one `data:` line holding one JSON object, and a blank line.
+- **[10.5]** The events are:
+  - `chunk` · `{"text": "…"}`: the next piece of the stream. Pieces may end anywhere, even inside a line; the stream is all the `text` values in order.
+  - `done` · `{"stopReason": "end_turn" | "max_tokens" | "refusal", "model": "…", "ms": 1234}`: the stream is complete. `max_tokens` means the model was cut off, so the last lines may be missing.
+  - `error` · `{"code": "…", "message": "…", "retryable": true | false}`: the stream failed. Codes the reference server uses are `timeout`, `model_error`, `rate_limited`, `refusal`, `unavailable` and `daily_cap`; a client MUST accept any code and rely on `retryable`.
+
+  A server sends any number of `chunk` events, then exactly one `done` or `error` (the **terminal event**), then closes the response.
+- **[10.6]** A client MUST read the events as Server-Sent Events: a blank line ends an event; `\r\n` counts as `\n`; a line starting with `:` is a comment; several `data:` lines are joined with `\n`; `event:` names the event; other fields such as `id:` and `retry:` are ignored; an event without data is ignored. The result MUST NOT depend on how the bytes were split into reads, even inside a UTF-8 character ([3.3]).
+- **[10.7]** For each `chunk` the client MUST write `text` to the parser exactly as received, in order. It MUST skip an event whose name it doesn't know, whose data isn't a JSON object, or a `chunk` whose `text` isn't a string. A `done` with missing fields still ends the stream as done; an `error` with missing fields is `server_error`, not retryable.
+- **[10.8]** The first terminal event decides the outcome. A client MUST ignore every event after it.
+- **[10.9]** When the response ends, for any reason, the client MUST end the parser ([3.4]), so anything still pending becomes a fallback ([7.3]) instead of loading forever. If no terminal event arrived, the outcome is `connection_lost`, retryable. A client cancelled by the app reports that it was cancelled, and still ends the parser.
+- **[10.10]** While it has no event to send, a server MUST send a comment line (`: ping`) at least every 15 seconds. A client SHOULD treat 45 seconds without any bytes as `connection_lost`, and close the response.
+- **[10.11]** A stream can't be resumed. A server doesn't send event ids, and a client doesn't reconnect by itself. Retrying means a new request and a new parser.
+
+**Versions**
+- **[10.12]** A server that gets a `version` it can't write a stream for MUST answer `unsupported_version` ([10.2]) before streaming. Until 1.0, versions with a different MAJOR or MINOR number may be incompatible (section 12); the reference server writes only its own version and refuses any other.
+- **[10.13]** A server SHOULD start the stream with the version marker ([3.9]) for the version it writes. The server writes it, not the model.
+
+**Actions**
+- **[10.14]** A client runs a governed action (section 9) with `POST` to the server's mutate endpoint (`/api/mutate`) and the body `{"tool": "…", "params": {…}}`. The server MUST check the tool and params again before running anything, and answers:
+
+  | Status | Body |
+  |---|---|
+  | 200 | `{"ok": true, "tool": "…", "result": {…}}` |
+  | 400 | error `invalid_request`: the body isn't `{tool, params}` with an object for `params` |
+  | 403 | error `unknown_tool`: the tool isn't registered, or has no handler |
+  | 422 | error `invalid_params`, with `issues`: `[{"path": "…", "message": "…"}]` |
+  | 429 | error `rate_limited`, with `Retry-After` |
+  | 500 | error `tool_failed`, retryable |
+
+- **[10.15]** A server that limits requests answers `429` with `rate_limited` and a `Retry-After` header. A server behind a proxy MUST take the client's address from the proxy only when the request came through a proxy it trusts, and MUST otherwise ignore headers such as `X-Forwarded-For`, which anyone can write. The reference server trusts no proxy unless `OMNI_TRUST_PROXY` is set.
+
+**WebSockets**
+- **[10.16]** Over a WebSocket, each event is one text message: a JSON object with a `type` field. The client sends `{"type": "generate", "prompt": "…"}`, with `"version"` if it wants ([10.12]); the server answers with `{"type": "chunk", "text": "…"}` messages and one terminal `{"type": "done", …}` or `{"type": "error", …}` with the fields of [10.5], then closes with code 1000. Errors that [10.2] sends as an HTTP status are sent as an `error` message instead. One connection carries one screen, and the WebSocket's own pings replace [10.10]. Rules [10.7] to [10.9] and [10.11] apply.
+- **[10.17]** A browser doesn't apply CORS to WebSockets, so a server MUST check the `Origin` header of every WebSocket request itself and refuse origins it doesn't serve; otherwise any website a person visits could open a connection in their name. The reference server has no WebSocket endpoint.
+
+**AG-UI**
+- **[10.18]** Over [AG-UI](https://docs.ag-ui.com/) 1.0, a screen is one activity message with `activityType` `"omni-ir"`. The server sends `ACTIVITY_SNAPSHOT` with `content` `{"version": "MAJOR.MINOR", "lines": []}`, then one `ACTIVITY_DELTA` per complete line, whose `patch` is `[{"op": "add", "path": "/lines/-", "value": "…"}]` (the line without its line ending), including a last line without a line ending when the stream ends. The run ends with AG-UI's own `RUN_FINISHED` or `RUN_ERROR`. A stream the model cut off (`max_tokens`) still ends with `RUN_FINISHED`.
+- **[10.19]** A client MUST write each added line, followed by `\n`, to the parser. Lines can only be added: a client MUST treat any other patch operation or path, a value that isn't a string, or a later `ACTIVITY_SNAPSHOT` for the same message whose `lines` don't begin with the lines already received, as an error that changes nothing, because Omni-IR never lets a line be rewritten ([5.3]). When the run ends, however it ends, the client MUST end the parser ([10.9]).
+- **[10.20]** AG-UI carries the screen, never the authority to act. Governed actions MUST go through the app's own action endpoint ([10.14]), checked there, and never through the agent.
 
 ## 11. Security considerations
 
@@ -596,13 +649,13 @@ What the format prevents:
 
 What the app must still handle:
 - **Authorization** of every real action (section 9).
-- **Rate and cost limits** on generation.
+- **Rate and cost limits** on generation ([10.15]).
 - **The content of text.** A model can still write misleading words, such as a fake warning or a wrong price. Apps SHOULD treat model-written text as untrusted content, and SHOULD NOT use it for decisions without checking.
 - **Prompt injection** in whatever the model reads. The format limits what an injected instruction can make the screen do, but not what it can make the screen say.
 
 ## 12. Versioning and limits
 
-This is version 0.4, a draft. Until version 1.0, any change MAY be incompatible; changes are listed in CHANGELOG.md. A stream doesn't declare its version in v0.4.
+This is version 0.4, a draft. Until version 1.0, any change MAY be incompatible; changes are listed in CHANGELOG.md. A stream MAY declare the version it was written for with a version marker ([3.9]), and a client MAY ask for one ([10.1]).
 
 Adding to the catalog is a change too. Because the catalog is strict ([5.9]), a parser built for an older version rejects a new component (`unknown_component`), a new prop or a new allowed value (`invalid_props`), and its renderer shows a fallback in that place. A server SHOULD therefore ask a model only for what its clients' version accepts. The reference server generates its system prompt from its own schema, so a server and its clients stay compatible by using the same version.
 
@@ -695,5 +748,4 @@ Issues reported:
 
 - Data-driven lists. A List's items are written out one by one; there are no loops or bindings to collections.
 - A way to update or remove a component after its line has arrived. In v0.4 an id can't be reassigned ([5.3]).
-- A version marker inside the stream.
 - Renderers other than the web reference renderer.

@@ -98,6 +98,39 @@ func interpret(_ event: ServerEvent) -> StreamStep {
   }
 }
 
+/// The events of one `generate` response (SPEC.md [10.6]-[10.9]): `feed` returns the text to write to
+/// the parser, and `outcome` is set by the first terminal event, after which everything is ignored.
+struct StreamReader {
+  private var decoder = ServerEventDecoder()
+  private(set) var outcome: GenerateOutcome?
+
+  mutating func feed(_ bytes: some Sequence<UInt8>) -> [String] {
+    var texts: [String] = []
+    for event in decoder.feed(bytes) {
+      if outcome != nil { break }
+      switch interpret(event) {
+      case .text(let text): texts.append(text)
+      case .finished(let result): outcome = result
+      case .ignored: break
+      }
+    }
+    return texts
+  }
+
+  /// How the call ended once the response is over: without a terminal event, the connection was lost.
+  func finish() -> GenerateOutcome { outcome ?? connectionLost }
+}
+
+/// An error status before the stream started ([10.3]): the body's error, or `server_error`.
+func errorResponseOutcome(status: Int, body: [UInt8]) -> GenerateOutcome {
+  let json = (try? JSONSerialization.jsonObject(with: Data(body))) as? [String: Any]
+  if let error = json?["error"] as? [String: Any] { return errorOutcome(error) }
+  return .error(code: "server_error", message: "Request failed (\(status)).", retryable: status >= 500)
+}
+
+/// "MAJOR.MINOR" of this package's version, sent with each request ([10.1]).
+let requestVersion = omniIRVersion.split(separator: ".").prefix(2).joined(separator: ".")
+
 func errorOutcome(_ payload: [String: Any]?) -> GenerateOutcome {
   .error(
     code: payload?["code"] as? String ?? "server_error",
@@ -126,10 +159,13 @@ public struct OmniClient: Sendable {
   /// The server's origin, such as `https://example.com` or `http://localhost:8787`.
   public let baseURL: URL
   public let session: URLSession
+  /// With no bytes for this long, pings included, the stream counts as lost (SPEC.md [10.10]).
+  public let idleTimeout: TimeInterval
 
-  public init(baseURL: URL, session: URLSession = .shared) {
+  public init(baseURL: URL, session: URLSession = .shared, idleTimeout: TimeInterval = 45) {
     self.baseURL = baseURL
     self.session = session
+    self.idleTimeout = idleTimeout
   }
 
   /// Asks the server for a screen and writes it into `store` as it streams. The store is always ended
@@ -137,8 +173,11 @@ public struct OmniClient: Sendable {
   /// becomes a fallback instead of loading forever. Cancel the task to stop.
   @MainActor
   public func generate(_ prompt: String, into store: OmniStore) async -> GenerateOutcome {
-    var request = URLRequest(url: baseURL.appendingPathComponent("api/generate"))
+    var components = URLComponents(url: baseURL.appendingPathComponent("api/generate"), resolvingAgainstBaseURL: false)
+    components?.queryItems = [URLQueryItem(name: "version", value: requestVersion)]
+    var request = URLRequest(url: components?.url ?? baseURL.appendingPathComponent("api/generate"))
     request.httpMethod = "POST"
+    request.timeoutInterval = idleTimeout  // URLSession's timeout is the longest wait between bytes
     request.setValue("application/json", forHTTPHeaderField: "content-type")
     request.setValue("text/event-stream", forHTTPHeaderField: "accept")
     request.httpBody = try? JSONSerialization.data(withJSONObject: ["prompt": prompt])
@@ -155,26 +194,16 @@ public struct OmniClient: Sendable {
     guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
       var body: [UInt8] = []
       do { for try await byte in bytes { body.append(byte) } } catch {}
-      let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-      let json = (try? JSONSerialization.jsonObject(with: Data(body))) as? [String: Any]
-      if let error = json?["error"] as? [String: Any] { return errorOutcome(error) }
-      return .error(code: "server_error", message: "Request failed (\(status)).", retryable: status >= 500)
+      return errorResponseOutcome(status: (response as? HTTPURLResponse)?.statusCode ?? 0, body: body)
     }
 
-    var decoder = ServerEventDecoder()
-    var outcome: GenerateOutcome?
+    var reader = StreamReader()
     var line: [UInt8] = []
     do {
       for try await byte in bytes {
         line.append(byte)
         guard byte == 0x0A else { continue }
-        for event in decoder.feed(line) {
-          switch interpret(event) {
-          case .text(let text): store.write(text)
-          case .finished(let result): outcome = result
-          case .ignored: break
-          }
-        }
+        for text in reader.feed(line) { store.write(text) }
         line.removeAll(keepingCapacity: true)
       }
     } catch {
@@ -182,7 +211,7 @@ public struct OmniClient: Sendable {
       return Task.isCancelled ? .aborted : connectionLost
     }
     store.end()
-    return Task.isCancelled && outcome == nil ? .aborted : outcome ?? connectionLost
+    return Task.isCancelled && reader.outcome == nil ? .aborted : reader.finish()
   }
 
   /// An `onMutation` handler for OmniView that posts governed actions to `/api/mutate`. The server

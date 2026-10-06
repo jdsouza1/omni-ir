@@ -7,7 +7,7 @@
 // timeout, CORS and logging. It runs only the free FixtureModel in the hosted playground.
 import type { ToolRegistry } from "@omni-ir/core";
 import { TOOLS } from "../app/tools";
-import { describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MutateBody, runMutation, sseEvent } from "./api";
+import { describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MARKER_CHUNK, MutateBody, runMutation, sseEvent, versionError } from "./api";
 import { ModelError, type Model } from "./models/types";
 import { STUB_HANDLERS, type ToolHandler } from "./tools/handlers";
 
@@ -27,7 +27,7 @@ export function createInBrowserApi({ model, tools = TOOLS, handlers = STUB_HANDL
     // Like fetch: a request cancelled before it is answered rejects.
     if (init.signal?.aborted) throw new DOMException("The request was cancelled.", "AbortError");
     const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-    const path = new URL(url, "http://in-browser").pathname;
+    const { pathname: path, searchParams } = new URL(url, "http://in-browser");
     const method = (init.method ?? "GET").toUpperCase();
 
     if (method === "GET" && path === "/api/health") return json(200, { ok: true, model: model.kind });
@@ -51,6 +51,8 @@ export function createInBrowserApi({ model, tools = TOOLS, handlers = STUB_HANDL
 
     const parsed = GenerateBody.safeParse(body);
     if (!parsed.success) return json(400, errorBody("invalid_request", describeIssues(parsed.error)));
+    const refused = versionError(searchParams.get("version"));
+    if (refused) return json(400, refused);
     return generateResponse(model, parsed.data.prompt, init.signal ?? undefined);
   };
 }
@@ -71,6 +73,7 @@ function generateResponse(model: Model, prompt: string, signal: AbortSignal | un
       };
       if (signal?.aborted) return onAbort();
       signal?.addEventListener("abort", onAbort, { once: true });
+      send("chunk", { text: MARKER_CHUNK });
       try {
         const result = await model.generate(prompt, { signal: controller.signal, onText: (text) => send("chunk", { text }) });
         send("done", { stopReason: result.stopReason, model: result.model, ms: Math.round(performance.now() - started) });

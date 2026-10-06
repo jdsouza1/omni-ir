@@ -6,6 +6,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { catalogCases } from "./catalog";
+import { renderTransportFiles, TRANSPORT_CASES } from "./transport";
 
 export type InputPart = string | { repeat: string; times: number };
 export interface ExpectedIssue {
@@ -711,4 +712,8 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   mkdirSync(dir, { recursive: true });
   for (const [name, text] of Object.entries(renderCaseFiles())) writeFileSync(join(dir, name), text);
   console.log(`wrote ${Object.values(CASES).flat().length} cases to conformance/cases/`);
+  const transport = resolve("conformance", "transport");
+  mkdirSync(transport, { recursive: true });
+  for (const [name, text] of Object.entries(renderTransportFiles())) writeFileSync(join(transport, name), text);
+  console.log(`wrote ${TRANSPORT_CASES.length} transport cases to conformance/transport/`);
 }

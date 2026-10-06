@@ -3,6 +3,7 @@
 // server checks again. Port of packages/react/src/client. Uses only the JDK's HTTP classes.
 package dev.omniir.runtime
 
+import dev.omniir.core.OMNI_IR_VERSION
 import dev.omniir.core.Primitive
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +33,8 @@ public class MutationRejectedException(message: String) : Exception(message)
 public class OmniClient(
   /** The server's origin, such as `https://example.com` or `http://10.0.2.2:8787` (the emulator's host). */
   public val baseUrl: String,
+  /** With no bytes for this long, pings included, the stream counts as lost (SPEC.md [10.10]). */
+  public val idleTimeoutMillis: Int = 45_000,
 ) {
   /**
    * Asks the server for a screen and writes it into `store` as it streams. The store is always ended
@@ -40,7 +43,7 @@ public class OmniClient(
    */
   public suspend fun generate(prompt: String, store: OmniStore): GenerateOutcome = withContext(Dispatchers.IO) {
     val connection = try {
-      open("api/generate", Json.obj(mapOf("prompt" to prompt)), accept = "text/event-stream")
+      open("api/generate?version=" + OMNI_IR_VERSION.split(".").take(2).joinToString("."), Json.obj(mapOf("prompt" to prompt)), accept = "text/event-stream")
     } catch (e: IOException) {
       return@withContext GenerateOutcome.Failed("network_error", "Could not reach the server.", retryable = true)
     }
@@ -52,8 +55,7 @@ public class OmniClient(
       // Errors before the stream starts (bad request, rate limit): the store is left untouched.
       if (status !in 200..299) return@withContext errorResponse(connection, status)
 
-      val decoder = ServerEventDecoder()
-      var outcome: GenerateOutcome? = null
+      val reader = StreamReader()
       try {
         connection.inputStream.use { input ->
           val buffer = ByteArray(8192)
@@ -61,13 +63,7 @@ public class OmniClient(
             currentCoroutineContext().ensureActive()
             val n = input.read(buffer)
             if (n < 0) break
-            for (event in decoder.feed(buffer.copyOf(n))) {
-              when (val step = interpret(event)) {
-                is StreamStep.Text -> store.write(step.text)
-                is StreamStep.Finished -> outcome = step.outcome
-                StreamStep.Ignored -> {}
-              }
-            }
+            for (text in reader.feed(buffer.copyOf(n))) store.write(text)
           }
         }
       } catch (e: IOException) {
@@ -78,7 +74,7 @@ public class OmniClient(
         return@withContext GenerateOutcome.Aborted
       }
       store.end()
-      outcome ?: if (isCancelled()) GenerateOutcome.Aborted else CONNECTION_LOST
+      reader.outcome ?: if (isCancelled()) GenerateOutcome.Aborted else CONNECTION_LOST
     } finally {
       stop.dispose()
     }
@@ -114,6 +110,7 @@ public class OmniClient(
       requestMethod = "POST"
       doOutput = true
       connectTimeout = 15_000
+      readTimeout = idleTimeoutMillis
       setRequestProperty("content-type", "application/json")
       setRequestProperty("accept", accept)
       outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
@@ -122,8 +119,7 @@ public class OmniClient(
 
   private fun errorResponse(connection: HttpURLConnection, status: Int): GenerateOutcome {
     val body = try { connection.errorStream?.use { String(it.readBytes(), Charsets.UTF_8) } } catch (e: IOException) { null }
-    val error = Json.parseObject(body ?: "")?.get("error") as? Map<*, *>
-    return if (error != null) errorOutcome(error) else GenerateOutcome.Failed("server_error", "Request failed ($status).", retryable = status >= 500)
+    return errorResponseOutcome(status, body)
   }
 
   private suspend fun isCancelled() = !currentCoroutineContext().job.isActive
@@ -176,6 +172,38 @@ internal class ServerEventDecoder {
     }
     return if (data.isEmpty()) null else ServerEvent(event, data.joinToString("\n"))
   }
+}
+
+/**
+ * The events of one `generate` response (SPEC.md [10.6]-[10.9]): `feed` returns the text to write to
+ * the parser, and `outcome` is set by the first terminal event, after which everything is ignored.
+ */
+internal class StreamReader {
+  private val decoder = ServerEventDecoder()
+  var outcome: GenerateOutcome? = null
+    private set
+
+  fun feed(bytes: ByteArray): List<String> {
+    val texts = mutableListOf<String>()
+    for (event in decoder.feed(bytes)) {
+      if (outcome != null) break
+      when (val step = interpret(event)) {
+        is StreamStep.Text -> texts += step.text
+        is StreamStep.Finished -> outcome = step.outcome
+        StreamStep.Ignored -> {}
+      }
+    }
+    return texts
+  }
+
+  /** How the call ended once the response is over: without a terminal event, the connection was lost. */
+  fun finish(): GenerateOutcome = outcome ?: CONNECTION_LOST
+}
+
+/** An error status before the stream started ([10.3]): the body's error, or `server_error`. */
+internal fun errorResponseOutcome(status: Int, body: String?): GenerateOutcome {
+  val error = Json.parseObject(body ?: "")?.get("error") as? Map<*, *>
+  return if (error != null) errorOutcome(error) else GenerateOutcome.Failed("server_error", "Request failed ($status).", retryable = status >= 500)
 }
 
 /** What one event means for a `generate` call: text for the parser, or how the call ended. */

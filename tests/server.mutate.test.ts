@@ -25,7 +25,7 @@ describe("stub handlers", () => {
   });
 });
 
-describe("POST /api/mutate", () => {
+describe("POST /api/mutate [10.14]", () => {
   it.each([
     ["payments.confirm", { amount: 42.5, note: "Table 4" }, "receiptId"],
     ["auth.sendMagicLink", { email: "ada@example.com" }, "sent"],

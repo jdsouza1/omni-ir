@@ -2,7 +2,7 @@
 // The text is written to the parser exactly as it arrives; the parser and schema decide what is valid.
 // Once the stream has started, the parser is always ended (done, error, cancel or dropped connection),
 // so anything that never arrived becomes a "missing" fallback instead of loading forever.
-import type { OmniParser } from "@omni-ir/core";
+import { majorMinor, type OmniParser } from "@omni-ir/core";
 
 export type GenerateOutcome =
   | { status: "done"; stopReason: "end_turn" | "max_tokens" | "refusal"; model: string; ms: number }
@@ -15,16 +15,20 @@ export interface GenerateClientOptions {
   /** Server origin; "" means same origin. */
   baseUrl?: string;
   fetch?: typeof globalThis.fetch;
+  /** With no bytes for this long, pings included, the stream counts as lost ([10.10]). Default 45 s. */
+  idleTimeoutMs?: number;
 }
+
+const IDLE = Symbol("idle");
 
 type ErrorOutcome = Extract<GenerateOutcome, { status: "error" }>;
 
 export async function generate(prompt: string, options: GenerateClientOptions): Promise<GenerateOutcome> {
-  const { parser, signal, baseUrl = "", fetch: doFetch = globalThis.fetch } = options;
+  const { parser, signal, baseUrl = "", fetch: doFetch = globalThis.fetch, idleTimeoutMs = 45_000 } = options;
 
   let response: Response;
   try {
-    response = await doFetch(`${baseUrl}/api/generate`, {
+    response = await doFetch(`${baseUrl}/api/generate?version=${majorMinor()}`, {
       method: "POST",
       headers: { "content-type": "application/json", accept: "text/event-stream" },
       body: JSON.stringify({ prompt }),
@@ -51,7 +55,7 @@ export async function generate(prompt: string, options: GenerateClientOptions): 
       if (line.startsWith("event:")) event = line.slice(6).trim();
       else if (line.startsWith("data:")) data.push(line.slice(5).replace(/^ /, ""));
     }
-    if (data.length === 0) return;
+    if (data.length === 0 || outcome !== null) return; // everything after the terminal event is ignored [10.8]
     let payload: Record<string, unknown>;
     try {
       payload = JSON.parse(data.join("\n")) as Record<string, unknown>;
@@ -74,7 +78,14 @@ export async function generate(prompt: string, options: GenerateClientOptions): 
 
   try {
     for (;;) {
-      const { done, value } = await reader.read();
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const idle = new Promise<typeof IDLE>((resolve) => (timer = setTimeout(() => resolve(IDLE), idleTimeoutMs)));
+      const read = await Promise.race([reader.read(), idle]).finally(() => clearTimeout(timer));
+      if (read === IDLE) {
+        void reader.cancel().catch(() => {});
+        break;
+      }
+      const { done, value } = read;
       if (done) break;
       // Normalise CRLF framing; a "\r" left at the end joins its "\n" on the next read.
       buffer = (buffer + decoder.decode(value, { stream: true })).replace(/\r\n/g, "\n");

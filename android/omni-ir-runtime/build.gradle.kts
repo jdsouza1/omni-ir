@@ -28,5 +28,6 @@ dependencies {
 
 tasks.test {
   useJUnitPlatform()
+  systemProperty("omniir.repoRoot", rootDir.parentFile.absolutePath)
   testLogging { events("failed"); exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL }
 }

@@ -1,0 +1,507 @@
+{
+  "area": "transport",
+  "cases": [
+    {
+      "id": "sse-basic",
+      "rules": [
+        "10.4",
+        "10.5",
+        "10.7"
+      ],
+      "description": "Each chunk's text is written in order, even when a piece ends inside a line; done gives the outcome.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\ndata: {\"text\":\"root = Card([ti\"}\n\n",
+          "event: chunk\ndata: {\"text\":\"tle])\\ntitle = Heading(\\\"Hi\\\")\\n\"}\n\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "root = Card([title])\ntitle = Heading(\"Hi\")\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-empty-screen",
+      "rules": [
+        "10.5",
+        "10.9"
+      ],
+      "description": "A stream with no chunks and a done event: nothing written, the parser still ended.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-crlf",
+      "rules": [
+        "10.6"
+      ],
+      "description": "\\r\\n line endings in the event framing count as \\n.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\r\ndata: {\"text\":\"a = Divider()\\n\"}\r\n\r\n",
+          "event: done\r\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\r\n\r\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-comments-and-pings",
+      "rules": [
+        "10.6",
+        "10.10"
+      ],
+      "description": "Comment lines, such as the keep-alive ping, are skipped wherever they appear.",
+      "response": {
+        "status": 200,
+        "body": [
+          ": ping\n\n",
+          "event: chunk\ndata: {\"text\":\"a = Divider()\\n\"}\n\n",
+          ": ping\n\n",
+          ": another comment\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-multi-line-data",
+      "rules": [
+        "10.6"
+      ],
+      "description": "Several data lines are joined with \\n before the JSON is read.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\ndata: {\"text\":\ndata: \"a = Divider()\\n\"}\n\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-other-fields",
+      "rules": [
+        "10.6",
+        "10.11"
+      ],
+      "description": "id: and retry: fields, and fields without a space after the colon, are handled as Server-Sent Events say.",
+      "response": {
+        "status": 200,
+        "body": [
+          "id: 7\nretry: 1000\nevent:chunk\ndata:{\"text\":\"a = Divider()\\n\"}\n\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-utf8",
+      "rules": [
+        "10.6",
+        "3.3"
+      ],
+      "description": "Multi-byte characters arrive intact however the bytes are split (the runner splits every case).",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\ndata: {\"text\":\"a = Text(\\\"Café ☕ 日本 🎉\\\")\\n\"}\n\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Text(\"Café ☕ 日本 🎉\")\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-unknown-event",
+      "rules": [
+        "10.7"
+      ],
+      "description": "An event the client doesn't know is skipped.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: progress\ndata: {\"percent\":50}\n\n",
+          "event: chunk\ndata: {\"text\":\"a = Divider()\\n\"}\n\n",
+          "event: message\ndata: {\"text\":\"not a chunk\"}\n\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-bad-data",
+      "rules": [
+        "10.7"
+      ],
+      "description": "Data that isn't a JSON object, and a chunk whose text isn't a string, are skipped.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\ndata: not json\n\n",
+          "event: chunk\ndata: [1, 2]\n\n",
+          "event: chunk\ndata: {\"text\":42}\n\n",
+          "event: chunk\ndata: {}\n\n",
+          "event: chunk\ndata: {\"text\":\"a = Divider()\\n\"}\n\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-event-without-data",
+      "rules": [
+        "10.6"
+      ],
+      "description": "An event with a name but no data is ignored, including a done without data.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\n\n",
+          "event: done\n\n",
+          "event: chunk\ndata: {\"text\":\"a = Divider()\\n\"}\n\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-done-missing-fields",
+      "rules": [
+        "10.7"
+      ],
+      "description": "A done event with missing fields still ends the stream as done.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\ndata: {\"text\":\"a = Divider()\\n\"}\n\n",
+          "event: done\ndata: {}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "done"
+        }
+      }
+    },
+    {
+      "id": "sse-error-after-chunks",
+      "rules": [
+        "10.5",
+        "10.9"
+      ],
+      "description": "An error after some chunks: what arrived stays written, the parser is ended, the error is reported.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\ndata: {\"text\":\"root = Stack([a, b])\\na = Divider()\\n\"}\n\n",
+          "event: error\ndata: {\"code\":\"model_error\",\"message\":\"Generation failed.\",\"retryable\":true}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "root = Stack([a, b])\na = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "error",
+          "code": "model_error",
+          "retryable": true
+        }
+      }
+    },
+    {
+      "id": "sse-error-unknown-code",
+      "rules": [
+        "10.5"
+      ],
+      "description": "Any error code is accepted as given, with its retryable flag.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: error\ndata: {\"code\":\"quota_exhausted_for_tenant\",\"message\":\"No.\",\"retryable\":false}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "",
+        "ended": true,
+        "outcome": {
+          "status": "error",
+          "code": "quota_exhausted_for_tenant",
+          "retryable": false
+        }
+      }
+    },
+    {
+      "id": "sse-error-missing-fields",
+      "rules": [
+        "10.7"
+      ],
+      "description": "An error event with missing fields is server_error, not retryable.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: error\ndata: {}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "",
+        "ended": true,
+        "outcome": {
+          "status": "error",
+          "code": "server_error",
+          "retryable": false
+        }
+      }
+    },
+    {
+      "id": "sse-after-terminal",
+      "rules": [
+        "10.8"
+      ],
+      "description": "Everything after the first terminal event is ignored: later chunks, a second done, an error.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\ndata: {\"text\":\"a = Divider()\\n\"}\n\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":12}\n\n",
+          "event: chunk\ndata: {\"text\":\"b = Divider()\\n\"}\n\n",
+          "event: error\ndata: {\"code\":\"model_error\",\"message\":\"x\",\"retryable\":true}\n\n",
+          "event: done\ndata: {\"stopReason\":\"max_tokens\",\"model\":\"other\",\"ms\":1}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "done",
+          "stopReason": "end_turn",
+          "model": "mock",
+          "ms": 12
+        }
+      }
+    },
+    {
+      "id": "sse-no-terminal",
+      "rules": [
+        "10.9"
+      ],
+      "description": "The response ends without a terminal event: connection_lost, retryable, and the parser is ended.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\ndata: {\"text\":\"root = Stack([a])\\n\"}\n\n"
+        ]
+      },
+      "expect": {
+        "written": "root = Stack([a])\n",
+        "ended": true,
+        "outcome": {
+          "status": "error",
+          "code": "connection_lost",
+          "retryable": true
+        }
+      }
+    },
+    {
+      "id": "sse-unfinished-event",
+      "rules": [
+        "10.6",
+        "10.9"
+      ],
+      "description": "An event without its closing blank line when the response ends is not an event.",
+      "response": {
+        "status": 200,
+        "body": [
+          "event: chunk\ndata: {\"text\":\"a = Divider()\\n\"}\n\n",
+          "event: done\ndata: {\"stopReason\":\"end_turn\",\"model\":\"mock\",\"ms\":1}\n"
+        ]
+      },
+      "expect": {
+        "written": "a = Divider()\n",
+        "ended": true,
+        "outcome": {
+          "status": "error",
+          "code": "connection_lost",
+          "retryable": true
+        }
+      }
+    },
+    {
+      "id": "http-error-body",
+      "rules": [
+        "10.2",
+        "10.3"
+      ],
+      "description": "An error status with the error body: reported as given, nothing written, the parser not touched.",
+      "response": {
+        "status": 429,
+        "body": "{\"error\":{\"code\":\"rate_limited\",\"message\":\"Too many requests.\",\"retryable\":true}}"
+      },
+      "expect": {
+        "written": "",
+        "ended": false,
+        "outcome": {
+          "status": "error",
+          "code": "rate_limited",
+          "retryable": true
+        }
+      }
+    },
+    {
+      "id": "http-error-unsupported-version",
+      "rules": [
+        "10.2",
+        "10.3",
+        "10.12"
+      ],
+      "description": "unsupported_version before the stream starts.",
+      "response": {
+        "status": 400,
+        "body": "{\"error\":{\"code\":\"unsupported_version\",\"message\":\"This server writes Omni-IR 0.5.\",\"retryable\":false}}"
+      },
+      "expect": {
+        "written": "",
+        "ended": false,
+        "outcome": {
+          "status": "error",
+          "code": "unsupported_version",
+          "retryable": false
+        }
+      }
+    },
+    {
+      "id": "http-error-not-json-5xx",
+      "rules": [
+        "10.3"
+      ],
+      "description": "An error status with a body that isn't the error form: server_error, retryable for 500 and above.",
+      "response": {
+        "status": 502,
+        "body": "<html>Bad gateway</html>"
+      },
+      "expect": {
+        "written": "",
+        "ended": false,
+        "outcome": {
+          "status": "error",
+          "code": "server_error",
+          "retryable": true
+        }
+      }
+    },
+    {
+      "id": "http-error-not-json-4xx",
+      "rules": [
+        "10.3"
+      ],
+      "description": "An error status below 500 with a body that isn't the error form: server_error, not retryable.",
+      "response": {
+        "status": 404,
+        "body": "Not found"
+      },
+      "expect": {
+        "written": "",
+        "ended": false,
+        "outcome": {
+          "status": "error",
+          "code": "server_error",
+          "retryable": false
+        }
+      }
+    }
+  ]
+}

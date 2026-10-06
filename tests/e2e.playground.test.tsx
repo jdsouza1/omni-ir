@@ -50,7 +50,8 @@ describe("playground end to end", () => {
     await runExample(user, prompt);
     expect(status()).toMatch(/^Done in \d+ ms \(model: mock\)\.$/);
     const fixture = readFileSync(resolve("fixtures", `${FIXTURE_FOR[prompt]}.omni`), "utf8");
-    expect(sourceLines()).toHaveLength(fixture.trimEnd().split("\n").length);
+    // The server writes the version marker as line 1 ([10.13]).
+    expect(sourceLines()).toHaveLength(fixture.trimEnd().split("\n").length + 1);
     expect(document.querySelector(".pg-line[data-severity]")).toBeNull();
     expect(document.querySelector("[data-pending-id], [data-fallback-reason]")).toBeNull();
   });
