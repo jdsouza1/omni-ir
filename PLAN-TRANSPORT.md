@@ -92,15 +92,15 @@ RUN_FINISHED     (or RUN_ERROR {message, code})
 - *Cons:* about 100 bytes of wrapping per line (about 3 KB on a 30-line screen); it is our convention, so other AG-UI apps need our helper to draw it, and a future AG-UI standard for generative UI may need a second mapping; a hostile agent could send patches that rewrite earlier lines, so only appends are accepted (above).
 - *Trade-off:* plain text messages would show raw Omni-IR in chat for every client that doesn't know it; custom events are dropped silently by clients that don't know them.
 
-**7. Rate limits behind a proxy: an opt-in `OMNI_TRUST_PROXY` setting.**
-- *Pros:* limits work per user behind a load balancer; off by default, so a server not behind a proxy can't be fooled by a forged `X-Forwarded-For`; no new dependency.
-- *Cons:* set wrongly (trusting every hop on a server reachable directly), anyone can forge their address and dodge the limit, so the docs must say exactly when to set it; still one count per server instance.
-- *Trade-off:* a shared limiter (Redis) counts across instances but adds a service to run; it belongs with real handlers and sign-in.
-
 **6. AG-UI helpers in `@omni-ir/core/ag-ui`.**
 - *Pros:* nothing new to install; always the same version as the parser; apps that don't import it don't load it; no runtime dependency (our own types, `@ag-ui/core` in tests only).
 - *Cons:* the core package grows by a few KB; a breaking AG-UI change forces a core release; web only for now.
 - *Trade-off:* a separate `@omni-ir/ag-ui` package keeps core's releases independent but is one more package to publish and keep in step; it can still be split out later.
+
+**7. Rate limits behind a proxy: an opt-in `OMNI_TRUST_PROXY` setting.**
+- *Pros:* limits work per user behind a load balancer; off by default, so a server not behind a proxy can't be fooled by a forged `X-Forwarded-For`; no new dependency.
+- *Cons:* set wrongly (trusting every hop on a server reachable directly), anyone can forge their address and dodge the limit, so the docs must say exactly when to set it; still one count per server instance.
+- *Trade-off:* a shared limiter (Redis) counts across instances but adds a service to run; it belongs with real handlers and sign-in.
 
 ## Task checklist
 
