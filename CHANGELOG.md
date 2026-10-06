@@ -2,7 +2,7 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
-## Unreleased
+## 0.6.0 (2026-10-06)
 
 ### Added
 - **Real backend handlers in the reference server** (PLAN-BACKEND.md): every tool has an access rule ("signed-in" or "public"; a tool without one doesn't load), checks ownership against stored data, and answers `404 not_found` the same for "not yours" and "doesn't exist". Results carry only what a screen needs.
@@ -16,6 +16,11 @@ All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-
 ### Changed
 - SPEC.md section 9: ownership is checked against the server's own data, "not yours" looks like "doesn't exist", results and logs carry no one else's data. [10.14] lists `401 sign_in_required`, `403 bad_origin`, `404 not_found` and the `409` answers.
 - `/api/mutate` now needs a signed-in person for every tool except sending a sign-in link (unless `OMNI_AUTH=demo`). The stub handlers are gone; `assistant.ask` stays a labelled stub because a real one would call a paid model.
+
+### Compatibility
+- **The text format didn't change**: every 0.5 stream parses the same. But the version did, and until 1.0 any minor version may be incompatible ([12]): a 0.6 server writes `# omni-ir 0.6`, so 0.5 apps show the "needs an update" notice, and it refuses apps that ask for `?version=0.5` (`unsupported_version`). Update the server and the apps together, as before.
+- **A reference server deployed before 0.6 now requires sign-in** for actions. Set `OMNI_AUTH=demo` only for a demo; otherwise sign people in, or plug in your own `authenticate`.
+- 0.5 clients send no idempotency key and still work; 0.6 clients' extra header is ignored by servers that don't use it.
 
 ## 0.5.0 (2026-10-06)
 

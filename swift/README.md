@@ -14,10 +14,10 @@ The parser passes the same [conformance suite](../conformance/README.md) as the 
 In Xcode: **File → Add Package Dependencies…**, enter `https://github.com/jdsouza1/omni-ir`, and add `OmniIRSwiftUI` to your app. In a `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/jdsouza1/omni-ir", from: "0.5.0")
+.package(url: "https://github.com/jdsouza1/omni-ir", from: "0.6.0")
 ```
 
-`0.2.0` was the first release to include the Swift package (the `v0.1.0` tag predates it); `0.3.0` added the charts, `0.4.0` the nesting and size limits, `0.5.0` the transport standard and stream versions. Use the same version for the server that writes your streams: older parsers reject newer components.
+`0.2.0` was the first release to include the Swift package (the `v0.1.0` tag predates it); `0.3.0` added the charts, `0.4.0` the nesting and size limits, `0.5.0` the transport standard and stream versions, `0.6.0` the token setting and idempotency keys for real actions. Use the same version for the server that writes your streams: older parsers reject newer components.
 
 ## Usage
 

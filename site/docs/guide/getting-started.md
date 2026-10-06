@@ -64,7 +64,7 @@ With a server that implements `POST /api/generate` and `POST /api/mutate`, two h
 
 ## iPhone, iPad and Mac (SwiftUI)
 
-Add `https://github.com/jdsouza1/omni-ir` with Swift Package Manager (from `0.5.0`) and use `OmniIRSwiftUI`:
+Add `https://github.com/jdsouza1/omni-ir` with Swift Package Manager (from `0.6.0`) and use `OmniIRSwiftUI`:
 
 ```swift
 let store = OmniStore(tools: tools)

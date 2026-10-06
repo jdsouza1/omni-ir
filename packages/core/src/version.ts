@@ -1,6 +1,6 @@
 // The Omni-IR version this package implements. Kept equal to package.json by a test
 // (tests/version.test.ts); conformance/schema.json and the Swift and Kotlin constants follow it.
-export const OMNI_IR_VERSION = "0.5.0";
+export const OMNI_IR_VERSION = "0.6.0";
 
 /** "MAJOR.MINOR" of a version such as "0.5.0": what a version marker ([3.9]) and a request ([10.1]) carry. */
 export function majorMinor(version: string = OMNI_IR_VERSION): string {

@@ -3,7 +3,7 @@
 package dev.omniir.core
 
 /** The Omni-IR version this catalog describes. */
-public const val OMNI_IR_VERSION: String = "0.5.0"
+public const val OMNI_IR_VERSION: String = "0.6.0"
 
 /** The components in the Trusted Catalog. */
 public enum class ComponentType(public val wireName: String) {

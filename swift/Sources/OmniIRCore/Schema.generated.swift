@@ -2,7 +2,7 @@
 // The single authority is packages/core/src/schema.ts (TypeScript), exported with `npm run schema:export`.
 
 /// The Omni-IR version this catalog describes.
-public let omniIRVersion = "0.5.0"
+public let omniIRVersion = "0.6.0"
 
 /// The components in the Trusted Catalog.
 public enum ComponentType: String, Sendable, CaseIterable, Hashable {
