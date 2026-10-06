@@ -92,8 +92,10 @@ enum Format {
     let filled: Int
     /// The value as shown, with at most two decimals.
     let shown: String
-    /// What assistive technology reads: "Rated 4.96 out of 5".
-    var label: String { "Rated \(shown) out of \(max)" }
+    /// What assistive technology reads, in the app's words: "Rated 4.96 out of 5" in English.
+    func label(_ template: String = OmniStrings.english.rating) -> String {
+      fillTemplate(template, ["value": shown, "max": String(max)])
+    }
   }
 
   static func rating(_ value: Primitive?, max: Int?, locale: Locale) -> RatingModel {

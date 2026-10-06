@@ -13,6 +13,7 @@ private let cardFill = Color(nsColor: .controlBackgroundColor)
 #endif
 
 struct NodeView: View {
+  @Environment(\.omniStrings) private var strings
   let node: OmniNode
   let context: RenderContext
   @Environment(\.locale) private var locale
@@ -161,7 +162,7 @@ struct NodeView: View {
       if !fromUser { Spacer(minLength: 48) }
     }
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel(Text(verbatim: "\(fromUser ? "You" : "Assistant"): \(body)"))
+    .accessibilityLabel(Text(verbatim: "\(fromUser ? strings.user : strings.assistant): \(body)"))
   }
 
   /// A TableRow is drawn by its Table, cell by cell in the table's grid. This is only reached for a
@@ -239,7 +240,7 @@ struct NodeView: View {
       Text(verbatim: model.shown).font(.subheadline.weight(.semibold))
     }
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel(Text(verbatim: model.label))
+    .accessibilityLabel(Text(verbatim: model.label(strings.rating)))
   }
 
   private var listItem: some View {
@@ -306,6 +307,7 @@ struct InputField: View {
 
 /// A DateInput edits a `$key` holding "YYYY-MM-DD" (or "" for no date), shown as that day in every time zone.
 struct DateField: View {
+  @Environment(\.omniStrings) private var strings
   let node: OmniNode
   let store: OmniStore
 
@@ -335,11 +337,13 @@ struct DateField: View {
         .environment(\.calendar, Format.utcCalendar)
       } else {
         // No date yet: SwiftUI's date picker always holds a date, so it appears once one is chosen.
-        Button("Choose a date") {
+        Button {
           var start = Format.utcDay(Format.isoDay(Date())) ?? Date()
           if let lower, start < lower { start = lower }
           if let upper, start > upper { start = upper }
           store.setState(key, .text(Format.isoDay(start)))
+        } label: {
+          Text(verbatim: strings.chooseDate)
         }
         .buttonStyle(.bordered)
         .accessibilityLabel(Text(verbatim: "\(label): choose a date"))
@@ -436,6 +440,7 @@ struct TableView: View {
 /// Tabs: a segmented picker of the Tabs' labels, then the open Tab. The first Tab is open until the
 /// viewer picks another; which one is open is the viewer's choice, never `$state`.
 struct TabsView: View {
+  @Environment(\.omniStrings) private var strings
   let node: OmniNode
   let store: OmniStore
   @State private var picked: String?
@@ -449,7 +454,7 @@ struct TabsView: View {
           Text(verbatim: labels.indices.contains(index) ? labels[index] ?? "…" : "…").tag(id)
         }
       } label: {
-        Text("Sections")
+        Text(verbatim: strings.sections)
       }
       .labelsHidden()
       .pickerStyle(.segmented)
@@ -463,6 +468,7 @@ struct TabsView: View {
 /// A Button. With an action it stays disabled until an McpMutation approves it, and a press goes
 /// through the store's checks before the app's handler runs (R6).
 struct GovernedButton: View {
+  @Environment(\.omniStrings) private var strings
   let node: OmniNode
   let context: RenderContext
 
@@ -471,7 +477,8 @@ struct GovernedButton: View {
     let label = store.text(node.props["label"])
     let governance = isMutating(node) ? store.governance(for: node.id) : .ready(tool: "")
     let error: String? = switch governance {
-    case .notPermitted(let message), .blocked(_, let message): message
+    // The person sees a plain sentence; the detail goes to the app's onEvent.
+    case .notPermitted, .blocked: strings.blocked
     default: nil
     }
     let enabled = if case .ready = governance { !store.isRunning(node.id) } else { false }

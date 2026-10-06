@@ -1,3 +1,4 @@
+import type { OmniStrings } from "./strings.js";
 import type { ComponentType as ReactComponentType, ReactNode } from "react";
 import type { ComponentProps, ComponentType, Primitive, StateRef } from "@omni-ir/core";
 
@@ -53,6 +54,8 @@ export type CatalogProps<K extends ComponentType> = {
   props: ResolvedProps<K>;
   children: ReactNode;
   locale: string;
+  /** The renderer's own words (strings.ts): the app's, or English. */
+  strings: OmniStrings;
 } & (K extends keyof InteractionProps ? InteractionProps[K] : unknown);
 
 /**

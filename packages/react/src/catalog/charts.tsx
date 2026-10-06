@@ -230,7 +230,7 @@ export function LineChart(p: CatalogProps<"LineChart">) {
   return <XYChart {...(p as CatalogProps<"BarChart">)} kind="line" />;
 }
 
-export function PieChart({ id, props, slices, children, locale }: CatalogProps<"PieChart">) {
+export function PieChart({ id, props, slices, children, locale, strings }: CatalogProps<"PieChart">) {
   const [active, setActive] = useState<string>("");
   const arrived = slices.flatMap((s, i) => (s ? [{ ...s, index: i }] : []));
   const total = arrived.reduce((sum, s) => sum + s.value, 0);
@@ -272,7 +272,7 @@ export function PieChart({ id, props, slices, children, locale }: CatalogProps<"
       }
       readout={active}
       table={
-        <DataTable title={props.title} headings={["", "Value"]}>
+        <DataTable title={props.title} headings={["", strings.value]}>
           {children}
         </DataTable>
       }

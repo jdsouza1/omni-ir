@@ -137,10 +137,10 @@ class FormatTest {
 
   @Test
   fun `ratings are kept within 0 to max and read as Rated x out of max`() {
-    assertEquals("Rated 4.96 out of 5", Format.rating(Primitive.Number(4.96), null, us).label)
+    assertEquals("Rated 4.96 out of 5", Format.rating(Primitive.Number(4.96), null, us).label())
     assertEquals(5, Format.rating(Primitive.Number(4.96), null, us).filled)
-    assertEquals("Rated 5 out of 5", Format.rating(Primitive.Number(9.0), null, us).label)
-    assertEquals("Rated 0 out of 10", Format.rating(Primitive.Number(-2.0), 10, us).label)
+    assertEquals("Rated 5 out of 5", Format.rating(Primitive.Number(9.0), null, us).label())
+    assertEquals("Rated 0 out of 10", Format.rating(Primitive.Number(-2.0), 10, us).label())
     assertEquals(3.5, Format.rating(Primitive.Text("3.5"), null, us).value)
     assertEquals(0.0, Format.rating(Primitive.Text("lots"), null, us).value)
   }

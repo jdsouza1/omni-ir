@@ -185,10 +185,10 @@ struct OmniStoreTests {
   @Test("ratings are kept within 0…max and read as \"Rated x out of max\"")
   func ratings() {
     let us = Locale(identifier: "en_US")
-    #expect(Format.rating(.number(4.96), max: nil, locale: us).label == "Rated 4.96 out of 5")
+    #expect(Format.rating(.number(4.96), max: nil, locale: us).label() == "Rated 4.96 out of 5")
     #expect(Format.rating(.number(4.96), max: nil, locale: us).filled == 5)
-    #expect(Format.rating(.number(9), max: nil, locale: us).label == "Rated 5 out of 5")
-    #expect(Format.rating(.number(-2), max: 10, locale: us).label == "Rated 0 out of 10")
+    #expect(Format.rating(.number(9), max: nil, locale: us).label() == "Rated 5 out of 5")
+    #expect(Format.rating(.number(-2), max: 10, locale: us).label() == "Rated 0 out of 10")
     #expect(Format.rating(.text("3.5"), max: nil, locale: us).value == 3.5)
     #expect(Format.rating(.text("lots"), max: nil, locale: us).value == 0)
   }

@@ -92,9 +92,9 @@ Work on branch `wip/themes`. Each part starts with failing tests (constraint 4).
 - [x] C.1 The fixed colours from the shared defaults (version notice, charts)
 
 **D. The renderer's own words** *(tests first)*
-- [ ] D.1 One English table per platform, the same keys (a test checks); apps replace words (`strings`, `.omniStrings`, `strings =`), English fallback
-- [ ] D.2 Plain text everywhere, one-pass placeholders, no format functions; hostile-string tests on all three platforms
-- [ ] D.3 Blocked actions show the plain sentence; details to `onEvent` only
+- [x] D.1 One English table per platform, the same keys (a test checks); apps replace words (`strings`, `.omniStrings`, `strings =`), English fallback
+- [x] D.2 Plain text everywhere, one-pass placeholders, no format functions; hostile-string tests on all three platforms
+- [x] D.3 Blocked actions show the plain sentence; details to `onEvent` only
 
 **E. Spec and docs**
 - [ ] E.1 SPEC.md sections 8 and 11; a "Themes and wording" guide; CHANGELOG

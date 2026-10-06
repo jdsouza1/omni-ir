@@ -243,12 +243,14 @@ private fun BadgeView(props: Props) {
 
 @Composable
 private fun MessageView(props: Props) {
+  val strings = LocalOmniStrings.current
   val fromUser = props.option("from") == "user"
+  val sender = if (fromUser) strings.user else strings.assistant
   val body = props.text("text")
   val shape = if (fromUser) RoundedCornerShape(16.dp, 16.dp, 4.dp, 16.dp) else RoundedCornerShape(16.dp, 16.dp, 16.dp, 4.dp)
   Box(
     contentAlignment = if (fromUser) Alignment.CenterEnd else Alignment.CenterStart,
-    modifier = Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = "${if (fromUser) "You" else "Assistant"}: $body" },
+    modifier = Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = "$sender: $body" },
   ) {
     Box(Modifier.fillMaxWidth(0.85f), contentAlignment = if (fromUser) Alignment.CenterEnd else Alignment.CenterStart) {
       Surface(
@@ -291,10 +293,11 @@ private fun ImageView(props: Props, context: RenderContext) {
 @Composable
 private fun RatingView(props: Props) {
   val model = Format.rating(props.resolved("value"), props.number("max")?.toInt(), locale())
+  val label = model.label(LocalOmniStrings.current.rating)
   Row(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(6.dp),
-    modifier = Modifier.clearAndSetSemantics { contentDescription = model.label },
+    modifier = Modifier.clearAndSetSemantics { contentDescription = label },
   ) {
     Text(
       "★".repeat(model.filled),
@@ -353,6 +356,7 @@ private fun InputView(props: Props) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateInputView(props: Props) {
+  val strings = LocalOmniStrings.current
   val label = props.text("label")
   val day = Format.day(props.stateText())
   val shown = day?.let { Format.text(Primitive.Text(it.toString()), "date", null, locale()) }
@@ -362,7 +366,7 @@ private fun DateInputView(props: Props) {
   Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
     Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
     FilledTonalButton(onClick = { open = true }, modifier = Modifier.semantics { contentDescription = "$label: ${shown ?: "choose a date"}" }) {
-      Text(shown ?: "Choose a date")
+      Text(shown ?: strings.chooseDate)
     }
   }
   if (open) {
@@ -381,9 +385,9 @@ private fun DateInputView(props: Props) {
         TextButton(onClick = {
           state.selectedDateMillis?.let { props.setState(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate().toString()) }
           open = false
-        }) { Text("OK") }
+        }) { Text(strings.ok) }
       },
-      dismissButton = { TextButton(onClick = { open = false }) { Text("Cancel") } },
+      dismissButton = { TextButton(onClick = { open = false }) { Text(strings.cancel) } },
     ) { DatePicker(state) }
   }
 }
@@ -565,8 +569,9 @@ private fun utcMillis(day: LocalDate): Long = day.atStartOfDay(ZoneOffset.UTC).t
 private fun ButtonView(node: OmniNode, props: Props, context: RenderContext) {
   val governance = if (isMutating(node)) context.store.governance(node.id, context.document, context.actions) else Governance.Ready("")
   val error = when (governance) {
-    is Governance.NotPermitted -> governance.message
-    is Governance.Blocked -> governance.message
+    // The person sees a plain sentence; the detail goes to the app's onEvent.
+    is Governance.NotPermitted -> LocalOmniStrings.current.blocked
+    is Governance.Blocked -> LocalOmniStrings.current.blocked
     else -> null
   }
   val enabled = governance is Governance.Ready && node.id !in context.actions.running
