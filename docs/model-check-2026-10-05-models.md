@@ -2,7 +2,7 @@
 
 Does Omni-IR work with models other than Claude, from the system prompt alone? The same 19 requests as the earlier checks (the first nine, the five Step 10 requests and the five chart requests) were sent to three models, each in a fresh chat: first message the system prompt from `buildSystemPrompt()`, then one request per message. Every reply was checked with the real parser, tool registry and picture registry.
 
-**Where the models were reached:** ask-chat.ai, a paid reseller that offers many models in one app (the owner's subscription; no API calls from this project). It is not affiliated with the model providers, and it adds instructions of its own: two GPT replies pointed users to the reseller's support address, which is not in our prompt. Results are labelled "via ask-chat.ai, model as named by the site". The three models made clearly different mistakes, which suggests three different models, but this doesn't prove the exact versions. Claims on the website will be confirmed on the providers' own apps first.
+**Where the models were reached:** ask-chat.ai, a paid reseller (confirmed for Gemini on the official app: see the last section) that offers many models in one app (the owner's subscription; no API calls from this project). It is not affiliated with the model providers, and it adds instructions of its own: two GPT replies pointed users to the reseller's support address, which is not in our prompt. Results are labelled "via ask-chat.ai, model as named by the site". The three models made clearly different mistakes, which suggests three different models, but this doesn't prove the exact versions. Claims on the website will be confirmed on the providers' own apps first.
 
 ## Run 1: the original prompt, all 19 requests
 
@@ -46,3 +46,25 @@ All probes passed again. Two notes from run 2:
 With the fixed prompt, all three models write valid Omni-IR for nearly every request, and none of them broke the governance rules in any run: no invented tools, no markup, no styling. The cross-model check was worth it: it found two documentation problems that Claude had never tripped on.
 
 Replies: `review/models/*.json` (not committed: local review files). Scoring: the real parser via `review/models/score.ts`.
+
+## Confirmation on the official Gemini app (2026-10-06)
+
+Was the reseller really reaching Gemini? Five of the same requests, with the same original prompt (before the fixes), were sent to Gemini 3.1 Pro in the official app (gemini.google.com, the owner's account; no API cost). Every reply was checked with the real parser.
+
+| Request | Reseller "Gemini 3.1 Pro" | Official Gemini 3.1 Pro |
+|---|---|---|
+| Booking screen | ❌ `Image("cabin-pines", "Lakeside cabin", …)` | ✅ `Image("cabin-pines", alt="Lakeside cabin in the woods", …)` |
+| Video player (not in the catalog) | ❌ the same slip | ✅ correct |
+| Shopping bag | ✅ | ✅ |
+| Delete-account probe | ✅ left unwired | ✅ left unwired, "This action isn't available here." |
+| Red, animated chart with tooltips | ✅ plain chart | ✅ plain chart (the manager names moved into the labels) |
+
+**The official app: 5 of 5 valid.**
+
+**The reseller did reach Gemini.** The two versions made the same unusual choices independently: on the shopping bag, the same invented prices ($45.00 and $25.00), the identical note `"Linen shirt and canvas tote"`, the same ids (`totalStack`, `totalLabel`, `totalAmount`) and title; on the video player, the cabin picture as a thumbnail with the alt text "Video thumbnail" and a note that playback isn't available.
+
+**But the reseller's Gemini behaved like a lighter setting.** The official app thought for one to two minutes per reply, the reseller's version answered in 5 to 17 seconds, and only the reseller's version wrote alt text without `alt=`. The reseller publishes no model settings (thinking level, instructions), so this is measured, not documented. Either way, the reseller numbers are, if anything, the more pessimistic ones, and the prompt fixes removed the slip there too.
+
+The Gemini app itself twice failed with "Sorry, something went wrong" on a long chat; a fresh chat answered everything.
+
+Replies: `review/models/gemini-official-v1.json` (local review files).
