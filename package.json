@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit",
     "test": "npm run guard && vitest run",
     "test:fuzz": "vitest run tests/fuzz.test.ts",
+    "perf": "tsx scripts/perf.ts",
     "test:watch": "vitest",
     "guard": "node scripts/guard.mjs",
     "demo": "tsx scripts/demo.tsx",

@@ -85,9 +85,9 @@ Omni-IR's security doesn't depend on a model resisting jailbreaks: the spec trea
 - [x] B.5 Adversarial boundary tests: tool-name spoofing at all three layers; a hostile-output corpus run through all three parsers; coordinated multi-input attacks end to end; the unsafe model replies from the model check kept as cases
 
 **C. Performance** *(tests first)*
-- [ ] C.1 Measurements at 50 to 5,000 components on all three platforms, written up
-- [ ] C.2 Incremental checks if needed, with the corpus and conformance proving nothing changed
-- [ ] C.3 Performance budgets in CI
+- [x] C.1 Measurements at 50 to 5,000 components on all three platforms, written up
+- [x] C.2 Incremental checks if needed, with the corpus and conformance proving nothing changed
+- [x] C.3 Performance budgets in CI
 
 **D. Screen size limit** *(only if you approve question 4)*
 - [ ] D.1 Failing tests, then the limit in the schema, SPEC.md rule and issue code, conformance cases, and the Swift and Kotlin parsers
@@ -98,6 +98,16 @@ Omni-IR's security doesn't depend on a model resisting jailbreaks: the spec trea
 - [ ] E.3 `v0.4.0` release if anything changed in the packages: a separate go-ahead from you
 
 **Progress (2026-10-05):** A done via ask-chat.ai: [docs/model-check-2026-10-05-models.md](docs/model-check-2026-10-05-models.md). Run 1 (original prompt): Gemini 3.1 Pro 17/19, GPT-6.1 Sol 11/19, Llama 4 Maverick 14/19, every safety probe passed. Two prompt problems found and fixed (signatures now show named props, `Image(asset, alt=…, [ratio=…])`; the McpMutation is never a child). Run 2 (fixed prompt, earlier failures plus probes): 6/6, 12/12, 6/8. Still to do for A: a short confirmation on the providers' own apps before any claim goes on the website.
+
+**Progress (C, 2026-10-05):** measured, fixed and budgeted on all three platforms.
+
+| Components | TypeScript before | TypeScript after | Kotlin after | Swift OmniStore before / after (debug build) |
+|---|---|---|---|---|
+| 1,000 | 389 ms | 32 ms | 11 ms | 66 ms after |
+| 5,000 | 9.6 s | 111 ms | 34 ms | 285 ms after |
+| 20,000 | 57.8 s | 434 ms | 132 ms | 13.7 s / 0.93 s |
+
+Two causes, both quadratic: every line re-ran the whole-document check, and the stores copied the document's maps on every line (Swift through copy-on-write while `OmniStore` kept its own copy). Fixed with `DocumentIndex` in all three parsers (equivalence tests against `validateDocument` on every line of the corpus) and stores that grow in place. React rendering of a stream is still somewhat superlinear, because each line wakes every mounted component's selector: 200, 1,000 and 2,000 components take 0.13, 0.6 and 1.7 s in jsdom. Acceptable at real sizes, and bounded by D. Budgets: 20,000 components parse in under 5 s on every platform; 1,000 stream and render in under 10 s in jsdom.
 
 ## What I need from you
 

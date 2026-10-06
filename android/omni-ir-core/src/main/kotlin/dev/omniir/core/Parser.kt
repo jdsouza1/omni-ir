@@ -43,7 +43,14 @@ public class OmniParser(
   private val reported = mutableListOf<Issue>()
   private val buffer = LineBuffer(maxLineLength)
   private val accepted = mutableListOf<Statement>()
+  private val index = DocumentIndex()
   private val lineOf = mutableMapOf<String, Int>()
+
+  // Owned by the parser and shared by its documents (see OmniDocument).
+  private val nodes = LinkedHashMap<String, OmniNode>()
+  private val mutations = LinkedHashMap<String, Mutation>()
+  private var state = LinkedHashMap<String, Primitive>()
+  private val pending = LinkedHashSet<String>()
   private var endIssues: List<Issue>? = null
 
   /** Write text as it arrives; it may end anywhere, even in the middle of a line. Ignored after `end()`. */
@@ -70,7 +77,9 @@ public class OmniParser(
       if (line != null) issue.copy(line = line) else issue
     }
     endIssues = found
-    document = document.finished()
+    if (!document.complete) {
+      document = document.copy(missing = pending.toSet(), pending = emptySet(), complete = true, revision = document.revision + 1)
+    }
     onChange?.invoke(document)
     for (issue in found) {
       reported += issue
@@ -84,7 +93,9 @@ public class OmniParser(
   public fun setState(key: String, value: Primitive) {
     val current = document.state[key] ?: return
     if (current == value) return
-    document = document.copy(state = document.state + (key to value))
+    // An edit gets a new state map, so a reader holding the old one sees the change.
+    state = LinkedHashMap(state).apply { put(key, value) }
+    document = document.copy(state = state, revision = document.revision + 1)
     onChange?.invoke(document)
   }
 
@@ -114,13 +125,14 @@ public class OmniParser(
               is StatementResult.Failed -> reject(listOf(result.issue), line)
               is StatementResult.Ok -> {
                 // The accepted statements are always consistent, so any new issue is caused by this line.
-                val conflicts = validateDocument(accepted + result.statement, complete = false)
+                // The index checks only what the line touches, so a long stream stays linear.
+                val conflicts = index.check(result.statement)
                 if (conflicts.isNotEmpty()) return reject(conflicts, line)
                 accepted += result.statement
+                index.add(result.statement)
                 val id = result.statement.definedId
                 lineOf[id] = line
-                val (next, pending, resolved) = document.applied(result.statement)
-                document = next
+                val (pending, resolved) = apply(result.statement)
                 onChange?.invoke(document)
                 onEvent?.invoke(ParserEvent.Node(id, line))
                 resolved.forEach { onEvent?.invoke(ParserEvent.Resolved(it, line)) }
@@ -132,42 +144,35 @@ public class OmniParser(
       }
     }
   }
+
+  /** Add an accepted statement to the document; returns the references it left pending and the ones it resolved. */
+  private fun apply(statement: Statement): Pair<List<String>, List<String>> {
+    val newlyPending = mutableListOf<String>()
+    val resolved = mutableListOf<String>()
+    fun define(id: String) {
+      if (pending.remove(id)) resolved += id
+    }
+    val refs: List<String> = when (statement) {
+      is Statement.State -> {
+        state[statement.key] = statement.value
+        define(statement.key)
+        emptyList()
+      }
+      is Statement.Node -> {
+        nodes[statement.node.id] = statement.node
+        define(statement.node.id)
+        statement.node.children + stateKeys(statement.node.props)
+      }
+      is Statement.MutationStatement -> {
+        mutations[statement.mutation.target] = statement.mutation
+        stateKeys(statement.mutation.params)
+      }
+    }
+    for (ref in refs) {
+      val known = if (ref.startsWith("$")) ref in state else ref in nodes
+      if (!known && pending.add(ref)) newlyPending += ref
+    }
+    document = document.copy(nodes = nodes, mutations = mutations, state = state, pending = pending, revision = document.revision + 1)
+    return newlyPending to resolved
+  }
 }
-
-/** The document with an accepted statement added, plus the references it left pending and the ones it resolved. */
-internal fun OmniDocument.applied(statement: Statement): Triple<OmniDocument, List<String>, List<String>> {
-  val pending = pending.toMutableSet()
-  val newlyPending = mutableListOf<String>()
-  val resolved = mutableListOf<String>()
-  fun define(id: String) {
-    if (pending.remove(id)) resolved += id
-  }
-
-  var nodes = nodes
-  var mutations = mutations
-  var state = state
-  val refs: List<String> = when (statement) {
-    is Statement.State -> {
-      state = state + (statement.key to statement.value)
-      define(statement.key)
-      emptyList()
-    }
-    is Statement.Node -> {
-      nodes = nodes + (statement.node.id to statement.node)
-      define(statement.node.id)
-      statement.node.children + stateKeys(statement.node.props)
-    }
-    is Statement.MutationStatement -> {
-      mutations = mutations + (statement.mutation.target to statement.mutation)
-      stateKeys(statement.mutation.params)
-    }
-  }
-  for (ref in refs) {
-    val known = if (ref.startsWith("$")) ref in state else ref in nodes
-    if (!known && pending.add(ref)) newlyPending += ref
-  }
-  return Triple(copy(nodes = nodes, mutations = mutations, state = state, pending = pending), newlyPending, resolved)
-}
-
-/** End of stream: every still-pending reference becomes missing. */
-internal fun OmniDocument.finished(): OmniDocument = if (complete) this else copy(missing = pending, pending = emptySet(), complete = true)

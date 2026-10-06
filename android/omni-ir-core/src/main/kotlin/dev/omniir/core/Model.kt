@@ -70,7 +70,12 @@ public data class Mutation(
   public val params: Map<String, PropValue>,
 )
 
-/** Everything accepted so far. Immutable: each change produces a new document. */
+/**
+ * Everything accepted so far. Each change produces a new document with a higher [revision]. While a
+ * stream arrives, documents share the parser's maps, which grow in place: copying them on every line
+ * made long streams quadratic (PLAN-HARDENING.md C.2). Read the newest document; copy a map if you
+ * need it frozen.
+ */
 public data class OmniDocument(
   /** Components by id. */
   public val nodes: Map<String, OmniNode> = emptyMap(),
@@ -83,6 +88,8 @@ public data class OmniDocument(
   /** After the end of the stream: references that never arrived. */
   public val missing: Set<String> = emptySet(),
   public val complete: Boolean = false,
+  /** Increases with every change, so two documents from different moments never compare equal. */
+  public val revision: Long = 0,
 )
 
 /** One backend action the UI may trigger, with a check for its params. */

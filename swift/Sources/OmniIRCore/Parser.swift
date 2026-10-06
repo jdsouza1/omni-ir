@@ -30,6 +30,7 @@ public final class OmniParser {
 
   private var buffer: LineBuffer
   private var accepted: [Statement] = []
+  private var index = DocumentIndex()
   private var lineOf: [String: Int] = [:]
   private var endIssues: [Issue]?
 
@@ -109,9 +110,11 @@ public final class OmniParser {
           reject([issue], line: line)
         case .ok(let statement):
           // The accepted statements are always consistent, so any new issue is caused by this line.
-          let conflicts = validateDocument(accepted + [statement], complete: false)
+          // The index checks only what the line touches, so a long stream stays linear.
+          let conflicts = index.check(statement)
           if !conflicts.isEmpty { return reject(conflicts, line: line) }
           accepted.append(statement)
+          index.add(statement)
           let id = statement.definedId
           lineOf[id] = line
           let (pending, resolved) = document.apply(statement)
