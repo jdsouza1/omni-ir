@@ -150,7 +150,7 @@ Work on branch `wip/backend`. Each part starts with failing tests (constraint 4)
 - [x] F.1 The in-browser API with the in-memory store and a labelled pretend visitor
 
 **G. Docs and review** *(checkpoint: you review)*
-- [ ] G.1 SPEC.md section 9; a "Running real actions" guide; CHANGELOG; the roadmap renumbered (themes 16, app-defined components 17, live screens 18)
+- [x] G.1 SPEC.md section 9; a "Running real actions" guide; CHANGELOG; the roadmap renumbered (themes 16, app-defined components 17, live screens 18)
 - [ ] G.2 A review page: the attack tests and their results, a signed-in run end to end
 - [ ] G.3 Merge with your approval
 - [ ] G.4 `v0.6.0` release: a separate go-ahead from you

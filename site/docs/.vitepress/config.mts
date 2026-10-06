@@ -37,6 +37,7 @@ export default withMermaid(
             { text: "Android", link: "/guide/android" },
             { text: "Servers and transports", link: "/guide/transport" },
             { text: "Use with AG-UI", link: "/guide/ag-ui" },
+            { text: "Running real actions", link: "/guide/actions" },
           ],
         },
         {
