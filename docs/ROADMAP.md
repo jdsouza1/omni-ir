@@ -50,18 +50,18 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval.
 
-1. **Real backend tool handlers with authorization and persistence**, in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 14, since both concern the server side. Comes with security work that only makes sense once real data is involved:
+1. **Step 15 · Real backend tool handlers with authorization and persistence** (plan approved 2026-10-06: [PLAN-BACKEND.md](../PLAN-BACKEND.md)), in place of the stubs: checking that the signed-in user may perform each action, not only that its params are valid. Follows Step 14, since both concern the server side. Comes with security work that only makes sense once real data is involved:
    - [ ] Personal-data exposure checks: a handler never returns another user's data, and nothing personal leaks between sessions
    - [ ] Optional automated LLM red teaming with Promptfoo (OWASP LLM Top 10, attacker models generating jailbreaks and indirect injections, run against each supported model). It calls paid model APIs, so only as a capped manual run with the owner's go-ahead, never in CI
    - [ ] A human red team for chained attacks before real handlers go live, with the owner's go-ahead (an outside hire)
-2. **Step 15 · Themes and languages.**
+2. **Step 16 · Themes and languages.**
    - [ ] A design-token layer: brand colours, fonts and corner radius set by the app, never by the model, on web, iOS and Android
    - [ ] A dark theme for the web catalog (it is light-only today)
    - [ ] The renderers' own text ("Choose a date", "Component failed to load") translated, following the platform's locale
-3. **Step 16 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+3. **Step 17 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
    - [ ] Pictures looked up by the app when the screen is drawn (for example `product-123`), for shops and user pictures that can't all be registered in advance; the model still never writes a URL
    - [ ] Keep the system prompt small as the catalog grows: send only the components a request is likely to need, and measure the cost and the time to the first line
-4. **Step 17 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
+4. **Step 18 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
 
 ## Later
 
