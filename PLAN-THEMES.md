@@ -80,13 +80,13 @@ Work on branch `wip/themes`. Each part starts with failing tests (constraint 4).
 
 **A. Tokens** *(tests first)*
 - [ ] A.1 The token list with light and dark defaults; `conformance/theme.json` exported and checked for staleness; generated into Swift and Kotlin
-- [ ] A.2 Contrast tests for every pair, light and dark
+- [x] A.2 Contrast tests for every pair, light and dark
 
 **B. Web** *(tests first)*
-- [ ] B.1 `omni.css` on CSS variables, light values identical to today's look
-- [ ] B.2 Dark values, `theme="light" | "dark" | "system"` on `OmniRenderer`, dark chart colours
-- [ ] B.3 Direction-neutral CSS
-- [ ] B.4 The playground's preview follows its theme
+- [x] B.1 `omni.css` on CSS variables, light values identical to today's look
+- [x] B.2 Dark values, `theme="light" | "dark" | "system"` on `OmniRenderer`, dark chart colours
+- [x] B.3 Direction-neutral CSS
+- [x] B.4 The playground's preview follows its theme
 
 **C. iOS and Android**
 - [ ] C.1 The fixed colours from the shared defaults (version notice, charts)

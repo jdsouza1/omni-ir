@@ -10,7 +10,9 @@ import type { CatalogProps, ChartFormatProps } from "./types.js";
  * (adjacent pairs). Some fall below 3:1 against white, so charts always show values as text too:
  * the legend, the readout and the data table.
  */
-export const CHART_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"] as const;
+// The chart colours are design tokens (theme.ts): CSS variables, so the light and dark themes and an
+// app's own brand apply. SVG attributes can't hold var(), so marks set them through `style`.
+export const CHART_COLORS = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => `var(--omni-chart${n})`);
 /** Line charts also tell series apart by dash pattern, so colour is never the only cue. */
 const DASHES = ["", "6 4", "2 3", "10 3 2 3", "1 4", "12 4"] as const;
 
@@ -82,7 +84,7 @@ function Legend({ items }: { items: { key: string; name: string; color: string; 
       {items.map((item) => (
         <li key={item.key}>
           <svg width="18" height="10" aria-hidden="true">
-            <line x1="1" y1="5" x2="17" y2="5" stroke={item.color} strokeWidth="3" strokeLinecap="round" strokeDasharray={item.dash || undefined} />
+            <line x1="1" y1="5" x2="17" y2="5" style={{ stroke: item.color }} strokeWidth="3" strokeLinecap="round" strokeDasharray={item.dash || undefined} />
           </svg>
           {item.name}
           {item.note !== undefined && <span className="omni-chart__share">{item.note}</span>}
@@ -140,7 +142,7 @@ function XYChart({ kind, id, props, series, children, locale }: CatalogProps<"Ba
             width={barW}
             height={height}
             rx={Math.min(3, barW / 2)}
-            fill={CHART_COLORS[s.index % CHART_COLORS.length]}
+            style={{ fill: CHART_COLORS[s.index % CHART_COLORS.length] }}
             tabIndex={0}
             onMouseEnter={() => show(props.labels[li] ?? "", s.name, v)}
             onFocus={() => show(props.labels[li] ?? "", s.name, v)}
@@ -153,7 +155,7 @@ function XYChart({ kind, id, props, series, children, locale }: CatalogProps<"Ba
     arrived.forEach((s) => {
       const color = CHART_COLORS[s.index % CHART_COLORS.length];
       const points = s.values.map((v, li) => `${xCenter(li)},${y(v)}`).join(" ");
-      marks.push(<polyline key={`${s.id}-line`} points={points} fill="none" stroke={color} strokeWidth="2" strokeDasharray={DASHES[s.index % DASHES.length] || undefined} strokeLinejoin="round" />);
+      marks.push(<polyline key={`${s.id}-line`} points={points} fill="none" style={{ stroke: color }} strokeWidth="2" strokeDasharray={DASHES[s.index % DASHES.length] || undefined} strokeLinejoin="round" />);
       s.values.forEach((v, li) =>
         marks.push(
           <circle
@@ -161,8 +163,7 @@ function XYChart({ kind, id, props, series, children, locale }: CatalogProps<"Ba
             cx={xCenter(li)}
             cy={y(v)}
             r="4"
-            fill={color}
-            stroke="#fff"
+            style={{ fill: color, stroke: "var(--omni-surface)" }}
             strokeWidth="2"
             tabIndex={0}
             onMouseEnter={() => show(props.labels[li] ?? "", s.name, v)}
@@ -244,7 +245,7 @@ export function PieChart({ id, props, slices, children, locale }: CatalogProps<"
     angle += sweep;
     const color = CHART_COLORS[s.index % CHART_COLORS.length];
     const describe = () => setActive(`${s.name}: ${formatValue(s.value, props, locale)} (${share(s.value)})`);
-    const common = { fill: color, stroke: "#fff", strokeWidth: 2, tabIndex: 0, onMouseEnter: describe, onFocus: describe, className: "omni-chart__mark" };
+    const common = { style: { fill: color, stroke: "var(--omni-surface)" }, strokeWidth: 2, tabIndex: 0, onMouseEnter: describe, onFocus: describe, className: "omni-chart__mark" };
     if (sweep >= Math.PI * 2 - 1e-9) return <circle key={s.id} cx={cx} cy={cy} r={r} {...common} />;
     if (sweep === 0) return null;
     const x1 = cx + r * Math.cos(start);

@@ -1,0 +1,216 @@
+{
+  "description": "Omni-IR design tokens: the colours, font and corner radius a renderer draws with, set by the app, never by the stream. Colours are #rrggbb.",
+  "tokens": [
+    "surface",
+    "text",
+    "mutedText",
+    "labelText",
+    "border",
+    "inputBorder",
+    "divider",
+    "subtle",
+    "placeholder",
+    "placeholderHighlight",
+    "accent",
+    "onAccent",
+    "accentSoft",
+    "success",
+    "successSoft",
+    "successText",
+    "warning",
+    "warningSoft",
+    "warningText",
+    "danger",
+    "dangerSoft",
+    "dangerText",
+    "chartAxis",
+    "chart1",
+    "chart2",
+    "chart3",
+    "chart4",
+    "chart5",
+    "chart6",
+    "chart7",
+    "chart8"
+  ],
+  "light": {
+    "surface": "#ffffff",
+    "text": "#1f2329",
+    "mutedText": "#5b616e",
+    "labelText": "#3c4048",
+    "border": "#d9dce1",
+    "inputBorder": "#868c97",
+    "divider": "#e3e5e8",
+    "subtle": "#eef0f3",
+    "placeholder": "#eceef1",
+    "placeholderHighlight": "#f6f7f9",
+    "accent": "#1f5eff",
+    "onAccent": "#ffffff",
+    "accentSoft": "#eef3ff",
+    "success": "#2e7d32",
+    "successSoft": "#e3f4e6",
+    "successText": "#1b5e20",
+    "warning": "#b7791f",
+    "warningSoft": "#fff4d6",
+    "warningText": "#7a5200",
+    "danger": "#c62828",
+    "dangerSoft": "#fde4e4",
+    "dangerText": "#8e1c1c",
+    "chartAxis": "#9aa0aa",
+    "chart1": "#2a78d6",
+    "chart2": "#eb6834",
+    "chart3": "#1baf7a",
+    "chart4": "#eda100",
+    "chart5": "#e87ba4",
+    "chart6": "#008300",
+    "chart7": "#4a3aa7",
+    "chart8": "#e34948"
+  },
+  "dark": {
+    "surface": "#1b2029",
+    "text": "#e6e8ec",
+    "mutedText": "#a3aab6",
+    "labelText": "#c7ccd4",
+    "border": "#343b47",
+    "inputBorder": "#737b89",
+    "divider": "#2c333e",
+    "subtle": "#262c36",
+    "placeholder": "#2a303a",
+    "placeholderHighlight": "#353c47",
+    "accent": "#7c9dff",
+    "onAccent": "#0d1428",
+    "accentSoft": "#1d2846",
+    "success": "#6fcf86",
+    "successSoft": "#18301f",
+    "successText": "#9fe0ae",
+    "warning": "#e5a93f",
+    "warningSoft": "#34290f",
+    "warningText": "#f2c770",
+    "danger": "#ff7b72",
+    "dangerSoft": "#3b1a1a",
+    "dangerText": "#ffa59e",
+    "chartAxis": "#6b7381",
+    "chart1": "#5b9cf0",
+    "chart2": "#f38a5e",
+    "chart3": "#3cc995",
+    "chart4": "#f0b429",
+    "chart5": "#f09bbd",
+    "chart6": "#3fae3f",
+    "chart7": "#9b8cf0",
+    "chart8": "#f07676"
+  },
+  "shape": {
+    "radius": 8,
+    "radiusUnit": "px"
+  },
+  "contrast": [
+    {
+      "foreground": "text",
+      "background": "surface",
+      "minimum": 4.5,
+      "what": "body text"
+    },
+    {
+      "foreground": "mutedText",
+      "background": "surface",
+      "minimum": 4.5,
+      "what": "muted text"
+    },
+    {
+      "foreground": "labelText",
+      "background": "surface",
+      "minimum": 4.5,
+      "what": "field labels and table headings"
+    },
+    {
+      "foreground": "text",
+      "background": "subtle",
+      "minimum": 4.5,
+      "what": "assistant messages"
+    },
+    {
+      "foreground": "mutedText",
+      "background": "placeholder",
+      "minimum": 4.5,
+      "what": "a missing picture's alt text"
+    },
+    {
+      "foreground": "onAccent",
+      "background": "accent",
+      "minimum": 4.5,
+      "what": "primary buttons and user messages"
+    },
+    {
+      "foreground": "onAccent",
+      "background": "danger",
+      "minimum": 4.5,
+      "what": "danger buttons"
+    },
+    {
+      "foreground": "danger",
+      "background": "surface",
+      "minimum": 4.5,
+      "what": "a blocked action's message"
+    },
+    {
+      "foreground": "text",
+      "background": "accentSoft",
+      "minimum": 4.5,
+      "what": "info notices"
+    },
+    {
+      "foreground": "text",
+      "background": "successSoft",
+      "minimum": 4.5,
+      "what": "success notices"
+    },
+    {
+      "foreground": "text",
+      "background": "warningSoft",
+      "minimum": 4.5,
+      "what": "warning notices"
+    },
+    {
+      "foreground": "text",
+      "background": "dangerSoft",
+      "minimum": 4.5,
+      "what": "danger notices"
+    },
+    {
+      "foreground": "successText",
+      "background": "successSoft",
+      "minimum": 4.5,
+      "what": "success badges"
+    },
+    {
+      "foreground": "warningText",
+      "background": "warningSoft",
+      "minimum": 4.5,
+      "what": "warning badges"
+    },
+    {
+      "foreground": "dangerText",
+      "background": "dangerSoft",
+      "minimum": 4.5,
+      "what": "danger badges"
+    },
+    {
+      "foreground": "inputBorder",
+      "background": "surface",
+      "minimum": 3,
+      "what": "the edges of fields and switches"
+    },
+    {
+      "foreground": "accent",
+      "background": "surface",
+      "minimum": 3,
+      "what": "focus rings, an open tab, a switch that is on"
+    },
+    {
+      "foreground": "warning",
+      "background": "surface",
+      "minimum": 3,
+      "what": "rating stars"
+    }
+  ]
+}

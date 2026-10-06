@@ -29,6 +29,11 @@ export interface OmniRendererProps {
   /** The app's image asset registry. Without it, Images show their alt text. */
   assets?: Readonly<Record<string, Picture>>;
   locale?: string;
+  /**
+   * Light (the default), dark, or the device's setting. The app chooses; the stream can't. Colours,
+   * font and radius come from the design tokens (`--omni-*` CSS variables), which the app may set.
+   */
+  theme?: "light" | "dark" | "system";
 }
 
 export function OmniRenderer({
@@ -39,6 +44,7 @@ export function OmniRenderer({
   catalog = DEFAULT_CATALOG,
   assets = NO_ASSETS,
   locale = "en-US",
+  theme = "light",
 }: OmniRendererProps) {
   const value = useMemo<OmniContextValue>(
     () => ({ store, tools, catalog, assets, locale, onMutation, report: (event) => onEvent?.(event) }),
@@ -46,7 +52,7 @@ export function OmniRenderer({
   );
   return (
     <OmniContext.Provider value={value}>
-      <div className="omni-root">
+      <div className="omni-root" data-theme={theme}>
         <VersionNotice />
         <NodeSlot id={ROOT_ID} />
       </div>

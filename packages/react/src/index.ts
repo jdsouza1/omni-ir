@@ -5,3 +5,4 @@ export { DEFAULT_CATALOG } from "./catalog/catalog.js";
 export type { Catalog, CatalogProps, InteractionProps, Picture, ResolvedProps } from "./catalog/types.js";
 export { generate, type GenerateClientOptions, type GenerateOutcome } from "./client/generate.js";
 export { createMutationHandler, MutationRejectedError, type MutationClientOptions } from "./client/mutate.js";
+export { COLOR_TOKENS, CONTRAST_PAIRS, DARK, LIGHT, SHAPE, contrast, cssVariable, type ColorToken, type Palette } from "./catalog/theme.js";

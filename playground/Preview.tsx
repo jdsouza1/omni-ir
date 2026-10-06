@@ -21,6 +21,12 @@ export interface PreviewProps {
 
 const HIGHLIGHT = "data-pg-highlight";
 
+/** The rendered screen follows the page: its explicit data-theme if it has one, otherwise the device's setting. */
+function pageTheme(): "light" | "dark" | "system" {
+  const chosen = typeof document === "undefined" ? undefined : document.documentElement.dataset.theme;
+  return chosen === "light" || chosen === "dark" ? chosen : "system";
+}
+
 export function Preview({ runId, store, onMutation, onEvent, highlightedId, onHighlight, revision }: PreviewProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -45,7 +51,7 @@ export function Preview({ runId, store, onMutation, onEvent, highlightedId, onHi
       onFocus={(e) => onHighlight(idAt(e.target))}
       onBlur={() => onHighlight(null)}
     >
-      <OmniRenderer key={runId} store={store} tools={TOOLS} assets={ASSETS} onMutation={onMutation} onEvent={onEvent} />
+      <OmniRenderer key={runId} store={store} tools={TOOLS} assets={ASSETS} onMutation={onMutation} onEvent={onEvent} theme={pageTheme()} />
     </div>
   );
 }
