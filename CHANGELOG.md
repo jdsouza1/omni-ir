@@ -2,6 +2,15 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+### Changed
+- **Negative zero is the number 0** ([4.9]): `-0`, `-0.0`, `-0e5` and underflow such as `-1e-400` are read as 0 by every parser, so no renderer shows "-0". Found by the new differential fuzz corpus, where the Kotlin parser kept -0. Conformance suite: 81 cases.
+- **System prompt:** component signatures now show which props must be named and which are optional (`Image(asset, alt=…, [ratio=…])`, also in SPEC.md); the McpMutation rule says the Button, not the mutation, goes in the layout; values have no expressions. Found by checking Gemini, GPT and Llama.
+
+### Added
+- **Fuzz testing:** fast-check properties for the TypeScript parser, and a differential corpus of 2,000 generated streams (`fuzz/corpus.json`) that the Swift and Kotlin parsers must parse exactly as TypeScript does.
+
 ## 0.3.0 (2026-10-05)
 
 ### Added

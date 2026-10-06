@@ -318,6 +318,23 @@
       }
     },
     {
+      "id": "numbers-negative-zero",
+      "rules": [
+        "4.9"
+      ],
+      "description": "Negative zero, in any spelling and from underflow, is the number 0.",
+      "input": "$a = -0\n$b = -0.0\n$c = -0e5\n$d = -1e-400\nroot = Text($a)\n",
+      "expect": {
+        "issues": [],
+        "state": {
+          "$a": 0,
+          "$b": 0,
+          "$c": 0,
+          "$d": 0
+        }
+      }
+    },
+    {
       "id": "numbers-invalid",
       "rules": [
         "4.9"

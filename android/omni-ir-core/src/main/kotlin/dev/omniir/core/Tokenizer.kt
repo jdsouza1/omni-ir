@@ -159,7 +159,9 @@ private fun tokenize(s: String, offset: Int, warnings: MutableList<Issue>): List
       isDigit(c) || c == '.' || c == '-' -> {
         val end = numberEnd(s, i) ?: throw LineError(IssueCode.SYNTAX, "unexpected \"$c\"", col(i))
         if (end < s.length && isIdentChar(s[end])) throw LineError(IssueCode.SYNTAX, "invalid number \"${s.substring(i, end + 1)}…\"", col(i))
-        tokens += Token.Num(s.substring(i, end).toDouble(), col(i))
+        // Negative zero ("-0", or underflow such as -1e-400) is the number 0 [4.9].
+        val value = s.substring(i, end).toDouble()
+        tokens += Token.Num(if (value == 0.0) 0.0 else value, col(i))
         i = end
       }
       isIdentStart(c) -> {

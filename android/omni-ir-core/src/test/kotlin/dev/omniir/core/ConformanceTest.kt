@@ -60,6 +60,10 @@ private fun loadCases(): List<Case> {
   }
 }
 
+/** The differential corpus (fuzz/corpus.json): generated streams with the TypeScript parser's results. */
+private fun loadCorpus(): List<Case> =
+  Json.parseToJsonElement(File(repoRoot, "fuzz/corpus.json").readText()).jsonObject.getValue("cases").jsonArray.map { Case(it.jsonObject) }
+
 private data class Canonical(
   val issues: Set<ExpectedIssue>,
   val nodes: Map<String, Any?>,
@@ -115,17 +119,26 @@ class ConformanceTest {
 
   @TestFactory
   fun `gives the expected result, the same for every chunking`(): List<DynamicTest> = loadCases().map { case ->
-    DynamicTest.dynamicTest(case.id) {
-      val whole = run(case, null)
-      for (size in listOf(1, 5, 13)) assertEquals(whole, run(case, size), "${case.id}: chunks of $size bytes")
-      val expected = case.expect.getValue("issues").jsonArray.map {
-        ExpectedIssue(it.jsonObject["line"]?.jsonPrimitive?.intOrNull, it.jsonObject.getValue("code").jsonPrimitive.content)
-      }.toSet()
-      assertEquals(expected, whole.issues, "${case.id}: issues")
-      case.expect["nodes"]?.let { assertEquals(plain(it), whole.nodes, "${case.id}: nodes") }
-      case.expect["state"]?.let { assertEquals(plain(it), whole.state, "${case.id}: state") }
-      case.expect["mutations"]?.let { assertEquals(plain(it), whole.mutations, "${case.id}: mutations") }
-      case.expect["missing"]?.let { assertEquals(plain(it), whole.missing, "${case.id}: missing") }
-    }
+    DynamicTest.dynamicTest(case.id) { check(case, listOf(1, 5, 13)) }
+  }
+
+  // PLAN-HARDENING.md B.2: the Kotlin parser must reach exactly the TypeScript parser's result on
+  // every generated stream. A disagreement is settled by SPEC.md and becomes a conformance case.
+  @TestFactory
+  fun `agrees with the TypeScript parser on the fuzz corpus`(): List<DynamicTest> = loadCorpus().map { case ->
+    DynamicTest.dynamicTest(case.id) { check(case, listOf(7)) }
+  }
+
+  private fun check(case: Case, chunkSizes: List<Int>) {
+    val whole = run(case, null)
+    for (size in chunkSizes) assertEquals(whole, run(case, size), "${case.id}: chunks of $size bytes")
+    val expected = case.expect.getValue("issues").jsonArray.map {
+      ExpectedIssue(it.jsonObject["line"]?.jsonPrimitive?.intOrNull, it.jsonObject.getValue("code").jsonPrimitive.content)
+    }.toSet()
+    assertEquals(expected, whole.issues, "${case.id}: issues")
+    case.expect["nodes"]?.let { assertEquals(plain(it), whole.nodes, "${case.id}: nodes") }
+    case.expect["state"]?.let { assertEquals(plain(it), whole.state, "${case.id}: state") }
+    case.expect["mutations"]?.let { assertEquals(plain(it), whole.mutations, "${case.id}: mutations") }
+    case.expect["missing"]?.let { assertEquals(plain(it), whole.missing, "${case.id}: missing") }
   }
 }

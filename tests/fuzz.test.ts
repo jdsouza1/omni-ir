@@ -87,3 +87,11 @@ describe("fuzz: how the stream is split never matters [3.3]", () => {
     );
   });
 });
+
+describe("the differential corpus (fuzz/corpus.json)", () => {
+  it("is current: the TypeScript parser's results haven't changed (run npm run fuzz:corpus if this fails)", async () => {
+    const { buildCorpus, CORPUS_FILE } = await import("../fuzz/build");
+    const { readFileSync } = await import("node:fs");
+    expect(readFileSync(CORPUS_FILE, "utf8") === buildCorpus(), "fuzz/corpus.json is out of date").toBe(true);
+  }, 120_000);
+});

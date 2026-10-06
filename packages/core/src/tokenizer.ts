@@ -127,7 +127,9 @@ function tokenize(source: string, offset: number, warnings: Issue[]): Token[] {
       if (end < source.length && IDENT_CHAR.test(source[end]!)) {
         throw new LineError("syntax", `invalid number "${source.slice(i, end + 1)}…"`, col(i));
       }
-      tokens.push({ type: "number", value: Number(m[0]), col: col(i) });
+      // Negative zero ("-0", or underflow such as -1e-400) is the number 0 [4.9].
+      const value = Number(m[0]);
+      tokens.push({ type: "number", value: value === 0 ? 0 : value, col: col(i) });
       i = end;
     } else if (/[A-Za-z_]/.test(c)) {
       IDENT.lastIndex = i;

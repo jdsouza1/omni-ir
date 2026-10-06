@@ -32,6 +32,7 @@
     "landing:examples": "tsx scripts/landing-examples.ts",
     "spec": "tsx scripts/spec.ts",
     "conformance:build": "tsx conformance/build.ts",
+    "fuzz:corpus": "tsx fuzz/build.ts",
     "build:packages": "node scripts/build-packages.mjs",
     "pack:check": "node scripts/pack-check.mjs",
     "install:test": "node scripts/install-test.mjs",

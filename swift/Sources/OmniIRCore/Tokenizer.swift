@@ -262,6 +262,8 @@ private func jsNumber(_ text: String) -> Double {
   if mantissa.hasPrefix(".") { mantissa = "0" + mantissa }
   if mantissa.hasSuffix(".") { mantissa += "0" }
   let value = Double(mantissa + exponent) ?? .nan
+  // Negative zero ("-0", or underflow such as -1e-400) is the number 0 [4.9].
+  if value == 0 { return 0 }
   return negative ? -value : value
 }
 

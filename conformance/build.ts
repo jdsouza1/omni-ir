@@ -192,6 +192,15 @@ export const CASES: Record<string, ConformanceCase[]> = {
       expect: { issues: [], state: { $a: 42, $b: -150, $c: 0.5, $d: 3 } },
     },
     {
+      // Found by the differential fuzz corpus (PLAN-HARDENING.md B.2): Kotlin kept -0.0 where the
+      // other parsers' results said 0, and a renderer could show "-0".
+      id: "numbers-negative-zero",
+      rules: ["4.9"],
+      description: "Negative zero, in any spelling and from underflow, is the number 0.",
+      input: lines("$a = -0", "$b = -0.0", "$c = -0e5", "$d = -1e-400", "root = Text($a)"),
+      expect: { issues: [], state: { $a: 0, $b: 0, $c: 0, $d: 0 } },
+    },
+    {
       id: "numbers-invalid",
       rules: ["4.9"],
       description: "A number followed by a letter, and a number too large to be finite.",
