@@ -25,6 +25,7 @@ const LIMIT_LABELS: Record<keyof typeof LIMITS, string> = {
   chartLabels: "Labels in a BarChart or LineChart, and values in a Series",
   chartSeries: "Series in a BarChart or LineChart",
   chartSlices: "Slices in a PieChart",
+  nestingDepth: "Levels of lists, objects and calls nested inside one value ([4.13])",
 };
 
 const STAGE_LABEL = { line: "when the line arrives", end: "at end of stream", renderer: "in the renderer" } as const;

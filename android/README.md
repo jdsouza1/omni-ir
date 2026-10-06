@@ -9,7 +9,7 @@ Native Omni-IR for Android phones and tablets. A model writes flat, line-oriente
 | `omni-ir-compose` | `OmniView` and the Compose catalog, with Material 3 from your app's theme. | Android 8.0+ (API 26) |
 | `demo` | An app that streams the repo's example screens offline, or asks a running server. | Android |
 
-The parser passes the same [conformance suite](../conformance/README.md) as the TypeScript and Swift implementations (all 81 cases, with the input split at every chunk size tested), so all three treat every stream identically.
+The parser passes the same [conformance suite](../conformance/README.md) as the TypeScript and Swift implementations (all 82 cases, with the input split at every chunk size tested), so all three treat every stream identically.
 
 ## Install
 

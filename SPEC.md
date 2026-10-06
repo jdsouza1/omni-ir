@@ -91,6 +91,7 @@ escape        = "\" , any character ;
 - **[4.10]** An id MUST be an identifier (`1abc = …` is a `syntax` error) and MUST NOT be one of the reserved words `true`, `false`, `null`, `__proto__`, `constructor` or `prototype` (an `invalid_props` error). In a value, `true`, `false` and `null` are literals, not ids.
 - **[4.11]** Lists and objects follow the grammar above. Where each kind of value is allowed is set by the catalog (section 6): lists of ids only for children, objects only for McpMutation params.
 - **[4.12]** A call inside another statement's values, such as `root = Card([Heading("Hi")])`, is a `not_flat` error. Every component MUST be defined on its own line and referred to by id.
+- **[4.13]** Lists, objects and calls inside a value MUST NOT be nested more than 8 levels deep (`[[1]]` is 2 levels); deeper nesting is a `syntax` error. The catalog never needs more than 2, and the limit lets a parser reject runaway nesting before it uses unbounded memory or stack.
 
 The known limit of [4.5]: a Windows path written as `"C:\new"` contains the valid escape `\n` and becomes a line break. Models SHOULD be told to write `\\` for every backslash.
 
@@ -616,6 +617,7 @@ Adding to the catalog is a change too. Because the catalog is strict ([5.9]), a 
 | Labels in a BarChart or LineChart, and values in a Series | 24 |
 | Series in a BarChart or LineChart | 6 |
 | Slices in a PieChart | 8 |
+| Levels of lists, objects and calls nested inside one value ([4.13]) | 8 |
 <!-- /generated:limits -->
 
 Individual props have their own limits, listed in section 6.

@@ -5,11 +5,12 @@ All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-
 ## Unreleased
 
 ### Changed
-- **Negative zero is the number 0** ([4.9]): `-0`, `-0.0`, `-0e5` and underflow such as `-1e-400` are read as 0 by every parser, so no renderer shows "-0". Found by the new differential fuzz corpus, where the Kotlin parser kept -0. Conformance suite: 81 cases.
+- **Negative zero is the number 0** ([4.9]): `-0`, `-0.0`, `-0e5` and underflow such as `-1e-400` are read as 0 by every parser, so no renderer shows "-0". Found by the new differential fuzz corpus, where the Kotlin parser kept -0.
+- **Nesting limit** ([4.13]): lists, objects and calls nest at most 8 levels inside a value; deeper is a `syntax` error. Found by fuzzing: lists nested about 9,000 deep overflowed the Kotlin parser's stack, which would crash an Android app. Every parser now stops before recursing that far. New limit `nestingDepth` in `conformance/schema.json`. Conformance suite: 82 cases.
 - **System prompt:** component signatures now show which props must be named and which are optional (`Image(asset, alt=…, [ratio=…])`, also in SPEC.md); the McpMutation rule says the Button, not the mutation, goes in the layout; values have no expressions. Found by checking Gemini, GPT and Llama.
 
 ### Added
-- **Fuzz testing:** fast-check properties for the TypeScript parser, and a differential corpus of 2,000 generated streams (`fuzz/corpus.json`) that the Swift and Kotlin parsers must parse exactly as TypeScript does.
+- **Fuzz testing:** fast-check properties for the TypeScript parser, and a differential corpus of 2,000 generated streams (`fuzz/corpus.json`) that the Swift and Kotlin parsers must parse exactly as TypeScript does, and seeded no-crash fuzzing inside the Swift and Kotlin test suites (random bytes, token soup, edited fixtures, extreme lines).
 
 ## 0.3.0 (2026-10-05)
 

@@ -2,6 +2,7 @@
 // character-by-character tokenizer and a small recursive-descent parser, so commas, parentheses,
 // `#` and `$` inside strings are just text. The grammar accepts any well-formed value, including
 // nested calls; `schema.ts` decides what is allowed.
+import { LIMITS } from "./schema.js";
 import type { Issue, IssueCode, RawStatement, RawValue } from "./types.js";
 
 export type LineResult =
@@ -154,6 +155,8 @@ function tokenize(source: string, offset: number, warnings: Issue[]): Token[] {
 
 class TokenParser {
   private i = 0;
+  /** Lists, objects and calls open inside the current value [4.13]. */
+  private depth = 0;
 
   constructor(private readonly tokens: Token[]) {}
 
@@ -214,16 +217,29 @@ class TokenParser {
         if (token.value === "true" || token.value === "false") return { kind: "boolean", value: token.value === "true" };
         if (token.value === "null") return { kind: "null" };
         if (this.atPunct("(")) {
-          this.argumentList(); // parsed for well-formedness, then rejected by the schema
+          this.nested(token.col, () => this.argumentList()); // parsed for well-formedness, then rejected by the schema
           return { kind: "call", callee: token.value };
         }
         return { kind: "ident", name: token.value };
       case "punct":
-        if (token.value === "[") return this.array();
-        if (token.value === "{") return this.object();
+        if (token.value === "[") return this.nested(token.col, () => this.array());
+        if (token.value === "{") return this.nested(token.col, () => this.object());
         throw new LineError("syntax", `unexpected "${token.value}"`, token.col);
       case "eof":
         throw new LineError("syntax", "line ended where a value was expected", token.col);
+    }
+  }
+
+  /** Run `parse` one nesting level deeper, refusing to go past the limit before recursing [4.13]. */
+  private nested<T>(col: number, parse: () => T): T {
+    if (this.depth >= LIMITS.nestingDepth) {
+      throw new LineError("syntax", `values may nest at most ${LIMITS.nestingDepth} levels deep`, col);
+    }
+    this.depth++;
+    try {
+      return parse();
+    } finally {
+      this.depth--;
     }
   }
 

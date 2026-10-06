@@ -66,6 +66,28 @@ describe("fuzz: the parser never breaks", () => {
   }, 120_000);
 });
 
+describe("fuzz: lines at the edges [4.13]", () => {
+  // Found by fuzzing the Kotlin parser (B.3): deep nesting overflowed its stack. Every parser now
+  // stops at 8 levels; this checks the TypeScript one survives far deeper input.
+  const deep = fc.oneof(
+    fc.integer({ min: 1, max: 9000 }).map((n) => `root = Card(${"[".repeat(n)}${"]".repeat(n)})`),
+    fc.integer({ min: 1, max: 4000 }).map((n) => `$a = ${"{x: ".repeat(n)}1${"}".repeat(n)}`),
+    fc.integer({ min: 1, max: 9000 }).map((n) => `t = Text(${"a(".repeat(n)}1${")".repeat(n)})`),
+    fc.integer({ min: 1, max: 9000 }).map((n) => "(".repeat(n)),
+  );
+  it("deep nesting never throws, and deeper than 8 levels is a syntax error", () => {
+    fc.assert(
+      fc.property(deep, (text) => {
+        const result = parseCanonical([`${text}\n`], registry);
+        wellFormed(result, text);
+      }),
+      { ...options, numRuns: Math.min(numRuns, 200) },
+    );
+    const nine = parseCanonical([`$a = ${"[".repeat(9)}1${"]".repeat(9)}\n`], registry);
+    expect(nine.issues).toContainEqual({ line: 1, code: "syntax" });
+  }, 120_000);
+});
+
 describe("fuzz: how the stream is split never matters [3.3]", () => {
   it("broken streams give the same result whole and split at random bytes", () => {
     fc.assert(

@@ -28,6 +28,8 @@ export const LIMITS = {
   chartSeries: 6,
   /** Most Slices in a PieChart. */
   chartSlices: 8,
+  /** Deepest nesting of lists, objects and calls inside one value. */
+  nestingDepth: 8,
 } as const;
 
 export const MAX_TEXT = LIMITS.text;

@@ -95,6 +95,7 @@ public object Limits {
   public const val CHART_LABELS: Int = 24
   public const val CHART_SERIES: Int = 6
   public const val CHART_SLICES: Int = 8
+  public const val NESTING_DEPTH: Int = 8
 }
 
 internal object Catalog {

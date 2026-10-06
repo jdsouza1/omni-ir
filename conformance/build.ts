@@ -201,6 +201,23 @@ export const CASES: Record<string, ConformanceCase[]> = {
       expect: { issues: [], state: { $a: 0, $b: 0, $c: 0, $d: 0 } },
     },
     {
+      // Found by fuzzing the Kotlin parser (PLAN-HARDENING.md B.3): lists nested ~9,000 deep
+      // overflowed its stack. Nesting is now limited before any parser can recurse that far.
+      id: "nesting-limit",
+      rules: ["4.13"],
+      description: "Lists, objects and calls nest at most 8 levels inside a value; deeper is a syntax error.",
+      input: lines(
+        `$a = ${"[".repeat(8)}1${"]".repeat(8)}`,
+        `$b = ${"[".repeat(9)}1${"]".repeat(9)}`,
+        `$c = ${"{k: ".repeat(9)}1${"}".repeat(9)}`,
+        `t = Text(${"a(".repeat(8)}1${")".repeat(8)})`,
+        `u = Text(${"a(".repeat(9)}1${")".repeat(9)})`,
+        `$d = ${"[".repeat(5000)}`,
+        "root = Stack([t, u])",
+      ),
+      expect: { issues: [i(1, "invalid_props"), i(2, "syntax"), i(3, "syntax"), i(4, "not_flat"), i(5, "syntax"), i(6, "syntax"), i(7, "dangling_ref")], state: {} },
+    },
+    {
       id: "numbers-invalid",
       rules: ["4.9"],
       description: "A number followed by a letter, and a number too large to be finite.",

@@ -188,6 +188,7 @@ public enum Limits {
   public static let chartLabels = 24
   public static let chartSeries = 6
   public static let chartSlices = 8
+  public static let nestingDepth = 8
 }
 
 enum Catalog {

@@ -87,7 +87,7 @@ The same screens in each format; sizes are counted offline the way OpenUI's benc
 
 - **Compact:** on the nine model-check screens, Omni-IR uses 39% fewer tokens than A2UI, 55% fewer than json-render, 50% fewer than HTML with Tailwind and 18% fewer than React JSX. OpenUI Lang, the closest relative, is 4–10% smaller still: it allows positional arguments and components nested inside other components.
 - **Streams line by line:** the first content can be drawn after about 30–40 tokens. A2UI sent as one message, and generated React code, show nothing until the reply is complete.
-- **Tighter control than the alternatives:** no logic in the stream, pictures only from the app's registry, every data-changing action governed with its params checked, an 81-case conformance suite, and native web, iOS and Android renderers that pass it.
+- **Tighter control than the alternatives:** no logic in the stream, pictures only from the app's registry, every data-changing action governed with its params checked, an 82-case conformance suite, and native web, iOS and Android renderers that pass it.
 - **A smaller catalog:** 27 components against OpenUI's 53. Tables, dropdowns, switches, tabs and notices arrived in Step 10, bar, line and pie charts in Step 11; Omni-IR now draws 5 of OpenUI's 7 benchmark scenarios.
 - **Reliable, and safer when asked for something risky:** in fresh Claude.ai chats, Claude wrote both Omni-IR and OpenUI Lang validly on the first try for 9 of 9 requests. Asked for a button that permanently deletes the account, with no tool for it, Omni-IR left the button unwired and said so, while the OpenUI Lang reply wired it to an invented action.
 

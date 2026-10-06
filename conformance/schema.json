@@ -13,7 +13,8 @@
     "tableColumns": 8,
     "chartLabels": 24,
     "chartSeries": 6,
-    "chartSlices": 8
+    "chartSlices": 8,
+    "nestingDepth": 8
   },
   "reservedWords": [
     "true",

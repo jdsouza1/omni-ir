@@ -215,6 +215,20 @@ private fun numberEnd(s: String, start: Int): Int? {
 private class TokenParser(private val tokens: List<Token>) {
   private var i = 0
 
+  /** Lists, objects and calls open inside the current value [4.13]. */
+  private var depth = 0
+
+  /** Run `parse` one nesting level deeper, refusing to go past the limit before recursing [4.13]. */
+  private inline fun <T> nested(col: Int, parse: () -> T): T {
+    if (depth >= Limits.NESTING_DEPTH) throw LineError(IssueCode.SYNTAX, "values may nest at most ${Limits.NESTING_DEPTH} levels deep", col)
+    depth++
+    try {
+      return parse()
+    } finally {
+      depth--
+    }
+  }
+
   fun callStatement(id: String): RawStatement {
     val callee = peek()
     if (callee !is Token.Ident || !isPunct('(', 1)) throw LineError(IssueCode.SYNTAX, "expected a component call such as Text(…)", callee.col)
@@ -261,15 +275,15 @@ private class TokenParser(private val tokens: List<Token>) {
         token.value == "true" || token.value == "false" -> RawValue.Bool(token.value == "true")
         token.value == "null" -> RawValue.Null
         isPunct('(') -> {
-          argumentList() // parsed for well-formedness, then rejected by validation
+          nested(token.col) { argumentList() } // parsed for well-formedness, then rejected by validation
           RawValue.Call(token.value)
         }
         else -> RawValue.Ident(token.value)
       }
     }
     is Token.Punct -> when (token.value) {
-      '[' -> array()
-      '{' -> obj()
+      '[' -> nested(token.col) { array() }
+      '{' -> nested(token.col) { obj() }
       else -> throw LineError(IssueCode.SYNTAX, "unexpected \"${token.value}\"", token.col)
     }
     is Token.Eof -> throw LineError(IssueCode.SYNTAX, "line ended where a value was expected", token.col)

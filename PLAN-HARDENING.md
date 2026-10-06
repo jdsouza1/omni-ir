@@ -80,7 +80,7 @@ Omni-IR's security doesn't depend on a model resisting jailbreaks: the spec trea
 **B. Fuzz testing** *(tests first)*
 - [x] B.1 fast-check properties for the TypeScript parser: never throws, issues well-formed, chunking never matters, valid fixtures survive random splits
 - [x] B.2 The differential corpus (`fuzz/`): generated streams with the TypeScript results; Swift and Kotlin tests that must match them
-- [ ] B.3 Seeded no-crash runs in Swift and Kotlin
+- [x] B.3 Seeded no-crash runs in Swift and Kotlin
 - [ ] B.4 A weekly workflow with a long random run, saving any failure as a case
 - [ ] B.5 Adversarial boundary tests: tool-name spoofing at all three layers; a hostile-output corpus run through all three parsers; coordinated multi-input attacks end to end; the unsafe model replies from the model check kept as cases
 
