@@ -4,7 +4,7 @@ Goal: SPEC.md section 9 says a backend that performs real actions MUST check tha
 
 This is the open standard's **reference implementation**: a small, readable example of doing it right, free to run, with no real money, email or third-party accounts. The hosted service, if there is one, belongs in the private repository (open-core rule).
 
-Status: **APPROVED 2026-10-06** with the recommendations (all eight decisions). All work is free: mock model, built-in or in-memory storage, a fake payment ledger and a development mail outbox. Nothing published without a separate go-ahead.
+Status: **DONE 2026-10-06** (owner reviewed the review page and approved the merge; unreleased, for `v0.6.0`). **APPROVED 2026-10-06** with the recommendations (all eight decisions). All work is free: mock model, built-in or in-memory storage, a fake payment ledger and a development mail outbox. Nothing published without a separate go-ahead.
 
 Numbering: this becomes Step 15, so the roadmap's later steps move up by one (themes and languages 16, app-defined components 17, live screens 18).
 
@@ -152,5 +152,5 @@ Work on branch `wip/backend`. Each part starts with failing tests (constraint 4)
 **G. Docs and review** *(checkpoint: you review)*
 - [x] G.1 SPEC.md section 9; a "Running real actions" guide; CHANGELOG; the roadmap renumbered (themes 16, app-defined components 17, live screens 18)
 - [x] G.2 A review page: the attack tests and their results, a signed-in run end to end (https://claude.ai/artifact/VYzk5YJTqvDWLhiWoNVRnc)
-- [ ] G.3 Merge with your approval
+- [x] G.3 Merged with your approval (2026-10-06)
 - [ ] G.4 `v0.6.0` release: a separate go-ahead from you
