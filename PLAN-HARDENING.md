@@ -6,7 +6,7 @@ Goal: back up three claims with evidence before more people rely on them, all fo
 2. **"A bad stream can't break the app."** The parsers are tested with hand-written cases, never with large amounts of random, broken input.
 3. **"Fast enough for real screens."** Nobody has measured a large screen.
 
-Status: **DONE 2026-10-06** (owner reviewed the review page and approved the merge), except the short confirmation on the official Gemini and ChatGPT apps, now the first item on the roadmap. **APPROVED 2026-10-05** with the recommendations; **extended the same day** at the owner's request with adversarial boundary tests (2b, B.5). The owner chose ask-chat.ai (a paid reseller, 7-day trial) for the first model check, with me driving Chrome; results from it are labelled as such, and published claims are confirmed on the official apps.
+Status: **DONE 2026-10-06** (owner reviewed the review page and approved the merge), and the official-app confirmation done the same day: the Gemini results were confirmed on the official Gemini app (5 of 5 valid; the owner judged Gemini enough, so ChatGPT was not repeated). **APPROVED 2026-10-05** with the recommendations; **extended the same day** at the owner's request with adversarial boundary tests (2b, B.5). The owner chose ask-chat.ai (a paid reseller, 7-day trial) for the first model check, with me driving Chrome; results from it are labelled as such, and published claims are confirmed on the official apps.
 
 ## Proposal
 
@@ -94,10 +94,10 @@ Omni-IR's security doesn't depend on a model resisting jailbreaks: the spec trea
 
 **E. Review and release** *(checkpoint: you review)*
 - [x] E.1 A review page: the model results, what fuzzing found and fixed, the performance numbers (https://claude.ai/artifact/PXY4dH4uN37YBxjJHHJ1yv)
-- [x] E.2 Merge (approved 2026-10-06); the conformance counts and performance are in the README, the docs and the CHANGELOG. The "works with any model" claim stays off the site until the official-app check
+- [x] E.2 Merge (approved 2026-10-06); the conformance counts and performance are in the README, the docs and the CHANGELOG. The "works with any model" claim stayed off the site until the official-app check, done 2026-10-06 on the official Gemini app (5 of 5 valid)
 - [ ] E.3 `v0.4.0` release if anything changed in the packages: a separate go-ahead from you
 
-**Progress (2026-10-05):** A done via ask-chat.ai: [docs/model-check-2026-10-05-models.md](docs/model-check-2026-10-05-models.md). Run 1 (original prompt): Gemini 3.1 Pro 17/19, GPT-6.1 Sol 11/19, Llama 4 Maverick 14/19, every safety probe passed. Two prompt problems found and fixed (signatures now show named props, `Image(asset, alt=…, [ratio=…])`; the McpMutation is never a child). Run 2 (fixed prompt, earlier failures plus probes): 6/6, 12/12, 6/8. Still to do for A: a short confirmation on the providers' own apps before any claim goes on the website.
+**Progress (2026-10-05):** A done via ask-chat.ai: [docs/model-check-2026-10-05-models.md](docs/model-check-2026-10-05-models.md). Run 1 (original prompt): Gemini 3.1 Pro 17/19, GPT-6.1 Sol 11/19, Llama 4 Maverick 14/19, every safety probe passed. Two prompt problems found and fixed (signatures now show named props, `Image(asset, alt=…, [ratio=…])`; the McpMutation is never a child). Run 2 (fixed prompt, earlier failures plus probes): 6/6, 12/12, 6/8. Confirmed 2026-10-06 on the official Gemini app: 5 of 5 valid, and the same distinctive choices as the reseller's Gemini (see the model-check write-up). GPT and Llama results stay labelled as reached through the reseller.
 
 **Progress (C, 2026-10-05):** measured, fixed and budgeted on all three platforms.
 
