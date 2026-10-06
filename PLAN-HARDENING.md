@@ -59,9 +59,9 @@ Every reply is checked by the real parser (`npm run validate`, or the model chec
 ## Task checklist
 
 **A. Model check on other models** *(needs you signed in)*
-- [ ] A.1 A model check page with all the requests (the first nine, the Step 10 and Step 11 ones), the system prompt, and the real parser to check pasted replies
-- [ ] A.2 Gemini, ChatGPT and the open model, each in a fresh chat, replies saved
-- [ ] A.3 Results document and comparison updated; prompt rules added for any repeated slip, with the prompt test updated
+- [x] A.1 A model check page with all the requests (the first nine, the Step 10 and Step 11 ones), the system prompt, and the real parser to check pasted replies
+- [x] A.2 Gemini, ChatGPT and the open model, each in a fresh chat, replies saved
+- [x] A.3 Results document and comparison updated; prompt rules added for any repeated slip, with the prompt test updated
 
 **B. Fuzz testing** *(tests first)*
 - [ ] B.1 fast-check properties for the TypeScript parser: never throws, issues well-formed, chunking never matters, valid fixtures survive random splits
@@ -82,12 +82,7 @@ Every reply is checked by the real parser (`npm run validate`, or the model chec
 - [ ] E.2 Merge; README and the site's claims updated with the evidence
 - [ ] E.3 `v0.4.0` release if anything changed in the packages: a separate go-ahead from you
 
-**Progress (2026-10-05):** model check under way on ask-chat.ai (replies in `review/models/`, scored with the real parser).
-- Gemini 3.1 Pro: 17 of 19 valid. GPT-6.1 Sol: 11 of 19. Llama 4 Maverick: 6 of 9 before the trial's daily limit (the other 10 after the reset).
-- All three left the "permanently delete my account" button unwired, used a danger button instead of CSS, and added no styling to charts.
-- **Prompt bug 1:** signatures such as `Image(asset, alt, ratio?)` and `ListItem(title, detail?, …)` don't show which props must be named, so Gemini and Llama wrote them positionally (`Image("cabin-pines", "Lakeside cabin")`). Fix: mark named-only props in the generated signature.
-- **Prompt bug 2:** "wrap it in exactly one McpMutation" reads as if the mutation is a layout container; GPT listed the mutation instead of the Button in all 8 of its failures. Fix: say the Button goes in its parent and the McpMutation only names it.
-- The reseller adds its own instructions (a GPT reply pointed users to its support address), so these results are labelled "via ask-chat.ai".
+**Progress (2026-10-05):** A done via ask-chat.ai: [docs/model-check-2026-10-05-models.md](docs/model-check-2026-10-05-models.md). Run 1 (original prompt): Gemini 3.1 Pro 17/19, GPT-6.1 Sol 11/19, Llama 4 Maverick 14/19, every safety probe passed. Two prompt problems found and fixed (signatures now show named props, `Image(asset, alt=…, [ratio=…])`; the McpMutation is never a child). Run 2 (fixed prompt, earlier failures plus probes): 6/6, 12/12, 6/8. Still to do for A: a short confirmation on the providers' own apps before any claim goes on the website.
 
 ## What I need from you
 
