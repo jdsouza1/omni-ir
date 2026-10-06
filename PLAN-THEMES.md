@@ -97,7 +97,7 @@ Work on branch `wip/themes`. Each part starts with failing tests (constraint 4).
 - [x] D.3 Blocked actions show the plain sentence; details to `onEvent` only
 
 **E. Spec and docs**
-- [ ] E.1 SPEC.md sections 8 and 11; a "Themes and wording" guide; CHANGELOG
+- [x] E.1 SPEC.md sections 8 and 11; a "Themes and wording" guide; CHANGELOG
 
 **F. Review** *(checkpoint: you review)*
 - [ ] F.1 A review page: screens light and dark on the web, a rebranded screen, the same screens on iPhone and Android, the contrast results, replaced words

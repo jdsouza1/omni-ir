@@ -38,6 +38,7 @@ export default withMermaid(
             { text: "Servers and transports", link: "/guide/transport" },
             { text: "Use with AG-UI", link: "/guide/ag-ui" },
             { text: "Running real actions", link: "/guide/actions" },
+            { text: "Themes and wording", link: "/guide/themes" },
           ],
         },
         {

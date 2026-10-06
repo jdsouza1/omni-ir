@@ -56,7 +56,7 @@ A double-click, or a retry after a dropped connection, must not pay twice. `crea
 | 409 | `unavailable` | For example, those nights are already booked. |
 | 409 | `idempotency_conflict` | A key was reused for a different action. |
 
-The renderer shows the server's message where the action was blocked. Every outcome is also recorded in an audit trail (who, which tool, when, the outcome), without param values, which may be personal.
+A refusal reaches your app as a `handler_failed` event with the server's message, for you to show where it fits (the renderer itself shows a plain sentence only when it blocks a press before sending). Every outcome is also recorded in an audit trail (who, which tool, when, the outcome), without param values, which may be personal.
 
 ## Where data lives
 

@@ -565,6 +565,13 @@ These rules apply to anything that displays an Omni-IR screen. There are three r
 - When the parser reports `newer_version` ([3.9]), a renderer SHOULD tell the person, near the screen, that the app needs an update to show all of it.
 - *Tested by:* `tests/renderer.test.tsx`.
 
+**Themes and the renderer's own words**
+- Colours, fonts and shapes come only from the app: the renderer's defaults, or design tokens the app sets. Nothing in the stream chooses them, beyond picking among the catalog's own styles through enum props such as `tone`. The reference renderers share one list of tokens with light and dark defaults (`conformance/theme.json`).
+- A renderer's default themes MUST give text at least 4.5:1 contrast against its background, and the edges of controls and focus indicators at least 3:1 (WCAG 2.2 AA).
+- The words a renderer writes itself (placeholders read by screen readers, fallbacks, labels, the version notice) SHOULD be replaceable by the app. They MUST be shown as plain text, never as markup, and placeholders in them MUST be filled without interpreting the rest: no formatting function sees them, and a value that contains a placeholder is not filled again.
+- When a press is blocked, a renderer SHOULD show the person a plain sentence, and give the details of what was wrong only to the app.
+- *Tested by:* `tests/theme.test.tsx`, `tests/strings.test.tsx`; the Swift and Kotlin word tests in `swift/Tests/OmniIRSwiftUITests/StringsTests.swift` and `android/omni-ir-runtime/src/test`.
+
 **Failures**
 - A failure in one component MUST NOT break the rest of the screen.
 - Where the platform can catch a component that fails while rendering (as React's error boundaries do), the renderer MUST replace only that component with a fallback, and SHOULD retry it when its data changes.
@@ -653,6 +660,7 @@ What the format prevents:
 - **No invented components or props.** The catalog is fixed by the app ([5.9]).
 - **No pictures from the model.** Images come only from the app's asset registry ([5.17]), so a stream can't load a tracking pixel, leak data through a URL, or show an arbitrary picture from the web.
 - **No unapproved actions.** Actions need a registered tool and pass three checks: in the parser ([5.14]), in the renderer and on the backend (section 9).
+- **No look or wording from the model.** Themes and the renderer's own words come from the app's code (section 8); the stream has no syntax for them.
 - **Damage stays contained.** A bad line is rejected on its own ([3.8]), and a failing component only affects its own slot (section 8).
 
 What the app must still handle:
