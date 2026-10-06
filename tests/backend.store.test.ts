@@ -113,3 +113,25 @@ describe("sqlite store on disk", () => {
     second.close?.();
   });
 });
+
+describe("OMNI_DB", () => {
+  it("keeps the server's data in that SQLite file across restarts", async () => {
+    const { startServer } = await import("./serverHelpers");
+    const { MockModel } = await import("../server/models/mock");
+    const dir = mkdtempSync(join(tmpdir(), "omni-db-"));
+    dirs.push(dir);
+    const dbPath = join(dir, "omni.sqlite");
+    const book = async (checkIn: string, checkOut: string) => {
+      const server = await startServer({ model: new MockModel({ speed: "instant" }), config: { dbPath } });
+      const response = await fetch(`${server.url}/api/mutate`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ tool: "bookings.reserve", params: { checkIn, checkOut } }),
+      });
+      await server.close();
+      return response.status;
+    };
+    expect(await book("2026-12-01", "2026-12-04")).toBe(200);
+    expect(await book("2026-12-02", "2026-12-03")).toBe(409); // a new server, the same file
+  });
+});

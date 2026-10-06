@@ -13,7 +13,6 @@ import { ModelError, type Model } from "./models/types";
 import { clearedCookie, createDevMailer, credentialsOf, endSession, redeemLink, SESSION_TTL_MS, sessionCookie, userOfSession, type Mailer } from "./backend/auth";
 import { createMemoryStore } from "./backend/memoryStore";
 import { DEMO_VISITOR_EMAIL, seedDemo } from "./backend/seed";
-import { createSqliteStore } from "./backend/sqliteStore";
 import type { Store, User } from "./backend/types";
 import { HANDLERS, type ToolHandler } from "./tools/handlers";
 
@@ -75,8 +74,21 @@ export function createApp({
   app.use(cors(config.corsOrigin));
   app.use(express.json({ limit: "16kb" }));
 
-  const store = givenStore ?? (config.dbPath ? createSqliteStore(config.dbPath) : createMemoryStore());
-  const ready = givenStore ? Promise.resolve() : seedDemo(store);
+  // The SQLite store is loaded only when OMNI_DB asks for it, so node:sqlite is never imported
+  // where it isn't used (bundlers and test environments that don't know it). Every route that
+  // reads the store waits for `ready` first.
+  let store: Store = givenStore ?? createMemoryStore();
+  const ready = givenStore
+    ? Promise.resolve()
+    : (async () => {
+        if (config.dbPath) store = (await import("./backend/sqliteStore")).createSqliteStore(config.dbPath);
+        await seedDemo(store);
+      })();
+  /** Close the store this app opened (not one it was given): call when the server stops. */
+  app.locals.closeStore = async () => {
+    await ready;
+    if (!givenStore) store.close?.();
+  };
   const secure = config.publicUrl.startsWith("https:");
   /** Origins a browser may send actions from: the app's own and the one CORS allows. */
   const allowedOrigins = new Set([config.corsOrigin, new URL(config.publicUrl).origin]);

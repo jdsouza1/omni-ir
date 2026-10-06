@@ -25,7 +25,10 @@ export async function startServer(
   return {
     url,
     logs,
-    close: () => new Promise<void>((resolve) => server.close(() => resolve())),
+    close: async () => {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+      await (app.locals.closeStore as (() => Promise<void>) | undefined)?.();
+    },
     generate: (body: unknown, init: RequestInit = {}) =>
       fetch(`${url}/api/generate`, {
         method: "POST",
