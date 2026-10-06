@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
+import java.util.UUID
 
 /** How a `generate` call ended. */
 public sealed interface GenerateOutcome {
@@ -35,6 +36,8 @@ public class OmniClient(
   public val baseUrl: String,
   /** With no bytes for this long, pings included, the stream counts as lost (SPEC.md [10.10]). */
   public val idleTimeoutMillis: Int = 45_000,
+  /** The signed-in person's session token, sent as `Authorization: Bearer …` (SPEC.md [10.14]); null when signed out. */
+  public val token: () -> String? = { null },
 ) {
   /**
    * Asks the server for a screen and writes it into `store` as it streams. The store is always ended
@@ -86,14 +89,20 @@ public class OmniClient(
    * as `handler_failed`. `onResult` gets the server's result as JSON text.
    */
   public fun mutationHandler(onResult: ((MutationCall, String) -> Unit)? = null): suspend (MutationCall) -> Unit = { call ->
+    // One key per press, kept for the retry, so a server that honours keys never runs it twice.
+    val key = UUID.randomUUID().toString()
+    val request = Json.obj(mapOf("tool" to call.tool, "params" to call.params.mapValues { Json.primitive(it.value) }))
+    val send = {
+      val connection = open("api/mutate", request, headers = mapOf("Idempotency-Key" to key))
+      val status = connection.responseCode
+      val stream = if (status in 200..299) connection.inputStream else connection.errorStream
+      status to (stream?.use { String(it.readBytes(), Charsets.UTF_8) } ?: "")
+    }
     val (status, body) = withContext(Dispatchers.IO) {
       try {
-        val connection = open("api/mutate", Json.obj(mapOf("tool" to call.tool, "params" to call.params.mapValues { Json.primitive(it.value) })))
-        val status = connection.responseCode
-        val stream = if (status in 200..299) connection.inputStream else connection.errorStream
-        status to (stream?.use { String(it.readBytes(), Charsets.UTF_8) } ?: "")
+        send()
       } catch (e: IOException) {
-        throw MutationRejectedException("Could not reach the server.")
+        try { send() } catch (again: IOException) { throw MutationRejectedException("Could not reach the server.") }
       }
     }
     val json = Json.parseObject(body)
@@ -104,7 +113,7 @@ public class OmniClient(
     onResult?.invoke(call, json?.get("result")?.let(Json::write) ?: "{}")
   }
 
-  private fun open(path: String, body: String, accept: String = "application/json"): HttpURLConnection {
+  private fun open(path: String, body: String, accept: String = "application/json", headers: Map<String, String> = emptyMap()): HttpURLConnection {
     val url = URI(baseUrl.trimEnd('/') + "/" + path).toURL()
     return (url.openConnection() as HttpURLConnection).apply {
       requestMethod = "POST"
@@ -113,6 +122,8 @@ public class OmniClient(
       readTimeout = idleTimeoutMillis
       setRequestProperty("content-type", "application/json")
       setRequestProperty("accept", accept)
+      token()?.let { setRequestProperty("Authorization", "Bearer $it") }
+      for ((name, value) in headers) setRequestProperty(name, value)
       outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
     }
   }

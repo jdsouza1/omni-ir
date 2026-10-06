@@ -577,8 +577,10 @@ These rules apply to anything that displays an Omni-IR screen. There are three r
 - When the person presses a governed Button, the renderer MUST build the params by replacing each `$key` with its current value, then check the tool against the app's registry and the params against the tool's schema. If either check fails, it MUST NOT send the action, and SHOULD show that the action was blocked.
 - The backend MUST check the tool and params again before running anything, because anyone can send a request that didn't come from the renderer.
 - A backend that performs real actions MUST also check that the signed-in person is **allowed** to perform this action on this data. Schema checks only prove a request is well-formed.
+- It MUST check ownership against its own data, never against anything in the params: a model can write any id. Something that isn't the person's MUST get the same answer as something that doesn't exist ([10.14]), so nobody can find out which ids exist.
+- An action's result SHOULD carry only what the screen needs, never other people's data, and logs SHOULD NOT hold param values, which may be personal.
 - A Button without an `action` never contacts the backend.
-- *Tested by:* `tests/renderer.test.tsx`, `tests/server.mutate.test.ts`, `tests/e2e.client.test.tsx`.
+- *Tested by:* `tests/renderer.test.tsx`, `tests/server.mutate.test.ts`, `tests/backend.api.test.ts`, `tests/e2e.client.test.tsx`.
 
 ## 10. Transport
 
@@ -617,16 +619,21 @@ Sections 3 to 7 define the text. This section defines how a server sends that te
 - **[10.13]** A server SHOULD start the stream with the version marker ([3.9]) for the version it writes. The server writes it, not the model.
 
 **Actions**
-- **[10.14]** A client runs a governed action (section 9) with `POST` to the server's mutate endpoint (`/api/mutate`) and the body `{"tool": "…", "params": {…}}`. The server MUST check the tool and params again before running anything, and answers:
+- **[10.14]** A client runs a governed action (section 9) with `POST` to the server's mutate endpoint (`/api/mutate`) and the body `{"tool": "…", "params": {…}}`, with the person's credentials (a session cookie, or `Authorization: Bearer …` from a native app). It SHOULD add an `Idempotency-Key` header, 1 to 200 letters, digits or `_-:.`, new for each press and the same when it retries that press. The server MUST check the tool and params again before running anything. A server that performs real actions SHOULD honour the key: for 24 hours it answers a repeated key from the same person with the stored answer instead of running the action again, and refuses the key for different params. It answers:
 
   | Status | Body |
   |---|---|
   | 200 | `{"ok": true, "tool": "…", "result": {…}}` |
-  | 400 | error `invalid_request`: the body isn't `{tool, params}` with an object for `params` |
-  | 403 | error `unknown_tool`: the tool isn't registered, or has no handler |
+  | 400 | error `invalid_request`: the body isn't `{tool, params}` with an object for `params`, or the key is malformed |
+  | 401 | error `sign_in_required`: the tool is for signed-in people, and nobody is signed in |
+  | 403 | error `unknown_tool`: the tool isn't registered, or has no handler; or `bad_origin`: a browser request from another site |
+  | 404 | error `not_found`: what the params name doesn't exist **or isn't the person's**; the server MUST give the same answer for both |
+  | 409 | error `idempotency_conflict`: the key was used for other params; `idempotency_in_progress` (retryable): the same key is still running; or a tool's own conflict, such as `unavailable` |
   | 422 | error `invalid_params`, with `issues`: `[{"path": "…", "message": "…"}]` |
   | 429 | error `rate_limited`, with `Retry-After` |
   | 500 | error `tool_failed`, retryable |
+
+  A server that authenticates browsers with cookies MUST refuse an action whose `Origin` header isn't the app's, or that has none, because a browser sends cookies even on requests another site starts.
 
 - **[10.15]** A server that limits requests answers `429` with `rate_limited` and a `Retry-After` header. A server behind a proxy MUST take the client's address from the proxy only when the request came through a proxy it trusts, and MUST otherwise ignore headers such as `X-Forwarded-For`, which anyone can write. The reference server trusts no proxy unless `OMNI_TRUST_PROXY` is set.
 

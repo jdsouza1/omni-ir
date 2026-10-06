@@ -159,11 +159,14 @@ public struct OmniClient: Sendable {
   public let session: URLSession
   /// With no bytes for this long, pings included, the stream counts as lost (SPEC.md [10.10]).
   public let idleTimeout: TimeInterval
+  /// The signed-in person's session token, sent as `Authorization: Bearer …` (SPEC.md [10.14]); nil when signed out.
+  public let token: @Sendable () -> String?
 
-  public init(baseURL: URL, session: URLSession = .shared, idleTimeout: TimeInterval = 45) {
+  public init(baseURL: URL, session: URLSession = .shared, idleTimeout: TimeInterval = 45, token: @escaping @Sendable () -> String? = { nil }) {
     self.baseURL = baseURL
     self.session = session
     self.idleTimeout = idleTimeout
+    self.token = token
   }
 
   /// Asks the server for a screen and writes it into `store` as it streams. The store is always ended
@@ -178,6 +181,7 @@ public struct OmniClient: Sendable {
     request.timeoutInterval = idleTimeout  // URLSession's timeout is the longest wait between bytes
     request.setValue("application/json", forHTTPHeaderField: "content-type")
     request.setValue("text/event-stream", forHTTPHeaderField: "accept")
+    if let token = token() { request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization") }
     request.httpBody = try? JSONSerialization.data(withJSONObject: ["prompt": prompt])
 
     let bytes: URLSession.AsyncBytes
@@ -218,17 +222,25 @@ public struct OmniClient: Sendable {
   public func mutationHandler(onResult: (@MainActor (MutationCall, Data) -> Void)? = nil) -> @MainActor (MutationCall) async throws -> Void {
     let url = baseURL.appendingPathComponent("api/mutate")
     let session = session
+    let token = token
     return { call in
       var request = URLRequest(url: url)
       request.httpMethod = "POST"
       request.setValue("application/json", forHTTPHeaderField: "content-type")
+      // One key per press, kept for the retry, so a server that honours keys never runs it twice.
+      request.setValue(UUID().uuidString, forHTTPHeaderField: "idempotency-key")
+      if let token = token() { request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization") }
       request.httpBody = try JSONSerialization.data(withJSONObject: ["tool": call.tool, "params": jsonParams(call.params)])
       let data: Data
       let response: URLResponse
       do {
         (data, response) = try await session.data(for: request)
       } catch {
-        throw MutationRejectedError(message: "Could not reach the server.")
+        do {
+          (data, response) = try await session.data(for: request)
+        } catch {
+          throw MutationRejectedError(message: "Could not reach the server.")
+        }
       }
       let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
       guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {

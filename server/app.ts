@@ -157,7 +157,11 @@ export function createApp({
    * what the model wrote; the client's parser decides what is valid.
    */
   async function stream(req: Request, res: Response, prompt: string, output: StreamOutput) {
-    const limit = allow(req.ip ?? "unknown");
+    // Limited per address, and per signed-in person wherever their requests come from. Generation
+    // doesn't require sign-in, and nothing about the person is added to the prompt.
+    const { user } = await identify(req);
+    const byAddress = allow(req.ip ?? "unknown");
+    const limit = byAddress.ok && user ? allow(`user:${user.id}`) : byAddress;
     if (!limit.ok) {
       res.setHeader("Retry-After", String(limit.retryAfterSeconds));
       return sendError(res, 429, "rate_limited", "Too many requests; try again shortly.", true);

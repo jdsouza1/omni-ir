@@ -8,7 +8,7 @@ import { createDevMailer } from "../server/backend/auth";
 import type { Store } from "../server/backend/types";
 import { MockModel } from "../server/models/mock";
 import { HANDLERS } from "../server/tools/handlers";
-import { startServer } from "./serverHelpers";
+import { FakeModel, startServer } from "./serverHelpers";
 
 const ORIGIN = "http://localhost:5173";
 let server: Awaited<ReturnType<typeof startServer>> | null = null;
@@ -304,6 +304,33 @@ describe("personal data and limits [PLAN E]", () => {
     }
     const user = (await s.store.users.byEmail("secret.person@example.com"))!;
     expect(await s.store.audit.list()).toContainEqual(expect.objectContaining({ userId: user.id, tool: "support.createTicket", outcome: "ok" }));
+  });
+
+  it("sends the model only the prompt: nothing about the signed-in person", async () => {
+    const model = new FakeModel(async ({ onText }) => {
+      onText("root = Divider()\n");
+      return { stopReason: "end_turn", model: "fake" };
+    });
+    const store = createMemoryStore();
+    const mailer = createDevMailer();
+    server = await startServer({ model, config: { auth: "magic-link", publicUrl: ORIGIN }, store, mailer });
+    await fetch(`${server.url}/api/mutate`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ tool: "auth.sendMagicLink", params: { email: "ada@example.com" } }) });
+    const link = new URL(mailer.sent[0]!.link);
+    const cookie = (await fetch(`${server.url}${link.pathname}${link.search}`, { redirect: "manual" })).headers.get("set-cookie")!.split(";")[0]!;
+    await (await fetch(`${server.url}/api/generate`, { method: "POST", headers: { "content-type": "application/json", cookie }, body: JSON.stringify({ prompt: "my orders" }) })).text();
+    expect(model.prompts).toEqual(["my orders"]);
+  });
+
+  it("limits each signed-in person's generations, even across addresses", async () => {
+    const s = await setup({ rateLimitPerMinute: 2, trustProxy: ["loopback"] });
+    const cookie = await s.signIn("ada@example.com");
+    const statuses: number[] = [];
+    for (const ip of ["203.0.113.1", "203.0.113.2", "203.0.113.3"]) {
+      const response = await s.call("/api/generate", { method: "POST", headers: { "content-type": "application/json", cookie, "x-forwarded-for": ip }, body: JSON.stringify({ prompt: "hi" }) });
+      statuses.push(response.status);
+      await response.text();
+    }
+    expect(statuses).toEqual([200, 200, 429]);
   });
 
   it("limits each signed-in person, even across addresses", async () => {

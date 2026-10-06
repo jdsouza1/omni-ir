@@ -124,30 +124,30 @@ Numbering: this becomes Step 15, so the roadmap's later steps move up by one (th
 Work on branch `wip/backend`. Each part starts with failing tests (constraint 4).
 
 **A. Handler definitions and authorization** *(tests first)*
-- [ ] A.1 `defineTool({ params, access, run })`; the eight tools moved to it; the browser registry built from the params only
-- [ ] A.2 Deny by default: a test that every tool has an access rule; `401 sign_in_required` for signed-out calls
-- [ ] A.3 Ownership checks in the handlers; `404 not_found` for "not yours" and "doesn't exist"
+- [x] A.1 `defineTool({ params, access, run })`; the eight tools moved to it; the browser registry built from the params only
+- [x] A.2 Deny by default: a test that every tool has an access rule; `401 sign_in_required` for signed-out calls
+- [x] A.3 Ownership checks in the handlers; `404 not_found` for "not yours" and "doesn't exist"
 
 **B. Identity and sessions** *(tests first)*
-- [ ] B.1 The `authenticate` hook; the reference magic-link sign-in (hashed single-use links, 15-minute expiry, development outbox)
-- [ ] B.2 Sessions: `HttpOnly` cookie, bearer tokens for native apps, expiry, sign out; the `Origin` check on `/api/mutate`
+- [x] B.1 The `authenticate` hook; the reference magic-link sign-in (hashed single-use links, 15-minute expiry, development outbox)
+- [x] B.2 Sessions: `HttpOnly` cookie, bearer tokens for native apps, expiry, sign out; the `Origin` check on `/api/mutate`
 
 **C. Storage** *(tests first)*
-- [ ] C.1 The `Store` interface; in-memory and `node:sqlite` versions passing the same tests
-- [ ] C.2 Real handlers for the eight tools (assistant.ask stays a labelled stub); seeded demo data
+- [x] C.1 The `Store` interface; in-memory and `node:sqlite` versions passing the same tests
+- [x] C.2 Real handlers for the eight tools (assistant.ask stays a labelled stub); seeded demo data
 
 **D. Idempotency** *(tests first)*
-- [ ] D.1 SPEC.md [10.14]: the optional `Idempotency-Key` header; a server performing real actions SHOULD honour it
-- [ ] D.2 The server: one answer per key, per user, for 24 hours; `409 idempotency_conflict` for a reused key with different params
-- [ ] D.3 The web, Swift and Kotlin clients send a key per press, and credentials
+- [x] D.1 SPEC.md [10.14]: the optional `Idempotency-Key` header; a server performing real actions SHOULD honour it
+- [x] D.2 The server: one answer per key, per user, for 24 hours; `409 idempotency_conflict` for a reused key with different params
+- [x] D.3 The web, Swift and Kotlin clients send a key per press, and credentials
 
 **E. Personal data and limits** *(tests first)*
-- [ ] E.1 Cross-user attack tests for every tool, replayed sessions and reused keys
-- [ ] E.2 Results contain only what the screen needs; logs and the audit trail never hold param values; nothing personal in prompts
-- [ ] E.3 Rate limits per signed-in user as well as per address
+- [x] E.1 Cross-user attack tests for every tool, replayed sessions and reused keys
+- [x] E.2 Results contain only what the screen needs; logs and the audit trail never hold param values; nothing personal in prompts
+- [x] E.3 Rate limits per signed-in user as well as per address
 
 **F. Playground** *(tests first)*
-- [ ] F.1 The in-browser API with the in-memory store and a labelled pretend visitor
+- [x] F.1 The in-browser API with the in-memory store and a labelled pretend visitor
 
 **G. Docs and review** *(checkpoint: you review)*
 - [ ] G.1 SPEC.md section 9; a "Running real actions" guide; CHANGELOG; the roadmap renumbered (themes 16, app-defined components 17, live screens 18)

@@ -58,6 +58,9 @@ class ClientTest {
   private lateinit var server: HttpServer
   private val mutateBodies = mutableListOf<String>()
   private val generateQueries = mutableListOf<String?>()
+  private val mutateHeaders = mutableListOf<Map<String, String?>>()
+  /** How many times /api/mutate should drop the connection before answering. */
+  private var dropMutates = 0
   private lateinit var client: OmniClient
 
   @BeforeEach
@@ -93,6 +96,15 @@ class ClientTest {
     }
     server.createContext("/api/mutate") { exchange ->
       val body = String(exchange.requestBody.readBytes())
+      mutateHeaders += mapOf(
+        "key" to exchange.requestHeaders.getFirst("Idempotency-Key"),
+        "authorization" to exchange.requestHeaders.getFirst("Authorization"),
+      )
+      if (dropMutates > 0) {
+        dropMutates--
+        exchange.close() // no answer: the client sees a dropped connection
+        return@createContext
+      }
       mutateBodies += body
       val (status, reply) = if (body.contains("\"amount\":42.5")) 200 to """{"ok":true,"result":{"receiptId":"rcpt_1"}}"""
       else 422 to """{"error":{"code":"invalid_params","message":"amount: too small"}}"""
@@ -159,6 +171,29 @@ class ClientTest {
       handler(MutationCall("payM", "pay", "payments.confirm", mapOf("amount" to Primitive.Number(0.0))))
     }
     assertEquals("amount: too small", refused.message)
+  }
+
+  @Test
+  fun `each action has its own idempotency key, and a token when one is set (10_14)`() = runBlocking {
+    val signedIn = OmniClient("http://127.0.0.1:${server.address.port}", token = { "abc" })
+    val handler = signedIn.mutationHandler()
+    handler(MutationCall("payM", "pay", "payments.confirm", mapOf("amount" to Primitive.Number(42.5))))
+    handler(MutationCall("payM", "pay", "payments.confirm", mapOf("amount" to Primitive.Number(42.5))))
+    val keys = mutateHeaders.map { it["key"] }
+    assertTrue(keys.all { it != null && Regex("^[A-Za-z0-9_\\-:.]{1,200}$").matches(it) })
+    assertEquals(2, keys.toSet().size)
+    assertEquals(listOf("Bearer abc", "Bearer abc"), mutateHeaders.map { it["authorization"] })
+  }
+
+  @Test
+  fun `a dropped connection is retried once with the same key`() = runBlocking {
+    dropMutates = 1
+    var result = ""
+    client.mutationHandler { _, json -> result = json }(MutationCall("payM", "pay", "payments.confirm", mapOf("amount" to Primitive.Number(42.5))))
+    assertEquals("""{"receiptId":"rcpt_1"}""", result)
+    assertEquals(2, mutateHeaders.size)
+    assertEquals(mutateHeaders[0]["key"], mutateHeaders[1]["key"])
+    assertEquals(null, mutateHeaders[0]["authorization"])
   }
 
   @Test
