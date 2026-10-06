@@ -59,6 +59,8 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - [ ] A dark theme for the web catalog (it is light-only today)
    - [ ] The renderers' own text ("Choose a date", "Component failed to load") translated, following the platform's locale
 4. **Step 16 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+   - [ ] Pictures looked up by the app when the screen is drawn (for example `product-123`), for shops and user pictures that can't all be registered in advance; the model still never writes a URL
+   - [ ] Keep the system prompt small as the catalog grows: send only the components a request is likely to need, and measure the cost and the time to the first line
 5. **Step 17 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
 
 ## Later

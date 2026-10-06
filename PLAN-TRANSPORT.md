@@ -52,9 +52,11 @@ RUN_FINISHED     (or RUN_ERROR {message, code})
 - **Only adding lines is accepted.** `feedAgUiEvent` accepts a delta only if every operation is `add` at `/lines/-` with a string; anything else (replacing, removing or moving a line, or a second snapshot that rewrites the screen) is an error and changes nothing, because Omni-IR never lets a line be rewritten ([5.3]). A test covers each case.
 - **Governed actions do not go through the agent.** A Button's McpMutation still calls the app's own `/api/mutate`, checked again there; AG-UI carries the screen, never the authority to act. Stated in the spec.
 
-**6. Docs.** SPEC.md §10 rewritten as rules; a "Transport" page and a "Use with AG-UI" guide on the docs site; the landing page and README mention AG-UI support; CHANGELOG.
+**6. Rate limits behind a proxy** *(added 2026-10-06 from the review of earlier steps)*. The reference server counts requests per IP address but isn't told to trust a proxy, so behind a load balancer every user shares the proxy's address and one busy user blocks everyone. A new setting, `OMNI_TRUST_PROXY` (off by default; a hop count or a list of proxy addresses, passed to Express's `trust proxy`), makes the server read the client's address from `X-Forwarded-For` only when it comes from a trusted proxy. §10 says how a server reports a limit (429, `rate_limited`, `Retry-After`). Per-user limits wait for sign-in (roadmap item 2); the limiter stays in memory, which the docs state with its consequence (each server instance counts on its own).
 
-**Not in this step:** AG-UI on iOS and Android (the Swift and Kotlin clients get the SSE transport cases and the version marker; native AG-UI support waits until someone asks); AG-UI's protobuf binding; resuming a dropped stream; anything that reaches the agent from the screen.
+**7. Docs.** SPEC.md §10 rewritten as rules; a "Transport" page and a "Use with AG-UI" guide on the docs site; the landing page and README mention AG-UI support; CHANGELOG.
+
+**Not in this step:** a shared rate limiter across server instances (needs a store such as Redis; with real handlers); AG-UI on iOS and Android (the Swift and Kotlin clients get the SSE transport cases and the version marker; native AG-UI support waits until someone asks); AG-UI's protobuf binding; resuming a dropped stream; anything that reaches the agent from the screen.
 
 ## Facts that shape this
 
@@ -90,6 +92,11 @@ RUN_FINISHED     (or RUN_ERROR {message, code})
 - *Cons:* about 100 bytes of wrapping per line (about 3 KB on a 30-line screen); it is our convention, so other AG-UI apps need our helper to draw it, and a future AG-UI standard for generative UI may need a second mapping; a hostile agent could send patches that rewrite earlier lines, so only appends are accepted (above).
 - *Trade-off:* plain text messages would show raw Omni-IR in chat for every client that doesn't know it; custom events are dropped silently by clients that don't know them.
 
+**7. Rate limits behind a proxy: an opt-in `OMNI_TRUST_PROXY` setting.**
+- *Pros:* limits work per user behind a load balancer; off by default, so a server not behind a proxy can't be fooled by a forged `X-Forwarded-For`; no new dependency.
+- *Cons:* set wrongly (trusting every hop on a server reachable directly), anyone can forge their address and dodge the limit, so the docs must say exactly when to set it; still one count per server instance.
+- *Trade-off:* a shared limiter (Redis) counts across instances but adds a service to run; it belongs with real handlers and sign-in.
+
 **6. AG-UI helpers in `@omni-ir/core/ag-ui`.**
 - *Pros:* nothing new to install; always the same version as the parser; apps that don't import it don't load it; no runtime dependency (our own types, `@ag-ui/core` in tests only).
 - *Cons:* the core package grows by a few KB; a breaking AG-UI change forces a core release; web only for now.
@@ -121,6 +128,10 @@ Work on branch `wip/transport`. Each part starts with failing tests (constraint 
 - [ ] E.2 `@omni-ir/core/ag-ui`: `toAgUiEvents()` and `feedAgUiEvent()`; events checked against `@ag-ui/core` (dev dependency); only appends accepted, with a test per rejected patch
 - [ ] E.3 `POST /api/ag-ui` in the Express server; an end-to-end test comparing the screen with the SSE result
 - [ ] E.4 Package checks: the new entry point in the build, pack check and install test
+
+**G. Rate limits behind a proxy** *(tests first)*
+- [ ] G.1 `OMNI_TRUST_PROXY` in the server config, off by default; tests for no proxy, a trusted proxy and a forged header
+- [ ] G.2 §10's rate-limit rule; the deployment docs say when to set it
 
 **F. Docs and review** *(checkpoint: you review)*
 - [ ] F.1 Docs site: a "Transport" page and a "Use with AG-UI" guide; README, landing page and CHANGELOG
