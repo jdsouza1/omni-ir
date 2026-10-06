@@ -7,6 +7,31 @@ import type { ToolHandler } from "./tools/handlers";
 
 export const GenerateBody = z.strictObject({ prompt: z.string().trim().min(1).max(2000) });
 
+/**
+ * AG-UI 1.0's run input (RunAgentInput), as much as this server reads: the ids and the messages.
+ * Other fields (tools, context, state, forwardedProps) are allowed and ignored.
+ */
+export const AgUiRunInput = z.looseObject({
+  threadId: z.string().min(1).max(200),
+  runId: z.string().min(1).max(200),
+  messages: z.array(z.looseObject({ role: z.string(), content: z.unknown() })).max(200),
+});
+
+/** The prompt: the text of the last user message, or null when there is none of 1-2000 characters. */
+export function promptOf(input: z.infer<typeof AgUiRunInput>): string | null {
+  const last = [...input.messages].reverse().find((m) => m.role === "user");
+  const content = last?.content;
+  // Content is text, or a list of parts of which the text parts count.
+  const text =
+    typeof content === "string"
+      ? content
+      : Array.isArray(content)
+        ? content.map((part: unknown) => (typeof part === "object" && part !== null && (part as { type?: unknown }).type === "text" ? String((part as { text?: unknown }).text ?? "") : "")).join("")
+        : "";
+  const prompt = text.trim();
+  return prompt.length >= 1 && prompt.length <= 2000 ? prompt : null;
+}
+
 // `params` is checked as a plain object here and by the tool's own schema below. (z.record is not
 // used: it silently drops a "__proto__" key instead of rejecting it.)
 export const MutateBody = z.strictObject({

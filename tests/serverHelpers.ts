@@ -61,13 +61,16 @@ export const textOf = (events: SseEvent[]) =>
 export class FakeModel implements Model {
   readonly kind = "mock" as const;
   calls = 0;
+  /** Every prompt the model was given, in order. */
+  readonly prompts: string[] = [];
   lastSignal: AbortSignal | null = null;
   abortedAt: number | null = null;
 
   constructor(private readonly script: (options: GenerateOptions) => Promise<GenerateResult>) {}
 
-  generate(_prompt: string, options: GenerateOptions): Promise<GenerateResult> {
+  generate(prompt: string, options: GenerateOptions): Promise<GenerateResult> {
     this.calls++;
+    this.prompts.push(prompt);
     this.lastSignal = options.signal;
     options.signal.addEventListener("abort", () => (this.abortedAt = performance.now()), { once: true });
     return this.script(options);

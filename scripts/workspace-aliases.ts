@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 
 export const WORKSPACE_ALIASES = [
   { find: /^@omni-ir\/core$/, replacement: resolve("packages/core/src/index.ts") },
+  { find: /^@omni-ir\/core\/ag-ui$/, replacement: resolve("packages/core/src/agui.ts") },
   { find: /^@omni-ir\/react$/, replacement: resolve("packages/react/src/index.ts") },
   { find: /^@omni-ir\/react\/omni\.css$/, replacement: resolve("packages/react/src/catalog/omni.css") },
 ];

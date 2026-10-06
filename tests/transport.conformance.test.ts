@@ -80,7 +80,10 @@ describe("transport conformance suite", () => {
     const spec = readFileSync("SPEC.md", "utf8");
     const body = spec.slice(spec.indexOf("## 10. Transport"), spec.indexOf("## 11. Security considerations"));
     const specRules = new Set([...body.matchAll(/\*\*\[(10\.\d+)\]\*\*/g)].map((m) => m[1]!));
-    const tests = readdirSync("tests").map((f) => readFileSync(`tests/${f}`, "utf8")).join("\n");
+    const tests = readdirSync("tests")
+      .filter((f) => /\.tsx?$/.test(f))
+      .map((f) => readFileSync(`tests/${f}`, "utf8"))
+      .join("\n");
     const citedByTests = new Set([...tests.matchAll(/\[(10\.\d+)\]/g)].map((m) => m[1]!));
     // WebSockets are specified, not built (PLAN-TRANSPORT.md, decision 4): no endpoint to test yet.
     const specOnly = new Set(["10.16", "10.17"]);
