@@ -110,31 +110,31 @@ Work on branch `wip/transport`. Each part starts with failing tests (constraint 
 - [x] A.1 AG-UI 1.0: events, activity, HTTP+SSE binding, run input, versioning (above)
 
 **B. Transport standard** *(tests first)*
-- [ ] B.1 SPEC.md §10 as numbered rules: request, error body and codes, events, terminal event, pings, client rules, no resumption, `/api/mutate`
-- [ ] B.2 `conformance/cases/transport.json` from `conformance/build.ts`, with a coverage test like the parser rules'
-- [ ] B.3 Run the transport cases in TypeScript (`generate()`), Swift and Kotlin (`OmniClient` decoders); fix any difference by the spec
-- [ ] B.4 The idle timeout (45 s without bytes) in all three clients
+- [x] B.1 SPEC.md §10 as numbered rules: request, error body and codes, events, terminal event, pings, client rules, no resumption, `/api/mutate`
+- [x] B.2 `conformance/cases/transport.json` from `conformance/build.ts`, with a coverage test like the parser rules'
+- [x] B.3 Run the transport cases in TypeScript (`generate()`), Swift and Kotlin (`OmniClient` decoders); fix any difference by the spec
+- [x] B.4 The idle timeout (45 s without bytes) in all three clients
 
 **C. Stream versions** *(tests first)*
-- [ ] C.1 Spec rules for the marker, `newer_version` and the renderer's "update the app" notice, and `version` / `unsupported_version` in the request; conformance cases
-- [ ] C.2 The three parsers read the marker; regenerate the schema files and the fuzz corpus
-- [ ] C.3 The server and the in-browser API write the marker and check the requested version; the three clients send their version
+- [x] C.1 Spec rules for the marker, `newer_version` and the renderer's "update the app" notice, and `version` / `unsupported_version` in the request; conformance cases
+- [x] C.2 The three parsers read the marker; regenerate the schema files and the fuzz corpus
+- [x] C.3 The server and the in-browser API write the marker and check the requested version; the three clients send their version
 
 **D. WebSockets** *(spec only, question 4)*
-- [ ] D.1 The mapping in §10, with the origin check rule; no endpoint
+- [x] D.1 The mapping in §10, with the origin check rule; no endpoint
 
 **E. AG-UI** *(tests first)*
-- [ ] E.1 The mapping in §10 (activity type `omni-ir`, content `{version, lines}`, one line per patch, actions never through the agent)
-- [ ] E.2 `@omni-ir/core/ag-ui`: `toAgUiEvents()` and `feedAgUiEvent()`; events checked against `@ag-ui/core` (dev dependency); only appends accepted, with a test per rejected patch
-- [ ] E.3 `POST /api/ag-ui` in the Express server; an end-to-end test comparing the screen with the SSE result
-- [ ] E.4 Package checks: the new entry point in the build, pack check and install test
+- [x] E.1 The mapping in §10 (activity type `omni-ir`, content `{version, lines}`, one line per patch, actions never through the agent)
+- [x] E.2 `@omni-ir/core/ag-ui`: `toAgUiEvents()` and `feedAgUiEvent()`; events checked against `@ag-ui/core` (dev dependency); only appends accepted, with a test per rejected patch
+- [x] E.3 `POST /api/ag-ui` in the Express server; an end-to-end test comparing the screen with the SSE result
+- [x] E.4 Package checks: the new entry point in the build, pack check and install test
 
 **F. Rate limits behind a proxy** *(tests first)*
-- [ ] F.1 `OMNI_TRUST_PROXY` in the server config, off by default; tests for no proxy, a trusted proxy and a forged header
-- [ ] F.2 §10's rate-limit rule; the deployment docs say when to set it
+- [x] F.1 `OMNI_TRUST_PROXY` in the server config, off by default; tests for no proxy, a trusted proxy and a forged header
+- [x] F.2 §10's rate-limit rule; the deployment docs say when to set it
 
 **G. Docs and review** *(checkpoint: you review)*
-- [ ] G.1 Docs site: a "Transport" page and a "Use with AG-UI" guide; README, landing page and CHANGELOG
+- [x] G.1 Docs site: a "Transport" page and a "Use with AG-UI" guide; README, landing page and CHANGELOG
 - [ ] G.2 A review page: the transport rules, the case results on all three platforms, an AG-UI run
 - [ ] G.3 Merge with your approval
 - [ ] G.4 `v0.5.0` release: a separate go-ahead from you

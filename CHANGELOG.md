@@ -2,6 +2,21 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+### Added
+- **The transport is a standard** (SPEC.md section 10, rules [10.1]–[10.20], no longer informative): the request, the error body and its codes, the events and the terminal event, keep-alive pings, what a client does with each event and when the connection drops, no resumption, the action endpoint's answers, and rate limits behind a proxy. Any client now works with any server that follows it.
+- **Transport conformance cases** (`conformance/transport/`, 21 cases): server answers in, the text a client writes to its parser and the outcome out, each fed whole and split into reads of 1, 5 and 13 bytes. The web (`generate()`), iOS and Android (`OmniClient`) clients pass all of them.
+- **Stream versions:** a server writes `# omni-ir 0.5` as a stream's first line ([3.9], [10.13]). Older parsers read it as a comment. A parser built for an older version reports the new warning `newer_version`, keeps parsing, and the web, SwiftUI and Compose renderers show that the app needs an update. Clients send their version with each request (`?version=0.5`), and a server that can't write that version answers `unsupported_version` before streaming. `OMNI_IR_VERSION`, `majorMinor()` and `versionMarker()` in `@omni-ir/core`; `OmniDocument.newerVersion` on all three platforms.
+- **AG-UI** ([10.18]–[10.20]): a screen travels as one activity message of type `omni-ir`, one added line per update. `@omni-ir/core/ag-ui` has `AgUiEncoder` (for agent backends) and `createAgUiReader` (for apps), which accepts only added lines. The reference server answers AG-UI's run input at `POST /api/ag-ui`. Every event is checked against AG-UI's own schemas in the tests. Governed actions never go through the agent.
+- **WebSockets** are specified ([10.16]–[10.17], including the origin check browsers don't do), but not built.
+- **Idle timeout:** all three clients treat 45 seconds without any bytes as `connection_lost` (`idleTimeoutMs`, `idleTimeout`, `idleTimeoutMillis`).
+- **`OMNI_TRUST_PROXY`** for the reference server: which proxies may report the client's address, so rate limits work per client behind a load balancer. Off by default; `true` is refused.
+
+### Changed
+- The reference server's streams start with the version marker line, so the screen's line numbers are one higher than the model's text.
+- Clients ignore every event after the first `done` or `error` ([10.8]).
+
 ## 0.4.0 (2026-10-06)
 
 ### Changed

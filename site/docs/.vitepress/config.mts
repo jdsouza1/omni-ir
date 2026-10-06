@@ -35,6 +35,8 @@ export default withMermaid(
             { text: "The core package", link: "/guide/core" },
             { text: "iPhone, iPad and Mac", link: "/guide/swift" },
             { text: "Android", link: "/guide/android" },
+            { text: "Servers and transports", link: "/guide/transport" },
+            { text: "Use with AG-UI", link: "/guide/ag-ui" },
           ],
         },
         {

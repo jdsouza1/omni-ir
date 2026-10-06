@@ -140,7 +140,7 @@ export function Landing() {
                 </svg>
               </span>
               <h3>Vendor-neutral</h3>
-              <p>Not tied to any model, framework or company.</p>
+              <p>Not tied to any model, framework or company. Screens stream over plain HTTP or AG-UI, the protocol many agent frameworks speak.</p>
             </div>
             <div className="principle">
               <span className="icon green" aria-hidden="true">
