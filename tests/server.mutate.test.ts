@@ -1,6 +1,6 @@
 import { TOOLS } from "../app/tools";
 import { MockModel } from "../server/models/mock";
-import { STUB_HANDLERS, type ToolHandler } from "../server/tools/handlers";
+import { HANDLERS, type ToolHandler } from "../server/tools/handlers";
 import { startServer } from "./serverHelpers";
 
 let server: Awaited<ReturnType<typeof startServer>> | null = null;
@@ -8,6 +8,9 @@ afterEach(async () => {
   await server?.close();
   server = null;
 });
+
+/** A handler for signed-in people that runs `run`. */
+const handler = (run: () => Promise<Record<string, unknown>>) => ({ access: "signed-in" as const, run: vi.fn(run) });
 
 async function start(handlers?: Record<string, ToolHandler>) {
   server = await startServer({ model: new MockModel({ speed: "instant" }), ...(handlers ? { handlers } : {}) });
@@ -19,9 +22,9 @@ async function start(handlers?: Record<string, ToolHandler>) {
     });
 }
 
-describe("stub handlers", () => {
+describe("handlers", () => {
   it("cover exactly the tools in the registry", () => {
-    expect(Object.keys(STUB_HANDLERS).sort()).toEqual(Object.keys(TOOLS).sort());
+    expect(Object.keys(HANDLERS).sort()).toEqual(Object.keys(TOOLS).sort());
   });
 });
 
@@ -34,12 +37,12 @@ describe("POST /api/mutate [10.14]", () => {
     ["support.createTicket", { subject: "Refund", message: "Please help" }, "ticketId"],
     ["bookings.reserve", { checkIn: "2026-10-14", checkOut: "2026-10-17" }, "bookingId"],
     ["assistant.ask", { question: "Any quiet beaches?" }, "answer"],
-  ])("%s with valid params → 200 with a stub result", async (tool, params, field) => {
+  ])("%s with valid params → 200 with its result (as the demo visitor)", async (tool, params, field) => {
     const mutate = await start();
     const response = await mutate({ tool, params });
     expect(response.status).toBe(200);
     const body = (await response.json()) as { ok: boolean; tool: string; result: Record<string, unknown> };
-    expect(body).toMatchObject({ ok: true, tool, result: { stub: true } });
+    expect(body).toMatchObject({ ok: true, tool });
     expect(body.result).toHaveProperty(field);
   });
 
@@ -48,12 +51,12 @@ describe("POST /api/mutate [10.14]", () => {
     ["inherited from Object.prototype", "constructor"],
     ["prototype setter", "__proto__"],
   ])("unknown tool (%s) → 403, no handler runs", async (_, tool) => {
-    const handler = vi.fn<ToolHandler>(async () => ({}));
-    const mutate = await start({ ...STUB_HANDLERS, [tool]: handler });
+    const spy = handler(async () => ({}));
+    const mutate = await start({ ...HANDLERS, [tool]: spy });
     const response = await mutate({ tool, params: {} });
     expect(response.status).toBe(403);
     expect(await response.json()).toMatchObject({ error: { code: "unknown_tool" } });
-    expect(handler).not.toHaveBeenCalled();
+    expect(spy.run).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -63,14 +66,14 @@ describe("POST /api/mutate [10.14]", () => {
     ["extra param", { amount: 42.5, note: "", currency: "USD" }, ""],
     ["wrong type", { amount: "42.50", note: "" }, "amount"],
   ])("invalid params (%s) → 422, no handler runs", async (_, params, path) => {
-    const handler = vi.fn<ToolHandler>(async () => ({}));
-    const mutate = await start({ ...STUB_HANDLERS, "payments.confirm": handler });
+    const spy = handler(async () => ({}));
+    const mutate = await start({ ...HANDLERS, "payments.confirm": spy });
     const response = await mutate({ tool: "payments.confirm", params });
     expect(response.status).toBe(422);
     const body = (await response.json()) as { error: { code: string; issues: { path: string }[] } };
     expect(body.error.code).toBe("invalid_params");
     if (path) expect(body.error.issues.map((i) => i.path)).toContain(path);
-    expect(handler).not.toHaveBeenCalled();
+    expect(spy.run).not.toHaveBeenCalled();
   });
 
   it.each([
@@ -105,10 +108,10 @@ describe("POST /api/mutate [10.14]", () => {
 
   it("a failing handler → 500 with a generic message", async () => {
     const mutate = await start({
-      ...STUB_HANDLERS,
-      "payments.confirm": async () => {
+      ...HANDLERS,
+      "payments.confirm": handler(async () => {
         throw new Error("card processor key sk_live_123 rejected");
-      },
+      }),
     });
     const response = await mutate({ tool: "payments.confirm", params: { amount: 1, note: "" } });
     expect(response.status).toBe(500);

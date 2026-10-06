@@ -101,7 +101,8 @@ describe("the requested version [10.1] [10.12] [10.2]", () => {
 describe("rate limits behind a proxy [10.15]", () => {
   const limited = async (trustProxy: string | undefined, forwardedFor: string[]) => {
     const model = new FakeModel(async () => ({ stopReason: "end_turn", model: "fake" }));
-    server = await startServer({ model, config: { rateLimitPerMinute: 1, trustProxy: loadConfig(trustProxy === undefined ? {} : { OMNI_TRUST_PROXY: trustProxy }).config.trustProxy } });
+    // Signed out (magic-link, no session), so only the per-address limit applies.
+    server = await startServer({ model, config: { auth: "magic-link", rateLimitPerMinute: 1, trustProxy: loadConfig(trustProxy === undefined ? {} : { OMNI_TRUST_PROXY: trustProxy }).config.trustProxy } });
     const statuses: number[] = [];
     for (const address of forwardedFor) {
       const response = await fetch(`${server.url}/api/generate`, { ...json, headers: { ...json.headers, "x-forwarded-for": address }, body: prompt });

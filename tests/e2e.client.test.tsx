@@ -188,7 +188,7 @@ describe("generate(): streaming a screen from the server", () => {
 });
 
 describe("createMutationHandler(): governed actions reach the server", () => {
-  it("Pay → /api/mutate → stub receipt, with the typed note", async () => {
+  it("Pay → /api/mutate → receipt from the fake ledger, with the typed note", async () => {
     server = await startServer({ model: new MockModel({ speed: "instant" }) });
     const results: Record<string, unknown>[] = [];
     const onMutation = createMutationHandler({ baseUrl: server.url, onResult: (_call, result) => results.push(result) });
@@ -201,7 +201,7 @@ describe("createMutationHandler(): governed actions reach the server", () => {
       await user.click(screen.getByRole("button", { name: "Pay now" }));
     });
     await vi.waitFor(() => expect(results).toHaveLength(1));
-    expect(results[0]).toMatchObject({ stub: true, status: "confirmed", amount: 42.5 });
+    expect(results[0]).toMatchObject({ status: "confirmed", amount: 42.5 });
     expect(results[0]!.receiptId).toMatch(/^rcpt_/);
     expect(h.errors()).toEqual([]);
   });

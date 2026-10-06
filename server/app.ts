@@ -10,7 +10,11 @@ import type { ToolRegistry } from "@omni-ir/core";
 import type { ServerConfig } from "./config";
 import { AgUiRunInput, describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MARKER_CHUNK, MutateBody, promptOf, runMutation, sseEvent, versionError } from "./api";
 import { ModelError, type Model } from "./models/types";
-import { STUB_HANDLERS, type ToolHandler } from "./tools/handlers";
+import { clearedCookie, createDevMailer, credentialsOf, endSession, redeemLink, SESSION_TTL_MS, sessionCookie, userOfSession, type Mailer } from "./backend/auth";
+import { createMemoryStore } from "./backend/memoryStore";
+import { DEMO_VISITOR_EMAIL, seedDemo } from "./backend/seed";
+import type { Store, User } from "./backend/types";
+import { HANDLERS, type ToolHandler } from "./tools/handlers";
 
 export interface AppOptions {
   config: ServerConfig;
@@ -19,8 +23,17 @@ export interface AppOptions {
   tools?: ToolRegistry;
   /** Image assets streams may name; defaults to the shared registry. */
   assets?: AssetRegistry;
-  /** Handler per tool; defaults to the stubs. */
+  /** Handler per tool, with its access rule; defaults to the reference handlers. */
   handlers?: Readonly<Record<string, ToolHandler>>;
+  /** Where data lives; defaults to a SQLite file (OMNI_DB) or memory, with the demo data added. */
+  store?: Store;
+  /** Sends sign-in links; defaults to the development outbox, which prints them to the log. */
+  mailer?: Mailer;
+  /**
+   * Who is asking: replace the reference sign-in with your own (an existing session, an identity
+   * provider). Return null for nobody. Requests from a browser must still pass the Origin check.
+   */
+  authenticate?: (req: Request) => Promise<User | null>;
   /** Heartbeat interval for SSE streams (default 15 s). */
   heartbeatMs?: number;
   /** Structured log sink; never receives prompt text. */
@@ -46,7 +59,10 @@ export function createApp({
   model,
   tools = TOOLS,
   assets = ASSETS,
-  handlers = STUB_HANDLERS,
+  handlers = HANDLERS,
+  store: givenStore,
+  mailer = createDevMailer((line) => console.log(line)),
+  authenticate,
   heartbeatMs = 15_000,
   log = defaultLog,
   now = Date.now,
@@ -58,12 +74,52 @@ export function createApp({
   app.use(cors(config.corsOrigin));
   app.use(express.json({ limit: "16kb" }));
 
+  // The SQLite store is loaded only when OMNI_DB asks for it, so node:sqlite is never imported
+  // where it isn't used (bundlers and test environments that don't know it). Every route that
+  // reads the store waits for `ready` first.
+  let store: Store = givenStore ?? createMemoryStore();
+  const ready = givenStore
+    ? Promise.resolve()
+    : (async () => {
+        if (config.dbPath) store = (await import("./backend/sqliteStore")).createSqliteStore(config.dbPath);
+        await seedDemo(store);
+      })();
+  /** Close the store this app opened (not one it was given): call when the server stops. */
+  app.locals.closeStore = async () => {
+    await ready;
+    if (!givenStore) store.close?.();
+  };
+  const secure = config.publicUrl.startsWith("https:");
+  /** Origins a browser may send actions from: the app's own and the one CORS allows. */
+  const allowedOrigins = new Set([config.corsOrigin, new URL(config.publicUrl).origin]);
+
+  /**
+   * Who is asking, and how they proved it. A cookie is sent by the browser automatically, even on a
+   * request another site starts, so cookie-authenticated requests must come from an allowed Origin.
+   */
+  async function identify(req: Request): Promise<{ user: User | null; via: "cookie" | "bearer" | "app" | "demo" | null }> {
+    await ready;
+    if (authenticate) return { user: await authenticate(req), via: "app" };
+    if (config.auth === "demo") return { user: await store.users.ensure(DEMO_VISITOR_EMAIL), via: "demo" };
+    const credentials = credentialsOf({ authorization: req.get("authorization"), cookie: req.get("cookie") });
+    if (credentials.token === null) return { user: null, via: null };
+    const user = await userOfSession(store, credentials.token, now());
+    return { user, via: user ? credentials.via : null };
+  }
+
+  /** A browser request from another site is refused; a cookie-authenticated one must name an allowed Origin. */
+  function badOrigin(req: Request, via: string | null): boolean {
+    const origin = req.get("origin");
+    if (origin !== undefined) return !allowedOrigins.has(origin);
+    return via === "cookie";
+  }
+
   const allow = rateLimiter(config.rateLimitPerMinute, now);
   // Mutations are cheap for the server but may hit real services later; allow more, still bounded.
   const allowMutate = rateLimiter(config.rateLimitPerMinute * 3, now);
 
   app.get("/api/health", (_req, res) => {
-    res.json({ ok: true, model: model.kind });
+    res.json({ ok: true, model: model.kind, auth: config.auth });
   });
 
   /** The version a client asked for ([10.1]): null when none, "" when the query isn't one string. */
@@ -113,7 +169,11 @@ export function createApp({
    * what the model wrote; the client's parser decides what is valid.
    */
   async function stream(req: Request, res: Response, prompt: string, output: StreamOutput) {
-    const limit = allow(req.ip ?? "unknown");
+    // Limited per address, and per signed-in person wherever their requests come from. Generation
+    // doesn't require sign-in, and nothing about the person is added to the prompt.
+    const { user } = await identify(req);
+    const byAddress = allow(req.ip ?? "unknown");
+    const limit = byAddress.ok && user ? allow(`user:${user.id}`) : byAddress;
     if (!limit.ok) {
       res.setHeader("Retry-After", String(limit.retryAfterSeconds));
       return sendError(res, 429, "rate_limited", "Too many requests; try again shortly.", true);
@@ -204,16 +264,69 @@ export function createApp({
       return sendError(res, 400, "invalid_request", describeIssues(body.error));
     }
     const { tool, params } = body.data;
-    const entry = { event: "mutate", tool: tool.slice(0, 128) };
+    const entry: Record<string, unknown> = { event: "mutate", tool: tool.slice(0, 128) };
 
     // Rate limit first, so probing for tool names is throttled too.
     if (!allowMutate(req.ip ?? "unknown").ok) {
       log({ ...entry, outcome: "rate_limited" });
       return sendError(res, 429, "rate_limited", "Too many requests; try again shortly.", true);
     }
-    const answer = await runMutation(tool, params, tools, handlers);
+    const { user, via } = await identify(req);
+    entry.userId = user?.id ?? null;
+    // Each signed-in person is limited too, wherever their requests come from.
+    if (user && !allowMutate(`user:${user.id}`).ok) {
+      log({ ...entry, outcome: "rate_limited" });
+      return sendError(res, 429, "rate_limited", "Too many requests; try again shortly.", true);
+    }
+    if (badOrigin(req, via)) {
+      log({ ...entry, outcome: "bad_origin" });
+      return sendError(res, 403, "bad_origin", "This request didn't come from the app.");
+    }
+    const answer = await runMutation(
+      { tool, params, user, idempotencyKey: req.get("idempotency-key") ?? null },
+      { tools, handlers, ctx: { store, mailer, now: now(), publicUrl: config.publicUrl } },
+    );
     log({ ...entry, outcome: answer.outcome, ...answer.detail });
     return res.status(answer.status).json(answer.body);
+  });
+
+  // Sign-in (PLAN-BACKEND.md B). The emailed link lands here in a browser: a session cookie, then home.
+  app.get("/api/auth/callback", async (req, res) => {
+    await ready;
+    const token = typeof req.query.token === "string" ? req.query.token : "";
+    const signedIn = await redeemLink(store, token, now());
+    log({ event: "sign_in", outcome: signedIn ? "ok" : "expired", userId: signedIn?.user.id ?? null });
+    if (!signedIn) return res.redirect(303, "/?signin=expired");
+    res.setHeader("Set-Cookie", sessionCookie(signedIn.session, secure));
+    return res.redirect(303, "/");
+  });
+
+  // A native app that caught the link (a universal or app link) trades it for a bearer token.
+  app.post("/api/auth/session", async (req, res) => {
+    if (!allow(req.ip ?? "unknown").ok) return sendError(res, 429, "rate_limited", "Too many requests; try again shortly.", true);
+    const token = typeof req.body?.token === "string" ? (req.body.token as string) : "";
+    const signedIn = await (async () => {
+      await ready;
+      return redeemLink(store, token, now());
+    })();
+    log({ event: "sign_in", via: "bearer", outcome: signedIn ? "ok" : "expired", userId: signedIn?.user.id ?? null });
+    if (!signedIn) return sendError(res, 400, "invalid_request", "This sign-in link has expired or was already used.");
+    return res.json({ token: signedIn.session, expiresAt: now() + SESSION_TTL_MS });
+  });
+
+  app.post("/api/auth/signout", async (req, res) => {
+    await ready;
+    const credentials = credentialsOf({ authorization: req.get("authorization"), cookie: req.get("cookie") });
+    if (badOrigin(req, credentials.via)) return sendError(res, 403, "bad_origin", "This request didn't come from the app.");
+    if (credentials.token) await endSession(store, credentials.token);
+    if (credentials.via === "cookie") res.setHeader("Set-Cookie", clearedCookie(secure));
+    return res.status(204).end();
+  });
+
+  app.get("/api/auth/me", async (req, res) => {
+    const { user } = await identify(req);
+    res.setHeader("Cache-Control", "no-store");
+    return res.json({ user: user ? { email: user.email } : null, ...(config.auth === "demo" && !authenticate ? { demo: true } : {}) });
   });
 
   app.use((_req, res) => sendError(res, 404, "not_found", "Not found."));

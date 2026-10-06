@@ -22,6 +22,15 @@ export interface ServerConfig {
    * default), a number of hops, or addresses and subnets such as "loopback" or "10.0.0.0/8" ([10.15]).
    */
   trustProxy: false | number | string[];
+  /**
+   * Who is signed in (PLAN-BACKEND.md): "magic-link" (the default) signs people in with an emailed
+   * link; "demo" treats every request as one labelled demo visitor, for the playground and demos only.
+   */
+  auth: "magic-link" | "demo";
+  /** The app's address, where sign-in links point and the origin cookie-authenticated actions must come from. */
+  publicUrl: string;
+  /** A SQLite file for the reference backend's data; unset keeps it in memory until the server stops. */
+  dbPath: string | null;
 }
 
 export class ConfigError extends Error {}
@@ -42,6 +51,9 @@ const Env = z.object({
     .refine((v) => v !== "true", "true would trust a header anyone can write; give the number of proxies or their addresses")
     .transform((v): false | number | string[] => (v === "false" ? false : /^\d+$/.test(v) ? Number(v) : v.split(",").map((a) => a.trim()).filter(Boolean)))
     .default(false),
+  OMNI_AUTH: z.enum(["magic-link", "demo"]).default("magic-link"),
+  OMNI_PUBLIC_URL: z.url().default("http://localhost:5173"),
+  OMNI_DB: z.string().trim().min(1).optional(),
 });
 
 export function loadConfig(env: Record<string, string | undefined> = process.env): {
@@ -66,6 +78,9 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     dailyCap: e.OMNI_DAILY_CAP,
     mockSpeed: e.OMNI_MOCK_SPEED,
     trustProxy: e.OMNI_TRUST_PROXY,
+    auth: e.OMNI_AUTH,
+    publicUrl: e.OMNI_PUBLIC_URL,
+    dbPath: e.OMNI_DB ?? null,
   };
 
   const warnings: string[] = [];
@@ -76,6 +91,9 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     if (!present.ANTHROPIC_API_KEY && !present.ANTHROPIC_AUTH_TOKEN) {
       warnings.push("No ANTHROPIC_API_KEY in the environment; the SDK will try an `ant auth login` profile instead.");
     }
+  }
+  if (config.auth === "demo") {
+    warnings.push("OMNI_AUTH=demo: every request acts as one demo visitor. For the playground and demos only, never for real data.");
   }
   return { config, warnings };
 }

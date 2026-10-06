@@ -79,7 +79,7 @@ button click ──► McpMutationBoundary ──► /api/mutate ──► serve
 - **Governed actions.** A button that changes backend state must be wrapped by an `McpMutation` naming a tool from the app's registry. Until then it is disabled.
 - **Checked three times:** the parser rejects unknown tools, the browser validates params against the tool's schema before sending, and the server re-validates both before running anything. The server doesn't trust the browser.
 - **Contained failures.** A component that crashes shows a fallback; the rest of the screen keeps working. (In SwiftUI, which can't catch a failing view, components only ever receive validated props, so rendering can't fail.)
-- Stub action handlers mark where a real backend must add **authorization** (is this user allowed to do this?). Validation proves a request is well-formed, not that it's permitted.
+- **Real actions are authorized.** The reference server signs people in by emailed link, gives every tool an access rule, checks ownership against its own data, and uses idempotency keys so no action runs twice. Validation proves a request is well-formed; these prove it is allowed.
 
 ## How it compares
 

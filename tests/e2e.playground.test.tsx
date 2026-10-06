@@ -56,7 +56,7 @@ describe("playground end to end", () => {
     expect(document.querySelector("[data-pending-id], [data-fallback-reason]")).toBeNull();
   });
 
-  it("a governed click goes through /api/mutate and shows the stub receipt", async () => {
+  it("a governed click goes through /api/mutate and shows the receipt", async () => {
     const user = await open();
     await runExample(user, "a payment confirmation for $42.50");
     await user.type(screen.getByLabelText("Note for merchant (optional)"), "Table 4");

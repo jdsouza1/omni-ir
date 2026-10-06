@@ -9,7 +9,7 @@ flowchart TB
         model["Model<br/>MockModel (default, free)<br/>ClaudeModel (opt-in)"]
         generate["POST /api/generate<br/>streams text as SSE"]
         mutate["POST /api/mutate<br/>checks tool and params again"]
-        handlers["Tool handlers<br/>(stubs; real ones add authorization)"]
+        handlers["Tool handlers<br/>access rules, ownership, idempotency"]
         prompt --> model --> generate
         mutate --> handlers
     end

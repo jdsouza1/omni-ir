@@ -125,3 +125,36 @@ describe("the playground's client against the in-browser API", () => {
     expect((await pending).status).toBe("aborted");
   });
 });
+
+describe("in-browser actions as the pretend demo visitor (PLAN-BACKEND.md decision 7)", () => {
+  const post = (api: typeof fetch, tool: string, params: unknown, key?: string) =>
+    api("/api/mutate", {
+      method: "POST",
+      headers: { "content-type": "application/json", ...(key ? { "idempotency-key": key } : {}) },
+      body: JSON.stringify({ tool, params }),
+    });
+
+  it("says it is a demo visitor", async () => {
+    const api = createInBrowserApi({ model: new MockModel({ speed: "instant" }) });
+    expect(await (await api("/api/auth/me")).json()).toEqual({ user: { email: "visitor@example.com" }, demo: true });
+    expect(await (await api("/api/health")).json()).toMatchObject({ auth: "demo" });
+  });
+
+  it("follows the server's rules: one return per order, no overlapping stays, someone else's order not found", async () => {
+    const api = createInBrowserApi({ model: new MockModel({ speed: "instant" }) });
+    const first = (await (await post(api, "orders.requestReturn", { orderId: "A1B2-7731" })).json()) as { result: { returnId: string } };
+    const again = (await (await post(api, "orders.requestReturn", { orderId: "A1B2-7731" })).json()) as { result: { returnId: string } };
+    expect(again.result.returnId).toBe(first.result.returnId);
+    expect((await post(api, "orders.requestReturn", { orderId: "C3D4-1188" })).status).toBe(404);
+    expect((await post(api, "bookings.reserve", { checkIn: "2026-10-14", checkOut: "2026-10-17" })).status).toBe(200);
+    expect((await post(api, "bookings.reserve", { checkIn: "2026-10-15", checkOut: "2026-10-16" })).status).toBe(409);
+  });
+
+  it("honours idempotency keys", async () => {
+    const api = createInBrowserApi({ model: new MockModel({ speed: "instant" }) });
+    const a = await (await post(api, "payments.confirm", { amount: 5, note: "" }, "k1")).json();
+    const b = await (await post(api, "payments.confirm", { amount: 5, note: "" }, "k1")).json();
+    expect(b).toEqual(a);
+    expect((await post(api, "payments.confirm", { amount: 6, note: "" }, "k1")).status).toBe(409);
+  });
+});

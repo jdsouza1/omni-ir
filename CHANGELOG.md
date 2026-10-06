@@ -2,6 +2,21 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+### Added
+- **Real backend handlers in the reference server** (PLAN-BACKEND.md): every tool has an access rule ("signed-in" or "public"; a tool without one doesn't load), checks ownership against stored data, and answers `404 not_found` the same for "not yours" and "doesn't exist". Results carry only what a screen needs.
+- **Sign-in by emailed link:** single-use links valid for 15 minutes, stored as hashes; at most five an hour per address, with the same answer either way. Browsers get an `HttpOnly`, `SameSite=Lax` session cookie; native apps a bearer token (`POST /api/auth/session`). `POST /api/auth/signout`, `GET /api/auth/me`. Apps plug in their own sign-in with `createApp({ authenticate })`. A development outbox prints links; nothing is sent.
+- **Idempotency keys** ([10.14]): an optional `Idempotency-Key` header that servers performing real actions SHOULD honour. The reference server keeps each person's answers for 24 hours and refuses a key reused for other params (`409 idempotency_conflict`). `createMutationHandler` and the Swift and Kotlin `OmniClient`s send a key per press and retry once after a dropped connection with the same key.
+- **Storage:** a `Store` interface with an in-memory version and one on Node's built-in SQLite (`OMNI_DB`), no dependency.
+- **Audit trail and limits:** every action is recorded (who, tool, time, outcome), never param values; requests are limited per signed-in person as well as per address.
+- **Settings:** `OMNI_AUTH` (`magic-link`, or `demo` for the playground and demo apps), `OMNI_PUBLIC_URL`, `OMNI_DB`. The playground and the hosted playground act as a labelled demo visitor.
+- `createMutationHandler` takes `credentials` and `token`; `MutationRejectedError.code` gives the server's error code. `OmniClient` takes a `token` on iOS and Android.
+
+### Changed
+- SPEC.md section 9: ownership is checked against the server's own data, "not yours" looks like "doesn't exist", results and logs carry no one else's data. [10.14] lists `401 sign_in_required`, `403 bad_origin`, `404 not_found` and the `409` answers.
+- `/api/mutate` now needs a signed-in person for every tool except sending a sign-in link (unless `OMNI_AUTH=demo`). The stub handlers are gone; `assistant.ask` stays a labelled stub because a real one would call a paid model.
+
 ## 0.5.0 (2026-10-06)
 
 ### Added

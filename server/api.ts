@@ -3,7 +3,9 @@
 import { z } from "zod";
 import { majorMinor, versionMarker, type ToolRegistry } from "@omni-ir/core";
 import { ModelError } from "./models/types";
-import type { ToolHandler } from "./tools/handlers";
+import { sha256 } from "./backend/auth";
+import type { User } from "./backend/types";
+import { ToolError, type ToolContext, type ToolHandler } from "./tools/handlers";
 
 export const GenerateBody = z.strictObject({ prompt: z.string().trim().min(1).max(2000) });
 
@@ -82,46 +84,113 @@ export function generateError(err: unknown): { code: string; message: string; re
 export interface MutationAnswer {
   status: number;
   body: unknown;
-  /** For the log: ok, unknown_tool, invalid_params or tool_failed. */
+  /** For the log and the audit trail: ok, replayed, unknown_tool, sign_in_required, invalid_params, a handler's refusal code, or tool_failed. */
   outcome: string;
   detail?: Record<string, unknown>;
 }
 
+export interface MutationRequest {
+  tool: string;
+  params: Record<string, unknown>;
+  /** The signed-in person, if any. */
+  user: User | null;
+  /** The Idempotency-Key header ([10.14]): null when absent. */
+  idempotencyKey: string | null;
+}
+
+/** An idempotency key: 1-200 letters, digits and `_-:.` ([10.14]). */
+const IDEMPOTENCY_KEY = /^[A-Za-z0-9_\-:.]{1,200}$/;
+
+/** JSON with keys sorted, so the same params always give the same fingerprint. */
+function stableJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
+  if (typeof value === "object" && value !== null) {
+    return `{${Object.keys(value).sort().map((k) => `${JSON.stringify(k)}:${stableJson((value as Record<string, unknown>)[k])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
 /**
- * Run a governed action after checking it again: the tool must be registered and have a handler,
- * and its params must pass the tool's schema. The browser's checks can be bypassed, so these can't.
+ * Run a governed action after checking it again (section 9, [10.14]): the tool must be registered
+ * and have a handler; a tool for signed-in people needs one; the params must pass the tool's
+ * schema. A repeated idempotency key gets the stored answer instead of running the action twice.
+ * Every outcome is recorded in the audit trail, without param values. The browser's checks can be
+ * bypassed, so none of these can.
  */
 export async function runMutation(
-  tool: string,
-  params: Record<string, unknown>,
-  tools: ToolRegistry,
-  handlers: Readonly<Record<string, ToolHandler>>,
+  request: MutationRequest,
+  { tools, handlers, ctx }: { tools: ToolRegistry; handlers: Readonly<Record<string, ToolHandler>>; ctx: ToolContext },
 ): Promise<MutationAnswer> {
-  const schema = Object.hasOwn(tools, tool) ? tools[tool] : undefined;
-  const handler = Object.hasOwn(handlers, tool) ? handlers[tool] : undefined;
-  if (schema === undefined || handler === undefined) {
-    return { status: 403, body: errorBody("unknown_tool", `"${tool}" is not a permitted action.`), outcome: "unknown_tool" };
-  }
+  const { tool, params, user, idempotencyKey } = request;
+  const answer = await decide();
+  await ctx.store.audit.add({
+    at: ctx.now,
+    userId: user?.id ?? null,
+    tool: tool.slice(0, 128),
+    outcome: answer.outcome,
+    idempotencyKey: idempotencyKey !== null && IDEMPOTENCY_KEY.test(idempotencyKey) ? idempotencyKey : null,
+  });
+  return answer;
 
-  const reserved = RESERVED_KEYS.filter((key) => Object.hasOwn(params, key));
-  const parsed = reserved.length === 0 ? schema.safeParse(params) : null;
-  if (parsed === null || !parsed.success) {
-    const issues = parsed
-      ? parsed.error.issues.map((i) => ({ path: i.path.join("."), message: i.message }))
-      : reserved.map((key) => ({ path: key, message: "reserved key" }));
-    const body: ApiErrorBody = { error: { code: "invalid_params", message: "The action's details are not valid.", retryable: false, issues } };
-    return { status: 422, body, outcome: "invalid_params", detail: { paths: issues.map((i) => i.path) } };
-  }
+  async function decide(): Promise<MutationAnswer> {
+    const schema = Object.hasOwn(tools, tool) ? tools[tool] : undefined;
+    const handler = Object.hasOwn(handlers, tool) ? handlers[tool] : undefined;
+    if (schema === undefined || handler === undefined) {
+      return { status: 403, body: errorBody("unknown_tool", `"${tool}" is not a permitted action.`), outcome: "unknown_tool" };
+    }
+    if (handler.access === "signed-in" && user === null) {
+      return { status: 401, body: errorBody("sign_in_required", "Sign in to do this."), outcome: "sign_in_required" };
+    }
+    if (idempotencyKey !== null && !IDEMPOTENCY_KEY.test(idempotencyKey)) {
+      return { status: 400, body: errorBody("invalid_request", "Idempotency-Key must be 1-200 letters, digits, or _ - : ."), outcome: "invalid_request" };
+    }
 
-  try {
-    const result = await handler(parsed.data as Record<string, unknown>);
-    return { status: 200, body: { ok: true, tool, result }, outcome: "ok" };
-  } catch (err) {
-    return {
-      status: 500,
-      body: errorBody("tool_failed", "The action could not be completed.", true),
-      outcome: "tool_failed",
-      detail: { error: err instanceof Error ? err.message : String(err) },
-    };
+    const reserved = RESERVED_KEYS.filter((key) => Object.hasOwn(params, key));
+    const parsed = reserved.length === 0 ? schema.safeParse(params) : null;
+    if (parsed === null || !parsed.success) {
+      const issues = parsed
+        ? parsed.error.issues.map((i) => ({ path: i.path.join("."), message: i.message }))
+        : reserved.map((key) => ({ path: key, message: "reserved key" }));
+      const body: ApiErrorBody = { error: { code: "invalid_params", message: "The action's details are not valid.", retryable: false, issues } };
+      return { status: 422, body, outcome: "invalid_params", detail: { paths: issues.map((i) => i.path) } };
+    }
+    const valid = parsed.data as Record<string, unknown>;
+
+    // Keys are kept per person, so one person's key can never return another person's answer.
+    // Public actions (only the sign-in link) are safe to repeat and don't use keys.
+    const keyed = idempotencyKey !== null && user !== null ? { scope: user.id, key: idempotencyKey } : null;
+    if (keyed) {
+      const fingerprint = await sha256(`${tool}\n${stableJson(valid)}`);
+      const held = await ctx.store.idempotency.claim(keyed.scope, keyed.key, fingerprint, ctx.now);
+      if (held.state === "done") return { status: held.status, body: held.body, outcome: "replayed" };
+      if (held.state === "pending") {
+        return { status: 409, body: errorBody("idempotency_in_progress", "This action is still running.", true), outcome: "idempotency_in_progress" };
+      }
+      if (held.state === "conflict") {
+        return { status: 409, body: errorBody("idempotency_conflict", "This key was already used for a different action."), outcome: "idempotency_conflict" };
+      }
+    }
+
+    let result: MutationAnswer;
+    try {
+      const output =
+        handler.access === "public" ? await handler.run(valid, { ...ctx, user }) : await handler.run(valid, { ...ctx, user: user as User });
+      result = { status: 200, body: { ok: true, tool, result: output }, outcome: "ok" };
+    } catch (err) {
+      if (err instanceof ToolError) {
+        result = { status: err.status, body: errorBody(err.code, err.message), outcome: err.code };
+      } else {
+        // Unexpected: the key is released, so a retry can run the action.
+        if (keyed) await ctx.store.idempotency.release(keyed.scope, keyed.key);
+        return {
+          status: 500,
+          body: errorBody("tool_failed", "The action could not be completed.", true),
+          outcome: "tool_failed",
+          detail: { error: err instanceof Error ? err.message : String(err) },
+        };
+      }
+    }
+    if (keyed) await ctx.store.idempotency.finish(keyed.scope, keyed.key, result.status, result.body);
+    return result;
   }
 }
