@@ -77,6 +77,7 @@ import dev.omniir.core.PropValue
 import dev.omniir.core.isMutating
 import dev.omniir.runtime.Format
 import dev.omniir.runtime.Governance
+import dev.omniir.runtime.OmniPalette
 import dev.omniir.runtime.Slot
 import java.time.Instant
 import java.time.LocalDate
@@ -135,6 +136,10 @@ private fun locale(): Locale = LocalConfiguration.current.locales[0] ?: Locale.g
 
 @Composable
 private fun isDark() = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+
+/** The shared default colours (PLAN-THEMES.md) for the app's light or dark Material theme, the same as the web's. */
+@Composable
+internal fun omniPalette(): OmniPalette = if (isDark()) OmniPalette.DARK else OmniPalette.LIGHT
 
 // MARK: Layout
 
@@ -220,11 +225,11 @@ private fun TextView(props: Props) {
 
 @Composable
 private fun BadgeView(props: Props) {
-  val dark = isDark()
+  val palette = omniPalette()
   val (container, content) = when (props.option("tone")) {
-    "success" -> if (dark) Color(0xFF1E3A26) to Color(0xFF8FD6A0) else Color(0xFFE3F4E6) to Color(0xFF1B5E20)
-    "warning" -> if (dark) Color(0xFF3D3011) to Color(0xFFF2CC6B) else Color(0xFFFFF4D6) to Color(0xFF7A5200)
-    "danger" -> if (dark) Color(0xFF45201F) to Color(0xFFF2A3A0) else Color(0xFFFDE4E4) to Color(0xFF8E1C1C)
+    "success" -> Color(palette.successSoft) to Color(palette.successText)
+    "warning" -> Color(palette.warningSoft) to Color(palette.warningText)
+    "danger" -> Color(palette.dangerSoft) to Color(palette.dangerText)
     else -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
   }
   Text(
@@ -293,7 +298,7 @@ private fun RatingView(props: Props) {
   ) {
     Text(
       "★".repeat(model.filled),
-      color = Color(0xFFF59E0B),
+      color = Color(omniPalette().warning),
       style = MaterialTheme.typography.titleMedium,
     )
     if (model.max > model.filled) {
@@ -531,11 +536,11 @@ private fun TabsView(node: OmniNode, context: RenderContext) {
 /** A Notice: a short message in a tinted box, with an icon for its tone. */
 @Composable
 private fun NoticeView(props: Props) {
-  val dark = isDark()
+  val palette = omniPalette()
   val (container, accent, symbol) = when (props.option("tone")) {
-    "success" -> Triple(if (dark) Color(0xFF1E3A26) else Color(0xFFE3F4E6), if (dark) Color(0xFF8FD6A0) else Color(0xFF1B5E20), "✓")
-    "warning" -> Triple(if (dark) Color(0xFF3D3011) else Color(0xFFFFF4D6), if (dark) Color(0xFFF2CC6B) else Color(0xFF7A5200), "!")
-    "danger" -> Triple(if (dark) Color(0xFF45201F) else Color(0xFFFDE4E4), if (dark) Color(0xFFF2A3A0) else Color(0xFF8E1C1C), "✕")
+    "success" -> Triple(Color(palette.successSoft), Color(palette.successText), "✓")
+    "warning" -> Triple(Color(palette.warningSoft), Color(palette.warningText), "!")
+    "danger" -> Triple(Color(palette.dangerSoft), Color(palette.dangerText), "✕")
     else -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, "i")
   }
   Row(

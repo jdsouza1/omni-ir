@@ -5,22 +5,24 @@
 import Charts
 import SwiftUI
 
-/// Series colours in a fixed order, the same as the web renderer's (checked for colour blindness).
-let chartColors: [Color] = [
-  Color(red: 0x2a / 255, green: 0x78 / 255, blue: 0xd6 / 255),
-  Color(red: 0xeb / 255, green: 0x68 / 255, blue: 0x34 / 255),
-  Color(red: 0x1b / 255, green: 0xaf / 255, blue: 0x7a / 255),
-  Color(red: 0xed / 255, green: 0xa1 / 255, blue: 0x00 / 255),
-  Color(red: 0xe8 / 255, green: 0x7b / 255, blue: 0xa4 / 255),
-  Color(red: 0x00 / 255, green: 0x83 / 255, blue: 0x00 / 255),
-  Color(red: 0x4a / 255, green: 0x3a / 255, blue: 0xa7 / 255),
-  Color(red: 0xe3 / 255, green: 0x49 / 255, blue: 0x48 / 255),
-]
+extension Color {
+  /// A colour from the design tokens (OmniPalette), given as 0xRRGGBB.
+  init(omni rgb: UInt32) {
+    self.init(red: Double((rgb >> 16) & 0xFF) / 255, green: Double((rgb >> 8) & 0xFF) / 255, blue: Double(rgb & 0xFF) / 255)
+  }
+}
+
+/// The palette for the current light or dark appearance: the shared defaults (PLAN-THEMES.md), the same as the web's.
+func omniPalette(_ scheme: ColorScheme) -> OmniPalette { scheme == .dark ? .dark : .light }
 
 /// Line charts also tell series apart by dash pattern, so colour is never the only cue.
 private let chartDashes: [[CGFloat]] = [[], [6, 4], [2, 3], [10, 3, 2, 3], [1, 4], [12, 4]]
 
-private func color(_ index: Int) -> Color { chartColors[index % chartColors.count] }
+/// Series colours in a fixed order, the same as the web renderer's (checked for colour blindness).
+private func color(_ index: Int, _ scheme: ColorScheme) -> Color {
+  let colors = omniPalette(scheme).charts
+  return Color(omni: colors[index % colors.count])
+}
 
 /// A bar or line chart. Series arrive on their own lines; each keeps its colour as others arrive.
 struct XYChartView: View {
@@ -28,6 +30,7 @@ struct XYChartView: View {
   let store: OmniStore
   let line: Bool
   @Environment(\.locale) private var locale
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     let labels = Format.texts(node.props["labels"])
@@ -58,7 +61,7 @@ struct XYChartView: View {
           }
         }
       }
-      .chartForegroundStyleScale(domain: names, range: series.map { color($0.index) })
+      .chartForegroundStyleScale(domain: names, range: series.map { color($0.index, colorScheme) })
       .chartXScale(domain: labels)
       .chartYAxis {
         AxisMarks { value in
@@ -87,6 +90,7 @@ struct PieChartView: View {
   let node: OmniNode
   let store: OmniStore
   @Environment(\.locale) private var locale
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     let slices = store.chartSlices(node.children)
@@ -97,7 +101,7 @@ struct PieChartView: View {
       Text(verbatim: store.text(node.props["title"])).font(.subheadline.weight(.semibold))
       Chart(slices) { s in
         SectorMark(angle: .value("Value", s.value), angularInset: 1)
-          .foregroundStyle(color(s.index))
+          .foregroundStyle(color(s.index, colorScheme))
           .accessibilityLabel(Text(verbatim: s.name))
           .accessibilityValue(Text(verbatim: "\(Format.chartValue(s.value, format: format, currency: currency, locale: locale)), \(Format.share(s.value, of: total, locale: locale))"))
       }
@@ -105,7 +109,7 @@ struct PieChartView: View {
       VStack(alignment: .leading, spacing: 4) {
         ForEach(slices) { s in
           HStack(spacing: 8) {
-            Circle().fill(color(s.index)).frame(width: 10, height: 10).accessibilityHidden(true)
+            Circle().fill(color(s.index, colorScheme)).frame(width: 10, height: 10).accessibilityHidden(true)
             Text(verbatim: s.name).font(.subheadline)
             Spacer(minLength: 8)
             Text(verbatim: Format.share(s.value, of: total, locale: locale)).font(.subheadline).foregroundStyle(.secondary).monospacedDigit()

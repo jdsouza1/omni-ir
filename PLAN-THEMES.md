@@ -79,7 +79,7 @@ Status: **APPROVED 2026-10-06** in a leaner form, at the owner's choice: the ful
 Work on branch `wip/themes`. Each part starts with failing tests (constraint 4).
 
 **A. Tokens** *(tests first)*
-- [ ] A.1 The token list with light and dark defaults; `conformance/theme.json` exported and checked for staleness; generated into Swift and Kotlin
+- [x] A.1 The token list with light and dark defaults; `conformance/theme.json` exported and checked for staleness; generated into Swift and Kotlin
 - [x] A.2 Contrast tests for every pair, light and dark
 
 **B. Web** *(tests first)*
@@ -89,7 +89,7 @@ Work on branch `wip/themes`. Each part starts with failing tests (constraint 4).
 - [x] B.4 The playground's preview follows its theme
 
 **C. iOS and Android**
-- [ ] C.1 The fixed colours from the shared defaults (version notice, charts)
+- [x] C.1 The fixed colours from the shared defaults (version notice, charts)
 
 **D. The renderer's own words** *(tests first)*
 - [ ] D.1 One English table per platform, the same keys (a test checks); apps replace words (`strings`, `.omniStrings`, `strings =`), English fallback

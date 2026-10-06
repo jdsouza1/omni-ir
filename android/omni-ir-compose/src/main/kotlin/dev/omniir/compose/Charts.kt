@@ -37,21 +37,18 @@ import androidx.compose.ui.unit.sp
 import dev.omniir.core.OmniNode
 import dev.omniir.core.PropValue
 import dev.omniir.runtime.Format
+import dev.omniir.runtime.OmniPalette
 import java.util.Locale
-
-/** Series colours in a fixed order, the same as the web renderer's (checked for colour blindness). */
-private val CHART_COLORS = listOf(
-  Color(0xFF2A78D6), Color(0xFFEB6834), Color(0xFF1BAF7A), Color(0xFFEDA100),
-  Color(0xFFE87BA4), Color(0xFF008300), Color(0xFF4A3AA7), Color(0xFFE34948),
-)
 
 /** Line charts also tell series apart by dash pattern, so colour is never the only cue. */
 private val DASHES: List<FloatArray?> = listOf(null, floatArrayOf(18f, 12f), floatArrayOf(6f, 9f), floatArrayOf(30f, 9f, 6f, 9f), floatArrayOf(3f, 12f), floatArrayOf(36f, 12f))
 
-private fun chartColor(index: Int) = CHART_COLORS[index % CHART_COLORS.size]
+/** Series colours in a fixed order, the same as the web renderer's (checked for colour blindness). */
+private fun chartColor(palette: OmniPalette, index: Int) = Color(palette.charts[index % palette.charts.size])
 
 @Composable
 internal fun XYChartView(node: OmniNode, context: RenderContext, line: Boolean, locale: Locale) {
+  val palette = omniPalette()
   val title = context.store.text(node.props["title"], context.document)
   val labels = Format.texts(node.props["labels"])
   val format = (node.props["format"] as? PropValue.Text)?.value
@@ -92,11 +89,11 @@ internal fun XYChartView(node: OmniNode, context: RenderContext, line: Boolean, 
         for (s in series) {
           val path = Path()
           s.values.forEachIndexed { i, v -> val p = Offset(left + band * i + band / 2, y(v)); if (i == 0) path.moveTo(p.x, p.y) else path.lineTo(p.x, p.y) }
-          drawPath(path, chartColor(s.index), style = Stroke(width = 2.dp.toPx(), pathEffect = DASHES[s.index % DASHES.size]?.let { PathEffect.dashPathEffect(it) }))
+          drawPath(path, chartColor(palette, s.index), style = Stroke(width = 2.dp.toPx(), pathEffect = DASHES[s.index % DASHES.size]?.let { PathEffect.dashPathEffect(it) }))
           s.values.forEachIndexed { i, v ->
             val p = Offset(left + band * i + band / 2, y(v))
             drawCircle(surface, radius = 5.dp.toPx(), center = p)
-            drawCircle(chartColor(s.index), radius = 3.5.dp.toPx(), center = p)
+            drawCircle(chartColor(palette, s.index), radius = 3.5.dp.toPx(), center = p)
           }
         }
       } else {
@@ -108,18 +105,19 @@ internal fun XYChartView(node: OmniNode, context: RenderContext, line: Boolean, 
             val x = left + band * i + (band - groupW) / 2 + s.index * (barW + 2.dp.toPx())
             val yTop = y(maxOf(v, 0.0))
             val h = kotlin.math.abs(y(v) - y(0.0)).coerceAtLeast(1f)
-            drawRoundRect(chartColor(s.index), Offset(x, yTop), Size(barW, h), CornerRadius(3.dp.toPx()))
+            drawRoundRect(chartColor(palette, s.index), Offset(x, yTop), Size(barW, h), CornerRadius(3.dp.toPx()))
           }
         }
       }
     }
     // One Series needs no legend: the title names it.
-    if (node.children.size >= 2) Legend(series.map { Triple(it.name, chartColor(it.index), null as String?) })
+    if (node.children.size >= 2) Legend(series.map { Triple(it.name, chartColor(palette, it.index), null as String?) })
   }
 }
 
 @Composable
 internal fun PieChartView(node: OmniNode, context: RenderContext, locale: Locale) {
+  val palette = omniPalette()
   val title = context.store.text(node.props["title"], context.document)
   val format = (node.props["format"] as? PropValue.Text)?.value
   val currency = (node.props["currency"] as? PropValue.Text)?.value
@@ -135,14 +133,14 @@ internal fun PieChartView(node: OmniNode, context: RenderContext, locale: Locale
         for (s in slices) {
           val sweep = if (total > 0) (s.value / total * 360).toFloat() else 0f
           if (sweep > 0f) {
-            drawArc(chartColor(s.index), start, sweep, useCenter = true)
+            drawArc(chartColor(palette, s.index), start, sweep, useCenter = true)
             drawArc(surface, start, sweep, useCenter = true, style = Stroke(width = 2.dp.toPx()))
           }
           start += sweep
         }
       }
     }
-    Legend(slices.map { Triple(it.name, chartColor(it.index), Format.share(it.value, total, locale)) })
+    Legend(slices.map { Triple(it.name, chartColor(palette, it.index), Format.share(it.value, total, locale)) })
   }
 }
 

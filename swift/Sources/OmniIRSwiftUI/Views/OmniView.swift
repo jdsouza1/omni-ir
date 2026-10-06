@@ -39,12 +39,16 @@ public struct OmniView: View {
 
 /// The stream was written for a newer Omni-IR version (SPEC.md section 8): say the app needs an update.
 private struct VersionNotice: View {
+  @Environment(\.colorScheme) private var colorScheme
+
   var body: some View {
+    let palette = omniPalette(colorScheme)
     Text("This screen was made for a newer version of the app. The app needs an update to show all of it.")
       .font(.footnote)
+      .foregroundStyle(Color(omni: palette.text))
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(10)
-      .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
+      .background(Color(omni: palette.warningSoft), in: RoundedRectangle(cornerRadius: 10))
   }
 }
 

@@ -7,7 +7,7 @@ import { cleanup, render } from "@testing-library/react";
 import { createParser } from "@omni-ir/core";
 import { COLOR_TOKENS, CONTRAST_PAIRS, DARK, LIGHT, OmniRenderer, contrast, cssVariable } from "@omni-ir/react";
 import { TOOLS } from "../app/tools";
-import { themeCss, themeJson } from "../scripts/theme";
+import { KOTLIN_THEME_PATH, SWIFT_THEME_PATH, themeCss, themeJson, themeKotlin, themeSwift } from "../scripts/theme";
 
 afterEach(cleanup);
 const css = readFileSync("packages/react/src/catalog/omni.css", "utf8");
@@ -32,6 +32,11 @@ describe("the token list", () => {
 
   it("writes conformance/theme.json for other renderers (run npm run theme if this fails)", () => {
     expect(readFileSync("conformance/theme.json", "utf8")).toBe(themeJson());
+  });
+
+  it("gives the Swift and Kotlin catalogs the same defaults (run npm run theme if this fails)", () => {
+    expect(readFileSync(SWIFT_THEME_PATH, "utf8")).toBe(themeSwift());
+    expect(readFileSync(KOTLIN_THEME_PATH, "utf8")).toBe(themeKotlin());
   });
 });
 
