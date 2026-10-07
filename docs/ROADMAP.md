@@ -54,7 +54,7 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval, opening with its goal, how it fits this roadmap and who benefits, then the pros, cons and trade-offs of each decision.
 
-1. **Format version separate from package versions** (for `v0.8.0`, decided 2026-10-06). Today the stream's version marker and the server's version check use the package version, so every release makes older apps show "needs an update" and be refused by newer servers, even when the format hasn't changed (it hasn't since 0.5).
+1. **Format version separate from package versions** (for `v0.8.0`, plan approved 2026-10-07: [PLAN-VERSIONING.md](../PLAN-VERSIONING.md)). Today the stream's version marker and the server's version check use the package version, so every release makes older apps show "needs an update" and be refused by newer servers, even when the format hasn't changed (it hasn't since 0.5).
    - *Goal:* apps and servers on different package versions keep working together whenever the format is the same; the format's version moves only when the grammar or catalog changes.
    - *Fit:* corrects Step 14's version marker before more people depend on it; small, and first so later releases stop causing false alarms.
    - *Who benefits:* developers can update their server and apps independently; the people using their apps stop seeing a needless "update the app" notice; organisations get releases that don't break each other.
