@@ -2,6 +2,7 @@
 // everything drawn here (colours, sizes, axes, legend, the value readout) is the catalog's own.
 // The SVG is decorative to assistive technology: the same data is in a table made of the chart's
 // Series or Slice components, which screen readers read instead.
+import { cssVariable } from "./theme.js";
 import { useId, useState, type ReactNode } from "react";
 import type { CatalogProps, ChartFormatProps } from "./types.js";
 
@@ -12,7 +13,7 @@ import type { CatalogProps, ChartFormatProps } from "./types.js";
  */
 // The chart colours are design tokens (theme.ts): CSS variables, so the light and dark themes and an
 // app's own brand apply. SVG attributes can't hold var(), so marks set them through `style`.
-export const CHART_COLORS = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => `var(--omni-chart${n})`);
+export const CHART_COLORS = ([1, 2, 3, 4, 5, 6, 7, 8] as const).map((n) => `var(${cssVariable(`chart${n}`)})`);
 /** Line charts also tell series apart by dash pattern, so colour is never the only cue. */
 const DASHES = ["", "6 4", "2 3", "10 3 2 3", "1 4", "12 4"] as const;
 

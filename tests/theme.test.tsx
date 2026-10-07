@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { cleanup, render } from "@testing-library/react";
 import { createParser } from "@omni-ir/core";
 import { COLOR_TOKENS, CONTRAST_PAIRS, DARK, LIGHT, OmniRenderer, contrast, cssVariable } from "@omni-ir/react";
+import { CHART_COLORS } from "../packages/react/src/catalog/charts";
 import { TOOLS } from "../app/tools";
 import { KOTLIN_THEME_PATH, SWIFT_THEME_PATH, themeCss, themeJson, themeKotlin, themeSwift } from "../scripts/theme";
 
@@ -50,6 +51,17 @@ describe("omni.css", () => {
     expect(rules.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []).toEqual([]);
     const used = new Set([...rules.matchAll(/var\((--omni-[a-z0-9-]+)\)/g)].map((m) => m[1]!));
     const defined = new Set([...COLOR_TOKENS, "font", "radius"].map((t) => cssVariable(t as never)));
+    expect([...used].filter((v) => !defined.has(v)), "variables used but not defined").toEqual([]);
+  });
+
+  it("defines every variable the components use, as well as the stylesheet (charts set theirs in code)", () => {
+    const defined = new Set([...COLOR_TOKENS, "font", "radius"].map((t) => cssVariable(t as never)));
+    const used = new Set<string>();
+    for (const color of CHART_COLORS) for (const m of color.matchAll(/var\((--omni-[a-z0-9-]+)\)/g)) used.add(m[1]!);
+    for (const file of ["charts.tsx", "components.tsx"]) {
+      for (const m of readFileSync(`packages/react/src/catalog/${file}`, "utf8").matchAll(/var\((--omni-[a-z0-9-]+)\)/g)) used.add(m[1]!);
+    }
+    expect(used.size).toBeGreaterThan(8);
     expect([...used].filter((v) => !defined.has(v)), "variables used but not defined").toEqual([]);
   });
 
