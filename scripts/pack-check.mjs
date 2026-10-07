@@ -2,7 +2,7 @@
 // (`npm pack --dry-run`). Fails if anything but the build output, README, LICENSE and
 // package.json would be published, if a source map or a local file path would leak, or if an
 // `exports` target is missing. Run `npm run build:packages` first.
-import { execSync } from "node:child_process";
+import { execSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -42,6 +42,13 @@ for (const pkg of PACKAGES) {
   }
   for (const [dep, range] of Object.entries({ ...manifest.dependencies, ...manifest.peerDependencies })) {
     if (/^(file|link|workspace):/.test(range)) problems.push(`${where}: dependency ${dep} uses a local range (${range})`);
+  }
+  // npm "auto-corrects" some manifest problems silently at publish time, for example by dropping a
+  // bin entry whose path starts with "./" (npm 11): @omni-ir/mcp 0.10.0 lost its npx command that way.
+  const publish = spawnSync(`npm publish --dry-run --loglevel=warn --workspace "${dir}"`, { encoding: "utf8", shell: true });
+  const warnings = `${publish.stdout}\n${publish.stderr}`.match(/^npm warn publish .*$/gm) ?? [];
+  if (warnings.some((w) => /auto-corrected|errors corrected|was invalid/i.test(w))) {
+    problems.push(`${where}: npm would change package.json at publish time: ${warnings.join(" / ")}`);
   }
   console.log(`${where}@${manifest.version}: ${files.length} files, ${report.size} bytes packed`);
 }

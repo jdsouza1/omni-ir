@@ -1,6 +1,6 @@
 {
   "name": "@omni-ir/react",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Omni-IR for React: the Trusted Catalog components and a streaming renderer with McpMutation governance",
   "license": "Apache-2.0",
   "type": "module",
@@ -16,7 +16,7 @@
   "types": "./dist/index.d.ts",
   "files": ["dist", "README.md", "LICENSE"],
   "dependencies": {
-    "@omni-ir/core": "^0.10.0"
+    "@omni-ir/core": "^0.10.1"
   },
   "peerDependencies": {
     "react": "^19.0.0"
