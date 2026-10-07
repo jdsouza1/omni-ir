@@ -17,6 +17,8 @@ import type { Store, User } from "./backend/types";
 import { HANDLERS, type ToolHandler } from "./tools/handlers";
 import type { Challenge } from "../app/challenges";
 import { createModelGate, setupFingerprint } from "./modelCheck";
+import { createMcpHandler } from "@modelcontextprotocol/server";
+import { loadView, referenceMcp } from "./mcp";
 
 export interface AppOptions {
   config: ServerConfig;
@@ -44,6 +46,8 @@ export interface AppOptions {
   now?: () => number;
   /** The model check's challenge pool and random source (PLAN-MODELCHECK.md); defaults to app/challenges.ts. */
   modelCheck?: { pool?: readonly Challenge[]; random?: () => number };
+  /** The MCP view's HTML (PLAN-MCPAPPS.md); defaults to packages/mcp/dist/view.html when OMNI_MCP is on. */
+  mcpView?: string;
 }
 
 const RATE_WINDOW_MS = 60_000;
@@ -71,13 +75,17 @@ export function createApp({
   log = defaultLog,
   now = Date.now,
   modelCheck: challengeOptions = {},
+  mcpView,
 }: AppOptions): Express {
   const app = express();
   app.disable("x-powered-by");
   // Read the client's address from X-Forwarded-For only when a trusted proxy wrote it ([10.15]).
   app.set("trust proxy", config.trustProxy);
   app.use(cors(config.corsOrigin));
-  app.use(express.json({ limit: "16kb" }));
+  // A screen sent over MCP can be long (show_screen takes up to 200,000 characters); everything else is small.
+  const smallJson = express.json({ limit: "16kb" });
+  const mcpJson = express.json({ limit: "1mb" });
+  app.use((req, res, next) => (req.path === "/mcp" && config.mcp ? mcpJson : smallJson)(req, res, next));
 
   // The SQLite store is loaded only when OMNI_DB asks for it, so node:sqlite is never imported
   // where it isn't used (bundlers and test environments that don't know it). Every route that
@@ -114,6 +122,16 @@ export function createApp({
     log,
   });
   app.locals.modelCheck = gate;
+  const mcp = config.mcp
+    ? referenceMcp({
+        tools,
+        assets,
+        handlers,
+        context: () => ({ store, mailer, now: now(), publicUrl: config.publicUrl }),
+        viewHtml: mcpView ?? loadView(),
+        log,
+      })
+    : null;
   const secure = config.publicUrl.startsWith("https:");
   /** Origins a browser may send actions from: the app's own and the one CORS allows. */
   const allowedOrigins = new Set([config.corsOrigin, new URL(config.publicUrl).origin]);
@@ -144,7 +162,7 @@ export function createApp({
   const allowMutate = rateLimiter(config.rateLimitPerMinute * 3, now);
 
   app.get("/api/health", (_req, res) => {
-    res.json({ ok: true, model: model.kind, auth: config.auth, modelCheck: gate.status() });
+    res.json({ ok: true, model: model.kind, auth: config.auth, modelCheck: gate.status(), ...(mcp ? { mcp: mcp.counts } : {}) });
   });
 
   /** The version a client asked for ([10.1]): null when none, "" when the query isn't one string. */
@@ -362,6 +380,33 @@ export function createApp({
     res.setHeader("Cache-Control", "no-store");
     return res.json({ user: user ? { email: user.email } : null, ...(config.auth === "demo" && !authenticate ? { demo: true } : {}) });
   });
+
+  // MCP Apps hosts (PLAN-MCPAPPS.md): one MCP server per request, for the person whose bearer token
+  // the host sends. A cookie never identifies anyone here: any page could make a browser send it.
+  if (mcp) {
+    const handler = createMcpHandler(({ authInfo }) => mcp.serverFor((authInfo?.extra?.user as User | undefined) ?? null), {
+      onerror: (error) => log({ event: "mcp", outcome: "error", error: error.message }),
+    });
+    app.all("/mcp", async (req, res) => {
+      if (!allow(req.ip ?? "unknown").ok) return sendError(res, 429, "rate_limited", "Too many requests; try again shortly.", true);
+      const { user, via } = await identify(req);
+      if (badOrigin(req, via) || via === "cookie") return sendError(res, 403, "bad_origin", "MCP clients sign in with a bearer token.");
+      const headers = new Headers();
+      for (const [name, value] of Object.entries(req.headers)) if (typeof value === "string") headers.set(name, value);
+      const request = new Request(new URL(req.originalUrl, config.publicUrl), {
+        method: req.method,
+        headers,
+        body: req.method === "POST" ? JSON.stringify(req.body ?? null) : undefined,
+      });
+      const authInfo = user ? { token: "omni-ir-session", clientId: via ?? "omni-ir", scopes: [], extra: { user } } : undefined;
+      const response = await handler.fetch(request, { authInfo, parsedBody: req.body });
+      res.status(response.status);
+      response.headers.forEach((value, name) => res.setHeader(name, value));
+      if (!response.body) return res.end();
+      for await (const chunk of response.body) res.write(chunk);
+      res.end();
+    });
+  }
 
   app.use((_req, res) => sendError(res, 404, "not_found", "Not found."));
 

@@ -91,7 +91,7 @@ describe("transport conformance suite", () => {
     expect([...specRules].filter((r) => !covered.has(r)), "rules without a case or test").toEqual([]);
     const cited = TRANSPORT_CASES.flatMap((c) => c.rules).filter((r) => r.startsWith("10."));
     expect(cited.filter((r) => !specRules.has(r)), "cases citing unknown rules").toEqual([]);
-    expect(specRules.size).toBe(24);
+    expect(specRules.size).toBe(28);
   });
 
   it("asks for a screen as [10.1] says: POST, JSON body, event-stream, and the version in the query", async () => {

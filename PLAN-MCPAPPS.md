@@ -1,6 +1,6 @@
 # Omni-IR — Step 18: the MCP Apps bridge
 
-Status: **DRAFT 2026-10-07**, for the owner's approval. Free: tests use the MCP SDK's in-memory transport and a fake host; nothing calls a paid API. Trying it in Claude or ChatGPT is a manual check in the owner's own app, at no extra cost.
+Status: **APPROVED 2026-10-07** with the recommendations (all seven decisions). Free: tests use the MCP SDK's in-memory transport and a fake host; nothing calls a paid API. Trying it in Claude or ChatGPT is a manual check in the owner's own app, at no extra cost.
 
 ## Goal
 
@@ -82,19 +82,19 @@ A screen written in Omni-IR shows up, rendered by the Trusted Catalog, inside th
 Work on branch `wip/mcp-apps`. Each part starts with failing tests (constraint 4).
 
 **A. The view** *(tests first)*
-- [ ] A.1 The single-file view: parser, catalog, CSS and pictures bundled, no network; a size budget
-- [ ] A.2 Partial and complete tool input written to the parser line by line; restart when the text doesn't extend; tested with a fake host
-- [ ] A.3 Host theme and variables mapped onto the design tokens; contrast checked
+- [x] A.1 The single-file view: parser, catalog, CSS and pictures bundled, no network; a size budget
+- [x] A.2 Partial and complete tool input written to the parser line by line; restart when the text doesn't extend; tested with a fake host
+- [x] A.3 Host theme and variables mapped onto the design tokens; contrast checked
 
 **B. The server** *(tests first)*
-- [ ] B.1 `show_screen`, the UI resource and its link, the compact guide (token budget tested); the tool result lists rejected lines
-- [ ] B.2 App-only action tools from the registry, checked by schema, access rule and idempotency key, recorded in the audit trail
-- [ ] B.3 `@omni-ir/mcp`: stdio and Streamable HTTP, with an app's own tools and pictures; packed and install-tested like the others
-- [ ] B.4 Who is calling: MCP's authorization (OAuth) mapped to the server's users, so an action from a conversation runs as that person, under their access rules, and is recorded under them in the audit trail
-- [ ] B.5 Counts of screens shown and actions run, per tool, in the log and `GET /api/health`, so whoever runs the server can see how it's used
+- [x] B.1 `show_screen`, the UI resource and its link, the compact guide (token budget tested); the tool result lists rejected lines
+- [x] B.2 App-only action tools from the registry, checked by schema, access rule and idempotency key, recorded in the audit trail
+- [x] B.3 `@omni-ir/mcp`: stdio and Streamable HTTP, with an app's own tools and pictures; packed and install-tested like the others
+- [x] B.4 Who is calling: MCP's authorization (OAuth) mapped to the server's users, so an action from a conversation runs as that person, under their access rules, and is recorded under them in the audit trail
+- [x] B.5 Counts of screens shown and actions run, per tool, in the log and `GET /api/health`, so whoever runs the server can see how it's used
 
 **C. Spec, docs and record**
-- [ ] C.1 SPEC.md section 10, "Over MCP Apps": the rules and their tests; a guide page; CHANGELOG
+- [x] C.1 SPEC.md section 10, "Over MCP Apps": the rules and their tests; a guide page; CHANGELOG
 - [ ] C.2 The decision log: this step's entry and decisions
 
 **D. Review and release** *(checkpoint: you review)*

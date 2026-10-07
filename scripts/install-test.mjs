@@ -19,7 +19,7 @@ const write = (file, text) => {
 
 try {
   const tarballs = {};
-  for (const pkg of ["core", "react"]) {
+  for (const pkg of ["core", "react", "mcp"]) {
     const out = execSync(`npm pack --json --workspace packages/${pkg} --pack-destination "${dir}"`, { encoding: "utf8" });
     const [{ name, filename }] = JSON.parse(out);
     tarballs[name] = `file:./${filename}`;
@@ -37,10 +37,14 @@ try {
           react: root.dependencies.react,
           "react-dom": root.dependencies["react-dom"],
           zod: root.dependencies.zod,
+          // To check @omni-ir/mcp as an MCP host would: its client, and the server's in-memory transport.
+          "@modelcontextprotocol/client": root.devDependencies["@modelcontextprotocol/client"],
+          "@modelcontextprotocol/server": JSON.parse(readFileSync("packages/mcp/package.json", "utf8")).dependencies["@modelcontextprotocol/server"],
         },
         devDependencies: {
           "@types/react": root.devDependencies["@types/react"],
           "@types/react-dom": root.devDependencies["@types/react-dom"],
+          "@types/node": root.devDependencies["@types/node"],
           typescript: "^5.9.0",
           vite: root.devDependencies.vite,
         },
@@ -110,8 +114,57 @@ export function Screen() {
 export { checked };
 `,
   );
+  // @omni-ir/mcp as a host sees it: the tools, the view with the app's pictures, a screen, an action,
+  // and the npx server over stdio.
+  write(
+    "mcp.mjs",
+    `import { createOmniMcpServer, SCREEN_TOOL, VIEW_URI } from "@omni-ir/mcp";
+import { InMemoryTransport } from "@modelcontextprotocol/server";
+import { Client } from "@modelcontextprotocol/client";
+import { StdioClientTransport } from "@modelcontextprotocol/client/stdio";
+import { z } from "zod";
+const expect = (ok, what) => { if (!ok) { console.error("FAIL:", what); process.exit(1); } };
+const server = createOmniMcpServer({
+  tools: { "payments.confirm": z.strictObject({ amount: z.number().positive() }) },
+  assets: { dot: { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E", width: 1, height: 1 } },
+  onAction: async ({ params }) => ({ ok: true, result: { paid: params.amount } }),
+});
+const [a, b] = InMemoryTransport.createLinkedPair();
+await server.connect(a);
+const client = new Client({ name: "install-test", version: "1" });
+await client.connect(b);
+const { tools } = await client.listTools();
+expect(tools.some((t) => t.name === SCREEN_TOOL) && tools.some((t) => t.name === "payments.confirm"), "show_screen and the action tool");
+const view = (await client.readResource({ uri: VIEW_URI })).contents[0];
+expect(view.mimeType === "text/html;profile=mcp-app" && view.text.includes("omni-root") && view.text.includes('"dot"'), "the built view with the app's pictures");
+const shown = await client.callTool({ name: SCREEN_TOOL, arguments: { screen: 'root = Heading("Hi")\\n' } });
+expect(shown.structuredContent?.components === 1, "show_screen");
+const paid = await client.callTool({ name: "payments.confirm", arguments: { amount: 5 } });
+expect(paid.structuredContent?.paid === 5, "an action");
+await client.close();
+const stdio = new Client({ name: "install-test", version: "1" });
+await stdio.connect(new StdioClientTransport({ command: process.execPath, args: ["node_modules/@omni-ir/mcp/dist/bin.js"] }));
+expect((await stdio.listTools()).tools.map((t) => t.name).join() === SCREEN_TOOL, "npx @omni-ir/mcp over stdio");
+await stdio.close();
+console.log("mcp: ok");
+`,
+  );
+  write(
+    "src/mcp.ts",
+    `import { createOmniMcpServer, type ActionResult, type OmniMcpEvent } from "@omni-ir/mcp";
+import { z } from "zod";
+const events: OmniMcpEvent[] = [];
+export const server = createOmniMcpServer({
+  tools: { "orders.requestReturn": z.strictObject({ orderId: z.string() }) },
+  onAction: async (): Promise<ActionResult> => ({ ok: false, code: "not_found", message: "No such order." }),
+  onEvent: (event) => events.push(event),
+});
+`,
+  );
   write("src/css.d.ts", 'declare module "*.css";\n');
-  const tsconfig = (resolution) =>
+  // The browser packages type-check without Node's types; @omni-ir/mcp is a server package, and the
+  // MCP SDK's types need them, so it gets its own check.
+  const tsconfig = (resolution, only) =>
     JSON.stringify({
       compilerOptions: {
         target: "ES2022",
@@ -121,12 +174,14 @@ export { checked };
         jsx: "react-jsx",
         strict: true,
         noEmit: true,
-        types: [],
+        types: only ? ["node"] : [],
       },
-      include: ["src"],
+      include: only ? [only] : ["src"],
+      exclude: only ? [] : ["src/mcp.ts"],
     });
   write("tsconfig.json", tsconfig("nodenext"));
   write("tsconfig.bundler.json", tsconfig("bundler"));
+  write("tsconfig.mcp.json", tsconfig("nodenext", "src/mcp.ts"));
 
   write("index.html", '<!doctype html><html><body><div id="root"></div><script type="module" src="/src/main.js"></script></body></html>\n');
   write(
@@ -145,10 +200,13 @@ createRoot(document.getElementById("root")).render(createElement(OmniRenderer, {
   console.log(`\ninstall test in ${dir}`);
   run("npm install --no-audit --no-fund --loglevel=error");
   run("node render.mjs");
+  run("node mcp.mjs");
   run("npx tsc -p tsconfig.json");
   console.log("types (nodenext): ok");
   run("npx tsc -p tsconfig.bundler.json");
   console.log("types (bundler): ok");
+  run("npx tsc -p tsconfig.mcp.json");
+  console.log("types (@omni-ir/mcp, nodenext): ok");
   run("npx vite build --logLevel warn");
   const assetsDir = join(dir, "dist", "assets");
   const css = readdirSync(assetsDir).filter((f) => f.endsWith(".css"));

@@ -2,6 +2,14 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+### Added
+- **`@omni-ir/mcp`, the MCP Apps bridge** (Step 18, PLAN-MCPAPPS.md): Omni-IR screens inside Claude, ChatGPT, VS Code, Cursor and other hosts of MCP Apps. The host's model calls `show_screen` with Omni-IR (the tool's description is a compact guide generated from the schema, the app's tools and pictures, under 1,500 tokens); the host draws it with a view that bundles the parser and the Trusted Catalog into one HTML file with no network access (about 550 KB). The screen builds line by line from the host's partial tool input, in the host's colours and light or dark theme (each colour kept only if every contrast pair still passes). The result tells the model which lines were rejected, so it can fix them.
+- **Actions from conversations:** each registered tool is an MCP tool only the view can call (`visibility: ["app"]`), with a new idempotency key per press; the server checks it against the tool's own schema before the app's code runs. `npx @omni-ir/mcp` runs a screens-only server over stdio.
+- The reference server: `OMNI_MCP=on` serves the bridge at `/mcp`, with actions through the same checks as `/api/mutate` (access rules, ownership, idempotency, audit trail), the person from a bearer token (never a cookie), and counts of screens and actions in `/api/health` and the log. `npm run mcp` runs it over stdio for a local host.
+- SPEC.md section 10, "Over MCP Apps": rules [10.25] to [10.28]. Package checks: the pack check and the install test cover the new package, including its stdio server.
+
 ## 0.9.0 (2026-10-07)
 
 ### Added

@@ -17,6 +17,7 @@ export const PAGES: Record<string, string> = {
   "docs/ARCHITECTURE.md": "guide/how-it-works.md",
   "packages/react/README.md": "guide/react.md",
   "packages/core/README.md": "guide/core.md",
+  "packages/mcp/README.md": "guide/mcp.md",
   "swift/README.md": "guide/swift.md",
   "android/README.md": "guide/android.md",
   "conformance/README.md": "conformance.md",

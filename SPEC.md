@@ -662,6 +662,14 @@ A server MAY check that a model writes good Omni-IR before it serves that model'
 - **[10.23]** While a setup hasn't passed, a server that enforces the check answers `503` with `model_unverified`, retryable, and a `Retry-After` header ([10.2]), instead of serving screens. A client treats it like any other retryable error.
 - **[10.24]** A server that checks SHOULD also watch live replies with the same parser, and challenge the model again when too many have errors (in the reference server, more than 10% of the last 50, judged from 10 replies, at most once an hour). If that challenge fails, the setup is no longer verified.
 
+**Over MCP Apps**
+
+[MCP Apps](https://blog.modelcontextprotocol.io/posts/2026-01-26-mcp-apps/) is the Model Context Protocol's extension for interactive views in hosts such as Claude, ChatGPT and code editors. There the host's own model writes the screen, as a tool's argument, and an Omni-IR view in the host's sandboxed frame draws it.
+- **[10.25]** An MCP server offers a tool, `show_screen` in the reference package, whose one argument `screen` is Omni-IR text, linked by `_meta.ui.resourceUri` to a UI resource of type `text/html;profile=mcp-app`. The tool's description teaches the format, generated from the same catalog, tools and pictures as the parser it checks with. The view carries the parser, the catalog and the app's pictures inside it, and MUST NOT need the network, so it works under the hosts' default policy that allows none.
+- **[10.26]** The view writes the argument to a parser as it streams in: from partial input (`ui/notifications/tool-input-partial`) only complete lines, each once, and only while the new text begins with what was written; otherwise it starts a new parser, because a line is never rewritten ([5.3]). When the complete argument arrives (`ui/notifications/tool-input`) it writes the rest and ends the parser ([3.4]). Later input is ignored: one view shows one tool call.
+- **[10.27]** The tool's result MUST tell the model which lines were rejected, with their line numbers and issue codes, so it can call the tool again with a corrected screen. The parts that were accepted are still shown.
+- **[10.28]** Each tool in the app's registry is offered as an MCP tool with `visibility: ["app"]`, so the model can't call it and only the view can. A pressed button sends `tools/call` through the host with the params, and a new idempotency key in `_meta["io.omni-ir/idempotency-key"]`. The server MUST check the call as [10.14] requires (the tool's schema, who is calling, the key) before running anything: nothing from the view is trusted. A refusal comes back as an error result with `structuredContent` `{"code": "…", "message": "…"}`, which the view shows as a failed action.
+
 ## 11. Security considerations
 
 What the format prevents:

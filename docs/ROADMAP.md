@@ -62,8 +62,8 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - *Goal:* screens written in Omni-IR appear, drawn by the Trusted Catalog, in the AI apps people already use, with every line checked and every action governed.
    - *Fit:* a transport like AG-UI (Step 14), built from the parser, catalog, tool handlers (Step 15) and design tokens (Step 16); comes before app-defined components because a place where people see Omni-IR screens is worth more than more kinds of screens. No format change.
    - *Who benefits:* developers give their MCP servers rich, safe screens without writing HTML or trusting the model with code; the people using those hosts get real forms, tables and charts that stream in and match the host; organisations keep their own checks and audit trail on every action taken from a conversation.
-   - [ ] A. The view: one bundled HTML file, streaming from partial tool input, the host's theme on the design tokens
-   - [ ] B. The server: `show_screen`, the UI resource, a compact format guide, app-only action tools; sign-in for MCP connections (OAuth) so actions run as the person; counts of screens shown and actions; the `@omni-ir/mcp` package
+   - [x] A. The view: one bundled HTML file, streaming from partial tool input, the host's theme on the design tokens
+   - [x] B. The server: `show_screen`, the UI resource, a compact format guide, app-only action tools; sign-in for MCP connections (OAuth) so actions run as the person; counts of screens shown and actions; the `@omni-ir/mcp` package
    - [ ] C. SPEC.md section 10 "Over MCP Apps", a guide, the decision log
    - [ ] D. Review (with a manual check in Claude or ChatGPT), merge, release (each with your go-ahead)
 2. **Step 19 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
