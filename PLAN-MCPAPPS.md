@@ -95,10 +95,10 @@ Work on branch `wip/mcp-apps`. Each part starts with failing tests (constraint 4
 
 **C. Spec, docs and record**
 - [x] C.1 SPEC.md section 10, "Over MCP Apps": the rules and their tests; a guide page; CHANGELOG
-- [ ] C.2 The decision log: this step's entry and decisions
+- [x] C.2 The decision log: this step's entry and decisions
 
 **D. Review and release** *(checkpoint: you review)*
-- [ ] D.1 A short review page, with screenshots from a fake host; a manual check in Claude desktop or ChatGPT by the owner
+- [x] D.1 A short review page, with screenshots from a fake host; a manual check in Claude desktop or ChatGPT by the owner
 - [ ] D.2 Merge with your approval
 - [ ] D.3 Release: a separate go-ahead from you
 

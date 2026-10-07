@@ -64,7 +64,7 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - *Who benefits:* developers give their MCP servers rich, safe screens without writing HTML or trusting the model with code; the people using those hosts get real forms, tables and charts that stream in and match the host; organisations keep their own checks and audit trail on every action taken from a conversation.
    - [x] A. The view: one bundled HTML file, streaming from partial tool input, the host's theme on the design tokens
    - [x] B. The server: `show_screen`, the UI resource, a compact format guide, app-only action tools; sign-in for MCP connections (OAuth) so actions run as the person; counts of screens shown and actions; the `@omni-ir/mcp` package
-   - [ ] C. SPEC.md section 10 "Over MCP Apps", a guide, the decision log
+   - [x] C. SPEC.md section 10 "Over MCP Apps", a guide, the decision log
    - [ ] D. Review (with a manual check in Claude or ChatGPT), merge, release (each with your go-ahead)
 2. **Step 19 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
    - *Goal:* an app can add a component Omni-IR doesn't have (a seat map, a product card, a signature pad) and still get every guarantee: each line checked, actions governed, nothing drawn that the app didn't write.
