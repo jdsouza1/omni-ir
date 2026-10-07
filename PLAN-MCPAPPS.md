@@ -90,6 +90,8 @@ Work on branch `wip/mcp-apps`. Each part starts with failing tests (constraint 4
 - [ ] B.1 `show_screen`, the UI resource and its link, the compact guide (token budget tested); the tool result lists rejected lines
 - [ ] B.2 App-only action tools from the registry, checked by schema, access rule and idempotency key, recorded in the audit trail
 - [ ] B.3 `@omni-ir/mcp`: stdio and Streamable HTTP, with an app's own tools and pictures; packed and install-tested like the others
+- [ ] B.4 Who is calling: MCP's authorization (OAuth) mapped to the server's users, so an action from a conversation runs as that person, under their access rules, and is recorded under them in the audit trail
+- [ ] B.5 Counts of screens shown and actions run, per tool, in the log and `GET /api/health`, so whoever runs the server can see how it's used
 
 **C. Spec, docs and record**
 - [ ] C.1 SPEC.md section 10, "Over MCP Apps": the rules and their tests; a guide page; CHANGELOG
