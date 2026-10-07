@@ -602,6 +602,7 @@ Sections 3 to 7 define the text. This section defines how a server sends that te
   | 400 | `invalid_request` | The body isn't a valid request. |
   | 400 | `unsupported_version` | The server can't write a stream for the requested `version` ([10.12]). |
   | 429 | `rate_limited` | Too many requests; the `Retry-After` header gives the seconds to wait ([10.15]). |
+  | 503 | `model_unverified` | The model hasn't passed the server's model check ([10.23]); retryable, with `Retry-After`. |
   | 500 | `server_error` | Anything else. |
 
 - **[10.3]** A client that gets an error status MUST NOT write anything to the parser. It reports the body's `error`; if the body isn't in that form, it reports `server_error`, retryable when the status is 500 or above.
@@ -652,6 +653,14 @@ Sections 3 to 7 define the text. This section defines how a server sends that te
 - **[10.18]** Over [AG-UI](https://docs.ag-ui.com/) 1.0, a screen is one activity message with `activityType` `"omni-ir"`. The server sends `ACTIVITY_SNAPSHOT` with `content` `{"version": "MAJOR.MINOR", "lines": []}` (the version travels in `version`, not as a line), then one `ACTIVITY_DELTA` per complete line, whose `patch` is `[{"op": "add", "path": "/lines/-", "value": "…"}]` (the line without its line ending), including a last line without a line ending when the stream ends. The run ends with AG-UI's own `RUN_FINISHED` or `RUN_ERROR`. A stream the model cut off (`max_tokens`) still ends with `RUN_FINISHED`.
 - **[10.19]** A client MUST first write the version marker for `content.version` ([3.9]) as line 1, when it is in the form MAJOR.MINOR, so line numbers and version checks match the other transports; then each line in `lines`, in order, followed by `\n`. Lines can only be added: a client MUST treat any other patch operation or path, a value that isn't a string, or a later `ACTIVITY_SNAPSHOT` for the same message whose `lines` don't begin with the lines already received, as an error that changes nothing, because Omni-IR never lets a line be rewritten ([5.3]). When the run ends, however it ends, the client MUST end the parser ([10.9]).
 - **[10.20]** AG-UI carries the screen, never the authority to act. Governed actions MUST go through the app's own action endpoint ([10.14]), checked there, and never through the agent.
+
+**Checking the model** (optional for servers)
+
+A server MAY check that a model writes good Omni-IR before it serves that model's screens, the way a second sign-in factor checks a person before letting them in. The check is about proficiency, not safety: whatever the model writes, every line is still checked as sections 5 and 7 require.
+- **[10.21]** A challenge is a few requests drawn at random from a set the server keeps, sent to the model with the system prompt it uses for people's requests. Each reply is parsed with the parser and registries the server's clients use. A reply fails if the parser reports any error (section 7), and is incomplete if it lacks what its request needed (for example a component or a tool). A challenge passes when no reply fails and at most one is incomplete. The reference server draws four requests for ordinary screens and two that push against the rules (asking for code, styling, a URL, or an action no tool allows).
+- **[10.22]** A pass holds for one setup: the model, its system prompt and settings, the catalog, the tool registry and the asset registry. A change to any of them needs a new challenge, and a pass SHOULD expire (seven days in the reference server). A server SHOULD record each challenge (when, which setup, which requests, how the replies scored) and MUST NOT keep people's requests or screens for it.
+- **[10.23]** While a setup hasn't passed, a server that enforces the check answers `503` with `model_unverified`, retryable, and a `Retry-After` header ([10.2]), instead of serving screens. A client treats it like any other retryable error.
+- **[10.24]** A server that checks SHOULD also watch live replies with the same parser, and challenge the model again when too many have errors (in the reference server, more than 10% of the last 50, judged from 10 replies, at most once an hour). If that challenge fails, the setup is no longer verified.
 
 ## 11. Security considerations
 

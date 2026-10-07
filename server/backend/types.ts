@@ -34,6 +34,28 @@ export interface AuditEntry {
   idempotencyKey: string | null;
 }
 
+/**
+ * One model check (PLAN-MODELCHECK.md, [10.21]): which setup, when, and how its replies scored.
+ * Only the challenge's own request ids are kept, never a reply or anyone's request.
+ */
+export interface ModelCheckRecord {
+  at: number;
+  /** The setup's fingerprint: model, system prompt, settings, tools and pictures ([10.22]). */
+  fingerprint: string;
+  model: string;
+  /** Why it ran: the server started, a pass expired, live replies failed, or a failed setup was tried again. */
+  reason: "start" | "expired" | "recheck" | "retry";
+  passed: boolean;
+  requests: string[];
+  total: number;
+  /** Replies with no parse error. */
+  safe: number;
+  /** Replies with what the request needed. */
+  complete: number;
+  /** The model's error code when it couldn't answer, or null. */
+  error: string | null;
+}
+
 /** What an idempotency key already holds ([10.14]). */
 export type KeyState =
   | { state: "new" }
@@ -98,6 +120,12 @@ export interface Store {
   audit: {
     add(entry: AuditEntry): Promise<void>;
     list(): Promise<AuditEntry[]>;
+  };
+  modelChecks: {
+    add(record: ModelCheckRecord): Promise<void>;
+    /** The setup's most recent passing check at or after `since`, or null. */
+    latestPass(fingerprint: string, since: number): Promise<ModelCheckRecord | null>;
+    list(): Promise<ModelCheckRecord[]>;
   };
   /** Release the database, where there is one. */
   close?(): void;

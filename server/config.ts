@@ -31,6 +31,12 @@ export interface ServerConfig {
   publicUrl: string;
   /** A SQLite file for the reference backend's data; unset keeps it in memory until the server stops. */
   dbPath: string | null;
+  /**
+   * The model check (PLAN-MODELCHECK.md, [10.21]): "enforce" refuses screens until the setup passes a
+   * challenge, "warn" serves anyway and logs, "off" skips it. Defaults to "enforce" for a real model
+   * and "off" for the mock, which replays fixtures.
+   */
+  modelCheck: "enforce" | "warn" | "off";
 }
 
 export class ConfigError extends Error {}
@@ -54,6 +60,7 @@ const Env = z.object({
   OMNI_AUTH: z.enum(["magic-link", "demo"]).default("magic-link"),
   OMNI_PUBLIC_URL: z.url().default("http://localhost:5173"),
   OMNI_DB: z.string().trim().min(1).optional(),
+  OMNI_MODEL_CHECK: z.enum(["enforce", "warn", "off"]).optional(),
 });
 
 export function loadConfig(env: Record<string, string | undefined> = process.env): {
@@ -81,6 +88,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     auth: e.OMNI_AUTH,
     publicUrl: e.OMNI_PUBLIC_URL,
     dbPath: e.OMNI_DB ?? null,
+    modelCheck: e.OMNI_MODEL_CHECK ?? (e.OMNI_MODEL === "claude" ? "enforce" : "off"),
   };
 
   const warnings: string[] = [];
@@ -88,6 +96,9 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     warnings.push(
       `OMNI_MODEL=claude: every generation calls the Claude API and is billed per request (daily cap: ${config.dailyCap}).`,
     );
+    if (config.modelCheck !== "off") {
+      warnings.push(`Model check (${config.modelCheck}): each new setup is challenged with six generations, counted in the daily cap.`);
+    }
     if (!present.ANTHROPIC_API_KEY && !present.ANTHROPIC_AUTH_TOKEN) {
       warnings.push("No ANTHROPIC_API_KEY in the environment; the SDK will try an `ant auth login` profile instead.");
     }

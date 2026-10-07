@@ -1,6 +1,6 @@
 # Omni-IR — Step 17: model proficiency check (2FA-style)
 
-Status: **APPROVED 2026-10-07** with the recommendations (all seven decisions). Free by default: tests and demos use a scripted fake model; a real model is challenged only when `OMNI_MODEL=claude` is set, and its calls count against the daily cap. Nothing here changes the stream format.
+Status: **APPROVED 2026-10-07** with the recommendations (all seven decisions); built on `wip/model-check` (A–C). Free by default: tests and demos use a scripted fake model; a real model is challenged only when `OMNI_MODEL=claude` is set, and its calls count against the daily cap. Nothing here changes the stream format.
 
 ## Goal
 
@@ -90,22 +90,22 @@ Tests, demos and CI use a scripted fake model with good and bad replies: no paid
 Work on branch `wip/model-check`. Each part starts with failing tests (constraint 4).
 
 **A. Pool and score** *(tests first)*
-- [ ] A.1 The challenge pool (`app/challenges.ts`), with a test that each request names only components and tools that exist
-- [ ] A.2 The scorer: safety and quality rules on the real parser, tested on good and bad replies from a scripted fake model
+- [x] A.1 The challenge pool (`app/challenges.ts`), with a test that each request names only components and tools that exist
+- [x] A.2 The scorer: safety and quality rules on the real parser, tested on good and bad replies from a scripted fake model
 
 **B. The server** *(tests first)*
-- [ ] B.1 The setup fingerprint and the kept result (memory or SQLite, like the other stores)
-- [ ] B.2 `OMNI_MODEL_CHECK` (`enforce`, `warn`, `off`), `503 model_unverified` with `Retry-After`, the state in `/api/health`, challenges in the audit trail
-- [ ] B.3 The live re-check from the observer's counts, at most once an hour
-- [ ] B.4 The web, iOS and Android clients treat `model_unverified` as retryable; a transport case
+- [x] B.1 The setup fingerprint and the kept result (memory or SQLite, like the other stores)
+- [x] B.2 `OMNI_MODEL_CHECK` (`enforce`, `warn`, `off`), `503 model_unverified` with `Retry-After`, the state in `/api/health`, challenges in the audit trail
+- [x] B.3 The live re-check from the observer's counts, at most once an hour
+- [x] B.4 The web, iOS and Android clients treat `model_unverified` as retryable; a transport case
 
 **C. By hand, spec and docs**
-- [ ] C.1 `npm run model:challenge` (fake model by default; a real one only with `OMNI_MODEL=claude`)
-- [ ] C.2 SPEC.md: the optional "Model checks" section and the error code; a guide page; CHANGELOG
-- [ ] C.3 The decision log: this step's entry and decisions
+- [x] C.1 `npm run model:challenge` (fake model by default; a real one only with `OMNI_MODEL=claude`)
+- [x] C.2 SPEC.md: the optional "Model checks" section and the error code; a guide page; CHANGELOG
+- [x] C.3 The decision log: this step's entry and decisions
 
 **D. Review and release** *(checkpoint: you review)*
-- [ ] D.1 A short review page: a challenge report from the fake model, passing and failing
+- [x] D.1 A short review page: a challenge report from the fake model, passing and failing
 - [ ] D.2 Merge with your approval
 - [ ] D.3 Release: a separate go-ahead from you
 

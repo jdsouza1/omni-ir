@@ -2,6 +2,14 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+### Added
+- **Model check, 2FA-style** (Step 17, PLAN-MODELCHECK.md): before a model writes screens for people, the reference server challenges it with six requests drawn at random from `app/challenges.ts` (40 requests: 30 ordinary screens and 10 that push against the rules) and scores each reply with the real parser. Every reply must have no parse error, and five of six must have what the request needed. A pass clears one setup (model, system prompt and settings, catalog, tools, pictures) for seven days; more than 10% of recent live replies with errors trigger a new challenge, at most once an hour. It checks proficiency, not safety: the parser still checks every line.
+- `OMNI_MODEL_CHECK` (`enforce`, `warn`, `off`): `enforce` by default with `OMNI_MODEL=claude`, `off` with the mock. While a setup is unverified and the check is enforced, the generate and AG-UI routes answer `503 model_unverified`, retryable, with `Retry-After`. `GET /api/health` shows the check's state; each challenge is logged and kept in the store (`modelChecks`, memory or SQLite), with request ids and scores only.
+- `npm run model:challenge [-- --seed N]`: one challenge against the configured model, with each reply's score (free with the mock model).
+- SPEC.md section 10, "Checking the model" (optional for servers): rules [10.21] to [10.24], and `model_unverified` in [10.2]'s table. A new transport case, passed by the web, iOS and Android clients. Guide: Checking the model.
+
 ## 0.8.0 (2026-10-07)
 
 ### Changed

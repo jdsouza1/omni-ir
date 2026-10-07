@@ -42,7 +42,7 @@ export function createInBrowserApi({ model, tools = TOOLS, handlers = HANDLERS, 
     const { pathname: path, searchParams } = new URL(url, "http://in-browser");
     const method = (init.method ?? "GET").toUpperCase();
 
-    if (method === "GET" && path === "/api/health") return json(200, { ok: true, model: model.kind, auth: "demo" });
+    if (method === "GET" && path === "/api/health") return json(200, { ok: true, model: model.kind, auth: "demo", modelCheck: { mode: "off" } });
     if (method === "GET" && path === "/api/auth/me") return json(200, { user: { email: DEMO_VISITOR_EMAIL }, demo: true });
     if (method !== "POST" || (path !== "/api/generate" && path !== "/api/mutate")) return json(404, errorBody("not_found", "Not found."));
 

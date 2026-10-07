@@ -74,6 +74,7 @@ An app with its own database implements the same interface.
 | `OMNI_AUTH` | `magic-link` | `magic-link` signs people in by email link. `demo` treats every request as one demo visitor, `visitor@example.com`: for the playground and the demo apps only, never for real data. |
 | `OMNI_PUBLIC_URL` | `http://localhost:5173` | Your app's address: where sign-in links point, and the origin actions must come from. Use `https://` in production, which also marks the cookie `Secure`. |
 | `OMNI_DB` | unset (memory) | A SQLite file for the server's data. |
+| `OMNI_MODEL_CHECK` | `enforce` with Claude, `off` with the mock | Whether the model must pass a challenge before it writes screens ([Checking the model](./model-check)). |
 | `OMNI_TRUST_PROXY` | `false` | Which proxies may report a client's address ([Servers and transports](./transport)). |
 
 Requests are limited per address, and per signed-in person wherever their requests come from.

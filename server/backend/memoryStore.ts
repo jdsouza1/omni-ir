@@ -1,6 +1,6 @@
 // The Store in memory: for tests and the hosted playground, where nothing should outlive the page.
 // Imports nothing from Node, so it also runs in the browser.
-import { KEY_TTL_MS, type AuditEntry, type Booking, type KeyState, type Order, type Store, type User } from "./types";
+import { KEY_TTL_MS, type AuditEntry, type Booking, type KeyState, type ModelCheckRecord, type Order, type Store, type User } from "./types";
 
 /** Nights overlap when each stay starts before the other ends (dates are YYYY-MM-DD, so they compare as text). */
 export const overlaps = (a: { checkIn: string; checkOut: string }, b: { checkIn: string; checkOut: string }) =>
@@ -17,6 +17,7 @@ export function createMemoryStore(): Store {
   const bookings: Booking[] = [];
   const keys = new Map<string, { fingerprint: string; at: number; answer: { status: number; body: unknown } | null }>();
   const audit: AuditEntry[] = [];
+  const modelChecks: ModelCheckRecord[] = [];
   let nextUser = 1;
 
   return {
@@ -96,6 +97,12 @@ export function createMemoryStore(): Store {
     audit: {
       add: async (entry) => void audit.push(entry),
       list: async () => [...audit],
+    },
+    modelChecks: {
+      add: async (record) => void modelChecks.push({ ...record, requests: [...record.requests] }),
+      latestPass: async (fingerprint, since) =>
+        [...modelChecks].reverse().find((r) => r.fingerprint === fingerprint && r.passed && r.at >= since) ?? null,
+      list: async () => modelChecks.map((r) => ({ ...r, requests: [...r.requests] })),
     },
   };
 }

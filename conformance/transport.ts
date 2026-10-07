@@ -169,6 +169,13 @@ export const TRANSPORT_CASES: TransportCase[] = [
     expect: { written: "", ended: false, outcome: { status: "error", code: "unsupported_version", retryable: false } },
   },
   {
+    id: "http-error-model-unverified",
+    rules: ["10.2", "10.3", "10.23"],
+    description: "A server whose model hasn't passed its check refuses with model_unverified, retryable: reported as given, nothing written.",
+    response: { status: 503, body: JSON.stringify({ error: { code: "model_unverified", message: "The model is being checked; try again shortly.", retryable: true } }) },
+    expect: { written: "", ended: false, outcome: { status: "error", code: "model_unverified", retryable: true } },
+  },
+  {
     id: "http-error-not-json-5xx",
     rules: ["10.3"],
     description: "An error status with a body that isn't the error form: server_error, retryable for 500 and above.",

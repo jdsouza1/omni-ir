@@ -17,8 +17,19 @@ export interface GenerateOptions {
   onText: (text: string) => void;
 }
 
+/** What makes a model's replies what they are, for the model check's setup fingerprint ([10.22]). */
+export interface ModelSetup {
+  /** The model's id, such as "claude-opus-5-5". */
+  id: string;
+  systemPrompt: string;
+  /** Anything else that changes its replies, such as the effort level. */
+  settings?: Record<string, unknown>;
+}
+
 export interface Model {
   readonly kind: "mock" | "claude";
+  /** The setup the model check fingerprints; a model without one is identified by its kind. */
+  readonly setup?: ModelSetup;
   generate(prompt: string, options: GenerateOptions): Promise<GenerateResult>;
 }
 

@@ -16,8 +16,18 @@ describe("loadConfig", () => {
       auth: "magic-link",
       publicUrl: "http://localhost:5173",
       dbPath: null,
+      modelCheck: "off",
     });
     expect(warnings).toEqual([]);
+  });
+
+  it("checks a real model by default and never the mock (PLAN-MODELCHECK.md, decision 1)", () => {
+    expect(loadConfig({ OMNI_MODEL: "claude" }).config.modelCheck).toBe("enforce");
+    expect(loadConfig({ OMNI_MODEL: "claude", OMNI_MODEL_CHECK: "warn" }).config.modelCheck).toBe("warn");
+    expect(loadConfig({ OMNI_MODEL: "claude", OMNI_MODEL_CHECK: "off" }).config.modelCheck).toBe("off");
+    expect(loadConfig({ OMNI_MODEL_CHECK: "enforce" }).config.modelCheck).toBe("enforce");
+    expect(() => loadConfig({ OMNI_MODEL_CHECK: "strict" })).toThrow(ConfigError);
+    expect(loadConfig({ OMNI_MODEL: "claude" }).warnings.join(" ")).toMatch(/model check.*six generations/i);
   });
 
   it("parses numbers and enums from strings", () => {
@@ -45,7 +55,7 @@ describe("loadConfig", () => {
 
   it("warns that the Claude model costs money and names the daily cap", () => {
     const { warnings } = loadConfig({ OMNI_MODEL: "claude", ANTHROPIC_API_KEY: "sk-test", OMNI_DAILY_CAP: "20" });
-    expect(warnings).toHaveLength(1);
+    expect(warnings).toHaveLength(2); // and the model check's generations
     expect(warnings[0]).toMatch(/billed per request/);
     expect(warnings[0]).toMatch(/20/);
   });
