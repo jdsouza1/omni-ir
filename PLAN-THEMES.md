@@ -7,7 +7,7 @@ Goal: an app can make Omni-IR screens look and read like the rest of the app, an
 3. **Readable for everyone:** tests prove the default themes meet the accessibility contrast standard in light and dark.
 4. **The renderer's own words can be replaced**, so an app in any language isn't stuck with English labels; and a blocked action shows a plain sentence instead of developer text.
 
-Status: **APPROVED 2026-10-06** in a leaner form, at the owner's choice: the full theming API on iOS and Android, and built-in translations, wait for real demand ("I have no idea yet if people will adopt this; translations are overkill"). Free: no paid API, no new service. Released as `v0.7.0` only with a separate go-ahead.
+Status: **DONE 2026-10-06** (owner reviewed the review page, chose option B for the chart colours and approved the merge). **APPROVED 2026-10-06** in a leaner form, at the owner's choice: the full theming API on iOS and Android, and built-in translations, wait for real demand ("I have no idea yet if people will adopt this; translations are overkill"). Free: no paid API, no new service. Released as `v0.7.0` only with a separate go-ahead.
 
 ## Where things stand
 
@@ -103,5 +103,5 @@ Work on branch `wip/themes`. Each part starts with failing tests (constraint 4).
 
 **F. Review** *(checkpoint: you review)*
 - [x] F.1 A review page: screens light and dark on the web, a rebranded screen, the same screens on iPhone and Android, the contrast results, replaced words (https://claude.ai/artifact/RoMf9YaFaQaLJMvQ7Kde8o)
-- [ ] F.2 Merge with your approval
+- [x] F.2 Merged with your approval (2026-10-06)
 - [ ] F.3 `v0.7.0` release: a separate go-ahead from you

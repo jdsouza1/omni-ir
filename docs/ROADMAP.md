@@ -30,6 +30,7 @@ Updated 2026-10-06. Planned dates for the remaining work are kept from the origi
 | Release | `v0.5.0` (2026-10-06): the transport standard, stream versions and AG-UI, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
 | Since then | Real backend handlers in the reference server: an access rule for every tool, sign-in by emailed link with sessions for browsers and tokens for native apps, ownership checks that answer "not found" for other people's data, storage in memory or SQLite, idempotency keys in the spec and all three clients, an audit trail without personal data, and per-person limits | [PLAN-BACKEND.md](../PLAN-BACKEND.md), [guide](../site/docs/guide/actions.md) |
 | Release | `v0.6.0` (2026-10-06): real backend handlers, sign-in and idempotency keys, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
+| Since then | Themes and the renderer's own words: about 30 design tokens shared by web, iOS and Android; web dark mode; contrast tests (WCAG AA) and colour-blind tests for chart colours; the renderer's own words in English, replaceable by the app; blocked actions show a plain sentence | [PLAN-THEMES.md](../PLAN-THEMES.md), [guide](../site/docs/guide/themes.md) |
 
 ## Planned
 
@@ -52,14 +53,10 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval.
 
-1. **Step 16 · Themes and the renderer's own words** (plan approved 2026-10-06, leaner: [PLAN-THEMES.md](../PLAN-THEMES.md); translations and mobile theming settings wait for demand).
-   - [ ] Brand colours, font and corner radius set by the app (never the model) as design tokens; CSS variables on the web, shared defaults on iOS and Android
-   - [ ] A dark theme for the web catalog (light only today), with contrast tests
-   - [ ] The renderers' own words in English, replaceable by the app; blocked actions show a plain sentence
-2. **Step 17 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+1. **Step 17 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
    - [ ] Pictures looked up by the app when the screen is drawn (for example `product-123`), for shops and user pictures that can't all be registered in advance; the model still never writes a URL
    - [ ] Keep the system prompt small as the catalog grows: send only the components a request is likely to need, and measure the cost and the time to the first line
-3. **Step 18 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
+2. **Step 18 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
 
 ## Later
 
