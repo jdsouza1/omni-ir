@@ -21,6 +21,18 @@
         "dist/site"
       ],
       "port": 8766
+    },
+    {
+      "name": "mcp-host",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8767",
+        "--directory",
+        "dist/mcp-host"
+      ],
+      "port": 8767
     }
   ]
 }

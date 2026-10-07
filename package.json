@@ -7,7 +7,8 @@
   "type": "module",
   "workspaces": [
     "packages/core",
-    "packages/react"
+    "packages/react",
+    "packages/mcp"
   ],
   "engines": {
     "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
@@ -22,6 +23,9 @@
     "demo": "tsx scripts/demo.tsx",
     "server": "tsx watch server/index.ts",
     "server:start": "tsx server/index.ts",
+    "mcp": "npm run mcp:view && tsx server/mcpStdio.ts",
+    "mcp:view": "tsx scripts/mcp-view.ts",
+    "mcp:host": "tsx scripts/mcp-host.ts",
     "validate": "tsx scripts/validate.tsx",
     "model:challenge": "tsx scripts/model-challenge.ts",
     "prompt:print": "tsx scripts/prompt-print.ts",
@@ -52,6 +56,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",
+    "@modelcontextprotocol/server": "2.3.1",
     "express": "^5.2.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -59,6 +64,7 @@
   },
   "devDependencies": {
     "@ag-ui/core": "1.0.2",
+    "@modelcontextprotocol/client": "^2.3.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",

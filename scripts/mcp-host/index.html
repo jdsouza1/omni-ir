@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Omni-IR MCP demo host</title>
+    <style>
+      :root { --bg: #f6f5f2; --panel: #ffffff; --text: #1f1e1c; --muted: #6b6860; --line: #e4e1da; --accent: #c2410c; color-scheme: light; }
+      :root[data-theme="dark"] { --bg: #1b1a18; --panel: #24221f; --text: #f3f1ec; --muted: #a9a59c; --line: #3a3732; color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+      main { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; display: grid; gap: 14px; }
+      header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+      h1 { font-size: 1.05rem; margin: 0; }
+      .note { color: var(--muted); font-size: 0.85rem; }
+      .bubble { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+      .who { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; }
+      .tool { font-family: ui-monospace, Consolas, monospace; font-size: 0.8rem; color: var(--accent); }
+      iframe { width: 100%; border: 0; display: block; min-height: 120px; background: transparent; }
+      .controls { display: flex; gap: 8px; flex-wrap: wrap; }
+      button, select { font: inherit; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); }
+      pre { margin: 0; font-size: 0.8rem; white-space: pre-wrap; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>MCP Apps demo host</h1>
+        <div class="controls">
+          <select id="screen" aria-label="Screen"></select>
+          <button id="theme" type="button">Dark</button>
+          <button id="replay" type="button">Replay</button>
+        </div>
+      </header>
+      <p class="note">A local stand-in for Claude or ChatGPT: it streams a sample tool call to the Omni-IR view through the official MCP Apps host bridge. No model, no network.</p>
+      <div class="bubble"><div class="who">You</div><div id="ask"></div></div>
+      <div class="bubble">
+        <div class="who">Assistant · <span class="tool">show_screen</span></div>
+        <iframe id="view" title="Omni-IR screen" sandbox="allow-scripts allow-same-origin"></iframe>
+      </div>
+      <div class="bubble"><div class="who">Actions sent to the server</div><pre id="log">None yet.</pre></div>
+    </main>
+    <script type="module" src="./host.ts"></script>
+  </body>
+</html>

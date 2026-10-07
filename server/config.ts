@@ -37,6 +37,8 @@ export interface ServerConfig {
    * and "off" for the mock, which replays fixtures.
    */
   modelCheck: "enforce" | "warn" | "off";
+  /** Serve Omni-IR to MCP Apps hosts at /mcp (PLAN-MCPAPPS.md). Off unless OMNI_MCP=on. */
+  mcp: boolean;
 }
 
 export class ConfigError extends Error {}
@@ -61,6 +63,7 @@ const Env = z.object({
   OMNI_PUBLIC_URL: z.url().default("http://localhost:5173"),
   OMNI_DB: z.string().trim().min(1).optional(),
   OMNI_MODEL_CHECK: z.enum(["enforce", "warn", "off"]).optional(),
+  OMNI_MCP: z.enum(["on", "off"]).default("off"),
 });
 
 export function loadConfig(env: Record<string, string | undefined> = process.env): {
@@ -89,6 +92,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     publicUrl: e.OMNI_PUBLIC_URL,
     dbPath: e.OMNI_DB ?? null,
     modelCheck: e.OMNI_MODEL_CHECK ?? (e.OMNI_MODEL === "claude" ? "enforce" : "off"),
+    mcp: e.OMNI_MCP === "on",
   };
 
   const warnings: string[] = [];

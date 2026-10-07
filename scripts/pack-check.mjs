@@ -6,10 +6,11 @@ import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const PACKAGES = ["core", "react"];
-const ALLOWED = [/^package\.json$/, /^README\.md$/, /^LICENSE$/, /^dist\/.+\.(js|d\.ts)$/, /^dist\/omni\.css$/];
-// Absolute paths from a developer machine or CI runner.
-const LOCAL_PATH = /[A-Za-z]:[\\/](Users|home)[\\/]|\/(Users|home|runner)\/[\w.-]+\/|file:\/\//;
+const PACKAGES = ["core", "react", "mcp"];
+const ALLOWED = [/^package\.json$/, /^README\.md$/, /^LICENSE$/, /^dist\/.+\.(js|d\.ts)$/, /^dist\/omni\.css$/, /^dist\/view\.html$/];
+// Absolute paths from a developer machine or CI runner, plain or as file URLs (file:///…). A bare
+// "file://" is fine: the MCP SDK's schemas check that a root's URI starts with it.
+const LOCAL_PATH = /[A-Za-z]:[\\/](Users|home)[\\/]|\/(Users|home|runner)\/[\w.-]+\/|file:\/\/\/\w/;
 
 const problems = [];
 const manifests = {};
@@ -25,7 +26,7 @@ for (const pkg of PACKAGES) {
   if (!files.some((f) => f.startsWith("dist/"))) problems.push(`${where}: no dist/ files; run npm run build:packages first`);
   for (const file of files) {
     if (!ALLOWED.some((re) => re.test(file))) problems.push(`${where}: would publish ${file}`);
-    if (/\.(js|d\.ts|css)$/.test(file) && LOCAL_PATH.test(readFileSync(join(dir, file), "utf8"))) {
+    if (/\.(js|d\.ts|css|html)$/.test(file) && LOCAL_PATH.test(readFileSync(join(dir, file), "utf8"))) {
       problems.push(`${where}: ${file} contains a local file path`);
     }
   }
@@ -45,11 +46,14 @@ for (const pkg of PACKAGES) {
   console.log(`${where}@${manifest.version}: ${files.length} files, ${report.size} bytes packed`);
 }
 
-// Both packages are released together with the same version, and react depends on that version.
-const { core, react } = manifests;
-if (core.version !== react.version) problems.push(`versions differ: core ${core.version}, react ${react.version}`);
-if (react.dependencies?.["@omni-ir/core"] !== `^${core.version}`) {
-  problems.push(`@omni-ir/react should depend on @omni-ir/core ^${core.version}, not ${react.dependencies?.["@omni-ir/core"]}`);
+// The packages are released together with the same version, and react and mcp depend on that version.
+const { core } = manifests;
+for (const pkg of ["react", "mcp"]) {
+  const manifest = manifests[pkg];
+  if (core.version !== manifest.version) problems.push(`versions differ: core ${core.version}, ${pkg} ${manifest.version}`);
+  if (manifest.dependencies?.["@omni-ir/core"] !== `^${core.version}`) {
+    problems.push(`${manifest.name} should depend on @omni-ir/core ^${core.version}, not ${manifest.dependencies?.["@omni-ir/core"]}`);
+  }
 }
 
 if (problems.length) {

@@ -107,6 +107,7 @@ To check how well a model follows the protocol without paying for API calls, pas
 |---|---|
 | `packages/core/` | `@omni-ir/core`: line buffer, tokenizer, parser, store; `schema.ts` is the single authority on the protocol |
 | `packages/react/` | `@omni-ir/react`: the Trusted Catalog components, `OmniRenderer` and browser helpers |
+| `packages/mcp/` | `@omni-ir/mcp`: Omni-IR screens in MCP Apps hosts (Claude, ChatGPT, VS Code, Cursor): an MCP server and a view built from the parser and catalog |
 | `server/` | Express SSE server, mock and Claude models |
 | `playground/` | The Interactive Playground |
 | `app/` | The tool registry and image asset registry shared by browser and server |

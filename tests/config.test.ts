@@ -17,6 +17,7 @@ describe("loadConfig", () => {
       publicUrl: "http://localhost:5173",
       dbPath: null,
       modelCheck: "off",
+      mcp: false,
     });
     expect(warnings).toEqual([]);
   });
