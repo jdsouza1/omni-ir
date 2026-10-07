@@ -25,6 +25,7 @@
     "server:start": "tsx server/index.ts",
     "mcp": "npm run mcp:view && tsx server/mcpStdio.ts",
     "mcp:view": "tsx scripts/mcp-view.ts",
+    "mcp:host": "tsx scripts/mcp-host.ts",
     "validate": "tsx scripts/validate.tsx",
     "model:challenge": "tsx scripts/model-challenge.ts",
     "prompt:print": "tsx scripts/prompt-print.ts",

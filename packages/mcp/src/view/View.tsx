@@ -2,7 +2,7 @@
 // argument from the host, writes it to the parser line by line ([10.26]) and draws it with the Trusted
 // Catalog. Pressed actions go to the server through the host ([10.28]). Bundled with React, the
 // catalog and its CSS into one HTML file by scripts/mcp-view.ts; it never uses the network.
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { z } from "zod";
 import type { App } from "@modelcontextprotocol/ext-apps";
 import { createParser, type Issue, type OmniStore, type ToolRegistry } from "@omni-ir/core";
@@ -97,6 +97,11 @@ export function createViewController(app: App, config: ViewConfig): ViewControll
 
 export function OmniMcpView({ controller }: { controller: ViewController }) {
   const { store, look } = useSyncExternalStore(controller.subscribe, controller.getSnapshot);
+  // The frame's own colour scheme follows the host's theme: browsers paint an iframe opaque when its
+  // scheme differs from the page around it, which would put a white box behind a dark screen.
+  useEffect(() => {
+    document.documentElement.style.colorScheme = look.theme;
+  }, [look.theme]);
   // An id selector outranks the catalog's own token rules, so the host's values win.
   const css = Object.entries(look.variables)
     .map(([name, value]) => `  ${name}: ${value};`)

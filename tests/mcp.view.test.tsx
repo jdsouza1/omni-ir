@@ -103,6 +103,8 @@ describe("the bridge's view [10.26]", () => {
     await settle();
     const root = view.container.querySelector(".omni-root") as HTMLElement;
     expect(root.dataset.theme).toBe("dark");
+    // The frame's own scheme matches, so the browser doesn't paint it opaque inside a dark host.
+    expect(document.documentElement.style.colorScheme).toBe("dark");
     expect(view.container.querySelector("style")?.textContent).toContain("--omni-surface: #1b1b1b");
     await act(async () => void (await bridge.sendHostContextChange({ theme: "light" })));
     await settle();

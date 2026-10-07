@@ -48,6 +48,7 @@ Over HTTP, use the MCP SDK's `createMcpHandler` with a factory that passes who i
 ## In the repository
 
 - `npm run mcp` runs the reference server's bridge over stdio, with the demo tools and pictures, acting as the demo visitor. Add it to a local MCP Apps host (Claude desktop's MCP servers, for example) to try screens with real actions. No model is called by the server: the host's model writes the screens.
+- `npm run mcp:host` builds a local demo host (`dist/mcp-host`, serve it over HTTP) that streams sample screens into the view through the official host bridge: a way to see the view, in light and dark, without an MCP host.
 - `OMNI_MCP=on npm run server` serves the same at `/mcp` over HTTP. Actions run through the same checks as `POST /api/mutate`: the tool's schema, its access rule (signed-in actions need `Authorization: Bearer <token>` from the server's sign-in), ownership, idempotency keys and the audit trail. A cookie never signs anyone in here, since any page could make a browser send it. `GET /api/health` then counts screens shown, rejected lines and actions per tool.
 - Full MCP authorization (an OAuth authorization server with discovery) isn't part of the reference server: an app plugs in its identity provider's tokens with the SDK's bearer authentication and passes the person as `user`.
 
