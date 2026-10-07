@@ -2,7 +2,7 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
-## Unreleased
+## 0.10.0 (2026-10-07)
 
 ### Added
 - **`@omni-ir/mcp`, the MCP Apps bridge** (Step 18, PLAN-MCPAPPS.md): Omni-IR screens inside Claude, ChatGPT, VS Code, Cursor and other hosts of MCP Apps. The host's model calls `show_screen` with Omni-IR (the tool's description is a compact guide generated from the schema, the app's tools and pictures, under 1,500 tokens); the host draws it with a view that bundles the parser and the Trusted Catalog into one HTML file with no network access (about 550 KB). The screen builds line by line from the host's partial tool input, in the host's colours and light or dark theme (each colour kept only if every contrast pair still passes). The result tells the model which lines were rejected, so it can fix them.

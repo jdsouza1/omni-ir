@@ -14,10 +14,10 @@ The parser passes the same [conformance suite](../conformance/README.md) as the 
 In Xcode: **File → Add Package Dependencies…**, enter `https://github.com/jdsouza1/omni-ir`, and add `OmniIRSwiftUI` to your app. In a `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/jdsouza1/omni-ir", from: "0.9.0")
+.package(url: "https://github.com/jdsouza1/omni-ir", from: "0.10.0")
 ```
 
-`0.2.0` was the first release to include the Swift package (the `v0.1.0` tag predates it); `0.3.0` added the charts, `0.4.0` the nesting and size limits, `0.5.0` the transport standard and stream versions, `0.6.0` the token setting and idempotency keys for real actions, `0.7.0` the shared colours and replaceable words (`OmniPalette`, `OmniStrings`, `.omniStrings`), `0.8.0` the stream format's own version (`omniIRFormatVersion`), `0.9.0` the model check's `model_unverified` code, reported like any retryable error. An app works with any server that writes its stream format or an older one; the format is `0.5` from `0.5.0` to `0.9.0`.
+`0.2.0` was the first release to include the Swift package (the `v0.1.0` tag predates it); `0.3.0` added the charts, `0.4.0` the nesting and size limits, `0.5.0` the transport standard and stream versions, `0.6.0` the token setting and idempotency keys for real actions, `0.7.0` the shared colours and replaceable words (`OmniPalette`, `OmniStrings`, `.omniStrings`), `0.8.0` the stream format's own version (`omniIRFormatVersion`), `0.9.0` the model check's `model_unverified` code, reported like any retryable error; `0.10.0` changes nothing in Swift (it adds `@omni-ir/mcp` for MCP Apps hosts). An app works with any server that writes its stream format or an older one; the format is `0.5` from `0.5.0` to `0.10.0`.
 
 ## Usage
 
