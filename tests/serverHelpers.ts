@@ -25,6 +25,7 @@ export async function startServer(
   return {
     url,
     logs,
+    app,
     close: async () => {
       await new Promise<void>((resolve) => server.close(() => resolve()));
       await (app.locals.closeStore as (() => Promise<void>) | undefined)?.();

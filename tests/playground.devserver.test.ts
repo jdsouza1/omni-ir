@@ -30,7 +30,7 @@ describe("npm run playground (dev server)", () => {
 
   it("serves the API in-process with the free mock model", async () => {
     const health = await (await fetch(`${base}/api/health`)).json();
-    expect(health).toEqual({ ok: true, model: "mock", auth: "demo" }); // the playground acts as the labelled demo visitor
+    expect(health).toEqual({ ok: true, model: "mock", auth: "demo", modelCheck: { mode: "off" } }); // the playground acts as the labelled demo visitor
   });
 
   it("streams /api/generate from the same origin", async () => {

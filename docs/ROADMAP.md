@@ -9,7 +9,7 @@ Updated 2026-10-07. Planned dates for the remaining work are kept from the origi
 | 1 · Core spec | Syntax spec v0.1 draft | [SPEC.md](../SPEC.md) |
 | 1 · Core spec | Zod validation schemas | `packages/core/src/schema.ts` |
 | 1 · Core spec | Zod schemas and parser published on npm as [`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) 0.1.0 | `packages/core/` |
-| 1 · Core spec | Conformance suite (96 cases, including one per component, and 21 transport cases) | [conformance/](../conformance/README.md) |
+| 1 · Core spec | Conformance suite (98 cases, including one per component, and 22 transport cases) | [conformance/](../conformance/README.md) |
 | 2 · Web reference | Streaming parser in TypeScript, written test-first | `packages/core/` |
 | 2 · Web reference | React Trusted Catalog and renderer, with McpMutation governance | `packages/react/` |
 | 2 · Web reference | Express streaming server with a free mock model and an opt-in Claude adapter | `server/` |
@@ -60,8 +60,8 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - *Goal:* a broken setup (a swapped model, an edited prompt, a provider's silent update) is caught before the people using the app see it. It checks proficiency, not safety: the parser and catalog stay the guarantee for every line.
    - *Fit:* makes the manual model check page, Step 13's cross-model check and the server's observer parser automatic and continuous; comes before app-defined components, which make each app's setup different. No format change.
    - *Who benefits:* developers learn at start-up that a change broke their screens and can switch models as a checked step; the people using their apps don't get a run of broken screens; organisations get a recorded answer to "is this model fit to write our screens?".
-   - [ ] A. Challenge pool (about 40 requests) and scorer, tested with a scripted fake model
-   - [ ] B. Server: setup fingerprint, `OMNI_MODEL_CHECK` (`enforce`, `warn`, `off`), `503 model_unverified`, health and audit trail, live re-check; the three clients retry on the new code
+   - [x] A. Challenge pool (about 40 requests) and scorer, tested with a scripted fake model
+   - [x] B. Server: setup fingerprint, `OMNI_MODEL_CHECK` (`enforce`, `warn`, `off`), `503 model_unverified`, health and audit trail, live re-check; the three clients retry on the new code
    - [ ] C. `npm run model:challenge`, an optional "Model checks" section in SPEC.md, a guide, the decision log
    - [ ] D. Review page, merge, release (each with your go-ahead)
 2. **Step 18 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.

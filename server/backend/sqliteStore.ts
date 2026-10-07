@@ -2,7 +2,7 @@
 // no dependency and no database server. One file, one machine; an app running several server
 // instances implements the Store on its own database instead.
 import { DatabaseSync } from "node:sqlite";
-import { KEY_TTL_MS, type KeyState, type Store, type User } from "./types";
+import { KEY_TTL_MS, type KeyState, type ModelCheckRecord, type Store, type User } from "./types";
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE);
@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS settings (user_id TEXT PRIMARY KEY, language TEXT NOT
 CREATE TABLE IF NOT EXISTS payments (id TEXT PRIMARY KEY, owner_id TEXT NOT NULL, amount REAL NOT NULL, note TEXT NOT NULL, at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS idempotency (scope TEXT NOT NULL, key TEXT NOT NULL, fingerprint TEXT NOT NULL, at INTEGER NOT NULL, status INTEGER, body TEXT, PRIMARY KEY (scope, key));
 CREATE TABLE IF NOT EXISTS audit (seq INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, user_id TEXT, tool TEXT NOT NULL, outcome TEXT NOT NULL, idempotency_key TEXT);
+CREATE TABLE IF NOT EXISTS model_checks (seq INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, fingerprint TEXT NOT NULL, model TEXT NOT NULL, reason TEXT NOT NULL, passed INTEGER NOT NULL, requests TEXT NOT NULL, total INTEGER NOT NULL, safe INTEGER NOT NULL, complete INTEGER NOT NULL, error TEXT);
 `;
 
 type Row = Record<string, string | number | null>;
@@ -139,6 +140,35 @@ export function createSqliteStore(path: string): Store {
           idempotencyKey: r.idempotency_key === null ? null : String(r.idempotency_key),
         })),
     },
+    modelChecks: {
+      add: async (r) =>
+        void run(
+          "INSERT INTO model_checks (at, fingerprint, model, reason, passed, requests, total, safe, complete, error) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          r.at, r.fingerprint, r.model, r.reason, r.passed ? 1 : 0, JSON.stringify(r.requests), r.total, r.safe, r.complete, r.error,
+        ),
+      latestPass: async (fingerprint, since) => {
+        const row = get(`${CHECK_COLUMNS} WHERE fingerprint = ? AND passed = 1 AND at >= ? ORDER BY seq DESC LIMIT 1`, fingerprint, since);
+        return row ? checkOf(row) : null;
+      },
+      list: async () => (db.prepare(`${CHECK_COLUMNS} ORDER BY seq`).all() as Row[]).map(checkOf),
+    },
     close: () => db.close(),
+  };
+}
+
+const CHECK_COLUMNS = "SELECT at, fingerprint, model, reason, passed, requests, total, safe, complete, error FROM model_checks";
+
+function checkOf(r: Row): ModelCheckRecord {
+  return {
+    at: Number(r.at),
+    fingerprint: String(r.fingerprint),
+    model: String(r.model),
+    reason: String(r.reason) as ModelCheckRecord["reason"],
+    passed: Number(r.passed) === 1,
+    requests: JSON.parse(String(r.requests)) as string[],
+    total: Number(r.total),
+    safe: Number(r.safe),
+    complete: Number(r.complete),
+    error: r.error === null ? null : String(r.error),
   };
 }

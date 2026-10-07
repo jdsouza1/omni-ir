@@ -15,6 +15,8 @@ import { createMemoryStore } from "./backend/memoryStore";
 import { DEMO_VISITOR_EMAIL, seedDemo } from "./backend/seed";
 import type { Store, User } from "./backend/types";
 import { HANDLERS, type ToolHandler } from "./tools/handlers";
+import type { Challenge } from "../app/challenges";
+import { createModelGate, setupFingerprint } from "./modelCheck";
 
 export interface AppOptions {
   config: ServerConfig;
@@ -40,6 +42,8 @@ export interface AppOptions {
   log?: (entry: Record<string, unknown>) => void;
   /** Clock, injectable for rate-limit tests. */
   now?: () => number;
+  /** The model check's challenge pool and random source (PLAN-MODELCHECK.md); defaults to app/challenges.ts. */
+  modelCheck?: { pool?: readonly Challenge[]; random?: () => number };
 }
 
 const RATE_WINDOW_MS = 60_000;
@@ -66,6 +70,7 @@ export function createApp({
   heartbeatMs = 15_000,
   log = defaultLog,
   now = Date.now,
+  modelCheck: challengeOptions = {},
 }: AppOptions): Express {
   const app = express();
   app.disable("x-powered-by");
@@ -89,6 +94,26 @@ export function createApp({
     await ready;
     if (!givenStore) store.close?.();
   };
+  // The model check ([10.21]): a challenge for this setup, recorded in the store once it is ready.
+  const gate = createModelGate({
+    mode: config.modelCheck,
+    model,
+    fingerprint: setupFingerprint({ model: model.setup?.id ?? model.kind, systemPrompt: model.setup?.systemPrompt ?? "", settings: model.setup?.settings, tools, assets }),
+    store: {
+      modelChecks: {
+        add: async (record) => (await ready, store.modelChecks.add(record)),
+        latestPass: async (fingerprint, since) => (await ready, store.modelChecks.latestPass(fingerprint, since)),
+        list: async () => (await ready, store.modelChecks.list()),
+      },
+    },
+    tools,
+    assets,
+    ...challengeOptions,
+    timeoutMs: config.timeoutMs,
+    now,
+    log,
+  });
+  app.locals.modelCheck = gate;
   const secure = config.publicUrl.startsWith("https:");
   /** Origins a browser may send actions from: the app's own and the one CORS allows. */
   const allowedOrigins = new Set([config.corsOrigin, new URL(config.publicUrl).origin]);
@@ -119,7 +144,7 @@ export function createApp({
   const allowMutate = rateLimiter(config.rateLimitPerMinute * 3, now);
 
   app.get("/api/health", (_req, res) => {
-    res.json({ ok: true, model: model.kind, auth: config.auth });
+    res.json({ ok: true, model: model.kind, auth: config.auth, modelCheck: gate.status() });
   });
 
   /** The version a client asked for ([10.1]): null when none, "" when the query isn't one string. */
@@ -169,6 +194,13 @@ export function createApp({
    * what the model wrote; the client's parser decides what is valid.
    */
   async function stream(req: Request, res: Response, prompt: string, output: StreamOutput) {
+    // A setup that hasn't passed its model check isn't served when the check is enforced ([10.23]).
+    const admitted = gate.admit();
+    if (!admitted.ok) {
+      log({ event: output.route, model: model.kind, outcome: "model_unverified" });
+      res.setHeader("Retry-After", String(admitted.retryAfterSeconds));
+      return sendError(res, 503, "model_unverified", admitted.message, true);
+    }
     // Limited per address, and per signed-in person wherever their requests come from. Generation
     // doesn't require sign-in, and nothing about the person is added to the prompt.
     const { user } = await identify(req);
@@ -252,6 +284,8 @@ export function createApp({
       clearTimeout(timeout);
       if (!res.writableEnded) res.end();
       observer.end();
+      // Finished live replies feed the live re-check ([10.24]); cancelled or failed ones say nothing about the model.
+      if (entry.outcome === "done") gate.observe(Object.keys(parse.errors).length > 0);
       log({ ...entry, ms: now() - started, chunks, chars, parse: { ...parse, components: observer.getSnapshot().nodes.size } });
     }
   }

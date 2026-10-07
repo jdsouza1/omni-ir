@@ -63,6 +63,7 @@ A request the server can't start is answered with an HTTP status and one JSON bo
 | 400 | `invalid_request` | The body isn't a valid request. |
 | 400 | `unsupported_version` | The server writes a newer format than the client reads. |
 | 429 | `rate_limited` | Too many requests. `Retry-After` gives the seconds to wait. |
+| 503 | `model_unverified` | The server's model hasn't passed its [model check](./model-check) yet; retryable, with `Retry-After`. |
 | 500 | `server_error` | Anything else. |
 
 ## Actions

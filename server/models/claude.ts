@@ -3,7 +3,7 @@
 // Only text deltas are forwarded; thinking is never sent to the browser.
 import Anthropic from "@anthropic-ai/sdk";
 import type { BetaMessageStreamParams } from "@anthropic-ai/sdk/resources/beta/messages/messages";
-import { ModelError, type GenerateOptions, type GenerateResult, type Model, type StopReason } from "./types";
+import { ModelError, type GenerateOptions, type GenerateResult, type Model, type ModelSetup, type StopReason } from "./types";
 
 export const CLAUDE_MODEL_ID = "claude-opus-5-5";
 
@@ -40,6 +40,10 @@ export class ClaudeModel implements Model {
   private used = 0;
 
   constructor(private readonly options: ClaudeModelOptions) {}
+
+  get setup(): ModelSetup {
+    return { id: CLAUDE_MODEL_ID, systemPrompt: this.options.systemPrompt, settings: { effort: this.options.effort, maxTokens: this.options.maxTokens ?? 16_000 } };
+  }
 
   async generate(prompt: string, { signal, onText }: GenerateOptions): Promise<GenerateResult> {
     if (signal.aborted) throw new ModelError("aborted", "Generation was cancelled.");

@@ -96,6 +96,20 @@ describe.each(stores)("%s store", (_, make) => {
     await store.audit.add({ at: 2, userId: null, tool: "auth.sendMagicLink", outcome: "ok", idempotencyKey: null });
     expect((await store.audit.list()).map((e) => e.tool)).toEqual(["payments.confirm", "auth.sendMagicLink"]);
   });
+
+  it("keeps model checks, and finds a setup's latest pass since a given time (PLAN-MODELCHECK.md)", async () => {
+    const check = { fingerprint: "f1", model: "m", reason: "start" as const, requests: ["a", "b"], total: 2, safe: 2, complete: 2, error: null };
+    await store.modelChecks.add({ ...check, at: 10, passed: true });
+    await store.modelChecks.add({ ...check, at: 20, passed: true });
+    await store.modelChecks.add({ ...check, at: 30, passed: false, safe: 1, error: "model_error" });
+    await store.modelChecks.add({ ...check, at: 40, passed: true, fingerprint: "f2" });
+    expect((await store.modelChecks.latestPass("f1", 0))?.at).toBe(20);
+    expect(await store.modelChecks.latestPass("f1", 21)).toBeNull();
+    expect(await store.modelChecks.latestPass("f3", 0)).toBeNull();
+    const all = await store.modelChecks.list();
+    expect(all.map((r) => r.at)).toEqual([10, 20, 30, 40]);
+    expect(all[2]).toEqual({ ...check, at: 30, passed: false, safe: 1, error: "model_error" });
+  });
 });
 
 describe("sqlite store on disk", () => {

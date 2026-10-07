@@ -23,6 +23,7 @@
     "server": "tsx watch server/index.ts",
     "server:start": "tsx server/index.ts",
     "validate": "tsx scripts/validate.tsx",
+    "model:challenge": "tsx scripts/model-challenge.ts",
     "prompt:print": "tsx scripts/prompt-print.ts",
     "playground": "vite --config playground/vite.config.ts --configLoader runner",
     "playground:build": "vite build --config playground/vite.config.ts --configLoader runner",
