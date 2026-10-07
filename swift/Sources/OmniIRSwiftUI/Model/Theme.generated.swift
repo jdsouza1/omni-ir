@@ -65,11 +65,11 @@ public struct OmniPalette: Sendable, Equatable {
     chartAxis: 0x9AA0AA,
     chart1: 0x2A78D6,
     chart2: 0xEB6834,
-    chart3: 0x1BAF7A,
-    chart4: 0xEDA100,
-    chart5: 0xE87BA4,
-    chart6: 0x008300,
-    chart7: 0x4A3AA7,
+    chart3: 0xD161A7,
+    chart4: 0x4A3AA7,
+    chart5: 0x2CA75C,
+    chart6: 0xD47E00,
+    chart7: 0x008300,
     chart8: 0xE34948)
 
   public static let dark = OmniPalette(
@@ -96,12 +96,12 @@ public struct OmniPalette: Sendable, Equatable {
     dangerSoft: 0x3B1A1A,
     dangerText: 0xFFA59E,
     chartAxis: 0x6B7381,
-    chart1: 0x5B9CF0,
-    chart2: 0xF38A5E,
-    chart3: 0x3CC995,
-    chart4: 0xF0B429,
-    chart5: 0xF09BBD,
-    chart6: 0x3FAE3F,
-    chart7: 0x9B8CF0,
-    chart8: 0xF07676)
+    chart1: 0x2A78D6,
+    chart2: 0xEB6834,
+    chart3: 0xD161A7,
+    chart4: 0x7569BC,
+    chart5: 0x2CA75C,
+    chart6: 0xD47E00,
+    chart7: 0x0A880A,
+    chart8: 0xE34948)
 }

@@ -45,6 +45,8 @@ Status: **APPROVED 2026-10-06** in a leaner form, at the owner's choice: the ful
 
 **4. Spec.** Section 8 gains: the app, never the stream, sets the theme; the renderer's own words are the app's to replace and are shown as plain text; the default themes meet the contrast rules. Section 11 notes that neither can be reached from the stream.
 
+**Chart colours (owner's decision B, 2026-10-06, at the review):** three light chart colours were below 3:1 on white (green, amber, pink). They were darkened with the smallest change that reaches 3:1, and a colour-blind check (protanopia, deuteranopia, tritanopia) showed darkening alone brought green, orange and amber closer together, so the order changed to put the most distinct colours first. The same check found that the step's first dark chart colours had two near-identical ones for deuteranopia; the dark colours are now the light ones, lightened only where needed. Both checks are tests.
+
 **Not in this step, until there is demand:** a theming setting on iOS and Android (`OmniTheme`); built-in translations; right-to-left layouts; telling the model the person's language; styling per component or per screen.
 
 ## Decisions: pros, cons and trade-offs

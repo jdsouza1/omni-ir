@@ -66,13 +66,15 @@ export const LIGHT: Palette = {
   dangerSoft: "#fde4e4",
   dangerText: "#8e1c1c",
   chartAxis: "#9aa0aa",
+  // Chart colours (owner's decision B, 2026-10-06): every one at least 3:1 on white, ordered so the
+  // first few stay far apart for colour-blind viewers (tests/cvd.ts checks both).
   chart1: "#2a78d6",
   chart2: "#eb6834",
-  chart3: "#1baf7a",
-  chart4: "#eda100",
-  chart5: "#e87ba4",
-  chart6: "#008300",
-  chart7: "#4a3aa7",
+  chart3: "#d161a7",
+  chart4: "#4a3aa7",
+  chart5: "#2ca75c",
+  chart6: "#d47e00",
+  chart7: "#008300",
   chart8: "#e34948",
 };
 
@@ -100,14 +102,15 @@ export const DARK: Palette = {
   dangerSoft: "#3b1a1a",
   dangerText: "#ffa59e",
   chartAxis: "#6b7381",
-  chart1: "#5b9cf0",
-  chart2: "#f38a5e",
-  chart3: "#3cc995",
-  chart4: "#f0b429",
-  chart5: "#f09bbd",
-  chart6: "#3fae3f",
-  chart7: "#9b8cf0",
-  chart8: "#f07676",
+  // The light chart colours, lightened only where needed to reach 3.5:1 on the dark card.
+  chart1: "#2a78d6",
+  chart2: "#eb6834",
+  chart3: "#d161a7",
+  chart4: "#7569bc",
+  chart5: "#2ca75c",
+  chart6: "#d47e00",
+  chart7: "#0a880a",
+  chart8: "#e34948",
 };
 
 /** The font and the corner radius of controls (cards use 1.5×, pictures and notices 1.25×). */
@@ -151,4 +154,5 @@ export const CONTRAST_PAIRS: readonly (readonly [fore: ColorToken, back: ColorTo
   ["inputBorder", "surface", 3, "the edges of fields and switches"],
   ["accent", "surface", 3, "focus rings, an open tab, a switch that is on"],
   ["warning", "surface", 3, "rating stars"],
+  ...([1, 2, 3, 4, 5, 6, 7, 8] as const).map((n) => [`chart${n}`, "surface", 3, `chart colour ${n}`] as const),
 ];

@@ -14,6 +14,7 @@ All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-
 ### Changed
 - **A blocked action shows a plain sentence** ("This can't be sent. Check the details and try again.") instead of the validation text (`amount: Too small…`); the detail still goes to `onEvent`.
 - **Input borders are darker** (#868c97, was #c3c7ce): the old ones were 1.7:1 against white, under the 3:1 a control's edge needs. Everything else in the light theme looks as before.
+- **Chart colours** (the owner's choice, 2026-10-06): every colour now stands out at least 3:1 from the background in light and dark. Green, amber and pink were darker than before, and the order changed so the first four series stay far apart for colour-blind viewers: blue, orange, pink, purple, then green, amber, dark green, red. Charts with one or two series look as before; charts with three or more show their series in the new order. The dark chart colours are the light ones, lightened only where needed, which fixed two dark colours that looked almost the same to people with deuteranopia. Tests simulate protanopia, deuteranopia and tritanopia.
 - iOS and Android take their fixed colours (charts, notices, badges, rating stars, the version notice) from the shared defaults, so the three platforms match.
 - Custom React catalogs receive a new `strings` prop alongside `locale`.
 

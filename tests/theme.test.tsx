@@ -8,6 +8,7 @@ import { createParser } from "@omni-ir/core";
 import { COLOR_TOKENS, CONTRAST_PAIRS, DARK, LIGHT, OmniRenderer, contrast, cssVariable } from "@omni-ir/react";
 import { CHART_COLORS } from "../packages/react/src/catalog/charts";
 import { TOOLS } from "../app/tools";
+import { minSeparation } from "./cvd";
 import { KOTLIN_THEME_PATH, SWIFT_THEME_PATH, themeCss, themeJson, themeKotlin, themeSwift } from "../scripts/theme";
 
 afterEach(cleanup);
@@ -29,6 +30,16 @@ describe("the token list", () => {
     for (const [fore, back, minimum, what] of CONTRAST_PAIRS) {
       expect(contrast(palette[fore], palette[back]), `${what}: ${fore} on ${back}`).toBeGreaterThanOrEqual(minimum);
     }
+  });
+
+  it.each([
+    ["light", LIGHT],
+    ["dark", DARK],
+  ] as const)("keeps chart colours apart for colour-blind viewers (%s)", (_, palette) => {
+    const charts = ([1, 2, 3, 4, 5, 6, 7, 8] as const).map((n) => palette[`chart${n}`]);
+    for (const [kind, separation] of Object.entries(minSeparation(charts))) expect(separation, `all eight, ${kind}`).toBeGreaterThanOrEqual(6);
+    for (const [kind, separation] of Object.entries(minSeparation(charts, 4))) expect(separation, `first four, ${kind}`).toBeGreaterThanOrEqual(9);
+    for (const [kind, separation] of Object.entries(minSeparation(charts, 2))) expect(separation, `first two, ${kind}`).toBeGreaterThanOrEqual(50);
   });
 
   it("writes conformance/theme.json for other renderers (run npm run theme if this fails)", () => {

@@ -59,11 +59,11 @@
     "chartAxis": "#9aa0aa",
     "chart1": "#2a78d6",
     "chart2": "#eb6834",
-    "chart3": "#1baf7a",
-    "chart4": "#eda100",
-    "chart5": "#e87ba4",
-    "chart6": "#008300",
-    "chart7": "#4a3aa7",
+    "chart3": "#d161a7",
+    "chart4": "#4a3aa7",
+    "chart5": "#2ca75c",
+    "chart6": "#d47e00",
+    "chart7": "#008300",
     "chart8": "#e34948"
   },
   "dark": {
@@ -90,14 +90,14 @@
     "dangerSoft": "#3b1a1a",
     "dangerText": "#ffa59e",
     "chartAxis": "#6b7381",
-    "chart1": "#5b9cf0",
-    "chart2": "#f38a5e",
-    "chart3": "#3cc995",
-    "chart4": "#f0b429",
-    "chart5": "#f09bbd",
-    "chart6": "#3fae3f",
-    "chart7": "#9b8cf0",
-    "chart8": "#f07676"
+    "chart1": "#2a78d6",
+    "chart2": "#eb6834",
+    "chart3": "#d161a7",
+    "chart4": "#7569bc",
+    "chart5": "#2ca75c",
+    "chart6": "#d47e00",
+    "chart7": "#0a880a",
+    "chart8": "#e34948"
   },
   "shape": {
     "radius": 8,
@@ -211,6 +211,54 @@
       "background": "surface",
       "minimum": 3,
       "what": "rating stars"
+    },
+    {
+      "foreground": "chart1",
+      "background": "surface",
+      "minimum": 3,
+      "what": "chart colour 1"
+    },
+    {
+      "foreground": "chart2",
+      "background": "surface",
+      "minimum": 3,
+      "what": "chart colour 2"
+    },
+    {
+      "foreground": "chart3",
+      "background": "surface",
+      "minimum": 3,
+      "what": "chart colour 3"
+    },
+    {
+      "foreground": "chart4",
+      "background": "surface",
+      "minimum": 3,
+      "what": "chart colour 4"
+    },
+    {
+      "foreground": "chart5",
+      "background": "surface",
+      "minimum": 3,
+      "what": "chart colour 5"
+    },
+    {
+      "foreground": "chart6",
+      "background": "surface",
+      "minimum": 3,
+      "what": "chart colour 6"
+    },
+    {
+      "foreground": "chart7",
+      "background": "surface",
+      "minimum": 3,
+      "what": "chart colour 7"
+    },
+    {
+      "foreground": "chart8",
+      "background": "surface",
+      "minimum": 3,
+      "what": "chart colour 8"
     }
   ]
 }
