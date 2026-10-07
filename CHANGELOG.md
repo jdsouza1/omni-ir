@@ -4,7 +4,7 @@ All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-
 
 ## 0.10.1 (2026-10-07)
 
-The first release of `@omni-ir/mcp` (with `@omni-ir/core` and `@omni-ir/react` at the same version). Its first version, 0.10.0, was published by hand without its `npx` command: npm 11 silently drops a `bin` path written `./dist/bin.js`. 0.10.1 fixes the path, and the pack check now fails whenever npm would change a package's manifest at publish time. `@omni-ir/core` and `@omni-ir/react` 0.10.0 were never published.
+The first release of `@omni-ir/mcp` (with `@omni-ir/core` and `@omni-ir/react` at the same version). Its first version, 0.10.0, was published by hand, while npm 11 warned that its `bin` path, written `./dist/bin.js`, was invalid. 0.10.1 writes the path as npm expects and is published from GitHub with provenance like the others, and the pack check now fails whenever npm would change a package's manifest at publish time. `@omni-ir/core` and `@omni-ir/react` 0.10.0 were never published.
 
 ### Added
 - **`@omni-ir/mcp`, the MCP Apps bridge** (Step 18, PLAN-MCPAPPS.md): Omni-IR screens inside Claude, ChatGPT, VS Code, Cursor and other hosts of MCP Apps. The host's model calls `show_screen` with Omni-IR (the tool's description is a compact guide generated from the schema, the app's tools and pictures, under 1,500 tokens); the host draws it with a view that bundles the parser and the Trusted Catalog into one HTML file with no network access (about 550 KB). The screen builds line by line from the host's partial tool input, in the host's colours and light or dark theme (each colour kept only if every contrast pair still passes). The result tells the model which lines were rejected, so it can fix them.
