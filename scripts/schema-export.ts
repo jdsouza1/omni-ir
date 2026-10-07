@@ -8,6 +8,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { z } from "zod";
 import {
+  FORMAT_VERSION,
   COMPONENTS,
   COMPONENT_TYPES,
   CROSS_PROP_RULES,
@@ -33,6 +34,8 @@ export function renderSchemaJson(): string {
       "In props, a value written `$key` is {kind: \"state\", key: \"$key\"}, a bare identifier is {kind: \"ref\", id}, " +
       "and a children list is an array of refs. See conformance/README.md.",
     version,
+    // The stream format's own version (PLAN-VERSIONING.md): changes only when the format does.
+    formatVersion: FORMAT_VERSION,
     rootId: ROOT_ID,
     limits: LIMITS,
     reservedWords: [...RESERVED_WORDS],

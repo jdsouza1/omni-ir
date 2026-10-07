@@ -125,6 +125,20 @@ export const CASES: Record<string, ConformanceCase[]> = {
       expect: { issues: [], nodes: { root: node("Divider") } },
     },
     {
+      id: "version-marker-old-release-numbers",
+      rules: ["3.9"],
+      description: "0.6 and 0.7 were releases that didn't change the format: a marker naming them means format 0.5, never newer than a parser for 0.5 or later.",
+      input: lines("# omni-ir 0.7", "root = Divider()"),
+      expect: { issues: [], nodes: { root: node("Divider") } },
+    },
+    {
+      id: "version-marker-next-format",
+      rules: ["3.9"],
+      description: "The next format version after 0.5 is 0.8: newer than format 0.5.",
+      input: lines("# omni-ir 0.8", "root = Divider()"),
+      expect: { issues: [i(1, "newer_version")], nodes: { root: node("Divider") } },
+    },
+    {
       id: "version-marker-not-line-1",
       rules: ["3.9", "3.6"],
       description: "The same text on any line but line 1 is an ordinary comment, even after a blank first line.",

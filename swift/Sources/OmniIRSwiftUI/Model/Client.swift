@@ -169,13 +169,9 @@ public struct OmniClient: Sendable {
     self.token = token
   }
 
-  /// Asks the server for a screen and writes it into `store` as it streams. The store is always ended
-  /// once the stream has started (done, error, cancelled or dropped), so anything that never arrived
-  /// becomes a fallback instead of loading forever. Cancel the task to stop.
-  @MainActor
-  public func generate(_ prompt: String, into store: OmniStore) async -> GenerateOutcome {
+  private func generateRequest(_ prompt: String, withVersion: Bool) -> URLRequest {
     var components = URLComponents(url: baseURL.appendingPathComponent("api/generate"), resolvingAgainstBaseURL: false)
-    components?.queryItems = [URLQueryItem(name: "version", value: majorMinor())]
+    if withVersion { components?.queryItems = [URLQueryItem(name: "version", value: omniIRFormatVersion)] }
     var request = URLRequest(url: components?.url ?? baseURL.appendingPathComponent("api/generate"))
     request.httpMethod = "POST"
     request.timeoutInterval = idleTimeout  // URLSession's timeout is the longest wait between bytes
@@ -183,20 +179,39 @@ public struct OmniClient: Sendable {
     request.setValue("text/event-stream", forHTTPHeaderField: "accept")
     if let token = token() { request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization") }
     request.httpBody = try? JSONSerialization.data(withJSONObject: ["prompt": prompt])
+    return request
+  }
 
-    let bytes: URLSession.AsyncBytes
-    let response: URLResponse
-    do {
-      (bytes, response) = try await session.bytes(for: request)
-    } catch {
-      return Task.isCancelled ? .aborted : .error(code: "network_error", message: "Could not reach the server.", retryable: true)
+  /// Asks the server for a screen and writes it into `store` as it streams. The store is always ended
+  /// once the stream has started (done, error, cancelled or dropped), so anything that never arrived
+  /// becomes a fallback instead of loading forever. Cancel the task to stop.
+  @MainActor
+  public func generate(_ prompt: String, into store: OmniStore) async -> GenerateOutcome {
+    // Ask for this package's format (SPEC.md [10.1]). A server that compares versions exactly (0.6 and
+    // 0.7 did) refuses a different number; one retry without a version gets the stream, and the parser's
+    // marker check decides whether the screen needs a newer app ([10.12], [3.9]).
+    var opened: URLSession.AsyncBytes?
+    for withVersion in [true, false] {
+      let bytes: URLSession.AsyncBytes
+      let response: URLResponse
+      do {
+        (bytes, response) = try await session.bytes(for: generateRequest(prompt, withVersion: withVersion))
+      } catch {
+        return Task.isCancelled ? .aborted : .error(code: "network_error", message: "Could not reach the server.", retryable: true)
+      }
+      // Errors before the stream starts (bad request, rate limit): the store is left untouched.
+      guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+        var body: [UInt8] = []
+        do { for try await byte in bytes { body.append(byte) } } catch {}
+        let refused = errorResponseOutcome(status: (response as? HTTPURLResponse)?.statusCode ?? 0, body: body)
+        if withVersion, case .error(let code, _, _) = refused, code == "unsupported_version" { continue }
+        return refused
+      }
+      opened = bytes
+      break
     }
-
-    // Errors before the stream starts (bad request, rate limit): the store is left untouched.
-    guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
-      var body: [UInt8] = []
-      do { for try await byte in bytes { body.append(byte) } } catch {}
-      return errorResponseOutcome(status: (response as? HTTPURLResponse)?.statusCode ?? 0, body: body)
+    guard let bytes = opened else {
+      return .error(code: "unsupported_version", message: "The server can't write a stream this app can read.", retryable: false)
     }
 
     var reader = StreamReader()

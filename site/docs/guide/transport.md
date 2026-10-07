@@ -12,7 +12,7 @@ Accept: text/event-stream
 {"prompt": "a payment confirmation for $42.50"}
 ```
 
-`version` is optional. It is the Omni-IR version the client renders; a server that can't write that version answers `400` with the code `unsupported_version` before it streams anything. It is in the query, not the body, so older servers simply ignore it.
+`version` is optional. It is the **stream format** the client's parser reads, currently `0.5`; it changes only when the format does, not with every release (see [Versions](#versions) below). A server answers `400` with the code `unsupported_version` only when it writes a newer format than the client reads. It is in the query, not the body, so older servers simply ignore it.
 
 ## The stream
 
@@ -37,9 +37,18 @@ data: {"stopReason":"end_turn","model":"claude-opus-5-5","ms":1840}
 - **`chunk`** carries the next piece of text. Pieces end anywhere, even inside a line; the client writes them to its parser exactly as they arrive.
 - **`done`** or **`error`** ends the stream. Only the first one counts; anything after it is ignored.
 - **`: ping`** comes at least every 15 seconds while nothing else does. A client that hears nothing at all for 45 seconds treats the connection as lost.
-- **The first line** is the version marker, `# omni-ir 0.5`, written by the server, not the model. Older parsers read it as a comment. A newer parser that gets a stream for a later version reports `newer_version` and the renderer tells the person the app needs an update, while still showing everything it understands.
+- **The first line** is the version marker, `# omni-ir 0.5`: the stream format, written by the server, not the model. Older parsers read it as a comment. A parser that gets a stream in a newer format reports `newer_version`, and the renderer tells the person the app needs an update, while still showing everything it understands.
 
 When the connection drops before `done` or `error`, the client ends its parser, so whatever never arrived shows as a fallback rather than loading forever, and reports `connection_lost`, which may be retried. Streams can't be resumed: retrying means asking again.
+
+## Versions
+
+Two numbers are involved, and they move separately:
+
+- The **stream format** (`0.5` today) is what a model writes and a parser reads: the grammar, the catalog and the rules. It changes only when one of those does, and formats only add, so a parser reads its own format and every older one.
+- The **package release** (`@omni-ir/core` 0.8.0, for example) changes with every release, including ones that only improve the server, the renderer or the clients.
+
+So a server and its apps keep working together across releases, as long as the app reads the server's format. Releases 0.6 and 0.7 wrote their release number into the marker; parsers understand those numbers as format 0.5. When an older server (0.6 or 0.7) refuses the format number a newer client asks for, the client asks once more without a number.
 
 ## Errors before the stream
 
@@ -52,7 +61,7 @@ A request the server can't start is answered with an HTTP status and one JSON bo
 | Status | Code | When |
 |---|---|---|
 | 400 | `invalid_request` | The body isn't a valid request. |
-| 400 | `unsupported_version` | The server can't write the requested version. |
+| 400 | `unsupported_version` | The server writes a newer format than the client reads. |
 | 429 | `rate_limited` | Too many requests. `Retry-After` gives the seconds to wait. |
 | 500 | `server_error` | Anything else. |
 

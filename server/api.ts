@@ -1,7 +1,7 @@
 // The API's rules, shared by the Express app (app.ts) and the in-browser API the hosted playground
 // uses (inBrowser.ts), so both answer every request the same way. Imports nothing from Node.
 import { z } from "zod";
-import { majorMinor, versionMarker, type ToolRegistry } from "@omni-ir/core";
+import { canRead, FORMAT_VERSION, versionMarker, type ToolRegistry } from "@omni-ir/core";
 import { ModelError } from "./models/types";
 import { sha256 } from "./backend/auth";
 import type { User } from "./backend/types";
@@ -59,14 +59,15 @@ export function describeIssues(error: z.ZodError): string {
 }
 
 /**
- * The version a client asked for in the query ([10.1]), checked before streaming ([10.12]): null when
- * this server can write it (or none was asked for), otherwise the error to answer with (status 400).
+ * The format a client asked for in the query ([10.1]), checked before streaming ([10.12]): null when the
+ * client can read this server's format (or asked for none), otherwise the error to answer with (400).
+ * Within 0.x formats only add, so a client reads its own format and every older one.
  */
 export function versionError(requested: string | null): ApiErrorBody | null {
   if (requested === null) return null;
   if (!/^\d+\.\d+$/.test(requested)) return errorBody("invalid_request", "version must be MAJOR.MINOR, such as 0.5.");
-  if (requested === majorMinor()) return null;
-  return errorBody("unsupported_version", `This server writes Omni-IR ${majorMinor()}; it can't write a stream for ${requested}.`);
+  if (canRead(requested)) return null;
+  return errorBody("unsupported_version", `This server writes Omni-IR format ${FORMAT_VERSION}, newer than ${requested}: the app needs an update.`);
 }
 
 /** The first chunk of every stream: the version marker, written by the server, not the model ([10.13]). */

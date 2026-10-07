@@ -1,8 +1,11 @@
 // Generated from conformance/schema.json by `npm run swift:schema`; do not edit.
 // The single authority is packages/core/src/schema.ts (TypeScript), exported with `npm run schema:export`.
 
-/// The Omni-IR version this catalog describes.
+/// The package release this catalog was exported from.
 public let omniIRVersion = "0.7.0"
+
+/// The stream format's version: what the version marker, requests and version checks carry.
+public let omniIRFormatVersion = "0.5"
 
 /// The components in the Trusted Catalog.
 public enum ComponentType: String, Sendable, CaseIterable, Hashable {

@@ -1,6 +1,6 @@
 # Omni-IR Specification
 
-**Version 0.7 (draft)** · Apache-2.0
+**Specification 0.7 (draft) · stream format 0.5** · Apache-2.0
 
 Omni-IR is a text format that an AI model writes to describe a user interface, one short line at a time, and that a trusted client renders with its own components as the lines arrive. This document says exactly what a stream may contain and how a conforming parser and renderer must treat it. It describes what is implemented and tested in this repository; nothing here is aspirational.
 
@@ -47,7 +47,7 @@ payIt = McpMutation(pay, tool="payments.confirm", params={amount: $amount, note:
 - **[3.6]** A line that is empty, contains only spaces and tabs, or whose first non-space character is `#` is ignored.
 - **[3.7]** A line longer than the line length limit (section 12) is reported as `line_too_long` and skipped. Processing resumes with the next line. A parser SHOULD NOT keep an over-long line in memory while waiting for its end.
 - **[3.8]** An issue in one line never stops the stream. Later lines are processed normally.
-- **[3.9]** If line 1 is a comment of the form `# omni-ir MAJOR.MINOR` (spaces or tabs MAY appear before and after `#` and at the end of the line, and MUST separate `omni-ir` from the version; MAJOR and MINOR are whole numbers of any length), it is the **version marker**: the Omni-IR version the stream was written for. A parser built for a lower version (comparing MAJOR, then MINOR, as numbers) MUST report a `newer_version` warning on line 1 and process the rest of the stream as usual. The same text on any other line, or in any other form, is an ordinary comment. Parsers older than 0.5 treat the marker as a comment, as [3.6] requires.
+- **[3.9]** If line 1 is a comment of the form `# omni-ir MAJOR.MINOR` (spaces or tabs MAY appear before and after `#` and at the end of the line, and MUST separate `omni-ir` from the version; MAJOR and MINOR are whole numbers of any length), it is the **version marker**: the stream format the stream was written for (section 12). The numbers 0.6 and 0.7 name format 0.5: they were releases that didn't change the format, and wrote their release number. A parser built for an older format (comparing MAJOR, then MINOR, as numbers, after that substitution) MUST report a `newer_version` warning on line 1 and process the rest of the stream as usual. The same text on any other line, or in any other form, is an ordinary comment. Parsers older than 0.5 treat the marker as a comment, as [3.6] requires.
 
 ## 4. Grammar
 
@@ -145,7 +145,7 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.15]** An McpMutation's `target` MUST be a Button with an `action`. A target that never arrives is `dangling_ref`; a target without an action is `mutation_target_not_interactive`.
 - **[5.16]** McpMutation `params` is an object whose keys are identifiers (not reserved words) and whose values are literals or `$key` references. A component id as a value, a repeated key or a reserved key is an `invalid_props` error.
 
-## 6. Component catalog (v0.7)
+## 6. Component catalog (format 0.5)
 
 A component has exactly the props listed; any other prop is rejected ([5.9]). "Values" lists what each prop accepts; `$state` means a `$key` reference ([5.11]), and `id` means a component id. The styling of every value (what `"muted"` or `"primary"` looks like) belongs to the renderer. In each signature, positional props are written bare in their order, props written `name=…` can only be given by name, and props in [brackets] are optional: `Image(asset, alt=…, [ratio=…])` is written `Image("cabin-pines", alt="A cabin", ratio="16:9")`.
 
@@ -594,7 +594,7 @@ These rules apply to anything that displays an Omni-IR screen. There are three r
 Sections 3 to 7 define the text. This section defines how a server sends that text to a client, so that any client works with any server. An app MAY carry Omni-IR between its own server and its own clients in any other way; a server or client that says it supports the Omni-IR transport MUST follow these rules. The **server** is what produces the stream (it usually asks a model); the **client** receives it and feeds a parser. The reference server (`server/`) and the clients in `@omni-ir/react` (`generate()`), `OmniIRSwiftUI` and `omni-ir-runtime` (`OmniClient`) follow them. Language-neutral cases for clients are in `conformance/transport/`.
 
 **Requesting a screen**
-- **[10.1]** A client asks for a screen with an HTTP `POST` to the server's generate endpoint (`/api/generate` in the reference server), a JSON body `{"prompt": "…"}`, `Content-Type: application/json` and `Accept: text/event-stream`. It MAY add the query parameter `version=MAJOR.MINOR`, the Omni-IR version its parser was built for. The version is in the query, not the body, so servers older than 0.5 ignore it.
+- **[10.1]** A client asks for a screen with an HTTP `POST` to the server's generate endpoint (`/api/generate` in the reference server), a JSON body `{"prompt": "…"}`, `Content-Type: application/json` and `Accept: text/event-stream`. It MAY add the query parameter `version=MAJOR.MINOR`, the stream format its parser reads (section 12). The version is in the query, not the body, so servers older than 0.5 ignore it.
 - **[10.2]** A server that can't start the stream answers with an HTTP error status and the body `{"error": {"code": "…", "message": "…", "retryable": true | false}}`. It uses these codes:
 
   | Status | Code | Meaning |
@@ -622,8 +622,8 @@ Sections 3 to 7 define the text. This section defines how a server sends that te
 - **[10.11]** A stream can't be resumed. A server doesn't send event ids, and a client doesn't reconnect by itself. Retrying means a new request and a new parser.
 
 **Versions**
-- **[10.12]** A server that gets a `version` it can't write a stream for MUST answer `unsupported_version` ([10.2]) before streaming. Until 1.0, versions with a different MAJOR or MINOR number may be incompatible (section 12); the reference server writes only its own version and refuses any other.
-- **[10.13]** A server SHOULD start the stream with the version marker ([3.9]) for the version it writes. The server writes it, not the model.
+- **[10.12]** A server MUST answer `unsupported_version` ([10.2]), before streaming, only when the client asked for an older format than the one it writes (comparing as in [3.9], including its substitution of 0.6 and 0.7); a client reads its own format and every older one, because formats only add (section 12). A client that gets `unsupported_version` MAY ask once more without a `version`, since servers 0.6 and 0.7 refused any number but their own; the version marker then tells it whether the stream is newer than it reads.
+- **[10.13]** A server SHOULD start the stream with the version marker ([3.9]) for the format it writes. The server writes it, not the model.
 
 **Actions**
 - **[10.14]** A client runs a governed action (section 9) with `POST` to the server's mutate endpoint (`/api/mutate`) and the body `{"tool": "…", "params": {…}}`, with the person's credentials (a session cookie, or `Authorization: Bearer …` from a native app). It SHOULD add an `Idempotency-Key` header, 1 to 200 letters, digits or `_-:.`, new for each press and the same when it retries that press. The server MUST check the tool and params again before running anything. A server that performs real actions SHOULD honour the key: for 24 hours it answers a repeated key from the same person with the stored answer instead of running the action again, and refuses the key for different params. It answers:
@@ -671,9 +671,14 @@ What the app must still handle:
 
 ## 12. Versioning and limits
 
-This is version 0.7, a draft. Until version 1.0, any change MAY be incompatible; changes are listed in CHANGELOG.md. A stream MAY declare the version it was written for with a version marker ([3.9]), and a client MAY ask for one ([10.1]).
+This is specification 0.7, a draft, describing **stream format 0.5**. The two numbers move separately:
 
-Adding to the catalog is a change too. Because the catalog is strict ([5.9]), a parser built for an older version rejects a new component (`unknown_component`), a new prop or a new allowed value (`invalid_props`), and its renderer shows a fallback in that place. A server SHOULD therefore ask a model only for what its clients' version accepts. The reference server generates its system prompt from its own schema, so a server and its clients stay compatible by using the same version.
+- The **stream format** is what sections 3 to 7 define: the grammar, the document rules, the catalog, the issue codes and the limits. Its version changes only when one of those does. A stream MAY declare it with a version marker ([3.9]), and a client MAY ask for one ([10.1]).
+- The **specification** also covers renderers, actions and transport (sections 8 to 11), which improve with each release without changing the format. Its number follows the reference packages' releases; changes are listed in CHANGELOG.md.
+
+Until 1.0, a new format version only adds: new components, props, allowed values, issue codes or rules that accept more. It never removes or changes the meaning of something an older format had, so a parser reads its own format and every older one, and a server can serve any client that reads its format or a newer one ([10.12]). The format after 0.5 is numbered **0.8**, above every number a released parser has used, so parsers for 0.5 to 0.7 recognise it as newer.
+
+Adding to the catalog is a format change. Because the catalog is strict ([5.9]), a parser built for an older format rejects a new component (`unknown_component`), a new prop or a new allowed value (`invalid_props`), and its renderer shows a fallback in that place. A server SHOULD therefore ask a model only for what its clients' format accepts. The reference server generates its system prompt from its own schema.
 
 <!-- generated:limits -->
 | Limit | Maximum |
@@ -763,5 +768,5 @@ Issues reported:
 ## Not yet specified
 
 - Data-driven lists. A List's items are written out one by one; there are no loops or bindings to collections.
-- A way to update or remove a component after its line has arrived. In v0.7 an id can't be reassigned ([5.3]).
+- A way to update or remove a component after its line has arrived. In format 0.5 an id can't be reassigned ([5.3]).
 - Renderers other than the web reference renderer.

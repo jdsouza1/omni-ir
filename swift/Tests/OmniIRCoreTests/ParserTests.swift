@@ -14,8 +14,13 @@ struct ParserTests {
     #expect(newer.document.newerVersion && newer.document.complete)
     #expect(Set(newer.document.nodes.keys) == ["root"])
     let same = OmniParser(tools: tools)
-    same.write("# omni-ir \(majorMinor())\nroot = Divider()\n")
+    same.write("# omni-ir \(omniIRFormatVersion)\nroot = Divider()\n")
     #expect(!same.document.newerVersion)
+    // Releases 0.6 and 0.7 didn't change the format: their markers mean format 0.5. The next format is 0.8.
+    #expect(!isNewerMarker("# omni-ir 0.7"))
+    #expect(!isNewerMarker("# omni-ir 0.6"))
+    #expect(isNewerMarker("# omni-ir 0.8"))
+    #expect(omniIRFormatVersion == "0.5")
   }
 
   @Test("reports pending references and resolves them as their lines arrive")

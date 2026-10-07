@@ -70,6 +70,13 @@ class ClientTest {
       val prompt = String(exchange.requestBody.readBytes())
       generateQueries += exchange.requestURI.query
       exchange.responseHeaders.add("content-type", "text/event-stream")
+      // A 0.7 server: it compares versions exactly, so it refuses any other number it's asked for.
+      if (prompt.contains("old server") && exchange.requestURI.query != null) {
+        val body = """{"error":{"code":"unsupported_version","message":"This server writes Omni-IR 0.7.","retryable":false}}""".toByteArray()
+        exchange.sendResponseHeaders(400, body.size.toLong())
+        exchange.responseBody.use { it.write(body) }
+        return@createContext
+      }
       if (prompt.contains("rate limit")) {
         val body = """{"error":{"code":"rate_limited","message":"Too many requests.","retryable":true}}""".toByteArray()
         exchange.sendResponseHeaders(429, body.size.toLong())
@@ -148,9 +155,17 @@ class ClientTest {
   }
 
   @Test
-  fun `the request carries this version, MAJOR dot MINOR (10_1)`() = runBlocking {
+  fun `the request carries this package's format version (10_1)`() = runBlocking {
     client.generate("a payment", store())
-    assertEquals("version=" + dev.omniir.core.OMNI_IR_VERSION.split(".").take(2).joinToString("."), generateQueries.single())
+    assertEquals("version=0.5", generateQueries.single())
+  }
+
+  @Test
+  fun `a server that refuses the version gets one retry without it (10_12)`() = runBlocking {
+    val store = store()
+    assertEquals(GenerateOutcome.Done("end_turn", "mock", 5.0), client.generate("old server", store))
+    assertEquals(listOf("version=0.5", null), generateQueries)
+    assertTrue(store.document.value.complete)
   }
 
   @Test

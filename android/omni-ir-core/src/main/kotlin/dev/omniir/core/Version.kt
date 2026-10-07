@@ -1,8 +1,15 @@
-// The version marker (SPEC.md [3.9]): line 1 may say which Omni-IR version the stream was written for.
-// Port of packages/core/src/version.ts.
+// Versions (SPEC.md [3.9], PLAN-VERSIONING.md): the stream format has its own version, FORMAT_VERSION,
+// which changes only when the format does; the marker and version checks use it. Port of
+// packages/core/src/version.ts.
 package dev.omniir.core
 
 private val MARKER = Regex("""^[ \t]*#[ \t]*omni-ir[ \t]+([0-9]+)\.([0-9]+)[ \t]*$""")
+
+/** Releases that carried their package number but didn't change the format: they mean the format they carried. */
+private val OLD_RELEASE_NUMBERS = mapOf("0.6" to "0.5", "0.7" to "0.5")
+
+/** The format a MAJOR.MINOR number stands for: itself, or the format an old release number carried. */
+public fun formatOf(version: String): String = OLD_RELEASE_NUMBERS[version] ?: version
 
 /** Compares whole numbers written in decimal, of any length. */
 private fun compareDigits(a: String, b: String): Int {
@@ -11,13 +18,19 @@ private fun compareDigits(a: String, b: String): Int {
   return if (x.length != y.length) x.length - y.length else x.compareTo(y)
 }
 
-/** Whether line 1 is a version marker for a newer version than [version]. */
-public fun isNewerMarker(line: String, version: String = OMNI_IR_VERSION): Boolean {
-  val match = MARKER.matchEntire(line) ?: return false
-  val parts = version.split(".")
-  val byMajor = compareDigits(match.groupValues[1], parts.getOrElse(0) { "0" })
-  return byMajor > 0 || (byMajor == 0 && compareDigits(match.groupValues[2], parts.getOrElse(1) { "0" }) > 0)
+/** Compares two MAJOR.MINOR formats, by MAJOR then MINOR, as numbers. */
+private fun compareFormats(a: String, b: String): Int {
+  val x = formatOf(a).split(".")
+  val y = formatOf(b).split(".")
+  val byMajor = compareDigits(x.getOrElse(0) { "0" }, y.getOrElse(0) { "0" })
+  return if (byMajor != 0) byMajor else compareDigits(x.getOrElse(1) { "0" }, y.getOrElse(1) { "0" })
 }
 
-/** "MAJOR.MINOR" of this version: what a version marker and a request carry. */
+/** Whether line 1 is a version marker for a newer format than [format]; old release numbers count as the format they carried. */
+public fun isNewerMarker(line: String, format: String = FORMAT_VERSION): Boolean {
+  val match = MARKER.matchEntire(line) ?: return false
+  return compareFormats("${match.groupValues[1]}.${match.groupValues[2]}", format) > 0
+}
+
+/** "MAJOR.MINOR" of a version such as "0.8.0". */
 public fun majorMinor(version: String = OMNI_IR_VERSION): String = version.split(".").take(2).joinToString(".")

@@ -182,11 +182,11 @@ describe("POST /api/ag-ui [10.18] [10.20]", () => {
     }
   });
 
-  it("reports a failed model as RUN_ERROR, and refuses another version before streaming", async () => {
+  it("reports a failed model as RUN_ERROR, and refuses an older format before streaming", async () => {
     server = await startServer({ model: new MockModel({ speed: "instant" }) });
     const failed = await events(await post(input("demo: model error")));
     expect(failed.at(-1)).toMatchObject({ type: "RUN_ERROR", code: "model_error" });
-    const refused = await post(input("hi"), "?version=99.0");
+    const refused = await post(input("hi"), "?version=0.4"); // an older format than the server writes
     expect(refused.status).toBe(400);
     expect(await refused.json()).toMatchObject({ error: { code: "unsupported_version" } });
   });
