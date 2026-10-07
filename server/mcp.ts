@@ -3,7 +3,7 @@
 // ownership checks, idempotency keys and audit trail. Counts of screens shown and actions run, for
 // the log and /api/health (B.5): never a screen's text or an action's params.
 import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { ToolRegistry } from "@omni-ir/core";
 import { createOmniMcpServer, type ActionResult, type OmniMcpEvent } from "@omni-ir/mcp";
 import { OMNI_IR_VERSION } from "@omni-ir/core";
@@ -12,8 +12,8 @@ import { runMutation } from "./api";
 import type { User } from "./backend/types";
 import type { ToolContext, ToolHandler } from "./tools/handlers";
 
-/** Where `npm run mcp:view` writes the view. */
-export const VIEW_FILE = resolve("packages/mcp/dist/view.html");
+/** Where `npm run mcp:view` writes the view: found from this file, since an MCP host may start the server anywhere. */
+export const VIEW_FILE = fileURLToPath(new URL("../packages/mcp/dist/view.html", import.meta.url));
 
 export function loadView(): string {
   if (!existsSync(VIEW_FILE)) throw new Error(`The MCP view isn't built: run \`npm run mcp:view\` first (${VIEW_FILE}).`);
