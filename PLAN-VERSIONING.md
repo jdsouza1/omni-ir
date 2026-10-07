@@ -101,9 +101,9 @@ Work on branch `wip/versioning`. Each part starts with failing tests (constraint
 
 **C. Spec and docs**
 - [x] C.1 SPEC.md: the two numbers, rule [3.9], section 10's version rules, section 12 (additive changes within `0.x`, the next format version is `0.8`); the transport guide; CHANGELOG with the table above
-- [ ] C.2 The decision log: this step's entry and decisions
+- [x] C.2 The decision log: this step's entry and decisions
 
 **D. Review and release** *(checkpoint: you review)*
-- [ ] D.1 A short review page: the compatibility table, checked against real `0.6` and `0.7` behaviour in tests
+- [x] D.1 A short review page: the compatibility table, checked against real `0.6` and `0.7` behaviour in tests
 - [ ] D.2 Merge with your approval
 - [ ] D.3 `v0.8.0` release: a separate go-ahead from you
