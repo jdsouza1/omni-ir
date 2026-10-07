@@ -1,3 +1,4 @@
+import type { OmniStrings } from "../catalog/strings.js";
 import { createContext, useContext, useRef, useSyncExternalStore } from "react";
 import type { Catalog, Picture } from "../catalog/types.js";
 import type { Primitive, ToolRegistry } from "@omni-ir/core";
@@ -26,6 +27,8 @@ export interface OmniContextValue {
   /** The app's image asset registry; streams can only show pictures named here. */
   assets: Readonly<Record<string, Picture>>;
   locale: string;
+  /** The renderer's own words: the app's, or English. */
+  strings: OmniStrings;
   onMutation: (call: MutationCall) => void | Promise<void>;
   report: (event: RendererEvent) => void;
 }

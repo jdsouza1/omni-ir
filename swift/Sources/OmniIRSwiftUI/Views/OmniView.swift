@@ -39,12 +39,17 @@ public struct OmniView: View {
 
 /// The stream was written for a newer Omni-IR version (SPEC.md section 8): say the app needs an update.
 private struct VersionNotice: View {
+  @Environment(\.omniStrings) private var strings
+  @Environment(\.colorScheme) private var colorScheme
+
   var body: some View {
-    Text("This screen was made for a newer version of the app. The app needs an update to show all of it.")
+    let palette = omniPalette(colorScheme)
+    Text(verbatim: strings.newerVersion)
       .font(.footnote)
+      .foregroundStyle(Color(omni: palette.text))
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(10)
-      .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
+      .background(Color(omni: palette.warningSoft), in: RoundedRectangle(cornerRadius: 10))
   }
 }
 
@@ -80,6 +85,24 @@ extension EnvironmentValues {
   var omniContext: RenderContext? {
     get { self[OmniContextKey.self] }
     set { self[OmniContextKey.self] = newValue }
+  }
+
+  /// The renderer's own words (PLAN-THEMES.md): the app's, or English.
+  public var omniStrings: OmniStrings {
+    get { self[OmniStringsKey.self] }
+    set { self[OmniStringsKey.self] = newValue }
+  }
+}
+
+private struct OmniStringsKey: EnvironmentKey {
+  static let defaultValue = OmniStrings.english
+}
+
+extension View {
+  /// Replace the renderer's own words, for example `OmniStrings(loading: "Chargement")`. They are shown
+  /// as plain text; the app sets them, never the stream.
+  public func omniStrings(_ strings: OmniStrings) -> some View {
+    environment(\.omniStrings, strings)
   }
 }
 
@@ -121,6 +144,7 @@ struct Children: View {
 }
 
 struct SkeletonLines: View {
+  @Environment(\.omniStrings) private var strings
   let lines: Int
 
   var body: some View {
@@ -133,14 +157,15 @@ struct SkeletonLines: View {
       }
     }
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel("Loading")
+    .accessibilityLabel(Text(verbatim: strings.loading))
   }
 }
 
 /// Shown in place of a component that never arrived, about the size of a placeholder.
 struct FallbackView: View {
+  @Environment(\.omniStrings) private var strings
   var body: some View {
-    Text("Component failed to load")
+    Text(verbatim: strings.failedToLoad)
       .font(.footnote)
       .foregroundStyle(.secondary)
       .padding(.horizontal, 10)

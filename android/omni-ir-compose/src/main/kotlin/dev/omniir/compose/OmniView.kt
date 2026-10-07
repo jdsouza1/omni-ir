@@ -21,6 +21,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -34,6 +35,7 @@ import dev.omniir.core.OmniDocument
 import dev.omniir.runtime.ActionState
 import dev.omniir.runtime.MutationCall
 import dev.omniir.runtime.OmniStore
+import dev.omniir.runtime.OmniStrings
 import dev.omniir.runtime.RendererEvent
 import dev.omniir.runtime.Slot
 import kotlinx.coroutines.CoroutineScope
@@ -54,12 +56,13 @@ public fun OmniView(
   modifier: Modifier = Modifier,
   pictures: Map<String, Painter> = emptyMap(),
   onEvent: (RendererEvent) -> Unit = {},
+  strings: OmniStrings = OmniStrings(),
 ) {
   val document by store.document.collectAsState()
   val actions by store.actions.collectAsState()
   val scope = rememberCoroutineScope()
   val context = RenderContext(store, document, actions, pictures, onMutation, onEvent, scope)
-  CompositionLocalProvider(LocalRender provides context) {
+  CompositionLocalProvider(LocalRender provides context, LocalOmniStrings provides strings) {
     // The marker is line 1, so the notice appears before anything else and never moves the screen.
     if (document.newerVersion) {
       Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -76,7 +79,7 @@ public fun OmniView(
 @Composable
 private fun VersionNotice() {
   Text(
-    "This screen was made for a newer version of the app. The app needs an update to show all of it.",
+    LocalOmniStrings.current.newerVersion,
     style = MaterialTheme.typography.bodySmall,
     modifier = Modifier
       .fillMaxWidth()
@@ -100,6 +103,9 @@ internal class RenderContext(
 }
 
 internal val LocalRender = compositionLocalOf<RenderContext?> { null }
+
+/** The renderer's own words (PLAN-THEMES.md): the app's, or English. Plain text, set by the app, never by the stream. */
+internal val LocalOmniStrings = staticCompositionLocalOf { OmniStrings() }
 
 /** What one id shows: its component, a placeholder while it hasn't arrived, or a fallback if it never does. */
 @Composable
@@ -125,9 +131,10 @@ internal fun ColumnChildren(ids: List<String>, stretch: Boolean) {
 @Composable
 internal fun SkeletonLines(lines: Int) {
   val count = lines.coerceIn(1, 6)
+  val label = LocalOmniStrings.current.loading
   Column(
     verticalArrangement = Arrangement.spacedBy(6.dp),
-    modifier = Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = "Loading" },
+    modifier = Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = label },
   ) {
     repeat(count) { i ->
       Box(
@@ -145,7 +152,7 @@ internal fun SkeletonLines(lines: Int) {
 @Composable
 internal fun Fallback() {
   Text(
-    "Component failed to load",
+    LocalOmniStrings.current.failedToLoad,
     style = MaterialTheme.typography.bodySmall,
     color = MaterialTheme.colorScheme.onSurfaceVariant,
     modifier = Modifier

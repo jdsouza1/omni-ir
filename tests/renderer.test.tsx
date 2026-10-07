@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { DEFAULT_CATALOG } from "@omni-ir/react";
+import { DEFAULT_CATALOG, ENGLISH } from "@omni-ir/react";
 import type { Catalog, CatalogProps } from "@omni-ir/react";
 import { createStore } from "@omni-ir/core";
 import { createParser } from "@omni-ir/core";
@@ -154,7 +154,7 @@ describe("interaction and governance (R1, R5, R6)", () => {
     const button = screen.getByRole("button", { name: "Delete" }) as HTMLButtonElement;
     expect(button.getAttribute("data-mcp-error")).toBe("true");
     expect(button.disabled).toBe(true);
-    expect(screen.getByRole("alert").textContent).toContain("not a permitted action");
+    expect(screen.getByRole("alert").textContent).toBe(ENGLISH.blocked); // a plain sentence, not the developer detail
     await user.click(button);
     expect(h.onMutation).not.toHaveBeenCalled();
   });

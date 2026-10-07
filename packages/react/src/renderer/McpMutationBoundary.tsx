@@ -37,12 +37,13 @@ export function McpMutationBoundary({ id, children }: Props) {
     return children({
       onPress: undefined,
       disabled: true,
-      error: `"${mutation.tool}" is not a permitted action`,
+      error: ctx.strings.blocked,
       mcpTool: mutation.tool,
     });
   }
 
-  const error = blocked !== null && blocked.values === paramValues ? blocked.message : undefined;
+  // The person sees a plain sentence; the detail (which param, why) goes to the app's onEvent.
+  const error = blocked !== null && blocked.values === paramValues ? ctx.strings.blocked : undefined;
 
   const onPress = () =>
     runHandler(ctx.report, id, () => {

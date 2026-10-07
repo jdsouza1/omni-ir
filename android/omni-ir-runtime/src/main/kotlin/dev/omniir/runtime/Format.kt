@@ -116,8 +116,8 @@ public object Format {
     /** The value as shown, with at most two decimals. */
     val shown: String,
   ) {
-    /** What assistive technology reads: "Rated 4.96 out of 5". */
-    val label: String get() = "Rated $shown out of $max"
+    /** What assistive technology reads, in the app's words: "Rated 4.96 out of 5" in English. */
+    public fun label(template: String = OmniStrings().rating): String = fillTemplate(template, mapOf("value" to shown, "max" to max.toString()))
   }
 
   public fun rating(value: Primitive?, max: Int?, locale: Locale): RatingModel {

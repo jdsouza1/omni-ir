@@ -1,5 +1,6 @@
 import { memo, useMemo, useSyncExternalStore, type ComponentType as ReactComponentType, type ReactNode } from "react";
 import { DEFAULT_CATALOG } from "../catalog/catalog.js";
+import { resolveStrings, type StringKey } from "../catalog/strings.js";
 import { SkeletonLines } from "../catalog/components.js";
 import type { Catalog, Picture } from "../catalog/types.js";
 
@@ -29,6 +30,16 @@ export interface OmniRendererProps {
   /** The app's image asset registry. Without it, Images show their alt text. */
   assets?: Readonly<Record<string, Picture>>;
   locale?: string;
+  /**
+   * Light (the default), dark, or the device's setting. The app chooses; the stream can't. Colours,
+   * font and radius come from the design tokens (`--omni-*` CSS variables), which the app may set.
+   */
+  theme?: "light" | "dark" | "system";
+  /**
+   * The renderer's own words, replacing the English ones key by key (for example `{ loading: "Chargement" }`).
+   * Shown as plain text; set by the app, never by the stream.
+   */
+  strings?: Partial<Record<StringKey, string>>;
 }
 
 export function OmniRenderer({
@@ -39,14 +50,17 @@ export function OmniRenderer({
   catalog = DEFAULT_CATALOG,
   assets = NO_ASSETS,
   locale = "en-US",
+  theme = "light",
+  strings,
 }: OmniRendererProps) {
+  const words = useMemo(() => resolveStrings(strings), [strings]);
   const value = useMemo<OmniContextValue>(
-    () => ({ store, tools, catalog, assets, locale, onMutation, report: (event) => onEvent?.(event) }),
-    [store, tools, catalog, assets, locale, onMutation, onEvent],
+    () => ({ store, tools, catalog, assets, locale, strings: words, onMutation, report: (event) => onEvent?.(event) }),
+    [store, tools, catalog, assets, locale, words, onMutation, onEvent],
   );
   return (
     <OmniContext.Provider value={value}>
-      <div className="omni-root">
+      <div className="omni-root" data-theme={theme}>
         <VersionNotice />
         <NodeSlot id={ROOT_ID} />
       </div>
@@ -56,13 +70,13 @@ export function OmniRenderer({
 
 /** When the stream was written for a newer version, say so above the screen (SPEC.md section 8). */
 function VersionNotice() {
-  const { store } = useOmni();
+  const { store, strings } = useOmni();
   const getNewer = () => store.getSnapshot().newerVersion;
   const newer = useSyncExternalStore(store.subscribe, getNewer, getNewer);
   if (!newer) return null;
   return (
     <p className="omni-version-notice" role="status">
-      This screen was made for a newer version of the app. The app needs an update to show all of it.
+      {strings.newerVersion}
     </p>
   );
 }
@@ -81,10 +95,10 @@ function slotOf(doc: OmniDocument, id: string): Slot {
 
 /** One child position. It subscribes to its own id only (R3), so siblings and parents stay untouched. */
 function NodeSlot({ id }: { id: string }) {
-  const { store } = useOmni();
+  const { store, strings } = useOmni();
   const getSlot = () => slotOf(store.getSnapshot(), id);
   const slot = useSyncExternalStore(store.subscribe, getSlot, getSlot);
-  if (slot === "pending") return <SkeletonLines lines={1} pendingId={id} />;
+  if (slot === "pending") return <SkeletonLines lines={1} pendingId={id} label={strings.loading} />;
   if (slot === "missing") return <NodeFallback id={id} reason="missing" />;
   return <ResolvedSlot node={slot} />;
 }
@@ -114,7 +128,7 @@ const MemoNode = memo(function Node({
   const children: ReactNode = node.children.map((child) => <NodeSlot key={child} id={child} />);
   // One cast: the node's type picks its catalog entry, and the props match that type by construction.
   const Component = ctx.catalog[node.type] as ReactComponentType<Record<string, unknown>>;
-  const base = { id: node.id, props, children, locale: ctx.locale };
+  const base = { id: node.id, props, children, locale: ctx.locale, strings: ctx.strings };
 
   if (node.type === "Image" || node.type === "ListItem") {
     const name = node.type === "Image" ? node.props.asset : node.props.image;

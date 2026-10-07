@@ -39,6 +39,7 @@
     "pack:check": "node scripts/pack-check.mjs",
     "install:test": "node scripts/install-test.mjs",
     "schema:export": "tsx scripts/schema-export.ts",
+    "theme": "tsx scripts/theme.ts",
     "swift:schema": "tsx scripts/swift-schema.ts",
     "swift:assets": "tsx scripts/swift-demo-assets.ts",
     "kotlin:schema": "tsx scripts/kotlin-schema.ts",

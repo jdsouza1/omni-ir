@@ -4,8 +4,8 @@
 
   Omni-IR Playground — first design pass, matching the landing page (PLAN-PLAYGROUND.md Task G).
   Layout: header bar, controls, then one large workspace card (source | live preview on a dotted stage),
-  with actions and the event log below. The preview stage stays light in both themes because the
-  catalog's components (catalog/omni.css) are light-only for now.
+  with actions and the event log below. The preview stage follows the playground's theme, and so do
+  the rendered screens (OmniRenderer theme="system", or the page's explicit data-theme).
 */
 :root {
   --pg-bg: #f8fafc;
@@ -35,7 +35,7 @@
   --pg-radius: 14px;
   --pg-font: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --pg-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
-  /* The stage behind rendered screens: light in both themes (see the note above). */
+  /* The stage behind rendered screens. */
   --pg-stage: #f8fafc;
   --pg-stage-dots: #e2e8f0;
   color-scheme: light;
@@ -43,6 +43,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --pg-stage: #0b1120;
+    --pg-stage-dots: #1e293b;
     --pg-bg: #0b1120;
     --pg-surface: #111827;
     --pg-surface-2: #1e293b;
@@ -69,6 +71,8 @@
   }
 }
 :root[data-theme="dark"] {
+  --pg-stage: #0b1120;
+  --pg-stage-dots: #1e293b;
   --pg-bg: #0b1120;
   --pg-surface: #111827;
   --pg-surface-2: #1e293b;
@@ -155,7 +159,7 @@ button, input, textarea { font: inherit; color: inherit; }
 .pg-workspace { gap: 0; background: var(--pg-surface); border: 1px solid var(--pg-border); border-radius: var(--pg-radius-lg); box-shadow: var(--pg-shadow); overflow: hidden; align-items: stretch; }
 .pg-workspace > .pg-panel { border: 0; border-radius: 0; box-shadow: none; padding: 24px; }
 .pg-workspace > .pg-panel:first-child { border-right: 1px solid var(--pg-border-soft); }
-.pg-preview { background-color: var(--pg-stage); background-image: radial-gradient(var(--pg-stage-dots) 1px, transparent 1px); background-size: 18px 18px; min-height: 460px; color: #0f172a; color-scheme: light; }
+.pg-preview { background-color: var(--pg-stage); background-image: radial-gradient(var(--pg-stage-dots) 1px, transparent 1px); background-size: 18px 18px; min-height: 460px; }
 .pg-workspace > .pg-preview { background-color: var(--pg-stage); }
 .pg-preview .pg-panel-title, .pg-preview .pg-muted { color: #64748b; }
 .pg-preview-canvas { display: grid; justify-items: center; padding-block: 12px; }

@@ -77,6 +77,7 @@ import dev.omniir.core.PropValue
 import dev.omniir.core.isMutating
 import dev.omniir.runtime.Format
 import dev.omniir.runtime.Governance
+import dev.omniir.runtime.OmniPalette
 import dev.omniir.runtime.Slot
 import java.time.Instant
 import java.time.LocalDate
@@ -135,6 +136,10 @@ private fun locale(): Locale = LocalConfiguration.current.locales[0] ?: Locale.g
 
 @Composable
 private fun isDark() = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+
+/** The shared default colours (PLAN-THEMES.md) for the app's light or dark Material theme, the same as the web's. */
+@Composable
+internal fun omniPalette(): OmniPalette = if (isDark()) OmniPalette.DARK else OmniPalette.LIGHT
 
 // MARK: Layout
 
@@ -220,11 +225,11 @@ private fun TextView(props: Props) {
 
 @Composable
 private fun BadgeView(props: Props) {
-  val dark = isDark()
+  val palette = omniPalette()
   val (container, content) = when (props.option("tone")) {
-    "success" -> if (dark) Color(0xFF1E3A26) to Color(0xFF8FD6A0) else Color(0xFFE3F4E6) to Color(0xFF1B5E20)
-    "warning" -> if (dark) Color(0xFF3D3011) to Color(0xFFF2CC6B) else Color(0xFFFFF4D6) to Color(0xFF7A5200)
-    "danger" -> if (dark) Color(0xFF45201F) to Color(0xFFF2A3A0) else Color(0xFFFDE4E4) to Color(0xFF8E1C1C)
+    "success" -> Color(palette.successSoft) to Color(palette.successText)
+    "warning" -> Color(palette.warningSoft) to Color(palette.warningText)
+    "danger" -> Color(palette.dangerSoft) to Color(palette.dangerText)
     else -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
   }
   Text(
@@ -238,12 +243,14 @@ private fun BadgeView(props: Props) {
 
 @Composable
 private fun MessageView(props: Props) {
+  val strings = LocalOmniStrings.current
   val fromUser = props.option("from") == "user"
+  val sender = if (fromUser) strings.user else strings.assistant
   val body = props.text("text")
   val shape = if (fromUser) RoundedCornerShape(16.dp, 16.dp, 4.dp, 16.dp) else RoundedCornerShape(16.dp, 16.dp, 16.dp, 4.dp)
   Box(
     contentAlignment = if (fromUser) Alignment.CenterEnd else Alignment.CenterStart,
-    modifier = Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = "${if (fromUser) "You" else "Assistant"}: $body" },
+    modifier = Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = "$sender: $body" },
   ) {
     Box(Modifier.fillMaxWidth(0.85f), contentAlignment = if (fromUser) Alignment.CenterEnd else Alignment.CenterStart) {
       Surface(
@@ -286,14 +293,15 @@ private fun ImageView(props: Props, context: RenderContext) {
 @Composable
 private fun RatingView(props: Props) {
   val model = Format.rating(props.resolved("value"), props.number("max")?.toInt(), locale())
+  val label = model.label(LocalOmniStrings.current.rating)
   Row(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(6.dp),
-    modifier = Modifier.clearAndSetSemantics { contentDescription = model.label },
+    modifier = Modifier.clearAndSetSemantics { contentDescription = label },
   ) {
     Text(
       "★".repeat(model.filled),
-      color = Color(0xFFF59E0B),
+      color = Color(omniPalette().warning),
       style = MaterialTheme.typography.titleMedium,
     )
     if (model.max > model.filled) {
@@ -348,6 +356,7 @@ private fun InputView(props: Props) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateInputView(props: Props) {
+  val strings = LocalOmniStrings.current
   val label = props.text("label")
   val day = Format.day(props.stateText())
   val shown = day?.let { Format.text(Primitive.Text(it.toString()), "date", null, locale()) }
@@ -357,7 +366,7 @@ private fun DateInputView(props: Props) {
   Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
     Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
     FilledTonalButton(onClick = { open = true }, modifier = Modifier.semantics { contentDescription = "$label: ${shown ?: "choose a date"}" }) {
-      Text(shown ?: "Choose a date")
+      Text(shown ?: strings.chooseDate)
     }
   }
   if (open) {
@@ -376,9 +385,9 @@ private fun DateInputView(props: Props) {
         TextButton(onClick = {
           state.selectedDateMillis?.let { props.setState(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate().toString()) }
           open = false
-        }) { Text("OK") }
+        }) { Text(strings.ok) }
       },
-      dismissButton = { TextButton(onClick = { open = false }) { Text("Cancel") } },
+      dismissButton = { TextButton(onClick = { open = false }) { Text(strings.cancel) } },
     ) { DatePicker(state) }
   }
 }
@@ -531,11 +540,11 @@ private fun TabsView(node: OmniNode, context: RenderContext) {
 /** A Notice: a short message in a tinted box, with an icon for its tone. */
 @Composable
 private fun NoticeView(props: Props) {
-  val dark = isDark()
+  val palette = omniPalette()
   val (container, accent, symbol) = when (props.option("tone")) {
-    "success" -> Triple(if (dark) Color(0xFF1E3A26) else Color(0xFFE3F4E6), if (dark) Color(0xFF8FD6A0) else Color(0xFF1B5E20), "✓")
-    "warning" -> Triple(if (dark) Color(0xFF3D3011) else Color(0xFFFFF4D6), if (dark) Color(0xFFF2CC6B) else Color(0xFF7A5200), "!")
-    "danger" -> Triple(if (dark) Color(0xFF45201F) else Color(0xFFFDE4E4), if (dark) Color(0xFFF2A3A0) else Color(0xFF8E1C1C), "✕")
+    "success" -> Triple(Color(palette.successSoft), Color(palette.successText), "✓")
+    "warning" -> Triple(Color(palette.warningSoft), Color(palette.warningText), "!")
+    "danger" -> Triple(Color(palette.dangerSoft), Color(palette.dangerText), "✕")
     else -> Triple(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.colorScheme.onSecondaryContainer, "i")
   }
   Row(
@@ -560,8 +569,9 @@ private fun utcMillis(day: LocalDate): Long = day.atStartOfDay(ZoneOffset.UTC).t
 private fun ButtonView(node: OmniNode, props: Props, context: RenderContext) {
   val governance = if (isMutating(node)) context.store.governance(node.id, context.document, context.actions) else Governance.Ready("")
   val error = when (governance) {
-    is Governance.NotPermitted -> governance.message
-    is Governance.Blocked -> governance.message
+    // The person sees a plain sentence; the detail goes to the app's onEvent.
+    is Governance.NotPermitted -> LocalOmniStrings.current.blocked
+    is Governance.Blocked -> LocalOmniStrings.current.blocked
     else -> null
   }
   val enabled = governance is Governance.Ready && node.id !in context.actions.running
