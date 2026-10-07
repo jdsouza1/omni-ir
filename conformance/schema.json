@@ -1,6 +1,6 @@
 {
   "$comment": "Generated from packages/core/src/schema.ts by `npm run schema:export`; do not edit. In props, a value written `$key` is {kind: \"state\", key: \"$key\"}, a bare identifier is {kind: \"ref\", id}, and a children list is an array of refs. See conformance/README.md.",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "formatVersion": "0.5",
   "rootId": "root",
   "limits": {

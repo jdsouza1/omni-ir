@@ -1,6 +1,6 @@
 # Omni-IR Specification
 
-**Specification 0.7 (draft) · stream format 0.5** · Apache-2.0
+**Specification 0.8 (draft) · stream format 0.5** · Apache-2.0
 
 Omni-IR is a text format that an AI model writes to describe a user interface, one short line at a time, and that a trusted client renders with its own components as the lines arrive. This document says exactly what a stream may contain and how a conforming parser and renderer must treat it. It describes what is implemented and tested in this repository; nothing here is aspirational.
 
@@ -671,7 +671,7 @@ What the app must still handle:
 
 ## 12. Versioning and limits
 
-This is specification 0.7, a draft, describing **stream format 0.5**. The two numbers move separately:
+This is specification 0.8, a draft, describing **stream format 0.5**. The two numbers move separately:
 
 - The **stream format** is what sections 3 to 7 define: the grammar, the document rules, the catalog, the issue codes and the limits. Its version changes only when one of those does. A stream MAY declare it with a version marker ([3.9]), and a client MAY ask for one ([10.1]).
 - The **specification** also covers renderers, actions and transport (sections 8 to 11), which improve with each release without changing the format. Its number follows the reference packages' releases; changes are listed in CHANGELOG.md.
