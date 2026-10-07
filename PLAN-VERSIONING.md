@@ -1,6 +1,6 @@
 # Omni-IR — format versioning (for `v0.8.0`)
 
-Status: **APPROVED 2026-10-07** with the recommendations (all six decisions). Free: no paid API. Released as `v0.8.0` only with a separate go-ahead. From the retrospective in the decision log (lesson 1); the owner chose to release `v0.7.0` first and fix this in `v0.8.0`.
+Status: **DONE**, released as `v0.8.0` (2026-10-07). Approved 2026-10-07 with the recommendations (all six decisions). Free: no paid API. Released as `v0.8.0` only with a separate go-ahead. From the retrospective in the decision log (lesson 1); the owner chose to release `v0.7.0` first and fix this in `v0.8.0`.
 
 ## Goal
 
@@ -105,5 +105,5 @@ Work on branch `wip/versioning`. Each part starts with failing tests (constraint
 
 **D. Review and release** *(checkpoint: you review)*
 - [x] D.1 A short review page: the compatibility table, checked against real `0.6` and `0.7` behaviour in tests
-- [ ] D.2 Merge with your approval
-- [ ] D.3 `v0.8.0` release: a separate go-ahead from you
+- [x] D.2 Merge with your approval
+- [x] D.3 `v0.8.0` release: a separate go-ahead from you

@@ -1,6 +1,6 @@
 # Omni-IR roadmap
 
-Updated 2026-10-06. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
+Updated 2026-10-07. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
 
 ## Done
 
@@ -32,6 +32,8 @@ Updated 2026-10-06. Planned dates for the remaining work are kept from the origi
 | Release | `v0.6.0` (2026-10-06): real backend handlers, sign-in and idempotency keys, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
 | Since then | Themes and the renderer's own words: about 30 design tokens shared by web, iOS and Android; web dark mode; contrast tests (WCAG AA) and colour-blind tests for chart colours; the renderer's own words in English, replaceable by the app; blocked actions show a plain sentence | [PLAN-THEMES.md](../PLAN-THEMES.md), [guide](../site/docs/guide/themes.md) |
 | Release | `v0.7.0` (2026-10-06): themes, web dark mode and replaceable words, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
+| Since then | Format version separate from package versions: the stream carries its format's version (0.5), which changes only when the format does; servers serve any app that reads their format; apps retry once against 0.6 and 0.7 servers; a test catches a format change without a new number | [PLAN-VERSIONING.md](../PLAN-VERSIONING.md), [transport guide](../site/docs/guide/transport.md#versions) |
+| Release | `v0.8.0` (2026-10-07): the format's own version, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
 
 ## Planned
 
@@ -54,17 +56,13 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval, opening with its goal, how it fits this roadmap and who benefits, then the pros, cons and trade-offs of each decision.
 
-1. **Format version separate from package versions** (for `v0.8.0`, plan approved 2026-10-07: [PLAN-VERSIONING.md](../PLAN-VERSIONING.md)). Today the stream's version marker and the server's version check use the package version, so every release makes older apps show "needs an update" and be refused by newer servers, even when the format hasn't changed (it hasn't since 0.5).
-   - *Goal:* apps and servers on different package versions keep working together whenever the format is the same; the format's version moves only when the grammar or catalog changes.
-   - *Fit:* corrects Step 14's version marker before more people depend on it; small, and first so later releases stop causing false alarms.
-   - *Who benefits:* developers can update their server and apps independently; the people using their apps stop seeing a needless "update the app" notice; organisations get releases that don't break each other.
-2. **Step 17 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+1. **Step 17 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
    - *Goal:* an app can add a component Omni-IR doesn't have (a seat map, a product card, a signature pad) and still get every guarantee: each line checked, actions governed, nothing drawn that the app didn't write.
    - *Fit:* builds on Step 16's tokens (an app's components can use the same colours) and Step 15's governed actions; comes before live screens because live data is most useful in the app's own components.
    - *Who benefits:* developers stop hitting the catalog's limit, the most likely reason to drop Omni-IR after a trial; the people using their apps get screens that fit the task; organisations keep one checked format instead of a second, unchecked path for "special" screens.
    - [ ] Pictures looked up by the app when the screen is drawn (for example `product-123`), for shops and user pictures that can't all be registered in advance; the model still never writes a URL
    - [ ] Keep the system prompt small as the catalog grows: send only the components a request is likely to need, and measure the cost and the time to the first line
-3. **Step 18 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
+2. **Step 18 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
    - *Goal:* a screen can change after it arrives (a delivery status moves on, a chart gets this hour's numbers) while the stream still has no logic and every change is checked like a new line.
    - *Fit:* the last open item in the spec's "Not yet specified"; builds on Step 14's transport (updates travel the same way) and Step 15's backend (the data comes from the app's own handlers, never the model).
    - *Who benefits:* developers can use Omni-IR for dashboards and status pages, not only one-off screens; the people using their apps see current information; and the person's real data reaches the screen from the app without being sent to the model.
