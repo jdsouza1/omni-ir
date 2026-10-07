@@ -102,10 +102,10 @@ Work on branch `wip/model-check`. Each part starts with failing tests (constrain
 **C. By hand, spec and docs**
 - [x] C.1 `npm run model:challenge` (fake model by default; a real one only with `OMNI_MODEL=claude`)
 - [x] C.2 SPEC.md: the optional "Model checks" section and the error code; a guide page; CHANGELOG
-- [ ] C.3 The decision log: this step's entry and decisions
+- [x] C.3 The decision log: this step's entry and decisions
 
 **D. Review and release** *(checkpoint: you review)*
-- [ ] D.1 A short review page: a challenge report from the fake model, passing and failing
+- [x] D.1 A short review page: a challenge report from the fake model, passing and failing
 - [ ] D.2 Merge with your approval
 - [ ] D.3 Release: a separate go-ahead from you
 

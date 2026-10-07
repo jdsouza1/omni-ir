@@ -62,7 +62,7 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - *Who benefits:* developers learn at start-up that a change broke their screens and can switch models as a checked step; the people using their apps don't get a run of broken screens; organisations get a recorded answer to "is this model fit to write our screens?".
    - [x] A. Challenge pool (about 40 requests) and scorer, tested with a scripted fake model
    - [x] B. Server: setup fingerprint, `OMNI_MODEL_CHECK` (`enforce`, `warn`, `off`), `503 model_unverified`, health and audit trail, live re-check; the three clients retry on the new code
-   - [ ] C. `npm run model:challenge`, an optional "Model checks" section in SPEC.md, a guide, the decision log
+   - [x] C. `npm run model:challenge`, an optional "Model checks" section in SPEC.md, a guide, the decision log
    - [ ] D. Review page, merge, release (each with your go-ahead)
 2. **Step 18 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
    - *Goal:* an app can add a component Omni-IR doesn't have (a seat map, a product card, a signature pad) and still get every guarantee: each line checked, actions governed, nothing drawn that the app didn't write.
