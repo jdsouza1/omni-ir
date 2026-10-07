@@ -1,6 +1,6 @@
-# Omni-IR — model proficiency check (2FA-style)
+# Omni-IR — Step 17: model proficiency check (2FA-style)
 
-Status: **DRAFT 2026-10-07**, for the owner's approval. Free by default: tests and demos use a scripted fake model; a real model is challenged only when `OMNI_MODEL=claude` is set, and its calls count against the daily cap. Nothing here changes the stream format.
+Status: **APPROVED 2026-10-07** with the recommendations (all seven decisions). Free by default: tests and demos use a scripted fake model; a real model is challenged only when `OMNI_MODEL=claude` is set, and its calls count against the daily cap. Nothing here changes the stream format.
 
 ## Goal
 
@@ -11,7 +11,7 @@ It checks **proficiency, not safety.** The parser and catalog already refuse any
 ## How it fits the roadmap
 
 - **It builds on what exists:** the free model check page (`npm run model-check:page`, nine requests, checked in the browser), the cross-model check of Step 13, and the server's observer parser (`server/app.ts`), which already counts the errors in every reply. Today those are manual, one-off checks; this makes them automatic and continuous.
-- **It comes before Step 17** (app-defined components). Once apps add their own components, a model has more to get right, and each app's setup is different, so a check per setup becomes more useful. The challenge pool is built from the schema and the tool registry, so app components can join it in Step 17.
+- **It comes before Step 18** (app-defined components). Once apps add their own components, a model has more to get right, and each app's setup is different, so a check per setup becomes more useful. The challenge pool is built from the schema and the tool registry, so app components can join it in Step 18.
 - **It changes no format:** server behaviour and one new transport error code. The fingerprint test from `v0.8.0` stays green.
 
 ## Who benefits
@@ -75,11 +75,11 @@ It checks **proficiency, not safety.** The parser and catalog already refuse any
 - *Alternative:* reference server only (less to write, but the guarantee is ours alone and clients would see an unknown code).
 - *Trade-off:* a short section, so the idea is part of the standard rather than one implementation.
 
-**7. Order: after `v0.8.0`, before Step 17** (recommended).
+**7. Order: after `v0.8.0`, before Step 18** (recommended).
 - *Pros:* small, and builds only on what exists; in place before app components make setups more varied.
-- *Cons:* pushes Step 17, the most likely reason a trial ends ("the catalog isn't enough"), back by this step.
-- *Alternative:* after Step 17 (app components first, then the check, with app components in the pool from the start).
-- *Trade-off:* a few days' delay to Step 17 for a check that makes its larger setups safer to change.
+- *Cons:* pushes Step 18, the most likely reason a trial ends ("the catalog isn't enough"), back by this step.
+- *Alternative:* after Step 18 (app components first, then the check, with app components in the pool from the start).
+- *Trade-off:* a few days' delay to Step 18 for a check that makes its larger setups safer to change.
 
 ## Cost
 
@@ -111,4 +111,4 @@ Work on branch `wip/model-check`. Each part starts with failing tests (constrain
 
 ## What I need from you
 
-Approval of the plan, or changes to any of the seven decisions.
+The go-ahead to start building, then the review (D.1), the merge (D.2) and the release (D.3).
