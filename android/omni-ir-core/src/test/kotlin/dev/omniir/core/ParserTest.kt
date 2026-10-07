@@ -16,8 +16,13 @@ class ParserTest {
     assertTrue(newer.document.newerVersion && newer.document.complete)
     assertEquals(setOf("root"), newer.document.nodes.keys)
     val same = OmniParser(tools)
-    same.write("# omni-ir ${majorMinor()}\nroot = Divider()\n")
+    same.write("# omni-ir $FORMAT_VERSION\nroot = Divider()\n")
     assertEquals(false, same.document.newerVersion)
+    // Releases 0.6 and 0.7 didn't change the format: their markers mean format 0.5. The next format is 0.8.
+    assertEquals(false, isNewerMarker("# omni-ir 0.7"))
+    assertEquals(false, isNewerMarker("# omni-ir 0.6"))
+    assertEquals(true, isNewerMarker("# omni-ir 0.8"))
+    assertEquals("0.5", FORMAT_VERSION)
   }
 
   @Test

@@ -115,6 +115,38 @@ describe("generate(): streaming a screen from the server", () => {
     expect(h.parser.getSnapshot().complete).toBe(true);
   });
 
+  it("asks for its format, and retries once without a version when a server refuses it [10.12]", async () => {
+    const h = setup();
+    const urls: string[] = [];
+    const answers = [
+      () => new Response(JSON.stringify({ error: { code: "unsupported_version", message: "This server writes Omni-IR 0.7.", retryable: false } }), { status: 400 }),
+      () => new Response('event: chunk\ndata: {"text":"# omni-ir 0.7\\nroot = Divider()\\n"}\n\nevent: done\ndata: {"stopReason":"end_turn","model":"old","ms":1}\n\n', { status: 200, headers: { "content-type": "text/event-stream" } }),
+    ];
+    const oldServer: typeof fetch = async (input) => {
+      urls.push(String(input));
+      return answers.shift()!();
+    };
+    const outcome = await run("x", h.parser, { fetch: oldServer });
+    expect(new URL(urls[0]!, "http://x").searchParams.get("version")).toBe("0.5");
+    expect(new URL(urls[1]!, "http://x").searchParams.has("version")).toBe(false);
+    expect(outcome).toMatchObject({ status: "done" });
+    // A 0.7 server's marker means format 0.5: no update notice.
+    expect(h.parser.getSnapshot().newerVersion).toBe(false);
+    expect(h.parser.getSnapshot().nodes.has("root")).toBe(true);
+  });
+
+  it("retries only once: a second refusal is reported", async () => {
+    const h = setup();
+    let calls = 0;
+    const refusing: typeof fetch = async () => {
+      calls++;
+      return new Response(JSON.stringify({ error: { code: "unsupported_version", message: "No.", retryable: false } }), { status: 400 });
+    };
+    const outcome = await run("x", h.parser, { fetch: refusing });
+    expect(calls).toBe(2);
+    expect(outcome).toMatchObject({ status: "error", code: "unsupported_version" });
+  });
+
   it("reports connection_lost when no bytes arrive for the idle timeout, and closes the response [10.10]", async () => {
     const h = setup();
     let cancelled = false;

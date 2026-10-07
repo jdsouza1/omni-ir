@@ -1,5 +1,12 @@
-// The version marker (SPEC.md [3.9]): line 1 may say which Omni-IR version the stream was written for.
+// Versions (SPEC.md [3.9], PLAN-VERSIONING.md): the stream format has its own version,
+// omniIRFormatVersion, which changes only when the format does; the marker and version checks use it.
 // Port of packages/core/src/version.ts.
+
+/// Releases that carried their package number but didn't change the format: they mean the format they carried.
+private let oldReleaseNumbers = ["0.6": "0.5", "0.7": "0.5"]
+
+/// The format a MAJOR.MINOR number stands for: itself, or the format an old release number carried.
+public func formatOf(_ version: String) -> String { oldReleaseNumbers[version] ?? version }
 
 /// "MAJOR.MINOR" of a version such as "0.5.0": what a version marker and a request carry.
 public func majorMinor(_ version: String = omniIRVersion) -> String {
@@ -36,10 +43,17 @@ private func markerVersion(_ line: String) -> (Substring, Substring)? {
   return (major, minor)
 }
 
-/// Whether line 1 is a version marker for a newer version than `version`.
-public func isNewerMarker(_ line: String, version: String = omniIRVersion) -> Bool {
+/// Compares two MAJOR.MINOR formats, by MAJOR then MINOR, as numbers.
+private func compareFormats(_ a: String, _ b: String) -> Int {
+  let x = formatOf(a).split(separator: ".", omittingEmptySubsequences: false)
+  let y = formatOf(b).split(separator: ".", omittingEmptySubsequences: false)
+  let byMajor = compareDigits(x.first ?? "0", y.first ?? "0")
+  return byMajor != 0 ? byMajor : compareDigits(x.dropFirst().first ?? "0", y.dropFirst().first ?? "0")
+}
+
+/// Whether line 1 is a version marker for a newer format than `format`; old release numbers count as
+/// the format they carried.
+public func isNewerMarker(_ line: String, format: String = omniIRFormatVersion) -> Bool {
   guard let (major, minor) = markerVersion(line) else { return false }
-  let parts = version.split(separator: ".", omittingEmptySubsequences: false)
-  let byMajor = compareDigits(major, parts.first ?? "0")
-  return byMajor > 0 || (byMajor == 0 && compareDigits(minor, parts.dropFirst().first ?? "0") > 0)
+  return compareFormats("\(major).\(minor)", format) > 0
 }

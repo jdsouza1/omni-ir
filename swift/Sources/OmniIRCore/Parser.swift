@@ -96,7 +96,7 @@ public final class OmniParser {
     case .line(let text, let line):
       if line == 1 && isNewerMarker(text) {
         let warning = Issue(
-          code: .newerVersion, message: "the stream was written for a newer Omni-IR version than this parser's (\(majorMinor()))", line: line)
+          code: .newerVersion, message: "the stream was written for a newer Omni-IR format than this parser's (\(omniIRFormatVersion))", line: line)
         issues.append(warning)
         onEvent?(.warning(warning))
         document.newerVersion = true

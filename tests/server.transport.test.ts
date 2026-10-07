@@ -1,7 +1,7 @@
 // The server's side of the transport (SPEC.md section 10), for the Express app and the in-browser API
 // the hosted playground uses: framing, the terminal event, the version marker, the requested version,
 // error bodies, and rate limits behind a proxy. The client's side is in transport.conformance.test.ts.
-import { majorMinor, versionMarker } from "@omni-ir/core";
+import { versionMarker } from "@omni-ir/core";
 import { createInBrowserApi } from "../server/inBrowser";
 import { ConfigError, loadConfig } from "../server/config";
 import { MockModel } from "../server/models/mock";
@@ -49,16 +49,16 @@ describe("the stream [10.4] [10.5] [10.13]", () => {
   it("starts with the version marker, written by the server, not the model", async () => {
     for (const [where, call] of await apis()) {
       const { events } = await readSse(await call("/api/generate", { ...json, body: prompt }));
-      expect(textOf(events).startsWith(`${versionMarker()}\n`), where).toBe(true);
+      expect(textOf(events).startsWith("# omni-ir 0.5\n"), where).toBe(true); // the format's version, not the package's
       expect((events[0]!.data as { text: string }).text, where).toBe(`${versionMarker()}\n`);
     }
   });
 });
 
 describe("the requested version [10.1] [10.12] [10.2]", () => {
-  it("streams for this server's own version, or when none is asked for", async () => {
+  it("streams to any client that can read its format: its own, old release numbers, newer formats, or none", async () => {
     for (const [where, call] of await apis()) {
-      for (const path of [`/api/generate?version=${majorMinor()}`, "/api/generate"]) {
+      for (const path of ["/api/generate?version=0.5", "/api/generate?version=0.6", "/api/generate?version=0.7", "/api/generate?version=0.8", "/api/generate?version=99.0", "/api/generate"]) {
         const response = await call(path, { ...json, body: prompt });
         expect(response.status, `${where} ${path}`).toBe(200);
         await response.text();
@@ -66,14 +66,13 @@ describe("the requested version [10.1] [10.12] [10.2]", () => {
     }
   });
 
-  it("refuses any other version before streaming, with unsupported_version", async () => {
+  it("refuses only a client that asks for an older format, before streaming, with unsupported_version", async () => {
     for (const [where, call] of await apis()) {
-      for (const version of ["0.1", "99.0", "1.0"]) {
-        if (version === majorMinor()) continue;
+      for (const version of ["0.4", "0.1", "0.0"]) {
         const response = await call(`/api/generate?version=${version}`, { ...json, body: prompt });
         expect(response.status, `${where} ${version}`).toBe(400);
         expect(await response.json(), `${where} ${version}`).toEqual({
-          error: { code: "unsupported_version", message: expect.stringContaining(majorMinor()), retryable: false },
+          error: { code: "unsupported_version", message: expect.stringContaining("0.5"), retryable: false },
         });
       }
     }
@@ -92,7 +91,7 @@ describe("the requested version [10.1] [10.12] [10.2]", () => {
   it("doesn't call the model when it refuses", async () => {
     const model = new FakeModel(async () => ({ stopReason: "end_turn", model: "fake" }));
     server = await startServer({ model });
-    const response = await fetch(`${server.url}/api/generate?version=99.0`, { ...json, body: prompt });
+    const response = await fetch(`${server.url}/api/generate?version=0.4`, { ...json, body: prompt });
     expect(response.status).toBe(400);
     expect(model.calls).toBe(0);
   });

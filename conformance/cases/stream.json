@@ -272,6 +272,47 @@
       }
     },
     {
+      "id": "version-marker-old-release-numbers",
+      "rules": [
+        "3.9"
+      ],
+      "description": "0.6 and 0.7 were releases that didn't change the format: a marker naming them means format 0.5, never newer than a parser for 0.5 or later.",
+      "input": "# omni-ir 0.7\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "version-marker-next-format",
+      "rules": [
+        "3.9"
+      ],
+      "description": "The next format version after 0.5 is 0.8: newer than format 0.5.",
+      "input": "# omni-ir 0.8\nroot = Divider()\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "newer_version"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
       "id": "version-marker-not-line-1",
       "rules": [
         "3.9",

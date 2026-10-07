@@ -5,7 +5,7 @@ import { DocumentIndex, validateDocument, validateStatement, type Statement, typ
 import { createStore, type OmniDocument, type OmniStore } from "./store.js";
 import { parseLine } from "./tokenizer.js";
 import type { Issue } from "./types.js";
-import { isNewerMarker, majorMinor } from "./version.js";
+import { FORMAT_VERSION, isNewerMarker } from "./version.js";
 
 export type ParserEvent =
   | { type: "node"; id: string; line: number }
@@ -57,7 +57,7 @@ export function createParser(options: ParserOptions): OmniParser {
     }
 
     if (line === 1 && isNewerMarker(event.text)) {
-      const message = `the stream was written for a newer Omni-IR version than this parser's (${majorMinor()})`;
+      const message = `the stream was written for a newer Omni-IR format than this parser's (${FORMAT_VERSION})`;
       emit({ type: "warning", issue: { code: "newer_version", message, line } });
       store.markNewerVersion?.();
     }

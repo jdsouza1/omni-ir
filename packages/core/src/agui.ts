@@ -7,7 +7,7 @@
 // createAgUiReader (for an app with an AG-UI client): events in, lines written to an Omni-IR parser.
 // Governed actions never travel this way: they go to the app's own action endpoint ([10.20]).
 import type { OmniParser } from "./parser.js";
-import { majorMinor, versionMarker } from "./version.js";
+import { FORMAT_VERSION, versionMarker } from "./version.js";
 
 /** The activity type of an Omni-IR screen. */
 export const OMNI_ACTIVITY_TYPE = "omni-ir";
@@ -25,7 +25,7 @@ export interface AgUiEncoderOptions {
   runId: string;
   /** The activity message's id; one per screen. */
   messageId: string;
-  /** The Omni-IR version the text is written for, MAJOR.MINOR. Defaults to this package's. */
+  /** The Omni-IR format the text is written for, MAJOR.MINOR. Defaults to this package's format. */
   version?: string;
 }
 
@@ -41,7 +41,7 @@ export class AgUiEncoder {
   constructor(private readonly options: AgUiEncoderOptions) {}
 
   start(): AgUiEvent[] {
-    const { threadId, runId, messageId, version = majorMinor() } = this.options;
+    const { threadId, runId, messageId, version = FORMAT_VERSION } = this.options;
     return [
       { type: "RUN_STARTED", threadId, runId },
       { type: "ACTIVITY_SNAPSHOT", messageId, activityType: OMNI_ACTIVITY_TYPE, content: { version, lines: [] } },

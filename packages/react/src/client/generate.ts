@@ -2,7 +2,7 @@
 // The text is written to the parser exactly as it arrives; the parser and schema decide what is valid.
 // Once the stream has started, the parser is always ended (done, error, cancel or dropped connection),
 // so anything that never arrived becomes a "missing" fallback instead of loading forever.
-import { majorMinor, type OmniParser } from "@omni-ir/core";
+import { FORMAT_VERSION, type OmniParser } from "@omni-ir/core";
 
 export type GenerateOutcome =
   | { status: "done"; stopReason: "end_turn" | "max_tokens" | "refusal"; model: string; ms: number }
@@ -26,14 +26,25 @@ type ErrorOutcome = Extract<GenerateOutcome, { status: "error" }>;
 export async function generate(prompt: string, options: GenerateClientOptions): Promise<GenerateOutcome> {
   const { parser, signal, baseUrl = "", fetch: doFetch = globalThis.fetch, idleTimeoutMs = 45_000 } = options;
 
-  let response: Response;
-  try {
-    response = await doFetch(`${baseUrl}/api/generate?version=${majorMinor()}`, {
+  // Ask for this package's format ([10.1]). A server that compares versions exactly (0.6 and 0.7 did)
+  // refuses a different number; one retry without a version gets the stream, and the parser's marker
+  // check decides whether the screen needs a newer app ([10.12], [3.9]).
+  const request = (withVersion: boolean) =>
+    doFetch(`${baseUrl}/api/generate${withVersion ? `?version=${FORMAT_VERSION}` : ""}`, {
       method: "POST",
       headers: { "content-type": "application/json", accept: "text/event-stream" },
       body: JSON.stringify({ prompt }),
       ...(signal ? { signal } : {}),
     });
+
+  let response: Response;
+  try {
+    response = await request(true);
+    if (!response.ok || response.body === null) {
+      const refused = await readErrorResponse(response);
+      if (refused.code !== "unsupported_version") return refused;
+      response = await request(false);
+    }
   } catch {
     if (signal?.aborted) return { status: "aborted" };
     return { status: "error", code: "network_error", message: "Could not reach the server.", retryable: true };

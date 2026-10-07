@@ -113,7 +113,7 @@ public class OmniParser(
       is LineEvent.Line -> {
         val line = event.number
         if (line == 1 && isNewerMarker(event.text)) {
-          val placed = Issue(IssueCode.NEWER_VERSION, "the stream was written for a newer Omni-IR version than this parser's (${majorMinor()})", line = line)
+          val placed = Issue(IssueCode.NEWER_VERSION, "the stream was written for a newer Omni-IR format than this parser's ($FORMAT_VERSION)", line = line)
           reported += placed
           onEvent?.invoke(ParserEvent.Warning(placed))
           document = document.copy(newerVersion = true, revision = document.revision + 1)

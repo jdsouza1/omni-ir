@@ -2,6 +2,23 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+### Changed
+- **The stream format has its own version** (PLAN-VERSIONING.md): `FORMAT_VERSION`, `0.5`, the last release whose changes touched the format. The version marker, the `newer_version` check, a client's `?version=`, the server's check and AG-UI's `content.version` all carry it, instead of the package release. Packages carry on as `0.8.0`. `FORMAT_VERSION`, `formatOf()` and `canRead()` in `@omni-ir/core`; `formatVersion` in `conformance/schema.json`; `omniIRFormatVersion` (Swift) and `FORMAT_VERSION` (Kotlin).
+- **Servers serve any client that reads their format** ([10.12]): `unsupported_version` only when the client asked for an older format. Formats only add within 0.x, so a client reads its own format and every older one.
+- **Old numbers understood:** markers and requests naming `0.6` or `0.7` mean format `0.5` ([3.9]). The next format version is `0.8`.
+- **Clients retry once without a version** when a server answers `unsupported_version` (servers 0.6 and 0.7 compared versions exactly).
+- SPEC.md names both numbers: "Specification 0.7 (draft) · stream format 0.5", and section 12 explains them. A test fingerprints the format and fails if it changes without a new format version.
+
+### Compatibility
+
+| | 0.8 server | 0.6 or 0.7 server | 0.5 server |
+|---|---|---|---|
+| **0.8 app** | works | refused, then works on the retry | works |
+| **0.6 or 0.7 app** | works, no update notice (was refused) | as before | as before |
+| **0.5 app** | works, no update notice | as before | works |
+
 ## 0.7.0 (2026-10-06)
 
 ### Added

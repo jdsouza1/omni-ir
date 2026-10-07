@@ -91,16 +91,16 @@ Apps already shipped: `0.5`, `0.6` and `0.7` read the marker and send a version;
 Work on branch `wip/versioning`. Each part starts with failing tests (constraint 4).
 
 **A. The format version** *(tests first)*
-- [ ] A.1 `FORMAT_VERSION = "0.5"` and the old-number table in `@omni-ir/core`; `formatVersion` in `conformance/schema.json`; generated into Swift and Kotlin
-- [ ] A.2 The fingerprint test
+- [x] A.1 `FORMAT_VERSION = "0.5"` and the old-number table in `@omni-ir/core`; `formatVersion` in `conformance/schema.json`; generated into Swift and Kotlin
+- [x] A.2 The fingerprint test
 
 **B. Using it** *(tests first)*
-- [ ] B.1 The marker, the `newer_version` check (old numbers understood) and AG-UI on all three platforms; conformance cases for markers `0.6` and `0.7`
-- [ ] B.2 Requests and the server's check ("serve if my format ≤ yours"); the in-browser API too
-- [ ] B.3 One retry without a version on `unsupported_version`, on all three clients; transport cases
+- [x] B.1 The marker, the `newer_version` check (old numbers understood) and AG-UI on all three platforms; conformance cases for markers `0.6` and `0.7`
+- [x] B.2 Requests and the server's check ("serve if my format ≤ yours"); the in-browser API too
+- [x] B.3 One retry without a version on `unsupported_version`, on all three clients; transport cases
 
 **C. Spec and docs**
-- [ ] C.1 SPEC.md: the two numbers, rule [3.9], section 10's version rules, section 12 (additive changes within `0.x`, the next format version is `0.8`); the transport guide; CHANGELOG with the table above
+- [x] C.1 SPEC.md: the two numbers, rule [3.9], section 10's version rules, section 12 (additive changes within `0.x`, the next format version is `0.8`); the transport guide; CHANGELOG with the table above
 - [ ] C.2 The decision log: this step's entry and decisions
 
 **D. Review and release** *(checkpoint: you review)*

@@ -3,7 +3,7 @@
 // server checks again. Port of packages/react/src/client. Uses only the JDK's HTTP classes.
 package dev.omniir.runtime
 
-import dev.omniir.core.majorMinor
+import dev.omniir.core.FORMAT_VERSION
 import dev.omniir.core.Primitive
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -44,9 +44,18 @@ public class OmniClient(
    * once the stream has started (done, error, cancelled or dropped), so anything that never arrived
    * becomes a fallback instead of loading forever. Cancel the coroutine to stop.
    */
-  public suspend fun generate(prompt: String, store: OmniStore): GenerateOutcome = withContext(Dispatchers.IO) {
+  public suspend fun generate(prompt: String, store: OmniStore): GenerateOutcome =
+    // Ask for this package's format (SPEC.md [10.1]). A server that compares versions exactly (0.6 and 0.7
+    // did) refuses a different number; one retry without a version gets the stream, and the parser's
+    // marker check decides whether the screen needs a newer app ([10.12], [3.9]).
+    request(prompt, store, withVersion = true) ?: request(prompt, store, withVersion = false) ?: GenerateOutcome.Failed(
+      "unsupported_version", "The server can't write a stream this app can read.", retryable = false,
+    )
+
+  /** One request for a screen. Null means the server refused the requested version, so the caller may retry without it. */
+  private suspend fun request(prompt: String, store: OmniStore, withVersion: Boolean): GenerateOutcome? = withContext(Dispatchers.IO) {
     val connection = try {
-      open("api/generate?version=" + majorMinor(), Json.obj(mapOf("prompt" to prompt)), accept = "text/event-stream")
+      open("api/generate" + (if (withVersion) "?version=$FORMAT_VERSION" else ""), Json.obj(mapOf("prompt" to prompt)), accept = "text/event-stream")
     } catch (e: IOException) {
       return@withContext GenerateOutcome.Failed("network_error", "Could not reach the server.", retryable = true)
     }
@@ -56,7 +65,10 @@ public class OmniClient(
         return@withContext if (isCancelled()) GenerateOutcome.Aborted else GenerateOutcome.Failed("network_error", "Could not reach the server.", retryable = true)
       }
       // Errors before the stream starts (bad request, rate limit): the store is left untouched.
-      if (status !in 200..299) return@withContext errorResponse(connection, status)
+      if (status !in 200..299) {
+        val refused = errorResponse(connection, status)
+        return@withContext if (withVersion && refused is GenerateOutcome.Failed && refused.code == "unsupported_version") null else refused
+      }
 
       val reader = StreamReader()
       try {
