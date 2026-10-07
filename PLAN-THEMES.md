@@ -100,6 +100,6 @@ Work on branch `wip/themes`. Each part starts with failing tests (constraint 4).
 - [x] E.1 SPEC.md sections 8 and 11; a "Themes and wording" guide; CHANGELOG
 
 **F. Review** *(checkpoint: you review)*
-- [ ] F.1 A review page: screens light and dark on the web, a rebranded screen, the same screens on iPhone and Android, the contrast results, replaced words
+- [x] F.1 A review page: screens light and dark on the web, a rebranded screen, the same screens on iPhone and Android, the contrast results, replaced words (https://claude.ai/artifact/RoMf9YaFaQaLJMvQ7Kde8o)
 - [ ] F.2 Merge with your approval
 - [ ] F.3 `v0.7.0` release: a separate go-ahead from you
