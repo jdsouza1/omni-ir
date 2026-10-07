@@ -100,7 +100,7 @@ Work on branch `wip/mcp-apps`. Each part starts with failing tests (constraint 4
 **D. Review and release** *(checkpoint: you review)*
 - [x] D.1 A short review page, with screenshots from a fake host; a manual check in Claude desktop or ChatGPT by the owner
   - Manual check passed 2026-10-07: in Claude desktop (`npm run mcp`), Claude called `show_screen` and the booking screen was drawn in the conversation by the view, every line accepted.
-- [ ] D.2 Merge with your approval
+- [x] D.2 Merge with your approval
 - [ ] D.3 Release: a separate go-ahead from you
 
 ## What I need from you
