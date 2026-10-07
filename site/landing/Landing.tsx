@@ -67,7 +67,7 @@ export function Landing() {
         <section className="wrap hero" aria-labelledby="hero-title">
           <span className="pill">
             <span className="pill-dot" aria-hidden="true" />
-            An open standard · v0.6 preview
+            An open standard · v0.7 preview
           </span>
           <h1 id="hero-title">The Universal Blueprint for AI Software.</h1>
           <p>

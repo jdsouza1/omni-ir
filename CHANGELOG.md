@@ -2,7 +2,7 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
-## Unreleased
+## 0.7.0 (2026-10-06)
 
 ### Added
 - **Design tokens** (PLAN-THEMES.md): one list of about 30 colours plus a font and a corner radius, with light and dark defaults, written once (`packages/react/src/catalog/theme.ts`, exported to `conformance/theme.json`) and generated into Swift and Kotlin (`OmniPalette`) by `npm run theme`. Apps set them; the stream can't.
@@ -17,6 +17,12 @@ All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-
 - **Chart colours** (the owner's choice, 2026-10-06): every colour now stands out at least 3:1 from the background in light and dark. Green, amber and pink were darker than before, and the order changed so the first four series stay far apart for colour-blind viewers: blue, orange, pink, purple, then green, amber, dark green, red. Charts with one or two series look as before; charts with three or more show their series in the new order. The dark chart colours are the light ones, lightened only where needed, which fixed two dark colours that looked almost the same to people with deuteranopia. Tests simulate protanopia, deuteranopia and tritanopia.
 - iOS and Android take their fixed colours (charts, notices, badges, rating stars, the version notice) from the shared defaults, so the three platforms match.
 - Custom React catalogs receive a new `strings` prop alongside `locale`.
+
+### Compatibility
+- **The text format didn't change.** As with every 0.x minor release, a 0.7 server writes `# omni-ir 0.7` and refuses apps that ask for another version; update the server and the apps together.
+- **The web catalog's look:** light stays the default. Input borders are darker, and charts with three or more series show their colours in the new order. An app that overrode our CSS classes should move to the `--omni-*` variables, which stay stable.
+- **Custom React catalogs** get a `strings` prop; components that ignore it keep working. `SkeletonLines` now takes a `label`.
+- **Swift:** `Format.RatingModel.label` is now a function, `label(_ template:)`. **Kotlin:** `RatingModel.label` is now `label(template)`; `OmniView` takes an optional `strings`.
 
 ## 0.6.0 (2026-10-06)
 

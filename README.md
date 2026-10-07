@@ -2,7 +2,7 @@
 
 **A line-oriented streaming protocol for generative UI.** An AI model describes a screen in short, flat lines of Omni-IR; a trusted client parses each line as it streams in and renders it with its own components. The model never writes HTML, CSS or code, and can only trigger backend actions the app has explicitly allowed.
 
-> **Status: early (v0.6).** The parser, schema, streaming server and playground work and are tested, with renderers for the web (React), iPhone and iPad (SwiftUI) and Android (Jetpack Compose). The format is defined in [SPEC.md](SPEC.md), with a [conformance suite](conformance/README.md) that all three parsers pass. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+> **Status: early (v0.7).** The parser, schema, streaming server and playground work and are tested, with renderers for the web (React), iPhone and iPad (SwiftUI) and Android (Jetpack Compose). The format is defined in [SPEC.md](SPEC.md), with a [conformance suite](conformance/README.md) that all three parsers pass. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ```
 root = Card([title, amount, note, actions])
