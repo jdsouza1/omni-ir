@@ -1,6 +1,6 @@
 # Omni-IR — Step 18: the MCP Apps bridge
 
-Status: **APPROVED 2026-10-07** with the recommendations (all seven decisions). Free: tests use the MCP SDK's in-memory transport and a fake host; nothing calls a paid API. Trying it in Claude or ChatGPT is a manual check in the owner's own app, at no extra cost.
+Status: **DONE**, released as `v0.10.1` (2026-10-07). Approved 2026-10-07 with the recommendations (all seven decisions). Free: tests use the MCP SDK's in-memory transport and a fake host; nothing calls a paid API. Trying it in Claude or ChatGPT is a manual check in the owner's own app, at no extra cost.
 
 ## Goal
 
@@ -101,7 +101,7 @@ Work on branch `wip/mcp-apps`. Each part starts with failing tests (constraint 4
 - [x] D.1 A short review page, with screenshots from a fake host; a manual check in Claude desktop or ChatGPT by the owner
   - Manual check passed 2026-10-07: in Claude desktop (`npm run mcp`), Claude called `show_screen` and the booking screen was drawn in the conversation by the view, every line accepted.
 - [x] D.2 Merge with your approval
-- [ ] D.3 Release: a separate go-ahead from you
+- [x] D.3 Release: a separate go-ahead from you
 
 ## What I need from you
 

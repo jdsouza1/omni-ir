@@ -36,6 +36,8 @@ Updated 2026-10-07. Planned dates for the remaining work are kept from the origi
 | Release | `v0.8.0` (2026-10-07): the format's own version, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
 | Since then | Model check, 2FA-style: before a model writes screens for people, the server challenges it with six requests drawn at random from 40 and scores each reply with the real parser; a pass clears one setup for seven days, failing live replies trigger a new challenge, and an unverified setup gets `503 model_unverified` (optional for servers, SPEC [10.21]–[10.24]) | [PLAN-MODELCHECK.md](../PLAN-MODELCHECK.md), [guide](../site/docs/guide/model-check.md) |
 | Release | `v0.9.0` (2026-10-07): the model check, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
+| Since then | The MCP Apps bridge: Omni-IR screens inside Claude, ChatGPT, VS Code, Cursor and other MCP Apps hosts. The host's model writes Omni-IR as a tool's argument; a self-contained view with the parser and catalog draws it as it streams, in the host's theme; actions go through app-only tools that the server checks again. Checked in Claude desktop | [PLAN-MCPAPPS.md](../PLAN-MCPAPPS.md), [`@omni-ir/mcp`](../packages/mcp/README.md) |
+| Release | `v0.10.1` (2026-10-07): `@omni-ir/mcp` for the first time, with `@omni-ir/core` and `@omni-ir/react`, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
 
 ## Planned
 
@@ -58,21 +60,13 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval, opening with its goal, how it fits this roadmap and who benefits, then the pros, cons and trade-offs of each decision.
 
-1. **Step 18 · The MCP Apps bridge** (plan for approval: [PLAN-MCPAPPS.md](../PLAN-MCPAPPS.md)). Omni-IR screens inside Claude, ChatGPT, VS Code, Cursor and other hosts of MCP Apps, the official MCP extension for interactive interfaces: the host's model writes Omni-IR as a tool's argument, a view bundling the parser and catalog renders it as it streams, and actions go through app-only MCP tools that the server checks again.
-   - *Goal:* screens written in Omni-IR appear, drawn by the Trusted Catalog, in the AI apps people already use, with every line checked and every action governed.
-   - *Fit:* a transport like AG-UI (Step 14), built from the parser, catalog, tool handlers (Step 15) and design tokens (Step 16); comes before app-defined components because a place where people see Omni-IR screens is worth more than more kinds of screens. No format change.
-   - *Who benefits:* developers give their MCP servers rich, safe screens without writing HTML or trusting the model with code; the people using those hosts get real forms, tables and charts that stream in and match the host; organisations keep their own checks and audit trail on every action taken from a conversation.
-   - [x] A. The view: one bundled HTML file, streaming from partial tool input, the host's theme on the design tokens
-   - [x] B. The server: `show_screen`, the UI resource, a compact format guide, app-only action tools; sign-in for MCP connections (OAuth) so actions run as the person; counts of screens shown and actions; the `@omni-ir/mcp` package
-   - [x] C. SPEC.md section 10 "Over MCP Apps", a guide, the decision log
-   - [ ] D. Review (with a manual check in Claude or ChatGPT), merge, release (each with your go-ahead)
-2. **Step 19 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+1. **Step 19 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
    - *Goal:* an app can add a component Omni-IR doesn't have (a seat map, a product card, a signature pad) and still get every guarantee: each line checked, actions governed, nothing drawn that the app didn't write.
    - *Fit:* builds on Step 16's tokens (an app's components can use the same colours) and Step 15's governed actions, Step 17's check (app components join its challenges) and Step 18's bridge (app components reach MCP hosts through it); comes before live screens because live data is most useful in the app's own components.
    - *Who benefits:* developers stop hitting the catalog's limit, the most likely reason to drop Omni-IR after a trial; the people using their apps get screens that fit the task; organisations keep one checked format instead of a second, unchecked path for "special" screens.
    - [ ] Pictures looked up by the app when the screen is drawn (for example `product-123`), for shops and user pictures that can't all be registered in advance; the model still never writes a URL
    - [ ] Keep the system prompt small as the catalog grows: send only the components a request is likely to need, and measure the cost and the time to the first line
-3. **Step 20 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
+2. **Step 20 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
    - *Goal:* a screen can change after it arrives (a delivery status moves on, a chart gets this hour's numbers) while the stream still has no logic and every change is checked like a new line.
    - *Fit:* the last open item in the spec's "Not yet specified"; builds on Step 14's transport (updates travel the same way) and Step 15's backend (the data comes from the app's own handlers, never the model).
    - *Who benefits:* developers can use Omni-IR for dashboards and status pages, not only one-off screens; the people using their apps see current information; and the person's real data reaches the screen from the app without being sent to the model.
