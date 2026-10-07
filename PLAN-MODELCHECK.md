@@ -1,6 +1,6 @@
 # Omni-IR — Step 17: model proficiency check (2FA-style)
 
-Status: **APPROVED 2026-10-07** with the recommendations (all seven decisions); built on `wip/model-check` (A–C). Free by default: tests and demos use a scripted fake model; a real model is challenged only when `OMNI_MODEL=claude` is set, and its calls count against the daily cap. Nothing here changes the stream format.
+Status: **DONE**, released as `v0.9.0` (2026-10-07). Approved 2026-10-07 with the recommendations (all seven decisions). Free by default: tests and demos use a scripted fake model; a real model is challenged only when `OMNI_MODEL=claude` is set, and its calls count against the daily cap. Nothing here changes the stream format.
 
 ## Goal
 
@@ -106,8 +106,8 @@ Work on branch `wip/model-check`. Each part starts with failing tests (constrain
 
 **D. Review and release** *(checkpoint: you review)*
 - [x] D.1 A short review page: a challenge report from the fake model, passing and failing
-- [ ] D.2 Merge with your approval
-- [ ] D.3 Release: a separate go-ahead from you
+- [x] D.2 Merge with your approval
+- [x] D.3 Release: a separate go-ahead from you
 
 ## What I need from you
 
