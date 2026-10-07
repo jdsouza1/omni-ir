@@ -9,7 +9,7 @@ Apps and servers on different package versions keep working together whenever th
 ## How it fits the roadmap
 
 - **It corrects Step 14.** The version marker (`# omni-ir 0.7`) and the server's version check use the package version. Since the format last changed in `0.5`, every release since then has made older apps show "this screen needs an update" and be refused by newer servers, with nothing actually incompatible.
-- **It comes first,** before app-defined components (now Step 18), which will change the format. The new rule needs to be in place before that change, so it's the first format bump done the right way.
+- **It comes first,** before app-defined components (now Step 19), which will change the format. The new rule needs to be in place before that change, so it's the first format bump done the right way.
 - **It's small:** one constant and its rules on three platforms, plus tests. No change to what models write.
 
 ## Who benefits

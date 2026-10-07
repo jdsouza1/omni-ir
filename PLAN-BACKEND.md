@@ -65,7 +65,7 @@ Numbering: this becomes Step 15, so the roadmap's later steps move up by one (th
 - A handler never returns another person's data, and results contain only what the screen needs (no internal ids, no other users' names).
 - Nothing leaks between sessions: two signed-in test users, and every tool is attacked across them (other people's orders, bookings, tickets, profiles; replayed sessions; reused idempotency keys).
 - Logs and the audit trail record who did what, when, and the outcome, never param values (email addresses, notes, messages).
-- **Nothing personal goes to the model by default.** Screens still show what the model wrote; filling a screen with the person's real data (their actual orders) needs live data, which is Step 19. This step doesn't add personal data to prompts.
+- **Nothing personal goes to the model by default.** Screens still show what the model wrote; filling a screen with the person's real data (their actual orders) needs live data, which is Step 20. This step doesn't add personal data to prompts.
 
 **7. Limits and audit.** Rate limits count per signed-in user as well as per address. Every action leaves an audit record (user, tool, time, outcome, idempotency key), readable in tests and the log.
 
