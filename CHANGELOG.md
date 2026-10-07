@@ -2,7 +2,7 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
-## Unreleased
+## 0.9.0 (2026-10-07)
 
 ### Added
 - **Model check, 2FA-style** (Step 17, PLAN-MODELCHECK.md): before a model writes screens for people, the reference server challenges it with six requests drawn at random from `app/challenges.ts` (40 requests: 30 ordinary screens and 10 that push against the rules) and scores each reply with the real parser. Every reply must have no parse error, and five of six must have what the request needed. A pass clears one setup (model, system prompt and settings, catalog, tools, pictures) for seven days; more than 10% of recent live replies with errors trigger a new challenge, at most once an hour. It checks proficiency, not safety: the parser still checks every line.

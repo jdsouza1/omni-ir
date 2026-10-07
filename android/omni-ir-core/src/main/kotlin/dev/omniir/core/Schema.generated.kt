@@ -3,7 +3,7 @@
 package dev.omniir.core
 
 /** The package release this catalog was exported from. */
-public const val OMNI_IR_VERSION: String = "0.8.0"
+public const val OMNI_IR_VERSION: String = "0.9.0"
 
 /** The stream format's version: what the version marker, requests and version checks carry. */
 public const val FORMAT_VERSION: String = "0.5"
