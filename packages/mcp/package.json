@@ -1,6 +1,6 @@
 {
   "name": "@omni-ir/mcp",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "Omni-IR screens in MCP Apps hosts (Claude, ChatGPT, VS Code, Cursor): an MCP server whose tool takes Omni-IR, and a view that draws it with the Trusted Catalog",
   "license": "Apache-2.0",
   "type": "module",
@@ -20,7 +20,7 @@
   "dependencies": {
     "@modelcontextprotocol/ext-apps": "2.0.3",
     "@modelcontextprotocol/server": "2.3.1",
-    "@omni-ir/core": "^0.10.1",
+    "@omni-ir/core": "^0.11.0",
     "zod": "^4.6.5"
   },
   "repository": {
