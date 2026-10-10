@@ -14,7 +14,8 @@ onMounted(async () => {
   };
   el.onMutation = async (call) => {
     sent.push(call.tool);
-    log.value = `Sent ${call.tool} ${JSON.stringify(call.params)}`;
+    // What the person sees: a plain sentence, never the action's raw data.
+    log.value = `Paid ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(call.params.amount))}. This is a demo: nothing was charged.`;
   };
   el.write(
     [
@@ -43,8 +44,12 @@ onMounted(async () => {
   }
 });
 
+// Blocked actions and failed handlers: tell the person plainly; the details are for the app's logs.
 function onEvent(event) {
-  log.value = `${event.detail.type}${event.detail.issue ? `: ${event.detail.issue.code}` : ""}`;
+  if (event.detail.type === "error") {
+    console.warn(event.detail.issue);
+    log.value = "That didn't go through. Please try again.";
+  }
 }
 </script>
 
