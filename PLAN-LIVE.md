@@ -115,3 +115,4 @@ Each update is checked like a screen: catalog, props, types, tree rules and gove
 - [ ] E.1 A review page with screenshots and a recording on web, iPhone and Android
 - [ ] E.2 Merge with your approval
 - [ ] E.3 Release: a separate go-ahead from you
+- [ ] E.4 A retrospective through every step (1 to 22), like the earlier one in the decision log: what worked, what didn't, lessons, and proposed fixes for your approval
