@@ -1,6 +1,6 @@
 # Omni-IR — Step 19: forms, confirmations and screens as text
 
-Status: **APPROVED 2026-10-09** with the recommendations (all eight decisions). Free: no paid API; tests use mock data. Field validation adds props to the catalog, so this is the first format change under the versioning rules of `v0.8.0`: stream format `0.5` → `0.8`.
+Status: **DONE 2026-10-09: released as `v0.11.0`.** Approved 2026-10-09 with the recommendations (all eight decisions). Free: no paid API; tests use mock data. Field validation adds props to the catalog, so this is the first format change under the versioning rules of `v0.8.0`: stream format `0.5` → `0.8`.
 
 ## Goal
 
@@ -123,7 +123,7 @@ Work on branch `wip/forms`. Each part starts with failing tests (constraint 4).
 **E. Review and release** *(checkpoint: you review)*
 - [x] E.1 A short review page with screenshots on web, iPhone and Android (CI)
 - [x] E.2 Merge with your approval
-- [ ] E.3 Release: a separate go-ahead from you
+- [x] E.3 Release: a separate go-ahead from you
 
 ## What I need from you
 
