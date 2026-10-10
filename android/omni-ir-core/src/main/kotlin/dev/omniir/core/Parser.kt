@@ -26,6 +26,10 @@ public class OmniParser(
   /** Names of the pictures in the app's asset registry. Without them, no Image is accepted. */
   public val assets: Set<String> = emptySet(),
   maxLineLength: Int = Limits.LINE_LENGTH,
+  /** The app's own components (Step 20). */
+  public val components: AppComponents = AppComponents.NONE,
+  /** Families of picture names the app looks up when a screen is drawn (Step 20). */
+  public val pictures: List<PicturePattern> = emptyList(),
 ) {
   /** Everything accepted so far. A new object after every change. */
   public var document: OmniDocument = OmniDocument()
@@ -127,7 +131,7 @@ public class OmniParser(
               reported += placed
               onEvent?.invoke(ParserEvent.Warning(placed))
             }
-            when (val result = validateStatement(parsed.statement, tools, assets)) {
+            when (val result = validateStatement(parsed.statement, tools, assets, components, pictures)) {
               is StatementResult.Failed -> reject(listOf(result.issue), line)
               is StatementResult.Ok -> {
                 // The accepted statements are always consistent, so any new issue is caused by this line.

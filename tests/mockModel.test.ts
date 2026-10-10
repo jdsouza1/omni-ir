@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
+import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
 import { createParser, type ParserEvent } from "@omni-ir/core";
 import { MockModel } from "../server/models/mock";
@@ -16,7 +17,7 @@ async function collect(model: MockModel, prompt: string, signal = new AbortContr
 describe("fixtures", () => {
   const screens = readdirSync("fixtures").filter((f) => f.endsWith(".omni"));
 
-  it("includes the ten mock screens", () => {
+  it("includes the eleven mock screens", () => {
     expect(screens.sort()).toEqual([
       "account-settings.omni",
       "demo-mode.omni",
@@ -24,6 +25,7 @@ describe("fixtures", () => {
       "order-history.omni",
       "order-status.omni",
       "payment-confirmation.omni",
+      "product.omni",
       "profile-settings.omni",
       "sales-dashboard.omni",
       "sign-in.omni",
@@ -32,7 +34,7 @@ describe("fixtures", () => {
   });
 
   it.each(screens)("%s parses with no errors, warnings or end-of-stream issues", (name) => {
-    const parser = createParser({ tools: TOOLS });
+    const parser = createParser({ tools: TOOLS, components: APP_COMPONENTS, pictures: PICTURES });
     const events: ParserEvent[] = [];
     parser.subscribe((e) => events.push(e));
     parser.write(fixture(name));
@@ -46,6 +48,7 @@ describe("MockModel routing", () => {
 
   it.each([
     ["a payment confirmation for $42.50", "payment-confirmation"],
+    ["a product page for the canvas tote", "product"],
     ["Checkout screen please", "payment-confirmation"],
     ["a sign-in page", "sign-in"],
     ["LOGIN form", "sign-in"],

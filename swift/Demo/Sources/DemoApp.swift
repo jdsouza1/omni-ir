@@ -83,7 +83,10 @@ struct RootView: View {
 struct ScreenView: View {
   let source: Source
   let instant: Bool
-  @State private var store = OmniStore(tools: demoTools, assets: Set(demoPictureNames), confirm: demoConfirm)
+  @State private var store = OmniStore(
+    tools: demoTools, assets: Set(demoPictureNames), confirm: demoConfirm,
+    components: DemoComponentRegistry.bundled.components, pictures: DemoComponentRegistry.bundled.pictures
+  )
   @State private var log: [String] = []
   @State private var done = false
 
@@ -99,7 +102,9 @@ struct ScreenView: View {
             case .press(let id): log.append("Pressed \(id) (local only)")
             case .error(let issue): log.append("\(issue.code.rawValue): \(issue.message)")
             }
-          }
+          },
+          appViews: demoAppViews,
+          resolvePicture: { name in DemoComponentRegistry.bundled.productPictures[name].map { Image($0) } }
         )
         if !log.isEmpty {
           section("Actions", lines: log)

@@ -25,6 +25,8 @@ const SCREENS: { id: string; keywords: string[] }[] = [
   { id: "order-history", keywords: ["history", "past", "previous", "table", "invoices"] },
   { id: "order-status", keywords: ["order", "orders", "track", "tracking", "shipping", "delivery", "shipment", "package"] },
   { id: "support-contact", keywords: ["support", "help", "contact", "ticket"] },
+  // The demo app's own components (Step 20).
+  { id: "product", keywords: ["product", "tote", "quantity", "shop", "item"] },
   // The landing page examples.
   { id: "landing/booking", keywords: ["book", "booking", "stay", "reserve", "reservation", "cabin"] },
   { id: "landing/checkout", keywords: ["bag", "cart", "basket"] },

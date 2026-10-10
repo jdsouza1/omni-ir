@@ -97,6 +97,14 @@ private func before(_ a: String, _ b: String) -> Bool { a.utf16.lexicographicall
 public func checkField(_ type: ComponentType, props: [String: PropValue], value: Primitive?) -> FieldProblem? {
   let required = props["required"] == .bool(true)
   switch type {
+  case .app:
+    // An app component that is a field ([8.2], Step 20): required means a value that isn't empty.
+    guard required else { return nil }
+    switch value {
+    case nil, .null?, .bool(false)?: return FieldProblem("required")
+    case .text(let s)?: return jsTrim(s).isEmpty ? FieldProblem("required") : nil
+    default: return nil
+    }
   case .switch:
     return required && value != .bool(true) ? FieldProblem("turnOn") : nil
   case .select:
@@ -134,7 +142,7 @@ public func checkField(_ type: ComponentType, props: [String: PropValue], value:
 
 /// The `$key` a field edits, or nil for a component that isn't a field.
 public func fieldKey(_ node: OmniNode) -> String? {
-  guard fieldTypes.contains(node.type), case .state(let key)? = node.props["value"] else { return nil }
+  guard fieldTypes.contains(node.type) || (node.type == .app && node.isField), case .state(let key)? = node.props["value"] else { return nil }
   return key
 }
 

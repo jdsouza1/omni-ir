@@ -1,0 +1,6 @@
+root = Card([card, qty])
+card = ProductCard("Canvas tote", [add], price=24, currency="USD", picture="product-1042")
+$qty = 1
+qty = QuantityPicker($qty, label="How many", min=1, max=5)
+add = Button("Add to bag", action="addToBag")
+addToBag = McpMutation(add, tool="cart.add", params={productId: "1042", quantity: $qty})

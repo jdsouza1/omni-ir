@@ -7,6 +7,8 @@ import type { ToolRegistry } from "@omni-ir/core";
 import { OmniRenderer } from "@omni-ir/react";
 import type { MutationCall, OmniRendererProps, RendererEvent } from "@omni-ir/react";
 import { ASSETS } from "../app/assets";
+import { APP_COMPONENTS, PICTURES } from "../app/components";
+import { APP_VIEWS, resolvePicture } from "../app/views";
 import { TOOLS } from "../app/tools";
 
 export interface Harness {
@@ -33,7 +35,7 @@ export function renderOmni(
   } = {},
 ): Harness {
   const tools = options.tools ?? TOOLS;
-  const parser = options.parser ?? createParser({ tools, assets: ASSETS });
+  const parser = options.parser ?? createParser({ tools, assets: ASSETS, components: APP_COMPONENTS, pictures: PICTURES });
   const onMutation = options.onMutation
     ? (vi.fn(options.onMutation) as unknown as Harness["onMutation"])
     : vi.fn<(call: MutationCall) => void>();
@@ -46,6 +48,8 @@ export function renderOmni(
       store={parser.store}
       tools={tools}
       assets={ASSETS}
+      components={APP_VIEWS}
+      resolvePicture={resolvePicture}
       onMutation={onMutation}
       onEvent={onEvent}
       {...(options.catalog ? { catalog: options.catalog } : {})}

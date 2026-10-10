@@ -6,6 +6,7 @@ import { InMemoryTransport } from "@modelcontextprotocol/server";
 import { createOmniMcpServer, IDEMPOTENCY_META_KEY, SCREEN_TOOL, VIEW_URI, type ActionCall, type OmniMcpEvent, type OmniMcpOptions } from "@omni-ir/mcp";
 import { createParser, describeScreen } from "@omni-ir/core";
 import { ASSETS } from "../app/assets";
+import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
 
 const VIEW = "<!doctype html><html><head><!--omni-ir-config--></head><body><div id=root></div></body></html>";
@@ -113,6 +114,19 @@ describe("the bridge's MCP server", () => {
     expect(outline.length).toBeGreaterThan(0);
     expect(text).toContain(outline);
     expect(result.structuredContent).toMatchObject({ outline });
+  });
+
+  it("checks the app's own components and names them in the screen as text (Step 20)", async () => {
+    const { client } = await connect({ components: APP_COMPONENTS, pictures: PICTURES });
+    const screen = 'root = Stack([card])\ncard = ProductCard("Canvas tote", price=24, picture="product-1042")\n';
+    const result = await client.callTool({ name: SCREEN_TOOL, arguments: { screen } });
+    expect(result.structuredContent).toMatchObject({ components: 2, rejected: [] });
+    expect((result.content as { text: string }[])[0]!.text).toContain("ProductCard: Canvas tote");
+    const tools = await client.listTools();
+    expect(tools.tools.find((t) => t.name === SCREEN_TOOL)?.description).toContain("ProductCard(");
+    const plain = await connect();
+    const refused = await plain.client.callTool({ name: SCREEN_TOOL, arguments: { screen } });
+    expect(refused.structuredContent).toMatchObject({ rejected: expect.arrayContaining([expect.objectContaining({ code: "unknown_component" })]) });
   });
 
   it("runs an action only after checking it against the tool's schema, with the view's idempotency key [10.28]", async () => {

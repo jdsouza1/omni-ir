@@ -35,6 +35,11 @@ export const TOOLS: ToolRegistry = {
   "assistant.ask": z.strictObject({
     question: z.string().trim().min(1).max(500),
   }),
+  // The demo's own components (app/components.ts): a ProductCard's button adds to the bag.
+  "cart.add": z.strictObject({
+    productId: z.string().regex(/^[0-9]{1,8}$/),
+    quantity: z.number().int().min(1).max(99),
+  }),
   // Account settings (fixtures/account-settings.omni): a Select's choice and two Switches.
   "settings.update": z.strictObject({
     language: z.string().trim().min(1).max(40),

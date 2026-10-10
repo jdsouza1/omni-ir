@@ -60,12 +60,24 @@ public struct OmniNode: Sendable, Hashable, Identifiable {
   public let type: ComponentType
   public let props: [String: PropValue]
   public let children: [String]
+  /// For an app's own component (type `.app`, Step 20): its name, such as "ProductCard".
+  public let appName: String?
+  /// For an app component that edits a `$state` (its `value` prop): what that state holds.
+  public let holds: StateHolds?
+  /// For an app component declared as a field: it accepts `required` ([8.2]).
+  public let isField: Bool
 
-  public init(id: String, type: ComponentType, props: [String: PropValue], children: [String]) {
+  public init(
+    id: String, type: ComponentType, props: [String: PropValue], children: [String],
+    appName: String? = nil, holds: StateHolds? = nil, isField: Bool = false
+  ) {
     self.id = id
     self.type = type
     self.props = props
     self.children = children
+    self.appName = appName
+    self.holds = holds
+    self.isField = isField
   }
 }
 

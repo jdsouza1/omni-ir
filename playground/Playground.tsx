@@ -15,6 +15,7 @@ export const EXAMPLE_PROMPTS = [
   "book a stay",
   "my shopping bag",
   "a trip assistant",
+  "a product page",
 ];
 
 export const ERROR_DEMOS = [

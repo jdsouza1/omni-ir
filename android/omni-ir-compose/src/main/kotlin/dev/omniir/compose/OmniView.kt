@@ -55,6 +55,10 @@ import kotlinx.coroutines.launch
  *   to the store; a stream can never show a picture from anywhere else.
  * @param onMutation Runs a governed action. Its params are resolved and already checked by the tool.
  * @param onEvent Blocked actions, failed handlers and presses of Buttons without an action.
+ * @param appViews The app's composables for its own components (Step 20), by name; pass the same
+ *   components to the store. A declared component without one shows the renderer's fallback.
+ * @param resolvePicture Pictures the app looks up when a screen is drawn, for names that match the
+ *   store's picture patterns (Step 20), such as `product-1042`. Null when there is none.
  *
  * Tools that need the person's confirmation are set on the store (`OmniStore(confirm = …)`); the view
  * asks with its own dialog (SPEC.md section 9, Confirmations).
@@ -67,6 +71,8 @@ public fun OmniView(
   pictures: Map<String, Painter> = emptyMap(),
   onEvent: (RendererEvent) -> Unit = {},
   strings: OmniStrings = OmniStrings(),
+  appViews: Map<String, @Composable (AppViewProps) -> Unit> = emptyMap(),
+  resolvePicture: (String) -> Painter? = { null },
 ) {
   val document by store.document.collectAsState()
   val actions by store.actions.collectAsState()
@@ -74,7 +80,7 @@ public fun OmniView(
   val scope = rememberCoroutineScope()
   val focus = remember(store) { mutableMapOf<String, FocusRequester>() }
   var asking by remember(store) { mutableStateOf<Confirmation?>(null) }
-  val context = RenderContext(store, document, actions, shown, focus, pictures, onMutation, onEvent, scope) { text ->
+  val context = RenderContext(store, document, actions, shown, focus, pictures, onMutation, onEvent, scope, appViews, resolvePicture) { text ->
     val confirmation = Confirmation(text)
     asking = confirmation
     try {
@@ -138,8 +144,14 @@ internal class RenderContext(
   val onMutation: suspend (MutationCall) -> Unit,
   val onEvent: (RendererEvent) -> Unit,
   private val scope: CoroutineScope,
+  /** The app's composables for its own components (Step 20). */
+  val appViews: Map<String, @Composable (AppViewProps) -> Unit>,
+  private val resolvePicture: (String) -> Painter?,
   private val askConfirmation: suspend (String) -> Boolean,
 ) {
+  /** A picture by name: the app's registered ones, then its lookup (Step 20). */
+  fun picture(name: String?): Painter? = if (name == null) null else pictures[name] ?: resolvePicture(name)
+
   fun press(id: String) {
     scope.launch {
       val failed = store.press(id, onMutation, onEvent, askConfirmation)

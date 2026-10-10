@@ -1,7 +1,7 @@
 // The canonical, language-neutral view of a parse (see conformance/README.md), shared by the
 // conformance suite, the fuzz tests and the differential corpus (fuzz/).
 import { z } from "zod";
-import { createParser, type OmniDocument } from "@omni-ir/core";
+import { createParser, defineComponents, type AppComponentDeclaration, type OmniDocument, type PicturePattern } from "@omni-ir/core";
 
 export interface CanonicalIssue {
   line: number | null;
@@ -15,7 +15,10 @@ export function canonical(doc: OmniDocument, issues: CanonicalIssue[]) {
   const distinct = [...new Map(issues.map((i) => [`${i.line}:${i.code}`, i])).values()];
   return {
     issues: distinct.sort((a, b) => (a.line ?? Infinity) - (b.line ?? Infinity) || a.code.localeCompare(b.code)),
-    nodes: Object.fromEntries([...doc.nodes].map(([id, n]) => [id, { type: n.type, props: props(n.props), children: [...n.children] }])),
+    // An app component (Step 20) is written by its own name, marked app: true.
+    nodes: Object.fromEntries(
+      [...doc.nodes].map(([id, n]) => [id, n.type === "App" ? { type: n.name, app: true, props: props(n.props), children: [...n.children] } : { type: n.type, props: props(n.props), children: [...n.children] }]),
+    ),
     state: { ...doc.state },
     mutations: Object.fromEntries(
       [...doc.mutations].map(([target, m]) => [target, { id: m.id, tool: m.tool, params: props(m.params) }]),
@@ -31,16 +34,22 @@ export interface ParseOptions {
   tools?: readonly string[];
   /** Picture names in the registry. */
   assets?: readonly string[];
+  /** The app's own components, as their plain-JSON declarations (Step 20). */
+  components?: Readonly<Record<string, AppComponentDeclaration>>;
+  /** Families of picture names, as plain JSON (Step 20). */
+  pictures?: readonly PicturePattern[];
 }
 
 /**
  * Parse a stream fed as the given chunks (strings, or bytes for byte-level splits) and return the
  * canonical result. Any exception escapes, so a test sees it.
  */
-export function parseCanonical(chunks: readonly (string | Uint8Array)[], { tools = ["payments.confirm"], assets = [] }: ParseOptions = {}): Canonical {
+export function parseCanonical(chunks: readonly (string | Uint8Array)[], { tools = ["payments.confirm"], assets = [], components = {}, pictures = [] }: ParseOptions = {}): Canonical {
   const parser = createParser({
     tools: Object.fromEntries(tools.map((name) => [name, z.any()])),
     assets: Object.fromEntries(assets.map((name) => [name, {}])),
+    components: defineComponents(components),
+    pictures,
   });
   const issues: CanonicalIssue[] = [];
   parser.subscribe((e) => {

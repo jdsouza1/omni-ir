@@ -3,7 +3,8 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import fc from "fast-check";
-import { COMPONENT_TYPES } from "@omni-ir/core";
+import { COMPONENT_TYPES, componentDeclarations } from "@omni-ir/core";
+import { APP_COMPONENTS, PICTURES } from "../app/components";
 
 /** Every fixture the mock model streams, plus the failure variants and the landing examples. */
 export function fixtureTexts(dir = "fixtures"): string[] {
@@ -18,7 +19,11 @@ export function fixtureTexts(dir = "fixtures"): string[] {
 
 const ids = fc.constantFrom("root", "a", "b", "title", "pay", "payM", "list", "row1", "tab", "x_1", "Root", "_", "9bad", "__proto__", "constructor", "true", "a".repeat(70));
 const stateKeys = fc.constantFrom("$amount", "$note", "$x", "$", "$9", "$__proto__", `$${"k".repeat(70)}`);
-const componentNames = fc.oneof(fc.constantFrom(...COMPONENT_TYPES, "McpMutation"), fc.constantFrom("Div", "script", "card", "Button2", "Html", ""));
+const componentNames = fc.oneof(
+  fc.constantFrom(...COMPONENT_TYPES, "McpMutation"),
+  fc.constantFrom("ProductCard", "QuantityPicker", "App"),
+  fc.constantFrom("Div", "script", "card", "Button2", "Html", ""),
+);
 const numbers = fc.oneof(
   fc.integer().map(String),
   fc.double({ noNaN: false }).map(String),
@@ -41,7 +46,8 @@ const argument: fc.Arbitrary<string> = fc.letrec((tie) => ({
     stateKeys,
     fc.array(tie("value") as fc.Arbitrary<string>, { maxLength: 4 }).map((xs) => `[${xs.join(", ")}]`),
     fc.array(fc.tuple(fc.constantFrom("amount", "note", "__proto__", "a b", "x"), tie("value") as fc.Arbitrary<string>), { maxLength: 3 }).map((kv) => `{${kv.map(([k, v]) => `${k}: ${v}`).join(", ")}}`),
-    fc.tuple(fc.constantFrom("label", "tone", "format", "action", "tool", "params", "style", "class", "onClick", "variant", "alt", "lines"), tie("value") as fc.Arbitrary<string>).map(([k, v]) => `${k}=${v}`),
+    fc.tuple(fc.constantFrom("label", "tone", "format", "action", "tool", "params", "style", "class", "onClick", "variant", "alt", "lines", "price", "picture", "min", "max", "badges"), tie("value") as fc.Arbitrary<string>).map(([k, v]) => `${k}=${v}`),
+    fc.constantFrom('"product-1042"', '"product-x"', '"https://e.com/p.png"'),
     fc.constantFrom("(", ")", "[", "]", "{", "}", ",", "=", "+", "$a + 1", "Card(", "a.b", "...", "/*", "#"),
   ),
 })).value as fc.Arbitrary<string>;
@@ -110,5 +116,9 @@ export const FUZZ_TOOLS = [
   "bookings.reserve",
   "assistant.ask",
   "settings.update",
+  "cart.add",
 ] as const;
 export const FUZZ_ASSETS = ["cabin-pines", "shirt", "tote"] as const;
+/** The demo app's own components and picture patterns (Step 20), as plain JSON. */
+export const FUZZ_COMPONENTS = componentDeclarations(APP_COMPONENTS);
+export const FUZZ_PICTURES = PICTURES;

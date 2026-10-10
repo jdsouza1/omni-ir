@@ -77,7 +77,13 @@ private fun collectProps(callee: String, args: List<RawValue>, named: List<Pair<
   return props
 }
 
-internal fun validateStatement(raw: RawStatement, tools: ToolRegistry, assets: Set<String>): StatementResult {
+internal fun validateStatement(
+  raw: RawStatement,
+  tools: ToolRegistry,
+  assets: Set<String>,
+  components: AppComponents = AppComponents.NONE,
+  pictures: List<PicturePattern> = emptyList(),
+): StatementResult {
   when (raw) {
     is RawStatement.State -> {
       if (raw.key.length > Limits.STATE_KEY_LENGTH) return failed(IssueCode.INVALID_PROPS, "state key is too long", raw.key)
@@ -92,7 +98,10 @@ internal fun validateStatement(raw: RawStatement, tools: ToolRegistry, assets: S
       if (raw.callee == "McpMutation") return validateMutation(raw, tools)
       val type = ComponentType.fromWireName(raw.callee)
       val spec = type?.let { Catalog.components[it] }
-      if (type == null || spec == null) return failed(IssueCode.UNKNOWN_COMPONENT, "\"${raw.callee}\" is not in the Trusted Catalog", id)
+      if (type == null || spec == null) {
+        val app = components[raw.callee] ?: return failed(IssueCode.UNKNOWN_COMPONENT, "\"${raw.callee}\" is not in the Trusted Catalog", id)
+        return validateAppComponent(raw, app, assets, pictures)
+      }
       val props = try { collectProps(raw.callee, raw.args, raw.named, spec.positional) } catch (e: Exception) { return fail(e, id) }
       check(props, spec)?.let { return failed(IssueCode.INVALID_PROPS, it, id) }
       crossPropRule(type, props)?.let { return failed(IssueCode.INVALID_PROPS, it, id) }
@@ -111,10 +120,30 @@ internal fun validateStatement(raw: RawStatement, tools: ToolRegistry, assets: S
         else -> null
       }
       val asset = (assetProp?.let { out[it] } as? PropValue.Text)?.value
-      if (asset != null && asset !in assets) return failed(IssueCode.UNKNOWN_ASSET, "image \"$asset\" is not in the app's asset registry", id)
+      if (asset != null && asset !in assets && !matchesPicturePattern(asset, pictures)) return failed(IssueCode.UNKNOWN_ASSET, "image \"$asset\" is not in the app's asset registry", id)
       return StatementResult.Ok(Statement.Node(OmniNode(id, type, out, children)))
     }
   }
+}
+
+/** One of the app's own components (Step 20): checked like the catalog's, pictures included. */
+private fun validateAppComponent(raw: RawStatement.Call, app: AppComponent, assets: Set<String>, pictures: List<PicturePattern>): StatementResult {
+  val id = raw.id
+  val props = try { collectProps(raw.callee, raw.args, raw.named, app.spec.positional) } catch (e: Exception) { return fail(e, id) }
+  check(props, app.spec)?.let { return failed(IssueCode.INVALID_PROPS, it, id) }
+  val out = linkedMapOf<String, PropValue>()
+  var children = emptyList<String>()
+  for ((name, value) in props) {
+    if (name == "children" && value is Value.Arr) children = value.items.mapNotNull { (it as? Value.Ref)?.id }
+    else out[name] = propValue(value)
+  }
+  for ((name, p) in app.declaration.props) {
+    val picture = (out[name] as? PropValue.Text)?.value
+    if (p is AppProp.Picture && picture != null && picture !in assets && !matchesPicturePattern(picture, pictures)) {
+      return failed(IssueCode.UNKNOWN_ASSET, "picture \"$picture\" is not one the app knows", id)
+    }
+  }
+  return StatementResult.Ok(Statement.Node(OmniNode(id, ComponentType.APP, out, children, appName = app.name, holds = app.holds, isField = app.field)))
 }
 
 private fun validateMutation(raw: RawStatement.Call, tools: ToolRegistry): StatementResult {

@@ -29,9 +29,13 @@ kotlin {
   compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
 }
 
-/** Copies the repo's fixtures/ folder into the app's assets, as assets/fixtures. */
+/**
+ * Copies the repo's fixtures/ folder into the app's assets, as assets/fixtures, and the app's own
+ * component declarations (app/components.json, Step 20) as assets/components.json.
+ */
 abstract class CopyFixtures : DefaultTask() {
   @get:InputDirectory abstract val source: DirectoryProperty
+  @get:InputFile abstract val components: RegularFileProperty
   @get:OutputDirectory abstract val outputDir: DirectoryProperty
 
   @TaskAction
@@ -39,11 +43,13 @@ abstract class CopyFixtures : DefaultTask() {
     val target = outputDir.get().asFile.resolve("fixtures")
     target.deleteRecursively()
     source.get().asFile.copyRecursively(target)
+    components.get().asFile.copyTo(outputDir.get().asFile.resolve("components.json"), overwrite = true)
   }
 }
 
 val copyFixtures = tasks.register<CopyFixtures>("copyFixtures") {
   source.set(rootDir.parentFile.resolve("fixtures"))
+  components.set(rootDir.parentFile.resolve("app/components.json"))
 }
 
 androidComponents {

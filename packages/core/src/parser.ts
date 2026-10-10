@@ -1,7 +1,8 @@
 // Streaming parser: chunks → lines (R2) → raw statements (R4) → schema validation → store.
 // A bad line is reported and skipped; it never stops the stream.
 import { LineBuffer, type LineEvent } from "./lineBuffer.js";
-import { DocumentIndex, validateDocument, validateStatement, type Statement, type ToolRegistry } from "./schema.js";
+import type { AppComponents, PicturePattern } from "./appComponents.js";
+import { DocumentIndex, validateDocument, validateStatement, type Statement, type ToolRegistry, type ValidationContext } from "./schema.js";
 import { createStore, type OmniDocument, type OmniStore } from "./store.js";
 import { parseLine } from "./tokenizer.js";
 import type { Issue } from "./types.js";
@@ -19,6 +20,10 @@ export interface ParserOptions {
   tools: ToolRegistry;
   /** The app's image asset registry (only its names are used here). Without it, no Image is accepted. */
   assets?: Readonly<Record<string, unknown>>;
+  /** Families of picture names looked up when a screen is drawn, such as `product-{id}` (Step 20). */
+  pictures?: readonly PicturePattern[];
+  /** The app's own components (Step 20, `defineComponents`). */
+  components?: AppComponents;
   store?: OmniStore;
   maxLineLength?: number;
 }
@@ -34,7 +39,9 @@ export interface OmniParser {
 
 export function createParser(options: ParserOptions): OmniParser {
   const store = options.store ?? createStore();
-  const ctx = { tools: options.tools, assets: Object.keys(options.assets ?? {}) };
+  const ctx: ValidationContext = { tools: options.tools, assets: Object.keys(options.assets ?? {}) };
+  if (options.pictures !== undefined) ctx.pictures = options.pictures;
+  if (options.components !== undefined) ctx.components = options.components;
   const buffer = new LineBuffer(options.maxLineLength === undefined ? {} : { maxLineLength: options.maxLineLength });
   const accepted: Statement[] = [];
   const index = new DocumentIndex();

@@ -2,21 +2,37 @@
 // param schemas (as JSON Schema, rebuilt into Zod in the view for the first check before sending) and
 // the pictures. The view has no network ([10.25]), so this is all it knows about the app.
 import { z } from "zod";
-import type { ToolRegistry } from "@omni-ir/core";
+import { componentDeclarations, type AppComponentDeclaration, type AppComponents, type PicturePattern, type ToolRegistry } from "@omni-ir/core";
 import { CONFIG_ELEMENT_ID, CONFIG_PLACEHOLDER } from "./constants.js";
 import type { Picture } from "./guide.js";
 
 export interface ViewConfig {
   tools: Record<string, unknown>;
   assets: Readonly<Record<string, Picture>>;
+  /** The app's own components, as plain-JSON declarations (Step 20), so the view's parser accepts them. */
+  components?: Record<string, AppComponentDeclaration>;
+  /** Families of picture names (Step 20). */
+  pictures?: readonly PicturePattern[];
 }
 
 const BACKSLASH = String.fromCharCode(92);
 
-export function viewConfig({ tools, assets }: { tools: ToolRegistry; assets: Readonly<Record<string, Picture>> }): ViewConfig {
+export function viewConfig({
+  tools,
+  assets,
+  components,
+  pictures,
+}: {
+  tools: ToolRegistry;
+  assets: Readonly<Record<string, Picture>>;
+  components?: AppComponents;
+  pictures?: readonly PicturePattern[];
+}): ViewConfig {
   return {
     tools: Object.fromEntries(Object.entries(tools).map(([name, schema]) => [name, z.toJSONSchema(schema, { unrepresentable: "any" })])),
     assets,
+    ...(components !== undefined && Object.keys(components).length > 0 ? { components: componentDeclarations(components) } : {}),
+    ...(pictures !== undefined && pictures.length > 0 ? { pictures } : {}),
   };
 }
 

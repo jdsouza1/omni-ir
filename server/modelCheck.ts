@@ -7,7 +7,7 @@
 // It checks proficiency, not safety: the parser still checks every line of every screen.
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { createParser, OMNI_IR_VERSION, type ToolRegistry } from "@omni-ir/core";
+import { createParser, OMNI_IR_VERSION, type AppComponents, type PicturePattern, type ToolRegistry } from "@omni-ir/core";
 import type { AssetRegistry } from "../app/assets";
 import { CHALLENGES, type Challenge } from "../app/challenges";
 import type { ModelCheckRecord, Store } from "./backend/types";
@@ -29,6 +29,10 @@ const CHECKING_RETRY_AFTER_S = 15;
 export interface Registries {
   tools: ToolRegistry;
   assets: AssetRegistry;
+  /** The app's own components (Step 20): part of what the model is checked on. */
+  components?: AppComponents;
+  /** Families of picture names the app looks up (Step 20). */
+  pictures?: readonly PicturePattern[];
 }
 
 /** How one reply scored. Codes and ids only: the reply itself is never kept. */
@@ -45,8 +49,8 @@ export interface ReplyScore {
   missing: string[];
 }
 
-export function scoreReply(text: string, challenge: Challenge, { tools, assets }: Registries): ReplyScore {
-  const parser = createParser({ tools, assets });
+export function scoreReply(text: string, challenge: Challenge, { tools, assets, components: appComponents = {}, pictures = [] }: Registries): ReplyScore {
+  const parser = createParser({ tools, assets, components: appComponents, pictures });
   const errors = new Set<string>();
   parser.subscribe((e) => {
     if (e.type === "error") errors.add(e.issue.code);
@@ -54,7 +58,8 @@ export function scoreReply(text: string, challenge: Challenge, { tools, assets }
   parser.write(text);
   parser.end();
   const doc = parser.getSnapshot();
-  const types = new Set([...doc.nodes.values()].map((n) => n.type));
+  // An app component counts by its name, such as "ProductCard".
+  const types = new Set<string>([...doc.nodes.values()].map((n) => (n.type === "App" ? n.name : n.type)));
   const used = new Set([...doc.mutations.values()].map((m) => m.tool));
   const { components = [], tools: needed = [], minComponents, noMutations } = challenge.expect;
   const missing = [
@@ -133,7 +138,7 @@ export interface SetupParts extends Registries {
 }
 
 /** The setup's fingerprint ([10.22]): anything that changes what the model writes or what is accepted. */
-export function setupFingerprint({ model, systemPrompt, settings = {}, tools, assets }: SetupParts): string {
+export function setupFingerprint({ model, systemPrompt, settings = {}, tools, assets, components = {}, pictures: patterns = [] }: SetupParts): string {
   const sorted = (o: Record<string, unknown>) => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : 1)));
   const toolSchemas = Object.keys(tools)
     .sort()
@@ -141,8 +146,22 @@ export function setupFingerprint({ model, systemPrompt, settings = {}, tools, as
   const pictures = Object.keys(assets)
     .sort()
     .map((name) => [name, assets[name]!.src]);
+  // The app's own components and picture patterns (Step 20): changing one asks for a new check.
+  const appComponents = Object.keys(components)
+    .sort()
+    .map((name) => [name, components[name]!.declaration]);
+  const families = patterns.map((p) => `${p.prefix}{${p.id}:${p.maxLength}}`).sort();
   // The package version stands for the catalog and the parser that score the replies.
-  const setup = { model, systemPrompt, settings: sorted(settings), tools: toolSchemas, pictures, catalog: OMNI_IR_VERSION };
+  const setup = {
+    model,
+    systemPrompt,
+    settings: sorted(settings),
+    tools: toolSchemas,
+    pictures,
+    catalog: OMNI_IR_VERSION,
+    ...(appComponents.length > 0 ? { appComponents } : {}),
+    ...(families.length > 0 ? { pictureFamilies: families } : {}),
+  };
   return createHash("sha256").update(JSON.stringify(setup)).digest("hex");
 }
 

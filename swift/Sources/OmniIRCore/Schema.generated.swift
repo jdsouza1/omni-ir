@@ -7,7 +7,7 @@ public let omniIRVersion = "0.11.0"
 /// The stream format's version: what the version marker, requests and version checks carry.
 public let omniIRFormatVersion = "0.8"
 
-/// The components in the Trusted Catalog.
+/// The components in the Trusted Catalog, and app for the app's own (Step 20).
 public enum ComponentType: String, Sendable, CaseIterable, Hashable {
   case stack = "Stack"
   case card = "Card"
@@ -36,6 +36,8 @@ public enum ComponentType: String, Sendable, CaseIterable, Hashable {
   case pieChart = "PieChart"
   case series = "Series"
   case slice = "Slice"
+  /// One of the app's own components (Step 20): its name is the node's appName. A stream never writes "App".
+  case app = "App"
 }
 
 /// Every error and warning a parser reports.
@@ -154,7 +156,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .unterminatedString: "A string has no closing double quote."
     case .lineTooLong: "The line is longer than the line length limit."
     case .notFlat: "A component call appears inside another statement's arguments."
-    case .unknownComponent: "The component isn't in the catalog."
+    case .unknownComponent: "The component isn't in the catalog or among the app's own components."
     case .invalidProps: "An argument or value breaks the component's rules: wrong type, unknown prop, value not allowed, too long or repeated."
     case .unknownTool: "An McpMutation names a tool that isn't in the app's tool registry."
     case .duplicateId: "An id or $state key is assigned a second time. The first assignment stays."

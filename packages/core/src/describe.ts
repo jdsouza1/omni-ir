@@ -1,6 +1,7 @@
 // Human-readable descriptions of the schema, shared by the system prompt (server/prompt.ts) and the
 // generated sections of SPEC.md (scripts/spec.ts), so both always describe the same rules.
 import { z } from "zod";
+import type { AppComponent } from "./appComponents.js";
 import { ASSET_NAME, COMPONENTS, ISO_DATE, type ComponentType } from "./schema.js";
 
 export interface JsonSchema {
@@ -41,9 +42,24 @@ export interface ComponentShape {
 
 export function describeComponent(type: ComponentType): ComponentShape {
   const spec = COMPONENTS[type];
-  const schema = z.toJSONSchema(spec.props) as JsonSchema;
+  return { ...shapeOf(type, spec.positional as readonly string[], spec.props), type };
+}
+
+/** An app's own component (Step 20), described the same way, with the app's sentence about it. */
+export function describeAppComponent(component: AppComponent): AppComponentShape {
+  return { ...shapeOf(component.name, component.positional, component.schema), name: component.name, description: component.declaration.description };
+}
+
+export interface AppComponentShape {
+  name: string;
+  description: string;
+  signature: string;
+  props: PropShape[];
+}
+
+function shapeOf(type: string, positional: readonly string[], props: z.ZodType): { signature: string; props: PropShape[] } {
+  const schema = z.toJSONSchema(props) as JsonSchema;
   const required = new Set(schema.required ?? []);
-  const positional = spec.positional as readonly string[];
   const entries = Object.entries(schema.properties ?? {});
   const named = entries.map(([name]) => name).filter((name) => !positional.includes(name));
   // Positional props bare, the rest as `name=…` (they must be given by name); optional ones in
@@ -55,7 +71,6 @@ export function describeComponent(type: ComponentType): ComponentShape {
   };
   const signature = `${type}(${[...positional.map((n) => arg(n, false)), ...named.map((n) => arg(n, true))].join(", ")})`;
   return {
-    type,
     signature,
     props: entries.map(([name, def]) => ({
       name,
@@ -91,7 +106,10 @@ export function describeValue(def: JsonSchema, detailed = false): string {
   if (def.type === "number" || def.type === "integer") {
     const kind = def.type === "integer" ? "whole number" : "number";
     if (def.exclusiveMinimum !== undefined) return `${kind} > ${def.exclusiveMinimum}`;
-    if (def.minimum !== undefined && def.maximum !== undefined) return `${kind} ${def.minimum}-${def.maximum}`;
+    // A whole number's implicit safe-integer bounds aren't limits anyone chose.
+    const min = def.minimum === Number.MIN_SAFE_INTEGER ? undefined : def.minimum;
+    const max = def.maximum === Number.MAX_SAFE_INTEGER ? undefined : def.maximum;
+    if (min !== undefined && max !== undefined) return `${kind} ${min}-${max}`;
     return kind;
   }
   if (def.type === "boolean") return "true | false";

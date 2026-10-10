@@ -3,10 +3,11 @@
 // browser's parser and schema, the trusted zone.
 import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import { ASSETS, type AssetRegistry } from "../app/assets";
+import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
 import { createParser } from "@omni-ir/core";
 import { AgUiEncoder } from "@omni-ir/core/ag-ui";
-import type { ToolRegistry } from "@omni-ir/core";
+import type { AppComponents, PicturePattern, ToolRegistry } from "@omni-ir/core";
 import type { ServerConfig } from "./config";
 import { AgUiRunInput, describeIssues, errorBody, GenerateBody, generateError, INVALID_JSON, MARKER_CHUNK, MutateBody, promptOf, runMutation, sseEvent, versionError } from "./api";
 import { ModelError, type Model } from "./models/types";
@@ -27,6 +28,10 @@ export interface AppOptions {
   tools?: ToolRegistry;
   /** Image assets streams may name; defaults to the shared registry. */
   assets?: AssetRegistry;
+  /** The app's own components (Step 20); defaults to the demo app's. */
+  components?: AppComponents;
+  /** Families of picture names the app looks up (Step 20); defaults to the demo app's. */
+  pictures?: readonly PicturePattern[];
   /** Handler per tool, with its access rule; defaults to the reference handlers. */
   handlers?: Readonly<Record<string, ToolHandler>>;
   /** Where data lives; defaults to a SQLite file (OMNI_DB) or memory, with the demo data added. */
@@ -67,6 +72,8 @@ export function createApp({
   model,
   tools = TOOLS,
   assets = ASSETS,
+  components = APP_COMPONENTS,
+  pictures = PICTURES,
   handlers = HANDLERS,
   store: givenStore,
   mailer = createDevMailer((line) => console.log(line)),
@@ -106,7 +113,7 @@ export function createApp({
   const gate = createModelGate({
     mode: config.modelCheck,
     model,
-    fingerprint: setupFingerprint({ model: model.setup?.id ?? model.kind, systemPrompt: model.setup?.systemPrompt ?? "", settings: model.setup?.settings, tools, assets }),
+    fingerprint: setupFingerprint({ model: model.setup?.id ?? model.kind, systemPrompt: model.setup?.systemPrompt ?? "", settings: model.setup?.settings, tools, assets, components, pictures }),
     store: {
       modelChecks: {
         add: async (record) => (await ready, store.modelChecks.add(record)),
@@ -116,6 +123,8 @@ export function createApp({
     },
     tools,
     assets,
+    components,
+    pictures,
     ...challengeOptions,
     timeoutMs: config.timeoutMs,
     now,
@@ -124,6 +133,7 @@ export function createApp({
   app.locals.modelCheck = gate;
   const mcp = config.mcp
     ? referenceMcp({
+        // No app components here: the built-in view has no code to draw them (an app passes its own view).
         tools,
         assets,
         handlers,
@@ -262,7 +272,7 @@ export function createApp({
 
     // Observer: parses the same text server-side purely to log how well the model followed the
     // protocol. It never changes what is forwarded; the client's parser is the one that matters.
-    const observer = createParser({ tools, assets });
+    const observer = createParser({ tools, assets, components, pictures });
     const parse = { errors: {} as Record<string, number>, warnings: {} as Record<string, number> };
     observer.subscribe((e) => {
       if (e.type === "error") parse.errors[e.issue.code] = (parse.errors[e.issue.code] ?? 0) + 1;

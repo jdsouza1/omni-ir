@@ -40,6 +40,9 @@ private class Case(val json: JsonObject) {
   val id: String = json.getValue("id").jsonPrimitive.content
   val tools: List<String> = json["tools"]?.jsonArray?.map { it.jsonPrimitive.content } ?: listOf("payments.confirm")
   val assets: Set<String> = json["assets"]?.jsonArray?.map { it.jsonPrimitive.content }?.toSet() ?: emptySet()
+  /** The app's own components and picture patterns (Step 20), as plain JSON. */
+  val components: AppComponents = (json["components"]?.let(::plain) as? Map<*, *>)?.let(::appComponentsFromJsonValue) ?: AppComponents.NONE
+  val pictures: List<PicturePattern> = (json["pictures"]?.let(::plain) as? List<*>)?.let(::picturePatternsFromJsonValue) ?: emptyList()
   val expect: JsonObject = json.getValue("expect").jsonObject
 
   /** The stream: a string, or parts joined in order, where {repeat, times} is a long run of text. */
@@ -91,7 +94,7 @@ private fun plain(v: PropValue): Any? = when (v) {
 }
 
 private fun run(case: Case, chunkSize: Int?): Canonical {
-  val parser = OmniParser(case.tools.associateWith { Tool.acceptsAnything }, case.assets)
+  val parser = OmniParser(case.tools.associateWith { Tool.acceptsAnything }, case.assets, components = case.components, pictures = case.pictures)
   if (chunkSize == null) {
     parser.write(case.text)
   } else {
@@ -102,7 +105,12 @@ private fun run(case: Case, chunkSize: Int?): Canonical {
   val doc = parser.document
   return Canonical(
     issues = parser.issues.map { ExpectedIssue(it.line, it.code.wireName) }.toSet(),
-    nodes = doc.nodes.mapValues { (_, n) -> mapOf("type" to n.type.wireName, "props" to n.props.mapValues { plain(it.value) }, "children" to n.children) },
+    // An app component (Step 20) is written by its own name, marked app: true.
+    nodes = doc.nodes.mapValues { (_, n) ->
+      val props = n.props.mapValues { plain(it.value) }
+      if (n.type == ComponentType.APP) mapOf("type" to n.appName, "app" to true, "props" to props, "children" to n.children)
+      else mapOf("type" to n.type.wireName, "props" to props, "children" to n.children)
+    },
     state = doc.state.mapValues { plain(it.value) },
     mutations = doc.mutations.mapValues { (_, m) -> mapOf("id" to m.id, "tool" to m.tool, "params" to m.params.mapValues { plain(it.value) }) },
     missing = doc.missing.sorted(),

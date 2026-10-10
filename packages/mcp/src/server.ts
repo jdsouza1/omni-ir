@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { McpServer } from "@modelcontextprotocol/server";
 import { registerAppResource, registerAppTool, RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
-import { createParser, describeScreen, type ToolRegistry } from "@omni-ir/core";
+import { createParser, describeScreen, type AppComponents, type PicturePattern, type ToolRegistry } from "@omni-ir/core";
 import { injectConfig, viewConfig } from "./config.js";
 import { IDEMPOTENCY_META_KEY, SCREEN_TOOL, VIEW_URI } from "./constants.js";
 import { buildGuide, type Picture } from "./guide.js";
@@ -40,6 +40,14 @@ export interface OmniMcpOptions {
   tools?: ToolRegistry;
   /** Pictures screens may name; their `src` must be a `data:` URI, because the view has no network. */
   assets?: Readonly<Record<string, Picture>>;
+  /**
+   * The app's own components (Step 20). The model may use them and every line is checked; the built-in
+   * view has no code for them, so it shows its fallback there, and the screen as text names them. To
+   * draw them, build a view with your components and pass it as `viewHtml`.
+   */
+  components?: AppComponents;
+  /** Families of picture names (Step 20). The built-in view can't look pictures up, so it shows their descriptions. */
+  pictures?: readonly PicturePattern[];
   /** Runs an action after its params passed the tool's schema: the app's own access rules, idempotency and audit. */
   onAction?: (call: ActionCall) => Promise<ActionResult>;
   /** Who is calling, for onAction (from MCP's authorization, per connection or request). */
@@ -59,8 +67,10 @@ export function createOmniMcpServer(options: OmniMcpOptions = {}): McpServer {
   const { onAction, onEvent = () => {}, user = null } = options;
   const tools: ToolRegistry = onAction ? (options.tools ?? {}) : {};
   const assets = options.assets ?? {};
+  const appComponents = options.components ?? {};
+  const pictures = options.pictures ?? [];
   const server = new McpServer({ name: options.name ?? "omni-ir", version: options.version ?? "0.0.0" });
-  const html = injectConfig(options.viewHtml ?? defaultView(), viewConfig({ tools, assets }));
+  const html = injectConfig(options.viewHtml ?? defaultView(), viewConfig({ tools, assets, components: appComponents, pictures }));
 
   registerAppResource(server, "Omni-IR screen", VIEW_URI, { description: "Draws Omni-IR screens with the app's own components.", mimeType: RESOURCE_MIME_TYPE }, async () => ({
     contents: [{ uri: VIEW_URI, mimeType: RESOURCE_MIME_TYPE, text: html }],
@@ -71,14 +81,14 @@ export function createOmniMcpServer(options: OmniMcpOptions = {}): McpServer {
     SCREEN_TOOL,
     {
       title: "Show a screen",
-      description: buildGuide({ tools, assets }),
+      description: buildGuide({ tools, assets, components: appComponents, pictures }),
       inputSchema: z.object({ screen: z.string().min(1).max(MAX_SCREEN_CHARS).describe("The screen, in Omni-IR lines") }),
       annotations: { readOnlyHint: true },
       _meta: { ui: { resourceUri: VIEW_URI } },
     },
     async ({ screen }) => {
       // The same checks the view makes, so the model learns which lines were rejected ([10.27]).
-      const parser = createParser({ tools, assets });
+      const parser = createParser({ tools, assets, components: appComponents, pictures });
       const rejected: { line: number | null; code: string; message: string }[] = [];
       parser.subscribe((e) => {
         if (e.type === "error") rejected.push({ line: e.issue.line ?? null, code: e.issue.code, message: e.issue.message });

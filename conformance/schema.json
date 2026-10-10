@@ -1521,7 +1521,7 @@
     "unknown_component": {
       "severity": "error",
       "stage": "line",
-      "meaning": "The component isn't in the catalog."
+      "meaning": "The component isn't in the catalog or among the app's own components."
     },
     "invalid_props": {
       "severity": "error",

@@ -59,6 +59,12 @@ public data class OmniNode(
   public val type: ComponentType,
   public val props: Map<String, PropValue>,
   public val children: List<String>,
+  /** For an app's own component (type APP, Step 20): its name, such as "ProductCard". */
+  public val appName: String? = null,
+  /** For an app component that edits a `$state` (its `value` prop): what that state holds. */
+  public val holds: StateHolds? = null,
+  /** For an app component declared as a field: it accepts `required` ([8.2]). */
+  public val isField: Boolean = false,
 )
 
 /** An accepted McpMutation: approval for one Button to call one tool from the app's registry. */

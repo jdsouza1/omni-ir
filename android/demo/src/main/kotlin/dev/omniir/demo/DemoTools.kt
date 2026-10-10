@@ -43,6 +43,14 @@ object DemoTools {
       }
     },
     "assistant.ask" to Tool { p -> problems(rule(trimmed(p["question"])?.length in 1..500, "question: 1 to 500 characters")) },
+    // The demo's own components (Step 20): a ProductCard's button adds to the bag.
+    "cart.add" to Tool { p ->
+      val quantity = (p["quantity"] as? Primitive.Number)?.value
+      problems(
+        rule(text(p["productId"])?.let { it.length in 1..8 && it.all(Char::isDigit) } == true, "productId: 1 to 8 digits"),
+        rule(quantity != null && quantity == Math.rint(quantity) && quantity in 1.0..99.0, "quantity: a whole number from 1 to 99"),
+      )
+    },
     "settings.update" to Tool { p ->
       problems(
         rule(trimmed(p["language"])?.length in 1..40, "language: 1 to 40 characters"),

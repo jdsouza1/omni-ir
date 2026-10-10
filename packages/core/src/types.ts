@@ -72,7 +72,7 @@ export const ISSUE_CODES = {
   unterminated_string: { severity: "error", stage: "line", meaning: "A string has no closing double quote." },
   line_too_long: { severity: "error", stage: "line", meaning: "The line is longer than the line length limit." },
   not_flat: { severity: "error", stage: "line", meaning: "A component call appears inside another statement's arguments." },
-  unknown_component: { severity: "error", stage: "line", meaning: "The component isn't in the catalog." },
+  unknown_component: { severity: "error", stage: "line", meaning: "The component isn't in the catalog or among the app's own components." },
   invalid_props: {
     severity: "error",
     stage: "line",

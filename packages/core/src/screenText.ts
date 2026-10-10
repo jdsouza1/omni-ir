@@ -61,6 +61,14 @@ export function describeScreen(document: OmniDocument, options: DescribeScreenOp
     const p = node.props as Props;
     const required = p.required === true && "required";
     switch (node.type) {
+      case "App": {
+        // By name: its first text as the headline, its other props after it, the edited value last.
+        const entries = Object.entries(p).filter(([key, value]) => key !== "required" && !(key === "value" && isStateRef(value)));
+        const head = entries.findIndex(([, value]) => typeof value === "string" || isStateRef(value));
+        const headline = head === -1 ? "" : `: ${text(entries[head]![1])}`;
+        const rest = entries.filter((_, i) => i !== head).map(([key, value]) => `${key}: ${Array.isArray(value) ? texts(value).join(", ") : typeof value === "boolean" ? String(value) : text(value)}`);
+        return `${node.name}${headline}${details([required, ...rest])}${fieldValue(node)}`;
+      }
       case "Stack":
         return null;
       case "Card":

@@ -92,6 +92,17 @@ class DemoTest {
     waitForText("Sent payments.confirm")
   }
 
+  /** The app's own components (Step 20): drawn by its composables; the quantity reaches the action. */
+  @Test
+  fun appComponentsAddToBag() {
+    launch("fixture" to "product", "instant" to "true")
+    waitUntilDone()
+    compose.onNode(hasContentDescription("More")).performScrollTo().performClick()
+    compose.onNodeWithText("Add to bag").performScrollTo().performClick()
+    waitForText("Sent cart.add")
+    waitForText("quantity: 2")
+  }
+
   /** Charts draw, and each is read to TalkBack as its title followed by its values. */
   @Test
   fun chartsDraw() {

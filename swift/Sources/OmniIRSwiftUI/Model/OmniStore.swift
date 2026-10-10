@@ -92,11 +92,28 @@ public final class OmniStore {
   private var blocked: [String: (message: String, params: [String: Primitive])] = [:]
   private var running: Set<String> = []
 
-  public init(tools: ToolRegistry, assets: Set<String> = [], confirm: [String: Confirmation] = [:]) {
+  public init(
+    tools: ToolRegistry, assets: Set<String> = [], confirm: [String: Confirmation] = [:],
+    components: AppComponents = .none, pictures: [PicturePattern] = []
+  ) {
     self.tools = tools
     self.assets = assets
     self.confirm = confirm
-    parser = OmniParser(tools: tools, assets: assets)
+    parser = OmniParser(tools: tools, assets: assets, components: components, pictures: pictures)
+  }
+
+  /// An app component's props for its view (Step 20): each `$state` replaced by its current value, so
+  /// a view never sees a reference.
+  public func appProps(_ node: OmniNode) -> [String: PropValue] {
+    node.props.mapValues { value in
+      guard case .state(let key) = value else { return value }
+      switch document.state[key] ?? .null {
+      case .text(let s): return .text(s)
+      case .number(let n): return .number(n)
+      case .bool(let b): return .bool(b)
+      case .null: return .null
+      }
+    }
   }
 
   // MARK: Feeding the stream

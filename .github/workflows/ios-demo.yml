@@ -89,7 +89,7 @@ jobs:
 
       - name: Fields and confirmations
         run: |
-          xcodebuild test-without-building -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo             -destination "id=$UDID" -derivedDataPath build -only-testing:OmniIRDemoUITests/FormTests             -resultBundlePath build/Forms.xcresult -quiet
+          xcodebuild test-without-building -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo             -destination "id=$UDID" -derivedDataPath build -only-testing:OmniIRDemoUITests/FormTests -only-testing:OmniIRDemoUITests/AppComponentTests             -resultBundlePath build/Forms.xcresult -quiet
 
       - name: Collect the screenshots
         if: always()

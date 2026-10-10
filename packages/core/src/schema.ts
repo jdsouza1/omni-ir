@@ -2,6 +2,7 @@
 // which components exist, which props they take, flat syntax, the tool registry and the
 // cross-line document rules. The parser and renderer only use the types exported here.
 import { z } from "zod";
+import { matchesPicturePattern, type AppComponents, type PicturePattern, type StateHolds } from "./appComponents.js";
 import type { Issue, IssueCode, RawStatement, RawValue } from "./types.js";
 
 /** Size limits of the protocol (SPEC.md, generated "limits" section). */
@@ -343,7 +344,7 @@ export type ComponentProps = {
   [K in ComponentType]: Omit<z.infer<(typeof COMPONENTS)[K]["props"]>, "children">;
 };
 
-export type OmniNode = {
+export type BuiltinNode = {
   [K in ComponentType]: {
     kind: "node";
     id: string;
@@ -352,6 +353,23 @@ export type OmniNode = {
     children: readonly string[];
   };
 }[ComponentType];
+
+/** A component the app declared (Step 20): its name, its checked props and its children. */
+export interface AppNode {
+  kind: "node";
+  id: string;
+  type: "App";
+  /** The component's name, such as "ProductCard". */
+  name: string;
+  props: Readonly<Record<string, unknown>>;
+  children: readonly string[];
+  /** It's a field: it edits the `$state` in its `value` prop and accepts `required` ([8.2]). */
+  field?: true;
+  /** What the `$state` in its `value` prop holds, when it edits one. */
+  holds?: StateHolds;
+}
+
+export type OmniNode = BuiltinNode | AppNode;
 
 export interface MutationStatement {
   kind: "mutation";
@@ -379,6 +397,15 @@ export interface ValidationContext {
   tools: ToolRegistry;
   /** Names of the images the app registered. When absent, no image asset is accepted. */
   assets?: readonly string[];
+  /** Families of picture names the app looks up when a screen is drawn (Step 20), such as `product-{id}`. */
+  pictures?: readonly PicturePattern[];
+  /** The app's own components (Step 20). Lines using any other name are `unknown_component`. */
+  components?: AppComponents;
+}
+
+/** A picture name the app knows: registered, or matching one of its patterns. */
+function knownPicture(name: string, ctx: ValidationContext): boolean {
+  return (ctx.assets ?? []).includes(name) || matchesPicturePattern(name, ctx.pictures ?? []);
 }
 
 export type StatementResult = { ok: true; statement: Statement } | { ok: false; issues: Issue[] };
@@ -476,6 +503,8 @@ export function validateStatement(raw: RawStatement, ctx: ValidationContext): St
   if (raw.callee === MUTATION_TYPE) return validateMutation(raw, ctx);
 
   if (!Object.hasOwn(COMPONENTS, raw.callee)) {
+    const app = ctx.components !== undefined && Object.hasOwn(ctx.components, raw.callee) ? ctx.components[raw.callee] : undefined;
+    if (app !== undefined) return validateAppComponent(raw, app, ctx);
     return {
       ok: false,
       issues: [{ code: "unknown_component", message: `"${raw.callee}" is not in the Trusted Catalog`, id: raw.id }],
@@ -497,7 +526,7 @@ export function validateStatement(raw: RawStatement, ctx: ValidationContext): St
 
   // Images come only from the app's asset registry (never a URL).
   const asset = type === "Image" ? rest.asset : type === "ListItem" ? rest.image : undefined;
-  if (typeof asset === "string" && !(ctx.assets ?? []).includes(asset)) {
+  if (typeof asset === "string" && !knownPicture(asset, ctx)) {
     return {
       ok: false,
       issues: [{ code: "unknown_asset", message: `image "${asset}" is not in the app's asset registry`, id: raw.id }],
@@ -511,6 +540,33 @@ export function validateStatement(raw: RawStatement, ctx: ValidationContext): St
     props: rest,
     children: (children ?? []).map((ref) => ref.id),
   } as OmniNode;
+  return { ok: true, statement: node };
+}
+
+function validateAppComponent(
+  raw: Extract<RawStatement, { kind: "call" }>,
+  app: AppComponents[string],
+  ctx: ValidationContext,
+): StatementResult {
+  let props: Record<string, unknown>;
+  try {
+    props = collectProps(raw, app.positional);
+  } catch (err) {
+    return fail(err, raw.id);
+  }
+  const parsed = app.schema.safeParse(props);
+  if (!parsed.success) return { ok: false, issues: zodIssues(parsed.error, raw.id) };
+  const { children, ...rest } = parsed.data as { children?: NodeRef[] } & Record<string, unknown>;
+  // Pictures: registered names or the app's patterns, as for Images (never a URL).
+  for (const [prop, p] of Object.entries(app.declaration.props)) {
+    const value = rest[prop];
+    if (p.kind === "picture" && typeof value === "string" && !knownPicture(value, ctx)) {
+      return { ok: false, issues: [{ code: "unknown_asset", message: `picture "${value}" is not one the app knows`, id: raw.id }] };
+    }
+  }
+  const node: AppNode = { kind: "node", id: raw.id, type: "App", name: app.name, props: rest, children: (children ?? []).map((ref) => ref.id) };
+  if (app.field) node.field = true;
+  if (app.holds !== undefined) node.holds = app.holds;
   return { ok: true, statement: node };
 }
 
@@ -561,7 +617,7 @@ export function isMutating(node: OmniNode): boolean {
 export function stateKeysOf(statement: OmniNode | MutationStatement): string[] {
   const values = statement.kind === "mutation" ? Object.values(statement.params) : Object.values(statement.props);
   return values.flatMap((v) =>
-    v !== null && typeof v === "object" && "kind" in v && v.kind === "state" ? [v.key] : [],
+    v !== null && typeof v === "object" && "kind" in v && v.kind === "state" ? [(v as StateRef).key] : [],
   );
 }
 
@@ -645,6 +701,14 @@ export function validateDocument(statements: readonly Statement[], opts: Documen
   // Inputs and Selects edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD
   // date or ""; Switches need true or false.
   for (const node of nodes) {
+    if (node.type === "App") {
+      const key = editedKey(node);
+      if (key !== undefined && state.has(key)) {
+        const issue = inputStateIssue(node, state.get(key));
+        if (issue) issues.push(issue);
+      }
+      continue;
+    }
     if (node.type !== "Input" && node.type !== "DateInput" && node.type !== "Select" && node.type !== "Switch") continue;
     const key = node.props.value.key;
     if (!state.has(key)) continue;
@@ -791,6 +855,11 @@ function tooLarge(id: string): Issue {
 
 /** The streaming rules a bound input breaks with this state value, if any. */
 function inputStateIssue(node: OmniNode, value: Primitive | undefined): Issue | undefined {
+  if (node.type === "App") {
+    const holds = node.holds;
+    const ok = holds === undefined || value === null || typeof value === (holds === "text" ? "string" : holds);
+    return ok ? undefined : { code: "input_state_type", message: `${node.name} "${node.id}" is bound to ${editedKey(node)}, which doesn't hold ${holds === "text" ? "text" : `a ${holds}`}`, id: node.id };
+  }
   if ((node.type === "Input" || node.type === "Select") && typeof value !== "string") {
     return { code: "input_state_type", message: `${node.type} "${node.id}" is bound to ${node.props.value.key}, which is not a string`, id: node.id };
   }
@@ -803,7 +872,18 @@ function inputStateIssue(node: OmniNode, value: Primitive | undefined): Issue | 
   return undefined;
 }
 
-const isBoundInput = (node: OmniNode) => node.type === "Input" || node.type === "DateInput" || node.type === "Select" || node.type === "Switch";
+/** The `$state` a field or an editing app component is bound to, if any. */
+function boundKey(node: OmniNode): string | undefined {
+  if (node.type === "App") return node.holds === undefined ? undefined : editedKey(node);
+  if (node.type === "Input" || node.type === "DateInput" || node.type === "Select" || node.type === "Switch") return node.props.value.key;
+  return undefined;
+}
+
+/** The `$state` an app component edits (its `value` prop), if any. */
+export function editedKey(node: AppNode): string | undefined {
+  const value = node.props.value;
+  return value !== null && typeof value === "object" && (value as { kind?: unknown }).kind === "state" ? (value as { key: string }).key : undefined;
+}
 
 /**
  * The streaming rules, checked incrementally (PLAN-HARDENING.md C.2). For a document whose statements
@@ -844,10 +924,8 @@ export class DocumentIndex {
       return;
     }
     for (const child of this.claimedChildren(s).claimed) this.parentOf.set(child, s.id);
-    if (isBoundInput(s)) {
-      const key = s.props.value.key;
-      this.boundTo.set(key, [...(this.boundTo.get(key) ?? []), s]);
-    }
+    const key = boundKey(s);
+    if (key !== undefined) this.boundTo.set(key, [...(this.boundTo.get(key) ?? []), s]);
   }
 
   private checkMutation(m: MutationStatement): Issue[] {
@@ -908,8 +986,9 @@ export class DocumentIndex {
       issues.push({ code: "cycle", message: `"${node.id}" contains itself through its children`, id: node.id });
     }
 
-    if (isBoundInput(node) && this.state.has(node.props.value.key)) {
-      const issue = inputStateIssue(node, this.state.get(node.props.value.key));
+    const bound = boundKey(node);
+    if (bound !== undefined && this.state.has(bound)) {
+      const issue = inputStateIssue(node, this.state.get(bound));
       if (issue) issues.push(issue);
     }
 

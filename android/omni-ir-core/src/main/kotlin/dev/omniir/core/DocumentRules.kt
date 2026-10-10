@@ -62,6 +62,7 @@ internal fun validateDocument(statements: List<Statement>, complete: Boolean): L
   // Inputs and Selects edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD
   // date or ""; Switches need true or false.
   for (n in nodes) {
+    appBoundKey(n)?.let { key -> state[key]?.let { value -> appStateIssue(n, key, value)?.let { issues += it } } }
     if (n.type !in STATE_EDITORS) continue
     val key = (n.props["value"] as? PropValue.State)?.key ?: continue
     val value = state[key] ?: continue
@@ -186,6 +187,22 @@ internal fun stateKeys(values: Map<String, PropValue>): List<String> =
 /** `^\d{4}-\d{2}-\d{2}$` with ASCII digits. */
 public fun isIsoDate(s: String): Boolean =
   s.length == 10 && s[4] == '-' && s[7] == '-' && listOf(0, 1, 2, 3, 5, 6, 8, 9).all { s[it] in '0'..'9' }
+
+
+/** The `input_state_type` issue an app component (Step 20) has with the state it edits, if any. */
+internal fun appStateIssue(n: OmniNode, key: String, value: Primitive): Issue? {
+  val holds = n.holds ?: return null
+  val ok = value is Primitive.Null || when (holds) {
+    StateHolds.TEXT -> value is Primitive.Text
+    StateHolds.NUMBER -> value is Primitive.Number
+    StateHolds.BOOLEAN -> value is Primitive.Bool
+  }
+  val what = if (holds == StateHolds.TEXT) "text" else "a ${holds.wireName}"
+  return if (ok) null else Issue(IssueCode.INPUT_STATE_TYPE, "${n.appName} \"${n.id}\" is bound to $key, which doesn't hold $what", n.id)
+}
+
+/** The `$state` an app component edits (its `value` prop), if it edits one. */
+internal fun appBoundKey(n: OmniNode): String? = if (n.type == ComponentType.APP && n.holds != null) (n.props["value"] as? PropValue.State)?.key else null
 
 private val STATE_EDITORS = setOf(ComponentType.INPUT, ComponentType.DATE_INPUT, ComponentType.SELECT, ComponentType.SWITCH)
 

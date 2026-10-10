@@ -108,9 +108,11 @@ public let omniIRVersion = ${lit(schema.version)}
 /// The stream format's version: what the version marker, requests and version checks carry.
 public let omniIRFormatVersion = ${lit(schema.formatVersion)}
 
-/// The components in the Trusted Catalog.
+/// The components in the Trusted Catalog, and app for the app's own (Step 20).
 public enum ComponentType: String, Sendable, CaseIterable, Hashable {
 ${types.map((t) => `  case ${caseDecl(t)} = ${lit(t)}`).join("\n")}
+  /// One of the app's own components (Step 20): its name is the node's appName. A stream never writes "App".
+  case app = "App"
 }
 
 /// Every error and warning a parser reports.

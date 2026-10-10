@@ -26,7 +26,7 @@ An app can add a component Omni-IR doesn't have (a product card, a quantity pick
 const components = defineComponents({
   ProductCard: {
     description: "A product with its picture, name and price; children are its buttons.",
-    positional: ["name"],
+    positional: ["name", "children"],
     props: {
       name: text({ maxLength: 80 }),
       price: number({ minimum: 0 }),
@@ -47,7 +47,7 @@ const components = defineComponents({
 It compiles to the subset of JSON Schema that `conformance/schema.json` already uses, so the Swift and Kotlin parsers check it with the code they already have. A stream then writes:
 ```
 $qty = 1
-card = ProductCard("Canvas tote", price=24, currency="USD", picture="product-1042", [add])
+card = ProductCard("Canvas tote", [add], price=24, currency="USD", picture="product-1042")
 qty = QuantityPicker($qty, label="How many", min=1, max=5)
 add = Button("Add to bag", action="addM")
 addM = McpMutation(add, tool="cart.add", params={productId: "1042", quantity: $qty})
@@ -131,24 +131,24 @@ addM = McpMutation(add, tool="cart.add", params={productId: "1042", quantity: $q
 ## Checklist
 
 **A. Declaring and parsing** *(tests first)*
-- [ ] A.1 The declaration: `defineComponents` and the value helpers in `@omni-ir/core`, compiled to the JSON Schema subset; refused names (built-ins, reserved words) and bad declarations fail at registration
-- [ ] A.2 The TypeScript, Swift and Kotlin parsers accept declared components and check their props, children and `$state`; conformance cases with declarations; fuzz corpus streams with app components
-- [ ] A.3 Picture name patterns and the app's lookup, on all three platforms; `Image` accepts matching names too
+- [x] A.1 The declaration: `defineComponents` and the value helpers in `@omni-ir/core`, compiled to the JSON Schema subset; refused names (built-ins, reserved words) and bad declarations fail at registration
+- [x] A.2 The TypeScript, Swift and Kotlin parsers accept declared components and check their props, children and `$state`; conformance cases with declarations; fuzz corpus streams with app components
+- [x] A.3 Picture name patterns and the app's lookup, on all three platforms; `Image` accepts matching names too
 
 **B. Drawing**
-- [ ] B.1 React: a `components` prop with the app's views, slots for children, tokens; fallback where a view is missing; the test helper for missing views
-- [ ] B.2 SwiftUI and Compose: the same, with the `.app` kind (CI on a `wip/**` branch)
-- [ ] B.3 `describeScreen` writes app components from their declarations
+- [x] B.1 React: a `components` prop with the app's views, slots for children, tokens; fallback where a view is missing; the test helper for missing views
+- [x] B.2 SwiftUI and Compose: the same, with the `.app` kind (CI on a `wip/**` branch)
+- [x] B.3 `describeScreen` writes app components from their declarations
 
 **C. The model's side**
-- [ ] C.1 The system prompt and the MCP guide describe app components from their declarations; size budgets tested
-- [ ] C.2 The model check's fingerprint includes the declarations; apps can add test requests
+- [x] C.1 The system prompt and the MCP guide describe app components from their declarations; size budgets tested
+- [x] C.2 The model check's fingerprint includes the declarations; apps can add test requests
 
 **D. Demo**
-- [ ] D.1 ProductCard and QuantityPicker in the playground, both demo apps, a fixture for the mock model and a landing example; a `cart.add` tool and handler
+- [x] D.1 ProductCard and QuantityPicker in the playground, both demo apps, a fixture for the mock model and a landing example; a `cart.add` tool and handler
 
 **E. Spec, docs, review**
-- [ ] E.1 SPEC.md: app-defined components (document rules, what they may and may not do, picture patterns); a guide; CHANGELOG; the decision log
-- [ ] E.2 A review page with screenshots on web, iPhone and Android (CI)
-- [ ] E.3 Merge with your approval
+- [x] E.1 SPEC.md: app-defined components (document rules, what they may and may not do, picture patterns); a guide; CHANGELOG; the decision log
+- [x] E.2 A review page with screenshots on web, iPhone and Android (CI)
+- [x] E.3 Merge with your approval
 - [ ] E.4 Release: a separate go-ahead from you

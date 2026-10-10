@@ -21,6 +21,11 @@ enum Statement {
 struct ValidationContext {
   let tools: ToolRegistry
   let assets: Set<String>
+  var components: AppComponents = .none
+  var pictures: [PicturePattern] = []
+
+  /// A picture name the app knows: registered, or matching one of its patterns (Step 20).
+  func knows(picture name: String) -> Bool { assets.contains(name) || matchesPicturePattern(name, pictures) }
 }
 
 enum StatementResult {
@@ -106,6 +111,7 @@ func validateStatement(_ raw: RawStatement, _ ctx: ValidationContext) -> Stateme
     }
     if callee == "McpMutation" { return validateMutation(id: id, args: args, named: named, ctx) }
     guard let type = ComponentType(rawValue: callee), let spec = Catalog.components[type] else {
+      if let app = ctx.components[callee] { return validateAppComponent(id: id, args: args, named: named, app, ctx) }
       return .failed(Issue(code: .unknownComponent, message: "\"\(callee)\" is not in the Trusted Catalog", id: id))
     }
     let props: [(String, Value)]
@@ -129,11 +135,35 @@ func validateStatement(_ raw: RawStatement, _ ctx: ValidationContext) -> Stateme
 
     // Images come only from the app's asset registry (never a URL).
     let assetProp = type == .image ? "asset" : type == .listItem ? "image" : nil
-    if let assetProp, case .text(let asset)? = out[assetProp], !ctx.assets.contains(asset) {
+    if let assetProp, case .text(let asset)? = out[assetProp], !ctx.knows(picture: asset) {
       return .failed(Issue(code: .unknownAsset, message: "image \"\(asset)\" is not in the app's asset registry", id: id))
     }
     return .ok(.node(OmniNode(id: id, type: type, props: out, children: children)))
   }
+}
+
+/// One of the app's own components (Step 20): checked like the catalog's, pictures included.
+private func validateAppComponent(id: String, args: [RawValue], named: [(String, RawValue)], _ app: AppComponent, _ ctx: ValidationContext) -> StatementResult {
+  let props: [(String, Value)]
+  do { props = try collectProps(callee: app.name, args: args, named: named, positional: app.spec.positional) } catch { return fail(error, id: id) }
+  if let problem = check(props, against: app.spec) {
+    return .failed(Issue(code: .invalidProps, message: problem, id: id))
+  }
+  var out: [String: PropValue] = [:]
+  var children: [String] = []
+  for (name, value) in props {
+    if case .array(let items) = value, name == "children" {
+      children = items.compactMap { if case .ref(let child) = $0 { child } else { nil } }
+    } else {
+      out[name] = propValue(value)
+    }
+  }
+  for (name, prop) in app.declaration.props {
+    if case .picture = prop, case .text(let picture)? = out[name], !ctx.knows(picture: picture) {
+      return .failed(Issue(code: .unknownAsset, message: "picture \"\(picture)\" is not one the app knows", id: id))
+    }
+  }
+  return .ok(.node(OmniNode(id: id, type: .app, props: out, children: children, appName: app.name, holds: app.holds, isField: app.field)))
 }
 
 private func validateMutation(id: String, args: [RawValue], named: [(String, RawValue)], _ ctx: ValidationContext) -> StatementResult {

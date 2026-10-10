@@ -56,6 +56,9 @@ struct ConformanceCase: Sendable, Decodable, CustomTestStringConvertible {
   let input: JSON
   let tools: [String]?
   let assets: [String]?
+  /// The app's own components and picture patterns (Step 20), as plain JSON.
+  let components: JSON?
+  let pictures: JSON?
   let expect: Expect
 
   var testDescription: String { id }
@@ -98,6 +101,20 @@ enum CaseFiles {
   static let corpus: [ConformanceCase] = (try? loadCorpus()) ?? []
 }
 
+extension JSON {
+  /// As JSONSerialization would give it: dictionaries, arrays, strings, Doubles, Bools and NSNull.
+  var any: Any {
+    switch self {
+    case .null: NSNull()
+    case .bool(let b): b
+    case .number(let n): n
+    case .string(let s): s
+    case .array(let a): a.map(\.any)
+    case .object(let o): o.mapValues(\.any)
+    }
+  }
+}
+
 // MARK: - Canonical result
 
 struct Canonical: Equatable, CustomStringConvertible {
@@ -136,7 +153,9 @@ func json(_ v: PropValue) -> JSON {
 
 func run(_ c: ConformanceCase, chunkSize: Int?) -> Canonical {
   let tools = Dictionary(uniqueKeysWithValues: (c.tools ?? ["payments.confirm"]).map { ($0, Tool.acceptsAnything) })
-  let parser = OmniParser(tools: tools, assets: Set(c.assets ?? []))
+  let components = (try? c.components.map { try appComponents(fromJSONObject: $0.any) }) ?? AppComponents.none
+  let pictures = (try? c.pictures.map { try picturePatterns(fromJSONObject: $0.any) }) ?? []
+  let parser = OmniParser(tools: tools, assets: Set(c.assets ?? []), components: components, pictures: pictures)
   let text = c.text
   if let size = chunkSize {
     let bytes = Array(text.utf8)
@@ -152,8 +171,11 @@ func run(_ c: ConformanceCase, chunkSize: Int?) -> Canonical {
   let doc = parser.document
   return Canonical(
     issues: Set(parser.issues.map { ExpectedIssue(line: $0.line, code: $0.code.rawValue) }),
+    // An app component (Step 20) is written by its own name, marked app: true.
     nodes: doc.nodes.mapValues { n in
-      .object(["type": .string(n.type.rawValue), "props": .object(n.props.mapValues(json)), "children": .array(n.children.map(JSON.string))])
+      n.type == .app
+        ? .object(["type": .string(n.appName ?? ""), "app": .bool(true), "props": .object(n.props.mapValues(json)), "children": .array(n.children.map(JSON.string))])
+        : .object(["type": .string(n.type.rawValue), "props": .object(n.props.mapValues(json)), "children": .array(n.children.map(JSON.string))])
     },
     state: doc.state.mapValues(json),
     mutations: doc.mutations.mapValues { m in

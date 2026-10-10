@@ -3,6 +3,7 @@
 
 /// The `input_state_type` issue a bound Input, DateInput, Select or Switch has with this state value, if any.
 private func inputStateIssue(_ n: OmniNode, key: String, value: Primitive) -> Issue? {
+  if n.type == .app { return appStateIssue(n, key: key, value: value) }
   let message: String
   switch n.type {
   case .input, .select:
@@ -39,7 +40,7 @@ struct DocumentIndex {
   private func node(_ id: String) -> OmniNode? { if case .node(let n)? = byId[id] { n } else { nil } }
 
   private func boundKey(_ n: OmniNode) -> String? {
-    guard [.input, .dateInput, .select, .switch].contains(n.type), case .state(let key)? = n.props["value"] else { return nil }
+    guard [.input, .dateInput, .select, .switch].contains(n.type), case .state(let key)? = n.props["value"] else { return appBoundKey(n) }
     return key
   }
 

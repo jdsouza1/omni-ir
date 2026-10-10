@@ -11,7 +11,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import fc from "fast-check";
 import { parseCanonical } from "../tests/canonical";
-import { fixtureTexts, FUZZ_ASSETS, FUZZ_TOOLS, mutatedFixture, stream } from "./arbitraries";
+import { fixtureTexts, FUZZ_ASSETS, FUZZ_COMPONENTS, FUZZ_PICTURES, FUZZ_TOOLS, mutatedFixture, stream } from "./arbitraries";
 
 export const CORPUS_FILE = "fuzz/corpus.json";
 const SEED = 20261005;
@@ -32,7 +32,9 @@ export function buildCorpus(): string {
       input,
       tools: [...FUZZ_TOOLS],
       assets: [...FUZZ_ASSETS],
-      expect: parseCanonical([input], { tools: FUZZ_TOOLS, assets: FUZZ_ASSETS }),
+      components: FUZZ_COMPONENTS,
+      pictures: FUZZ_PICTURES,
+      expect: parseCanonical([input], { tools: FUZZ_TOOLS, assets: FUZZ_ASSETS, components: FUZZ_COMPONENTS, pictures: FUZZ_PICTURES }),
     };
   });
   const file = {

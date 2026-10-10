@@ -80,6 +80,13 @@ public fun checkField(type: ComponentType, props: Map<String, PropValue>, value:
       }
     }
     ComponentType.INPUT -> checkInput(props, jsTrim((value as? Primitive.Text)?.value ?: ""), required)
+    // An app component that is a field ([8.2], Step 20): required means a value that isn't empty.
+    ComponentType.APP ->
+      if (required && (value == null || value is Primitive.Null || value == Primitive.Bool(false) || (value is Primitive.Text && jsTrim(value.value).isEmpty()))) {
+        FieldProblem(FieldMessage.REQUIRED)
+      } else {
+        null
+      }
     else -> null
   }
 }
@@ -102,8 +109,11 @@ private fun checkInput(props: Map<String, PropValue>, text: String, required: Bo
 }
 
 /** The `$key` a field edits, or null for a component that isn't a field. */
-public fun fieldKey(node: OmniNode): String? =
-  if (node.type in FIELD_TYPES) (node.props["value"] as? PropValue.State)?.key else null
+public fun fieldKey(node: OmniNode): String? = when {
+  node.type in FIELD_TYPES -> (node.props["value"] as? PropValue.State)?.key
+  node.type == ComponentType.APP && node.isField -> (node.props["value"] as? PropValue.State)?.key
+  else -> null
+}
 
 /**
  * The fields a governed Button's press checks ([8.6]): those whose `$key` its McpMutation's params

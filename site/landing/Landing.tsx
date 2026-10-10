@@ -412,6 +412,28 @@ function Examples() {
                 </button>
               </article>
             )}
+            {key === "own" && (
+              <article className="card" aria-label="Rendered card with the app's own components" style={root}>
+                <div className="part product" style={ring("card")}>
+                  <img src={tote} alt="" />
+                  <span className="item-text">
+                    <span className="item-title">Canvas tote</span>
+                    <span className="item-price">$24.00</span>
+                  </span>
+                  <button type="button" className="part card-button brand" style={ring("add")}>
+                    Add to bag
+                  </button>
+                </div>
+                <div className="part field" style={ring("qty")}>
+                  <span className="field-label">How many</span>
+                  <span className="stepper" role="img" aria-label="Quantity 1">
+                    <span aria-hidden="true">−</span>
+                    <span>1</span>
+                    <span aria-hidden="true">+</span>
+                  </span>
+                </div>
+              </article>
+            )}
           </div>
         </div>
       </div>

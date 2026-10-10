@@ -8,6 +8,7 @@ public struct OmniStrings: Sendable, Equatable {
   public var loading: String
   public var failedToLoad: String
   public var failedToRender: String
+  public var unsupported: String
   public var rating: String
   public var user: String
   public var assistant: String
@@ -35,6 +36,7 @@ public struct OmniStrings: Sendable, Equatable {
     loading: String = "Loading",
     failedToLoad: String = "Component failed to load",
     failedToRender: String = "Component failed to render",
+    unsupported: String = "This part of the screen can't be shown here.",
     rating: String = "Rated {value} out of {max}",
     user: String = "You",
     assistant: String = "Assistant",
@@ -61,6 +63,7 @@ public struct OmniStrings: Sendable, Equatable {
     self.loading = loading
     self.failedToLoad = failedToLoad
     self.failedToRender = failedToRender
+    self.unsupported = unsupported
     self.rating = rating
     self.user = user
     self.assistant = assistant

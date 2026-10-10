@@ -29,6 +29,28 @@ export interface FieldFeedback {
   onBlur?: (() => void) | undefined;
 }
 
+/**
+ * What an app's own view receives (Step 20): checked props with `$state` read, its children as
+ * slots, pictures by name, and for a component that edits a `$state` its value, how to change it,
+ * and the field's message ([8.5]). The view is the app's code; the stream only chose the values.
+ */
+export interface AppViewProps {
+  id: string;
+  /** The component's name, such as "ProductCard". */
+  name: string;
+  props: Readonly<Record<string, unknown>>;
+  children: ReactNode;
+  locale: string;
+  strings: OmniStrings;
+  /** A picture by name: the app's registered ones, then its lookup. Undefined when there is none. */
+  picture: (name: string | undefined) => Picture | undefined;
+  /** For a component that edits a `$state`: its value and how to change it, plus its field message. */
+  field?: ({ value: Primitive; onChange: (value: Primitive) => void } & FieldFeedback) | undefined;
+}
+
+/** The app's views for its own components, by name. */
+export type AppViews = Readonly<Record<string, ReactComponentType<AppViewProps>>>;
+
 /** Extra props the renderer supplies to interactive components and pictures. */
 export interface InteractionProps {
   Input: { value: string; onChange: (value: string) => void } & FieldFeedback;

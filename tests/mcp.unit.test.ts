@@ -9,6 +9,7 @@ import { buildGuide, GUIDE_EXAMPLE } from "@omni-ir/mcp";
 import { createInputWriter } from "../packages/mcp/src/view/stream";
 import { hostTheme } from "../packages/mcp/src/view/theme";
 import { ASSETS } from "../app/assets";
+import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
 
 /** A sink that records what was written to each parser the writer opened. */
@@ -114,11 +115,33 @@ describe("the host's theme on the design tokens (A.3)", () => {
 });
 
 describe("the format guide in the tool's description (B.1)", () => {
-  const guide = buildGuide({ tools: TOOLS, assets: ASSETS });
+  const guide = buildGuide({ tools: TOOLS, assets: ASSETS, components: APP_COMPONENTS, pictures: PICTURES });
+  const encoder = encoding_for_model("gpt-5" as Parameters<typeof encoding_for_model>[0]);
+  const count = (text: string) => encoder.encode(text).length;
 
-  it("fits the token budget of decision 2", () => {
-    const tokens = encoding_for_model("gpt-5" as Parameters<typeof encoding_for_model>[0]).encode(guide).length;
-    expect(tokens).toBeLessThanOrEqual(1500);
+  // Decision 2 of Step 18, split by decision 8 of Step 20: the fixed part (grammar, catalog, example)
+  // has its own budget, and each of the app's tools and components adds at most a set amount.
+  it("keeps the fixed part within 1,350 tokens, each tool within 40 and each app component within 120", () => {
+    const base = buildGuide({ tools: {}, assets: {} });
+    expect(count(base)).toBeLessThanOrEqual(1350);
+    const withTool = buildGuide({ tools: { "payments.confirm": TOOLS["payments.confirm"]! }, assets: {} });
+    for (const [name, schema] of Object.entries(TOOLS)) {
+      const more = buildGuide({ tools: { "payments.confirm": TOOLS["payments.confirm"]!, [name]: schema }, assets: {} });
+      expect(count(more) - count(withTool), name).toBeLessThanOrEqual(40);
+    }
+    for (const component of Object.values(APP_COMPONENTS)) {
+      const one = buildGuide({ tools: {}, assets: {}, components: { [component.name]: component } });
+      const two = buildGuide({ tools: {}, assets: {}, components: { ...APP_COMPONENTS } });
+      expect(count(one) - count(base), component.name).toBeLessThanOrEqual(120 + 30); // + the section's heading
+      expect(count(two) - count(one)).toBeLessThanOrEqual(120);
+    }
+    // The demo app's whole guide, for the record: within the sum of its parts.
+    expect(count(guide)).toBeLessThanOrEqual(1350 + 40 * Object.keys(TOOLS).length + 120 * Object.keys(APP_COMPONENTS).length + 30 + 60);
+  });
+
+  it("names the app's own components and picture patterns", () => {
+    for (const name of Object.keys(APP_COMPONENTS)) expect(guide).toContain(`${name}(`);
+    expect(guide).toContain("product-{id}");
   });
 
   it("names every component, every tool with its params, and every picture", () => {
