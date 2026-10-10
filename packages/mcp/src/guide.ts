@@ -35,11 +35,11 @@ export function buildGuide({ tools, assets }: { tools: ToolRegistry; assets: Rea
   });
   const pictures = Object.keys(assets);
 
-  return `Shows a screen to the person, drawn by the app's own components. Write it in Omni-IR: one statement per line, no prose, Markdown, HTML or code.
+  return `Shows the person a screen, drawn by the app's components. Write it in Omni-IR: one statement per line, no prose, Markdown, HTML or code.
 - \`id = Component(args)\` defines a component; \`$name = value\` declares state; \`# …\` is a comment. Write \`root = …\` first.
 - Arguments: positional, then named (\`level=2\`); [brackets] mark optional ones. Values: "text" (escape \\" and \\\\), numbers, true, false, null, ids, $state, [id, …] children, ["a", 2] value lists.
 - One call per line, never nested: \`root = Card([title])\` then \`title = Heading("Hi")\`. Ids are unique; each component has one parent.
-- Inputs, DateInputs ("YYYY-MM-DD" or ""), Selects and Switches edit $state; declare it first. A List holds ListItems, a Table TableRows (one cell per column), Tabs hold Tab, a Bar or LineChart holds Series (one number per label), a PieChart holds Slices.
+- Inputs, DateInputs ("YYYY-MM-DD" or ""), Selects and Switches edit $state; declare it first. Optional checks: required=true; on Input also format="email"|"number"|"phone"|"url", minLength, maxLength. A List holds ListItems, a Table TableRows (one cell per column), Tabs hold Tab, a Bar or LineChart holds Series (one number per label), a PieChart holds Slices.
 - No styling, URLs or expressions: choose among the listed values.${
     toolLines.length > 0
       ? `

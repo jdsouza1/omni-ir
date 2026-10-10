@@ -127,7 +127,7 @@ describe("generate(): streaming a screen from the server", () => {
       return answers.shift()!();
     };
     const outcome = await run("x", h.parser, { fetch: oldServer });
-    expect(new URL(urls[0]!, "http://x").searchParams.get("version")).toBe("0.5");
+    expect(new URL(urls[0]!, "http://x").searchParams.get("version")).toBe("0.8");
     expect(new URL(urls[1]!, "http://x").searchParams.has("version")).toBe(false);
     expect(outcome).toMatchObject({ status: "done" });
     // A 0.7 server's marker means format 0.5: no update notice.

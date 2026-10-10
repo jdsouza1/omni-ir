@@ -1,13 +1,15 @@
-import { memo, useMemo, useSyncExternalStore, type ComponentType as ReactComponentType, type ReactNode } from "react";
+import { memo, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type ComponentType as ReactComponentType, type ReactNode } from "react";
 import { DEFAULT_CATALOG } from "../catalog/catalog.js";
-import { resolveStrings, type StringKey } from "../catalog/strings.js";
+import { fillTemplate, resolveStrings, type StringKey } from "../catalog/strings.js";
 import { SkeletonLines } from "../catalog/components.js";
 import type { Catalog, Picture } from "../catalog/types.js";
 
 const NO_ASSETS: Readonly<Record<string, Picture>> = {};
-import { isMutating, ROOT_ID, stateKeysOf, type OmniNode, type Primitive, type ToolRegistry } from "@omni-ir/core";
+import { checkField, isField, isMutating, ROOT_ID, stateKeysOf, type FieldType, type OmniNode, type Primitive, type ToolRegistry } from "@omni-ir/core";
 import type { OmniDocument, OmniStore } from "@omni-ir/core";
 import {
+  createConfirmations,
+  createFieldVisibility,
   OmniContext,
   runHandler,
   useOmni,
@@ -40,7 +42,15 @@ export interface OmniRendererProps {
    * Shown as plain text; set by the app, never by the stream.
    */
   strings?: Partial<Record<StringKey, string>>;
+  /**
+   * Actions that need the person's confirmation, by tool, with the app's sentence for each (SPEC.md [9.1]).
+   * `{name}` is filled with that param's value, as plain text, once: for example
+   * `{ "payments.confirm": "Pay {amount} now?" }`. The stream can't skip, change or draw it.
+   */
+  confirm?: Readonly<Record<string, string>>;
 }
+
+const NO_CONFIRMATIONS: Readonly<Record<string, string>> = {};
 
 export function OmniRenderer({
   store,
@@ -52,19 +62,84 @@ export function OmniRenderer({
   locale = "en-US",
   theme = "light",
   strings,
+  confirm = NO_CONFIRMATIONS,
 }: OmniRendererProps) {
   const words = useMemo(() => resolveStrings(strings), [strings]);
+  // One per screen: a new store is a new screen, with no messages shown yet.
+  const fields = useMemo(() => createFieldVisibility(), [store]);
+  const [confirmations] = useState(createConfirmations);
+  const root = useRef<HTMLDivElement>(null);
   const value = useMemo<OmniContextValue>(
-    () => ({ store, tools, catalog, assets, locale, strings: words, onMutation, report: (event) => onEvent?.(event) }),
-    [store, tools, catalog, assets, locale, words, onMutation, onEvent],
+    () => ({
+      store,
+      tools,
+      catalog,
+      assets,
+      locale,
+      strings: words,
+      onMutation,
+      report: (event) => onEvent?.(event),
+      fields,
+      confirm,
+      askConfirmation: confirmations.ask,
+      root,
+    }),
+    [store, tools, catalog, assets, locale, words, onMutation, onEvent, fields, confirm, confirmations],
   );
   return (
     <OmniContext.Provider value={value}>
-      <div className="omni-root" data-theme={theme}>
+      <div className="omni-root" data-theme={theme} ref={root}>
         <VersionNotice />
         <NodeSlot id={ROOT_ID} />
+        <ConfirmDialog confirmations={confirmations} />
       </div>
     </OmniContext.Provider>
+  );
+}
+
+/**
+ * The renderer's own confirmation ([9.1]): the app's sentence, Cancel and Confirm. Cancel has focus
+ * first, Escape cancels, and focus returns to the button that asked.
+ */
+function ConfirmDialog({ confirmations }: { confirmations: ReturnType<typeof createConfirmations> }) {
+  const { strings } = useOmni();
+  const pending = useSyncExternalStore(confirmations.subscribe, confirmations.current, confirmations.current);
+  const cancel = useRef<HTMLButtonElement>(null);
+  const textId = useId();
+  useEffect(() => {
+    if (pending === null) return;
+    const returnTo = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    cancel.current?.focus();
+    return () => returnTo?.focus();
+  }, [pending]);
+  if (pending === null) return null;
+  return (
+    <div className="omni-dialog-backdrop">
+      <div
+        className="omni-dialog"
+        role="alertdialog"
+        aria-modal="true"
+        aria-describedby={textId}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            e.preventDefault();
+            pending.answer(false);
+          }
+        }}
+      >
+        <p id={textId} className="omni-dialog__text">
+          {pending.text}
+        </p>
+        <div className="omni-dialog__actions">
+          <button ref={cancel} type="button" className="omni-button omni-button--secondary" onClick={() => pending.answer(false)}>
+            {strings.cancel}
+          </button>
+          <button type="button" className="omni-button omni-button--primary" onClick={() => pending.answer(true)}>
+            {strings.confirm}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -136,16 +211,16 @@ const MemoNode = memo(function Node({
     return <Component {...base} picture={picture} />;
   }
 
-  if (node.type === "Input" || node.type === "DateInput" || node.type === "Select") {
-    const key = node.props.value.key;
-    const onChange = (value: string) => runHandler(ctx.report, node.id, () => ctx.store.setState(key, value));
-    return <Component {...base} value={String(props.value ?? "")} onChange={onChange} />;
-  }
-
-  if (node.type === "Switch") {
-    const key = node.props.value.key;
-    const onChange = (value: boolean) => runHandler(ctx.report, node.id, () => ctx.store.setState(key, value));
-    return <Component {...base} value={props.value === true} onChange={onChange} />;
+  if (isField(node)) {
+    return <FieldNode node={node} value={props.value as Primitive}>{(feedback) => {
+      const key = node.props.value.key;
+      if (node.type === "Switch") {
+        const onChange = (value: boolean) => runHandler(ctx.report, node.id, () => ctx.store.setState(key, value));
+        return <Component {...base} {...feedback} value={props.value === true} onChange={onChange} />;
+      }
+      const onChange = (value: string) => runHandler(ctx.report, node.id, () => ctx.store.setState(key, value));
+      return <Component {...base} {...feedback} value={String(props.value ?? "")} onChange={onChange} />;
+    }}</FieldNode>;
   }
 
   if (node.type === "BarChart" || node.type === "LineChart") {
@@ -178,6 +253,28 @@ const MemoNode = memo(function Node({
 
   return <Component {...base} />;
 });
+
+/**
+ * A field's checks ([8.1]–[8.5]): its problem, in the renderer's own words, once the person has left
+ * the field or a press has read it. Subscribes to its own visibility only.
+ */
+function FieldNode({
+  node,
+  value,
+  children,
+}: {
+  node: Extract<OmniNode, { type: FieldType }>;
+  value: Primitive;
+  children: (feedback: { error: string | undefined; errorId: string; onBlur: () => void }) => ReactNode;
+}) {
+  const { fields, strings } = useOmni();
+  const errorId = useId();
+  const isShown = () => fields.isShown(node.id);
+  const shown = useSyncExternalStore(fields.subscribe, isShown, isShown);
+  const problem = checkField(node.type, node.props, value);
+  const error = shown && problem !== null ? fillTemplate(strings[problem.message], problem.values ?? {}) : undefined;
+  return <>{children({ error, errorId, onBlur: () => fields.show([node.id]) })}</>;
+}
 
 /**
  * Tabs show their Tabs' labels, which arrive on the Tabs' own lines. This subscribes to those labels

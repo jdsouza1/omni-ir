@@ -1076,6 +1076,98 @@
           }
         }
       }
+    },
+    {
+      "id": "field-constraints",
+      "rules": [
+        "5.26",
+        "5.9"
+      ],
+      "description": "Fields may declare constraints for the renderer to check: required on Input, DateInput, Select and Switch; format, minLength and maxLength on Input. minLength must not be more than maxLength (schema.json crossPropRules); a format outside the list, or a constraint on another component, is invalid_props.",
+      "input": "root = Stack([a, b, c, d])\n$email = \"\"\na = Input($email, label=\"Email\", required=true, format=\"email\", minLength=3, maxLength=120)\n$day = \"\"\nb = DateInput($day, label=\"Day\", required=true)\n$size = \"\"\nc = Select($size, label=\"Size\", options=[\"S\", \"M\"], required=true)\n$terms = false\nd = Switch($terms, label=\"I accept\", required=true)\ne = Input($email, label=\"Email\", minLength=10, maxLength=5)\nf = Input($email, label=\"Email\", format=\"postcode\")\ng = Heading(\"Hi\", required=true)\nh = Input($email, label=\"Email\", maxLength=0)\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "invalid_props"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a",
+              "b",
+              "c",
+              "d"
+            ]
+          },
+          "a": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$email"
+              },
+              "label": "Email",
+              "required": true,
+              "format": "email",
+              "minLength": 3,
+              "maxLength": 120
+            },
+            "children": []
+          },
+          "b": {
+            "type": "DateInput",
+            "props": {
+              "value": {
+                "state": "$day"
+              },
+              "label": "Day",
+              "required": true
+            },
+            "children": []
+          },
+          "c": {
+            "type": "Select",
+            "props": {
+              "value": {
+                "state": "$size"
+              },
+              "label": "Size",
+              "options": [
+                "S",
+                "M"
+              ],
+              "required": true
+            },
+            "children": []
+          },
+          "d": {
+            "type": "Switch",
+            "props": {
+              "value": {
+                "state": "$terms"
+              },
+              "label": "I accept",
+              "required": true
+            },
+            "children": []
+          }
+        }
+      }
     }
   ]
 }

@@ -6,7 +6,7 @@ package dev.omniir.core
 public const val OMNI_IR_VERSION: String = "0.10.1"
 
 /** The stream format's version: what the version marker, requests and version checks carry. */
-public const val FORMAT_VERSION: String = "0.5"
+public const val FORMAT_VERSION: String = "0.8"
 
 /** The components in the Trusted Catalog. */
 public enum class ComponentType(public val wireName: String) {
@@ -149,6 +149,10 @@ internal object Catalog {
         PropSpec("label", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
         PropSpec("placeholder", required = false, value = ValueSpec.TextValue(minLength = null, maxLength = 200, pattern = null)),
         PropSpec("lines", required = false, value = ValueSpec.NumberValue(minimum = 1.0, maximum = 10.0, integer = true)),
+        PropSpec("required", required = false, value = ValueSpec.BooleanValue),
+        PropSpec("format", required = false, value = ValueSpec.OneOf(listOf("email", "number", "phone", "url"))),
+        PropSpec("minLength", required = false, value = ValueSpec.NumberValue(minimum = 1.0, maximum = 2000.0, integer = true)),
+        PropSpec("maxLength", required = false, value = ValueSpec.NumberValue(minimum = 1.0, maximum = 2000.0, integer = true)),
       ),
     ),
     ComponentType.BUTTON to ComponentSpec(
@@ -199,6 +203,7 @@ internal object Catalog {
         PropSpec("label", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
         PropSpec("min", required = false, value = ValueSpec.TextValue(minLength = null, maxLength = null, pattern = "^\\d{4}-\\d{2}-\\d{2}\$")),
         PropSpec("max", required = false, value = ValueSpec.TextValue(minLength = null, maxLength = null, pattern = "^\\d{4}-\\d{2}-\\d{2}\$")),
+        PropSpec("required", required = false, value = ValueSpec.BooleanValue),
       ),
     ),
     ComponentType.LIST to ComponentSpec(
@@ -230,6 +235,7 @@ internal object Catalog {
         PropSpec("label", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
         PropSpec("options", required = true, value = ValueSpec.ListOf(item = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null), minItems = 1, maxItems = 50)),
         PropSpec("placeholder", required = false, value = ValueSpec.TextValue(minLength = null, maxLength = 200, pattern = null)),
+        PropSpec("required", required = false, value = ValueSpec.BooleanValue),
       ),
     ),
     ComponentType.SWITCH to ComponentSpec(
@@ -237,6 +243,7 @@ internal object Catalog {
       props = listOf(
         PropSpec("value", required = true, value = ValueSpec.State),
         PropSpec("label", required = true, value = ValueSpec.TextValue(minLength = 1, maxLength = 200, pattern = null)),
+        PropSpec("required", required = false, value = ValueSpec.BooleanValue),
       ),
     ),
     ComponentType.TABLE to ComponentSpec(

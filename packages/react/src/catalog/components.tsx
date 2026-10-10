@@ -41,29 +41,52 @@ export function Text({ id, props, locale }: CatalogProps<"Text">) {
   return <p data-node-id={id} className={`omni-text omni-text--${props.tone ?? "default"}`}>{formatText(props, locale)}</p>;
 }
 
-export function Input({ id, props, value, onChange }: CatalogProps<"Input">) {
+/** What a field shows about its checks: aria-invalid and aria-describedby on the control. */
+function fieldAria(error: string | undefined, errorId: string | undefined) {
+  return error === undefined ? {} : { "aria-invalid": true as const, "aria-describedby": errorId };
+}
+
+/** A field's message, in the renderer's own words; read out politely when it appears ([8.5]). */
+function FieldError({ error, errorId }: { error: string | undefined; errorId: string | undefined }) {
+  return error === undefined ? null : (
+    <span id={errorId} className="omni-field__error" aria-live="polite">
+      {error}
+    </span>
+  );
+}
+
+/** The keyboard an Input's format asks for; the check itself is the renderer's ([8.3]). */
+const INPUT_MODE = { email: "email", number: "decimal", phone: "tel", url: "url" } as const;
+
+export function Input({ id, props, value, onChange, error, errorId, onBlur }: CatalogProps<"Input">) {
+  const common = {
+    value,
+    placeholder: props.placeholder,
+    maxLength: props.maxLength,
+    required: props.required,
+    onChange: (e: { target: { value: string } }) => onChange(e.target.value),
+    onBlur,
+    ...fieldAria(error, errorId),
+  };
   return (
-    <label data-node-id={id} className="omni-input">
-      <span className="omni-input__label">{props.label}</span>
-      {(props.lines ?? 1) > 1 ? (
-        // A fixed-height box: longer text scrolls inside it, so the screen doesn't jump while typing.
-        <textarea
-          className="omni-input__field omni-input__field--multiline"
-          rows={props.lines}
-          value={value}
-          placeholder={props.placeholder}
-          onChange={(e) => onChange(e.target.value)}
-        />
-      ) : (
-        <input
-          className="omni-input__field"
-          type="text"
-          value={value}
-          placeholder={props.placeholder}
-          onChange={(e) => onChange(e.target.value)}
-        />
-      )}
-    </label>
+    <div data-node-id={id} className="omni-field">
+      <label className="omni-input">
+        <span className="omni-input__label">{props.label}</span>
+        {(props.lines ?? 1) > 1 ? (
+          // A fixed-height box: longer text scrolls inside it, so the screen doesn't jump while typing.
+          <textarea className="omni-input__field omni-input__field--multiline" rows={props.lines} {...common} />
+        ) : (
+          <input
+            className="omni-input__field"
+            type="text"
+            inputMode={props.format === undefined ? undefined : INPUT_MODE[props.format]}
+            autoComplete={props.format === "email" ? "email" : props.format === "phone" ? "tel" : undefined}
+            {...common}
+          />
+        )}
+      </label>
+      <FieldError error={error} errorId={errorId} />
+    </div>
   );
 }
 
@@ -146,19 +169,25 @@ export function Rating({ id, props, locale, strings }: CatalogProps<"Rating">) {
   );
 }
 
-export function DateInput({ id, props, value, onChange }: CatalogProps<"DateInput">) {
+export function DateInput({ id, props, value, onChange, error, errorId, onBlur }: CatalogProps<"DateInput">) {
   return (
-    <label data-node-id={id} className="omni-input">
-      <span className="omni-input__label">{props.label}</span>
-      <input
-        className="omni-input__field"
-        type="date"
-        value={value}
-        min={props.min}
-        max={props.max}
-        onChange={(e) => onChange(e.target.value)}
-      />
-    </label>
+    <div data-node-id={id} className="omni-field">
+      <label className="omni-input">
+        <span className="omni-input__label">{props.label}</span>
+        <input
+          className="omni-input__field"
+          type="date"
+          value={value}
+          min={props.min}
+          max={props.max}
+          required={props.required}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          {...fieldAria(error, errorId)}
+        />
+      </label>
+      <FieldError error={error} errorId={errorId} />
+    </div>
   );
 }
 
@@ -198,43 +227,59 @@ export function Message({ id, props, strings }: CatalogProps<"Message">) {
   );
 }
 
-export function Select({ id, props, value, onChange }: CatalogProps<"Select">) {
+export function Select({ id, props, value, onChange, error, errorId, onBlur }: CatalogProps<"Select">) {
   // A value that isn't one of the options shows as nothing chosen.
   const chosen = props.options.includes(value) ? value : "";
   return (
-    <label data-node-id={id} className="omni-input">
-      <span className="omni-input__label">{props.label}</span>
-      <select className="omni-input__field omni-select" value={chosen} onChange={(e) => onChange(e.target.value)}>
-        <option value="" disabled>
-          {props.placeholder ?? ""}
-        </option>
-        {props.options.map((option) => (
-          <option key={option} value={option}>
-            {option}
+    <div data-node-id={id} className="omni-field">
+      <label className="omni-input">
+        <span className="omni-input__label">{props.label}</span>
+        <select
+          className="omni-input__field omni-select"
+          value={chosen}
+          required={props.required}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          {...fieldAria(error, errorId)}
+        >
+          <option value="" disabled>
+            {props.placeholder ?? ""}
           </option>
-        ))}
-      </select>
-    </label>
+          {props.options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </label>
+      <FieldError error={error} errorId={errorId} />
+    </div>
   );
 }
 
-export function Switch({ id, props, value, onChange }: CatalogProps<"Switch">) {
+export function Switch({ id, props, value, onChange, error, errorId, onBlur }: CatalogProps<"Switch">) {
   const labelId = useId();
   return (
-    <div data-node-id={id} className="omni-switch">
-      <span id={labelId} className="omni-switch__label">
-        {props.label}
-      </span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={value}
-        aria-labelledby={labelId}
-        className={`omni-switch__track${value ? " omni-switch__track--on" : ""}`}
-        onClick={() => onChange(!value)}
-      >
-        <span className="omni-switch__thumb" aria-hidden="true" />
-      </button>
+    <div data-node-id={id} className="omni-switch-field">
+      <div className="omni-switch">
+        <span id={labelId} className="omni-switch__label">
+          {props.label}
+        </span>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={value}
+          aria-labelledby={labelId}
+          aria-required={props.required}
+          className={`omni-switch__track${value ? " omni-switch__track--on" : ""}`}
+          onClick={() => onChange(!value)}
+          onBlur={onBlur}
+          {...fieldAria(error, errorId)}
+        >
+          <span className="omni-switch__thumb" aria-hidden="true" />
+        </button>
+      </div>
+      <FieldError error={error} errorId={errorId} />
     </div>
   );
 }

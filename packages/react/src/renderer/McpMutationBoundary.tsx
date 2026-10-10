@@ -1,7 +1,8 @@
 // R5 + R6: the only path from a Button press to onMutation.
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 import type { InteractionProps } from "../catalog/types.js";
-import type { MutationStatement, Primitive, StateRef } from "@omni-ir/core";
+import { checkField, fieldKey, fieldsReadBy, isField, type MutationStatement, type Primitive, type StateRef } from "@omni-ir/core";
+import { fillTemplate } from "../catalog/strings.js";
 import { runHandler, useOmni, useStateValues } from "./context.js";
 
 type Governance = InteractionProps["Button"];
@@ -46,8 +47,20 @@ export function McpMutationBoundary({ id, children }: Props) {
   const error = blocked !== null && blocked.values === paramValues ? ctx.strings.blocked : undefined;
 
   const onPress = () =>
-    runHandler(ctx.report, id, () => {
-      const params = resolveParams(mutation, store.getSnapshot().state);
+    runHandler(ctx.report, id, async () => {
+      const snapshot = store.getSnapshot();
+      // [8.6]: the fields its params read must pass first; their messages show, and nothing is sent.
+      const fields = fieldsReadBy(mutation, snapshot);
+      const failing = fields.filter((fieldId) => {
+        const field = snapshot.nodes.get(fieldId);
+        return field !== undefined && isField(field) && checkField(field.type, field.props, snapshot.state[fieldKey(field)]) !== null;
+      });
+      if (failing.length > 0) {
+        ctx.fields.show(fields);
+        focusField(ctx.root.current, failing[0]!);
+        return;
+      }
+      const params = resolveParams(mutation, snapshot.state);
       const parsed = schema.safeParse(params);
       if (!parsed.success) {
         const message = parsed.error.issues
@@ -56,6 +69,12 @@ export function McpMutationBoundary({ id, children }: Props) {
         setBlocked({ message, values: paramValues });
         ctx.report({ type: "error", issue: { code: "mutation_blocked", message, id: mutation.id } });
         return;
+      }
+      // [9.1]: the app's own sentence for this tool, filled once with the params as plain text.
+      const template = Object.hasOwn(ctx.confirm, mutation.tool) ? ctx.confirm[mutation.tool] : undefined;
+      if (template !== undefined) {
+        const values = Object.fromEntries(Object.entries(params).map(([name, value]) => [name, value === null ? "" : String(value)]));
+        if (!(await ctx.askConfirmation(fillTemplate(template, values)))) return;
       }
       return ctx.onMutation({
         id: mutation.id,
@@ -71,6 +90,12 @@ export function McpMutationBoundary({ id, children }: Props) {
     error,
     mcpTool: mutation.tool,
   });
+}
+
+/** Move focus to a field that needs attention, so keyboard and screen reader users land on it. */
+function focusField(root: HTMLElement | null, id: string) {
+  const control = root?.querySelector<HTMLElement>(`[data-node-id="${id}"] :is(input, textarea, select, button)`);
+  control?.focus();
 }
 
 function resolveParams(mutation: MutationStatement, state: Readonly<Record<string, Primitive>>) {

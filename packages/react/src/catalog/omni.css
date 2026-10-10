@@ -148,6 +148,16 @@
 .omni-button:disabled { opacity: 0.5; cursor: not-allowed; }
 .omni-button[data-mcp-error] { outline: 2px solid var(--omni-danger); }
 .omni-button__error { font-size: 0.8rem; color: var(--omni-danger); }
+/* A field's message (SPEC.md [8.5]): the renderer's own words, under the field. */
+.omni-field__error { font-size: 0.8rem; color: var(--omni-danger-text); }
+.omni-input__field[aria-invalid="true"] { border-color: var(--omni-danger); }
+.omni-field, .omni-switch-field { display: flex; flex-direction: column; gap: 0.25rem; }
+/* The renderer's own confirmation (SPEC.md [9.1]), over the screen it belongs to. */
+.omni-root { position: relative; }
+.omni-dialog-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 1rem; background: rgba(15, 23, 42, 0.45); z-index: 1000; }
+.omni-dialog { width: min(100%, 26rem); background: var(--omni-surface); color: var(--omni-text); border-radius: calc(var(--omni-radius) * 1.5); padding: 1.25rem; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.3); display: flex; flex-direction: column; gap: 1rem; }
+.omni-dialog__text { margin: 0; line-height: 1.5; }
+.omni-dialog__actions { display: flex; justify-content: flex-end; gap: 0.5rem; flex-wrap: wrap; }
 
 .omni-divider { border: 0; border-top: 1px solid var(--omni-divider); margin: 0.25rem 0; width: 100%; }
 

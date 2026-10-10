@@ -32,6 +32,27 @@ export const ENGLISH = {
   newerVersion: "This screen was made for a newer version of the app. The app needs an update to show all of it.",
   /** Under a button whose action couldn't be sent; the details go to the app's onEvent. */
   blocked: "This can't be sent. Check the details and try again.",
+  // Under a form field that doesn't pass its checks (SPEC.md [8.2]–[8.4]).
+  /** An Input or DateInput declared `required` that is empty. */
+  required: "This is required.",
+  /** A Select declared `required` with nothing chosen. */
+  chooseOption: "Choose an option.",
+  /** A Switch declared `required` that is off. */
+  turnOn: "Turn this on to continue.",
+  invalidEmail: "Enter an email address, like name@example.com.",
+  invalidNumber: "Enter a number.",
+  invalidPhone: "Enter a phone number.",
+  invalidUrl: "Enter a web address that starts with https://.",
+  /** {min} is a number of characters. */
+  tooShort: "Use at least {min} characters.",
+  /** {max} is a number of characters. */
+  tooLong: "Use {max} characters or fewer.",
+  /** {min} is a date, written YYYY-MM-DD. */
+  dateTooEarly: "Choose {min} or later.",
+  /** {max} is a date, written YYYY-MM-DD. */
+  dateTooLate: "Choose {max} or earlier.",
+  /** The button that runs an action after the app's confirmation sentence (SPEC.md [9.1]). */
+  confirm: "Confirm",
 } as const;
 
 export type StringKey = keyof typeof ENGLISH;

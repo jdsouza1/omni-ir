@@ -49,7 +49,7 @@ describe("the stream [10.4] [10.5] [10.13]", () => {
   it("starts with the version marker, written by the server, not the model", async () => {
     for (const [where, call] of await apis()) {
       const { events } = await readSse(await call("/api/generate", { ...json, body: prompt }));
-      expect(textOf(events).startsWith("# omni-ir 0.5\n"), where).toBe(true); // the format's version, not the package's
+      expect(textOf(events).startsWith("# omni-ir 0.8\n"), where).toBe(true); // the format's version, not the package's
       expect((events[0]!.data as { text: string }).text, where).toBe(`${versionMarker()}\n`);
     }
   });
@@ -58,7 +58,7 @@ describe("the stream [10.4] [10.5] [10.13]", () => {
 describe("the requested version [10.1] [10.12] [10.2]", () => {
   it("streams to any client that can read its format: its own, old release numbers, newer formats, or none", async () => {
     for (const [where, call] of await apis()) {
-      for (const path of ["/api/generate?version=0.5", "/api/generate?version=0.6", "/api/generate?version=0.7", "/api/generate?version=0.8", "/api/generate?version=99.0", "/api/generate"]) {
+      for (const path of ["/api/generate?version=0.8", "/api/generate?version=0.9", "/api/generate?version=99.0", "/api/generate"]) {
         const response = await call(path, { ...json, body: prompt });
         expect(response.status, `${where} ${path}`).toBe(200);
         await response.text();
@@ -68,11 +68,11 @@ describe("the requested version [10.1] [10.12] [10.2]", () => {
 
   it("refuses only a client that asks for an older format, before streaming, with unsupported_version", async () => {
     for (const [where, call] of await apis()) {
-      for (const version of ["0.4", "0.1", "0.0"]) {
+      for (const version of ["0.7", "0.6", "0.5", "0.4", "0.1", "0.0"]) {
         const response = await call(`/api/generate?version=${version}`, { ...json, body: prompt });
         expect(response.status, `${where} ${version}`).toBe(400);
         expect(await response.json(), `${where} ${version}`).toEqual({
-          error: { code: "unsupported_version", message: expect.stringContaining("0.5"), retryable: false },
+          error: { code: "unsupported_version", message: expect.stringContaining("0.8"), retryable: false },
         });
       }
     }
