@@ -1,6 +1,6 @@
 # Omni-IR — Step 21: a Web Components renderer
 
-Status: **DRAFT for approval (2026-10-10).** Free: no paid API; tests and examples use the mock model. Example apps download free packages from npm in CI. Nothing here is built until you approve it.
+Status: **APPROVED 2026-10-10** with the recommendations (all eight decisions). Free: no paid API; tests and examples use the mock model. Example apps download free packages from npm in CI. Nothing here is built until you approve it.
 
 ## Goal
 
