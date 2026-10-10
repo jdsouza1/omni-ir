@@ -44,7 +44,7 @@ A developer using any web framework, or none, can draw Omni-IR screens with one 
 ## Decisions: pros, cons and trade-offs
 
 **1. How it's built: the React renderer, run on Preact inside the element** (recommended).
-- *Pros:* one catalog codebase for the web: every fix and every new component reaches React and the element at once, with the same tests. Preact (MIT, about 4 KB) replaces React's 69 KB; the whole element is measured at about 125 KB compressed, the same as a renderer written from scratch. The React renderer's own test suite runs again against the Preact build to prove they behave the same.
+- *Pros:* one catalog codebase for the web: every fix and every new component reaches React and the element at once, with the same tests. Preact (MIT, about 4 KB) replaces React's 69 KB; the whole element should come to about 125 KB compressed (the parser, 107 KB, plus the catalog, 15 KB, plus Preact, as measured separately), about the same as a renderer written from scratch. The React renderer's own test suite runs again against the Preact build to prove they behave the same.
 - *Cons:* Preact's React compatibility layer could differ in a corner case (a test catches it, but a fix may need care); a third-party dependency in the element.
 - *Alternatives:* bundle React itself (no compatibility risk, but about 70 KB more for every page); write a new framework-free renderer (smallest code, but a fourth implementation of the whole catalog to keep in step).
 - *Trade-off:* one implementation, at the size of a separate one, with a test suite that proves they match.
