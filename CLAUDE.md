@@ -66,6 +66,13 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - CI: `.github/workflows/ci.yml` runs `npm ci`, typecheck, `npm test`, `playground:build` and the package checks (build, pack check, install test) on Node 22 and 24, `swift test` on Linux and macOS plus an iOS simulator build, and the Kotlin parser and runtime tests on Linux (mock model only, no secrets). Node 22.22+ / 24.15+ required.
 - Vite runs with `--configLoader runner` (in the npm scripts and the dev-server test); without it Vite warns about extensionless imports in the config. On Windows, `timeout`/stopping a background task can leave `node.exe` servers running: check and stop leftovers before `npm ci`.
 
+## Working rules (owner's decision, 2026-10-10, from the Step 22 retrospective)
+- **Timebox every task** (about 20–30 minutes; one bug at most about 20) and check in when the box ends. A stuck task is reported, not ground on: reproduce it in the smallest possible test first.
+- **Plans walk one example end to end** before approval: what the model writes, what the app sends, what the person sees. The checklist names the phone test (iOS and Android demo UI tests) for the step's main feature.
+- **Check review evidence before showing it:** look at every screenshot and read every sentence a person will see before a review page is published. Screenshots wait for what they show, never a fixed time.
+- **After each change to the system prompt**, run the free model check page (`npm run model-check:page`): the owner pastes it into their own Claude.ai chat. No paid API.
+- **Hold pushes while an iOS or Android demo run is in progress** on the same branch, unless the push fixes it: a newer push cancels the run.
+
 ## Open core (owner's decision, 2026-10-04)
 This repository is public and is the open standard. Business material (go-to-market strategy, pricing, client work, delivery tooling, the hosted service) lives in a separate private repository and must never be written here: not in docs, plans, commit messages or examples. One exception, the owner's decision of 2026-10-09: the landing page's Pricing section may say that the standard is free and complete, and that a hosted version is planned, with a link to register interest. No prices, tiers, plan names or strategy, until there is something to buy.
 
