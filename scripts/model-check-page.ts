@@ -83,12 +83,13 @@ export const STEP22_REQUESTS = [
 
 type CheckRequest = { id: string; text: string; probe?: string; live?: Record<string, string>; noLive?: boolean };
 
-export async function renderPage(requests: readonly CheckRequest[] = REQUESTS): Promise<string> {
+export async function renderPage(requests: readonly CheckRequest[] = REQUESTS, title = "Omni-IR Model Check"): Promise<string> {
   const { js, css } = await bundle();
   const firstMessage = `${buildSystemPrompt()}\n\n---\nThose are your instructions for this chat. I'll send screen requests next, one per message. For this first message, reply with just this comment line:\n# ready`;
   const data = JSON.stringify({ firstMessage, requests });
   // Replacement functions, not strings: the bundle contains "$'" and similar, which a string would expand.
-  return PAGE.replace("/*OMNI_CSS*/", () => css.replace(/<\/(style)/gi, "<\\/$1"))
+  return PAGE.replace("<title>Omni-IR Model Check</title>", () => `<title>${title}</title>`)
+    .replace("/*OMNI_CSS*/", () => css.replace(/<\/(style)/gi, "<\\/$1"))
     .replace("/*OMNI_DATA*/", () => escapeScript(data))
     .replace("/*OMNI_CHECK*/", () => escapeScript(js));
 }
@@ -284,6 +285,6 @@ const PAGE = String.raw`<meta charset="utf-8">
 if (process.argv[1]?.endsWith("model-check-page.ts")) {
   const out = process.argv[2] ?? "model-check.html";
   const requests = process.argv.includes("--step22") ? STEP22_REQUESTS : process.argv.includes("--step11") ? STEP11_REQUESTS : process.argv.includes("--step10") ? STEP10_REQUESTS : REQUESTS;
-  writeFileSync(out, await renderPage(requests));
+  writeFileSync(out, await renderPage(requests, process.argv.includes("--step22") ? "Live Parts Model Check" : undefined));
   console.log(`wrote ${out}`);
 }
