@@ -7,6 +7,7 @@ import { createStore, type OmniDocument, type OmniStore } from "./store.js";
 import { parseLine } from "./tokenizer.js";
 import type { Issue } from "./types.js";
 import { FORMAT_VERSION, isNewerMarker } from "./version.js";
+import { missingReferences, planUpdate, type UpdateResult } from "./updates.js";
 
 export type ParserEvent =
   | { type: "node"; id: string; line: number }
@@ -14,7 +15,9 @@ export type ParserEvent =
   | { type: "resolved"; id: string; line: number }
   | { type: "warning"; issue: Issue }
   | { type: "error"; issue: Issue }
-  | { type: "end"; issues: Issue[] };
+  | { type: "end"; issues: Issue[] }
+  /** An update after the stream ended ([10.29]), applied whole or not at all; its issues count lines from 1 in the update. */
+  | { type: "update"; applied: boolean; issues: Issue[] };
 
 export interface ParserOptions {
   tools: ToolRegistry;
@@ -35,6 +38,12 @@ export interface OmniParser {
   end(): Issue[];
   subscribe(listener: (event: ParserEvent) => void): () => void;
   getSnapshot(): OmniDocument;
+  /**
+   * Apply an update from the app's own code to the ended screen (SPEC.md [10.29]-[10.34]): the same
+   * lines as a stream, where an id or $key the screen has is replaced. Applied whole or not at all.
+   * Never pass text a model wrote. Throws if the stream hasn't ended.
+   */
+  update(text: string): UpdateResult;
 }
 
 export function createParser(options: ParserOptions): OmniParser {
@@ -43,7 +52,8 @@ export function createParser(options: ParserOptions): OmniParser {
   if (options.pictures !== undefined) ctx.pictures = options.pictures;
   if (options.components !== undefined) ctx.components = options.components;
   const buffer = new LineBuffer(options.maxLineLength === undefined ? {} : { maxLineLength: options.maxLineLength });
-  const accepted: Statement[] = [];
+  let accepted: Statement[] = [];
+  let screenIssues: Issue[] = [];
   const index = new DocumentIndex();
   const lineOf = new Map<string, number>();
   const listeners = new Set<(event: ParserEvent) => void>();
@@ -109,6 +119,7 @@ export function createParser(options: ParserOptions): OmniParser {
         return line === undefined ? issue : { ...issue, line };
       });
       endIssues = issues;
+      screenIssues = validateDocument(accepted, { complete: true });
       store.finish();
       for (const issue of issues) emit({ type: "error", issue });
       emit({ type: "end", issues });
@@ -121,6 +132,27 @@ export function createParser(options: ParserOptions): OmniParser {
     },
 
     getSnapshot: () => store.getSnapshot(),
+
+    update(text) {
+      if (endIssues === null) throw new Error("OmniParser: update() before end(); updates change an ended screen ([10.29])");
+      const plan = planUpdate(accepted, screenIssues, text, ctx, options.maxLineLength);
+      if (plan.ok) {
+        const targets = new Map(accepted.flatMap((s) => (s.kind === "mutation" ? [[s.id, s.target] as const] : [])));
+        accepted = plan.statements;
+        screenIssues = plan.documentIssues;
+        store.applyUpdate?.({
+          assigned: plan.assigned,
+          removed: plan.removed.map((id) => {
+            const target = targets.get(id);
+            return target === undefined ? { id } : { id, target };
+          }),
+          missing: missingReferences(plan.statements),
+        });
+      }
+      const result = { applied: plan.ok, issues: plan.issues };
+      emit({ type: "update", ...result });
+      return result;
+    },
   };
 }
 

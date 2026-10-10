@@ -20,6 +20,9 @@ import type { Challenge } from "../app/challenges";
 import { createModelGate, setupFingerprint } from "./modelCheck";
 import { createMcpHandler } from "@modelcontextprotocol/server";
 import { loadView, referenceMcp } from "./mcp";
+import { ACTION_UPDATES, LIVE_FEEDS, type LiveFeed } from "../app/live";
+import { createLiveScreens } from "./live";
+import type { ActionUpdate } from "./api";
 
 export interface AppOptions {
   config: ServerConfig;
@@ -53,6 +56,12 @@ export interface AppOptions {
   modelCheck?: { pool?: readonly Challenge[]; random?: () => number };
   /** The MCP view's HTML (PLAN-MCPAPPS.md); defaults to packages/mcp/dist/view.html when OMNI_MCP is on. */
   mcpView?: string;
+  /** What the app keeps current on the screens it serves (Step 22); defaults to the demo's, app/live.ts. */
+  feeds?: readonly LiveFeed[];
+  /** The update each tool's result carries ([10.35]); defaults to the demo's. */
+  actionUpdates?: Readonly<Record<string, ActionUpdate>>;
+  /** Runs a feed's next step later; injectable for tests. */
+  schedule?: (fn: () => void, ms: number) => () => void;
 }
 
 const RATE_WINDOW_MS = 60_000;
@@ -61,6 +70,8 @@ const RATE_WINDOW_MS = 60_000;
 interface StreamOutput {
   /** The log entry's event name. */
   route: string;
+  /** Tell the client this screen is followed ([10.36]); routes without a live feed leave it out. */
+  live?(send: (frame: string) => void, screen: string): void;
   start(send: (frame: string) => void): void;
   text(send: (frame: string) => void, text: string): void;
   done(send: (frame: string) => void, done: { stopReason: string; model: string; ms: number }): void;
@@ -83,6 +94,9 @@ export function createApp({
   now = Date.now,
   modelCheck: challengeOptions = {},
   mcpView,
+  feeds = LIVE_FEEDS,
+  actionUpdates = ACTION_UPDATES,
+  schedule,
 }: AppOptions): Express {
   const app = express();
   app.disable("x-powered-by");
@@ -106,6 +120,7 @@ export function createApp({
       })();
   /** Close the store this app opened (not one it was given): call when the server stops. */
   app.locals.closeStore = async () => {
+    live.close();
     await ready;
     if (!givenStore) store.close?.();
   };
@@ -142,6 +157,9 @@ export function createApp({
         log,
       })
     : null;
+  // Screens kept current while open ([10.36]); stopped with the store when the server stops.
+  const live = createLiveScreens({ feeds, now, log, ...(schedule ? { schedule } : {}) });
+  app.locals.live = live;
   const secure = config.publicUrl.startsWith("https:");
   /** Origins a browser may send actions from: the app's own and the one CORS allows. */
   const allowedOrigins = new Set([config.corsOrigin, new URL(config.publicUrl).origin]);
@@ -190,8 +208,61 @@ export function createApp({
       route: "generate",
       start: (send) => send(sseEvent("chunk", { text: MARKER_CHUNK })),
       text: (send, text) => send(sseEvent("chunk", { text })),
+      live: (send, screen) => send(sseEvent("live", { screen })),
       done: (send, done) => send(sseEvent("done", done)),
       error: (send, error) => send(sseEvent("error", error)),
+    });
+  });
+
+  // A screen's updates while it is open ([10.37]): the app's own text, numbered, resumable.
+  app.get("/api/live", async (req, res) => {
+    const screen = typeof req.query.screen === "string" ? req.query.screen : "";
+    const after = typeof req.query.after === "string" && /^\d{1,15}$/.test(req.query.after) ? Number(req.query.after) : req.query.after === undefined ? 0 : -1;
+    if (screen === "" || after < 0) return sendError(res, 400, "invalid_request", "Follow a screen with ?screen=…&after=N.");
+    const limit = allow(req.ip ?? "unknown");
+    if (!limit.ok) {
+      res.setHeader("Retry-After", String(limit.retryAfterSeconds));
+      return sendError(res, 429, "rate_limited", "Too many requests; try again shortly.", true);
+    }
+    const { user } = await identify(req);
+    let closed = false;
+    const write = (frame: string) => {
+      if (!closed && !res.writableEnded) res.write(frame);
+    };
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      res.status(200);
+      res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+      res.setHeader("Cache-Control", "no-cache, no-transform");
+      res.setHeader("Connection", "keep-alive");
+      res.setHeader("X-Accel-Buffering", "no");
+      res.flushHeaders();
+    };
+    const heartbeat = setInterval(() => write(": ping\n\n"), heartbeatMs);
+    const stop = live.follow(screen, user?.id ?? null, after, {
+      update: (seq, text) => {
+        start();
+        write(sseEvent("update", { seq, text }));
+      },
+      end: () => {
+        start();
+        write(sseEvent("end", {}));
+        clearInterval(heartbeat);
+        res.end();
+      },
+    });
+    if (stop === null) {
+      clearInterval(heartbeat);
+      return sendError(res, 404, "not_found", "That screen isn't followed here.");
+    }
+    start();
+    log({ event: "live", outcome: "follow", after });
+    res.on("close", () => {
+      closed = true;
+      clearInterval(heartbeat);
+      stop();
     });
   });
 
@@ -292,6 +363,12 @@ export function createApp({
           observer.write(text);
         },
       });
+      // A screen the app keeps current gets its id before the terminal event ([10.36]).
+      if (output.live) {
+        observer.end();
+        const screen = live.open(observer, user?.id ?? null);
+        if (screen !== null) output.live(send, screen);
+      }
       output.done(send, { stopReason: result.stopReason, model: result.model, ms: now() - started });
       Object.assign(entry, { outcome: "done", stopReason: result.stopReason, usage: result.usage });
     } catch (err) {
@@ -325,7 +402,7 @@ export function createApp({
     if (!body.success) {
       return sendError(res, 400, "invalid_request", describeIssues(body.error));
     }
-    const { tool, params } = body.data;
+    const { tool, params, button } = body.data;
     const entry: Record<string, unknown> = { event: "mutate", tool: tool.slice(0, 128) };
 
     // Rate limit first, so probing for tool names is throttled too.
@@ -345,8 +422,8 @@ export function createApp({
       return sendError(res, 403, "bad_origin", "This request didn't come from the app.");
     }
     const answer = await runMutation(
-      { tool, params, user, idempotencyKey: req.get("idempotency-key") ?? null },
-      { tools, handlers, ctx: { store, mailer, now: now(), publicUrl: config.publicUrl } },
+      { tool, params, user, idempotencyKey: req.get("idempotency-key") ?? null, button },
+      { tools, handlers, ctx: { store, mailer, now: now(), publicUrl: config.publicUrl }, updates: actionUpdates },
     );
     log({ ...entry, outcome: answer.outcome, ...answer.detail });
     return res.status(answer.status).json(answer.body);

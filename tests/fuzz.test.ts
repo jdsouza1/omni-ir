@@ -118,4 +118,10 @@ describe("the differential corpus (fuzz/corpus.json)", () => {
     const { readFileSync } = await import("node:fs");
     expect(readFileSync(CORPUS_FILE, "utf8") === buildCorpus(), "fuzz/corpus.json is out of date").toBe(true);
   }, 120_000);
+
+  it("and its updates (fuzz/live-corpus.json) are current too", async () => {
+    const { buildLiveCorpus, LIVE_CORPUS_FILE } = await import("../fuzz/build");
+    const { readFileSync } = await import("node:fs");
+    expect(readFileSync(LIVE_CORPUS_FILE, "utf8") === buildLiveCorpus(), "fuzz/live-corpus.json is out of date").toBe(true);
+  }, 120_000);
 });

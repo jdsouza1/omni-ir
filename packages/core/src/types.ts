@@ -53,15 +53,19 @@ export type IssueCode =
   | "handler_failed"
   // warnings
   | "unknown_escape"
-  | "newer_version";
+  | "newer_version"
+  // updates (SPEC.md [10.29]-[10.34])
+  | "live_field_conflict"
+  | "update_too_large";
 
 export interface IssueInfo {
   severity: "error" | "warning";
   /**
    * When the issue is found: "line" as the line arrives (an error rejects that line), "end" when the
-   * stream ends, "renderer" while the screen is in use.
+   * stream ends, "renderer" while the screen is in use, "update" when an update arrives after the
+   * stream (an error rejects the whole update).
    */
-  stage: "line" | "end" | "renderer";
+  stage: "line" | "end" | "renderer" | "update";
   /** One plain sentence; SPEC.md's issue table is generated from these. */
   meaning: string;
 }
@@ -138,6 +142,12 @@ export const ISSUE_CODES = {
     stage: "line",
     meaning: "The version marker on line 1 names a newer Omni-IR version than the parser's. The rest of the stream is processed as usual.",
   },
+  live_field_conflict: {
+    severity: "error",
+    stage: "update",
+    meaning: "An update assigns a $key that a field reads, before or after the update. What the person enters belongs to them.",
+  },
+  update_too_large: { severity: "error", stage: "update", meaning: "An update holds more than 2,000 lines." },
 } as const satisfies Record<IssueCode, IssueInfo>;
 
 export interface Issue {

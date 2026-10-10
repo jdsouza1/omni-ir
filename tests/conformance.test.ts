@@ -25,7 +25,11 @@ function run(c: ConformanceCase, chunkSize: number | null) {
   if (chunkSize === null) parser.write(expand(c.input));
   else for (let at = 0; at < bytes.length; at += chunkSize) parser.write(bytes.subarray(at, at + chunkSize));
   parser.end();
-  return canonical(parser.getSnapshot(), issues);
+  const updates = (c.updates ?? []).map((u) => {
+    const result = parser.update(expand(u.input));
+    return { applied: result.applied, issues: canonical(parser.getSnapshot(), result.issues.map((x) => ({ line: x.line ?? null, code: x.code }))).issues };
+  });
+  return { ...canonical(parser.getSnapshot(), issues), updates };
 }
 
 describe("conformance suite", () => {
@@ -52,12 +56,15 @@ describe("conformance suite", () => {
       if (c.expect.state) expect(whole.state).toEqual(c.expect.state);
       if (c.expect.mutations) expect(whole.mutations).toEqual(c.expect.mutations);
       if (c.expect.missing) expect(whole.missing).toEqual(c.expect.missing);
+      expect(whole.updates).toEqual((c.updates ?? []).map((u) => ({ applied: u.expect.applied, issues: sortIssues(u.expect.issues) })));
     });
   });
 
-  it("covers every rule in SPEC.md sections 3-7, and cites only rules that exist", () => {
+  it("covers every rule in SPEC.md sections 3-7 and the update rules, and cites only rules that exist", () => {
     const spec = readFileSync("SPEC.md", "utf8");
-    const body = spec.slice(spec.indexOf("## 3. The stream"), spec.indexOf("## 8. Renderer requirements"));
+    const body =
+      spec.slice(spec.indexOf("## 3. The stream"), spec.indexOf("## 8. Renderer requirements")) +
+      spec.slice(spec.indexOf("**Updates** (optional"), spec.indexOf("**Action results**"));
     const specRules = new Set([...body.matchAll(/\*\*\[(\d+\.\d+)\]\*\*/g)].map((m) => m[1]!));
     const covered = new Set(Object.values(CASES).flat().flatMap((c) => c.rules));
     expect([...specRules].filter((r) => !covered.has(r)), "rules without a case").toEqual([]);

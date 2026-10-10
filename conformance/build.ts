@@ -42,6 +42,13 @@ export interface ConformanceCase {
     /** Compared only when present: references still pending at end of stream, sorted. */
     missing?: string[];
   };
+  /**
+   * Updates applied in order after the stream ends (SPEC.md [10.29]-[10.34]), each with whether it
+   * applied and its issues (line numbers count from 1 in the update). `expect.nodes`, `state`,
+   * `mutations` and `missing` then describe the screen after the last update; `expect.issues` stays
+   * the stream's.
+   */
+  updates?: { input: string | InputPart[]; expect: { applied: boolean; issues: ExpectedIssue[] } }[];
 }
 
 const i = (line: number | null, code: string): ExpectedIssue => ({ line, code });
@@ -73,6 +80,15 @@ const SHOP = {
     field: true,
   },
 };
+/** An order screen for the live cases (SPEC.md [10.29]-[10.34]); "orders.requestReturn" is in their registry. */
+const ORDER = lines(
+  'root = Card([status, eta, ret], title="Order 1042")',
+  'status = Badge("Shipped")',
+  '$eta = "Friday"',
+  "eta = Text($eta)",
+  'ret = Button("Request a return", action="requestReturn")',
+  'm = McpMutation(ret, tool="orders.requestReturn", params={order: "1042"})',
+);
 const PHOTOS = [{ prefix: "item-", id: "digits" as const, maxLength: 6 }];
 
 export const CASES: Record<string, ConformanceCase[]> = {
@@ -936,6 +952,247 @@ export const CASES: Record<string, ConformanceCase[]> = {
       expect: { issues: [i(1, "dangling_ref"), i(4, "unknown_asset"), i(5, "unknown_asset"), i(6, "invalid_props"), i(7, "unknown_asset")] },
     },
   ],
+  live: ([
+    {
+      id: "live-replace-component",
+      rules: ["10.29", "10.30"],
+      description: "After the stream ends, an update's line for an id the screen has replaces that component.",
+      input: ORDER,
+      updates: [{ input: lines('status = Badge("Out for delivery", tone="success")'), expect: { applied: true, issues: [] } }],
+      expect: {
+        issues: [],
+        nodes: {
+          root: node("Card", { title: "Order 1042" }, ["status", "eta", "ret"]),
+          status: node("Badge", { text: "Out for delivery", tone: "success" }),
+          eta: node("Text", { text: st("$eta") }),
+          ret: node("Button", { label: "Request a return", action: "requestReturn" }),
+        },
+      },
+    },
+    {
+      id: "live-set-state",
+      rules: ["10.30"],
+      description: "An update's line for a $key the screen has sets that value.",
+      input: ORDER,
+      updates: [{ input: lines('$eta = "Today by 6 pm"'), expect: { applied: true, issues: [] } }],
+      expect: { issues: [], state: { $eta: "Today by 6 pm" } },
+    },
+    {
+      id: "live-add-components",
+      rules: ["10.30", "10.31"],
+      description: "New ids are added, in either order: a child before the parent that lists it, or after.",
+      input: ORDER,
+      updates: [
+        { input: lines('note = Notice("Signature needed")', 'root = Card([note, status, eta, ret, map], title="Order 1042")', 'map = Text("Two stops away")'), expect: { applied: true, issues: [] } },
+      ],
+      expect: {
+        issues: [],
+        nodes: {
+          root: node("Card", { title: "Order 1042" }, ["note", "status", "eta", "ret", "map"]),
+          note: node("Notice", { text: "Signature needed" }),
+          status: node("Badge", { text: "Shipped" }),
+          eta: node("Text", { text: st("$eta") }),
+          ret: node("Button", { label: "Request a return", action: "requestReturn" }),
+          map: node("Text", { text: "Two stops away" }),
+        },
+        mutations: { ret: { id: "m", tool: "orders.requestReturn", params: { order: "1042" } } },
+      },
+    },
+    {
+      id: "live-remove-by-omission",
+      rules: ["10.31"],
+      description: "A component leaves when its parent's new line stops listing it, with what it governs: the Button's McpMutation goes too. Its $key stays.",
+      input: ORDER,
+      updates: [{ input: lines('root = Card([status, done], title="Order 1042")', 'done = Notice("Return requested", tone="success")'), expect: { applied: true, issues: [] } }],
+      expect: {
+        issues: [],
+        nodes: {
+          root: node("Card", { title: "Order 1042" }, ["status", "done"]),
+          status: node("Badge", { text: "Shipped" }),
+          done: node("Notice", { text: "Return requested", tone: "success" }),
+        },
+        state: { $eta: "Friday" },
+        mutations: {},
+      },
+    },
+    {
+      id: "live-button-done",
+      rules: ["10.31"],
+      description: "A Button replaced in place by a Notice loses its McpMutation: an action's result can say it's done where the Button was.",
+      input: ORDER,
+      updates: [{ input: lines('ret = Notice("Return requested", tone="success")'), expect: { applied: true, issues: [] } }],
+      expect: {
+        issues: [],
+        nodes: {
+          root: node("Card", { title: "Order 1042" }, ["status", "eta", "ret"]),
+          status: node("Badge", { text: "Shipped" }),
+          eta: node("Text", { text: st("$eta") }),
+          ret: node("Notice", { text: "Return requested", tone: "success" }),
+        },
+        mutations: {},
+      },
+    },
+    {
+      id: "live-unlisted-not-kept",
+      rules: ["10.31"],
+      description: "A component the update adds without listing it anywhere is not kept; the rest of the update applies.",
+      input: ORDER,
+      updates: [{ input: lines('stray = Text("Nobody lists me")', 'status = Badge("Delivered")'), expect: { applied: true, issues: [] } }],
+      expect: {
+        issues: [],
+        nodes: {
+          root: node("Card", { title: "Order 1042" }, ["status", "eta", "ret"]),
+          status: node("Badge", { text: "Delivered" }),
+          eta: node("Text", { text: st("$eta") }),
+          ret: node("Button", { label: "Request a return", action: "requestReturn" }),
+        },
+      },
+    },
+    {
+      id: "live-whole-or-nothing",
+      rules: ["10.32", "10.33", "10.30"],
+      description: "One failing line rejects the whole update: the good lines before and after it change nothing. Line numbers count from 1 in the update, comments included.",
+      input: ORDER,
+      updates: [{ input: lines("# the courier's update", 'status = Badge("Delivered")', 'eta = Banner("Now")', '$eta = "Delivered"'), expect: { applied: false, issues: [i(3, "unknown_component")] } }],
+      expect: { issues: [], nodes: { root: node("Card", { title: "Order 1042" }, ["status", "eta", "ret"]), status: node("Badge", { text: "Shipped" }), eta: node("Text", { text: st("$eta") }), ret: node("Button", { label: "Request a return", action: "requestReturn" }) }, state: { $eta: "Friday" } },
+    },
+    {
+      id: "live-duplicate-in-update",
+      rules: ["10.30", "10.33"],
+      description: "One update assigns each id and $key at most once: a second is duplicate_id, and nothing in the update applies.",
+      input: ORDER,
+      updates: [{ input: lines('status = Badge("Out for delivery")', '$eta = "Today"', 'status = Badge("Delivered")', '$eta = "Now"'), expect: { applied: false, issues: [i(3, "duplicate_id"), i(4, "duplicate_id")] } }],
+      expect: { issues: [], state: { $eta: "Friday" } },
+    },
+    {
+      id: "live-new-document-error",
+      rules: ["10.32", "10.33"],
+      description: "An update that would leave a new error is rejected whole: here a new Button with an action and no McpMutation, reported on the line that assigned it.",
+      input: ORDER,
+      updates: [{ input: lines('root = Card([status, eta, ret, pay], title="Order 1042")', 'pay = Button("Pay the duty", action="payDuty")'), expect: { applied: false, issues: [i(2, "ungoverned_mutation")] } }],
+      expect: { issues: [], nodes: { root: node("Card", { title: "Order 1042" }, ["status", "eta", "ret"]), status: node("Badge", { text: "Shipped" }), eta: node("Text", { text: st("$eta") }), ret: node("Button", { label: "Request a return", action: "requestReturn" }) } },
+    },
+    {
+      id: "live-governed-addition",
+      rules: ["10.30", "10.32"],
+      description: "The same Button with its McpMutation in the same update is accepted.",
+      input: ORDER,
+      updates: [
+        {
+          input: lines('root = Card([status, eta, ret, pay], title="Order 1042")', 'pay = Button("Pay the duty", action="payDuty")', 'pm = McpMutation(pay, tool="payments.confirm", params={amount: 4.2})'),
+          expect: { applied: true, issues: [] },
+        },
+      ],
+      expect: { issues: [], mutations: { ret: { id: "m", tool: "orders.requestReturn", params: { order: "1042" } }, pay: { id: "pm", tool: "payments.confirm", params: { amount: 4.2 } } } },
+    },
+    {
+      id: "live-tree-rules-in-order",
+      rules: ["10.32", "10.33"],
+      description: "The tree rules are checked on the screen the update would leave, with a replaced line in its old place and new lines after: eta can't belong to both root and the new box, and the error is reported on box, the later of the two.",
+      input: ORDER,
+      updates: [{ input: lines('root = Card([status, eta, ret, box], title="Order 1042")', "box = Stack([eta])"), expect: { applied: false, issues: [i(2, "multiple_parents")] } }],
+      expect: { issues: [] },
+    },
+    {
+      id: "live-chart-mismatch",
+      rules: ["10.32", "10.33"],
+      description: "New labels for a chart without new values for its Series would break [5.23], so the update is rejected; sending both in one update works.",
+      input: lines('root = BarChart("Sales", ["9am", "10am"], [s])', 's = Series("Orders", values=[3, 5])'),
+      updates: [
+        { input: lines('root = BarChart("Sales", ["9am", "10am", "11am"], [s])'), expect: { applied: false, issues: [i(null, "chart_mismatch")] } },
+        { input: lines('root = BarChart("Sales", ["9am", "10am", "11am"], [s])', 's = Series("Orders", values=[3, 5, 8])'), expect: { applied: true, issues: [] } },
+      ],
+      expect: {
+        issues: [],
+        nodes: { root: node("BarChart", { title: "Sales", labels: ["9am", "10am", "11am"] }, ["s"]), s: node("Series", { name: "Orders", values: [3, 5, 8] }) },
+      },
+    },
+    {
+      id: "live-existing-errors-tolerated",
+      rules: ["10.33"],
+      description: "Errors the screen already had don't stop an update: root still lists ghost, which never arrived, and the update applies. If the update supplies ghost, it is no longer missing.",
+      input: lines("root = Stack([a, ghost])", 'a = Text("Before")'),
+      updates: [
+        { input: lines('a = Text("After")'), expect: { applied: true, issues: [] } },
+        { input: lines('ghost = Text("Here now")'), expect: { applied: true, issues: [] } },
+      ],
+      expect: { issues: [i(1, "dangling_ref")], nodes: { root: node("Stack", {}, ["a", "ghost"]), a: node("Text", { text: "After" }), ghost: node("Text", { text: "Here now" }) }, missing: [] },
+    },
+    {
+      id: "live-field-conflict",
+      rules: ["10.34"],
+      description: "An update can't set a $key a field reads: live_field_conflict, and nothing applies.",
+      input: lines("root = Stack([email, tip])", '$email = ""', 'email = Input($email, label="Email")', 'tip = Text("Shipped")'),
+      updates: [{ input: lines('tip = Text("Out for delivery")', '$email = "someone@example.com"'), expect: { applied: false, issues: [i(2, "live_field_conflict")] } }],
+      expect: { issues: [], state: { $email: "" }, nodes: { root: node("Stack", {}, ["email", "tip"]), email: node("Input", { label: "Email", value: st("$email") }), tip: node("Text", { text: "Shipped" }) } },
+    },
+    {
+      id: "live-field-conflict-after",
+      rules: ["10.34"],
+      description: "Nor a $key that a field would read after the update: here the update turns the status text into an Input bound to it.",
+      input: lines("root = Stack([s])", '$status = "Shipped"', "s = Text($status)"),
+      updates: [{ input: lines('s = Input($status, label="Status")', '$status = "Delivered"'), expect: { applied: false, issues: [i(2, "live_field_conflict")] } }],
+      expect: { issues: [], state: { $status: "Shipped" } },
+    },
+    {
+      id: "live-new-field",
+      rules: ["10.34"],
+      description: "A new $key for a new field is allowed, and a field's own line can be replaced (its label changes, what the person entered stays in its $key).",
+      input: lines("root = Stack([email])", '$email = ""', 'email = Input($email, label="Email")'),
+      updates: [{ input: lines('root = Stack([email, note])', 'email = Input($email, label="Email for the courier")', '$note = ""', 'note = Input($note, label="Note")'), expect: { applied: true, issues: [] } }],
+      expect: {
+        issues: [],
+        state: { $email: "", $note: "" },
+        nodes: { root: node("Stack", {}, ["email", "note"]), email: node("Input", { label: "Email for the courier", value: st("$email") }), note: node("Input", { label: "Note", value: st("$note") }) },
+      },
+    },
+    {
+      id: "live-replace-mutation",
+      rules: ["10.30"],
+      description: "An update can replace an McpMutation, checked as any line is: its tool must be registered.",
+      input: ORDER,
+      updates: [
+        { input: lines('m = McpMutation(ret, tool="orders.cancel", params={order: "1042"})'), expect: { applied: false, issues: [i(1, "unknown_tool")] } },
+        { input: lines('m = McpMutation(ret, tool="orders.requestReturn", params={order: "1042", reason: "late"})'), expect: { applied: true, issues: [] } },
+      ],
+      expect: { issues: [], mutations: { ret: { id: "m", tool: "orders.requestReturn", params: { order: "1042", reason: "late" } } } },
+    },
+    {
+      id: "live-type-change",
+      rules: ["10.30"],
+      description: "A replaced line may name another component: the status Badge becomes a Notice.",
+      input: ORDER,
+      updates: [{ input: lines('status = Notice("Delivered to your door", tone="success")'), expect: { applied: true, issues: [] } }],
+      expect: { issues: [], nodes: { root: node("Card", { title: "Order 1042" }, ["status", "eta", "ret"]), status: node("Notice", { text: "Delivered to your door", tone: "success" }), eta: node("Text", { text: st("$eta") }), ret: node("Button", { label: "Request a return", action: "requestReturn" }) } },
+    },
+    {
+      id: "live-version-marker-is-comment",
+      rules: ["10.30"],
+      description: "A version marker means nothing in an update: no newer_version warning, and the update applies.",
+      input: ORDER,
+      updates: [{ input: lines("# omni-ir 99.0", 'status = Badge("Delivered")'), expect: { applied: true, issues: [] } }],
+      expect: { issues: [], nodes: { root: node("Card", { title: "Order 1042" }, ["status", "eta", "ret"]), status: node("Badge", { text: "Delivered" }), eta: node("Text", { text: st("$eta") }), ret: node("Button", { label: "Request a return", action: "requestReturn" }) } },
+    },
+    {
+      id: "live-too-large",
+      rules: ["10.30"],
+      description: "An update holds at most 2,000 lines, blank and comment lines included; a longer one is update_too_large and changes nothing.",
+      input: ORDER,
+      updates: [{ input: ['status = Badge("Delivered")\n', { repeat: "# pad\n", times: 2000 }], expect: { applied: false, issues: [i(null, "update_too_large")] } }],
+      expect: { issues: [], nodes: { root: node("Card", { title: "Order 1042" }, ["status", "eta", "ret"]), status: node("Badge", { text: "Shipped" }), eta: node("Text", { text: st("$eta") }), ret: node("Button", { label: "Request a return", action: "requestReturn" }) } },
+    },
+    {
+      id: "live-limits",
+      rules: ["10.32", "5.25"],
+      description: "The document limits apply to the screen an update would leave: with 1,000 $keys, a new one is document_too_large, while setting an existing one is fine.",
+      input: lines("root = Divider()", ...Array.from({ length: 1000 }, (_, n) => `$k${n} = 1`)),
+      updates: [
+        { input: lines("$extra = 1"), expect: { applied: false, issues: [i(1, "document_too_large")] } },
+        { input: lines("$k0 = 2"), expect: { applied: true, issues: [] } },
+      ],
+      expect: { issues: [] },
+    },
+  ] as ConformanceCase[]).map((c) => ({ tools: ["payments.confirm", "orders.requestReturn"], ...c })),
   catalog: catalogCases(),
 };
 

@@ -26,10 +26,16 @@ export interface MutationClientOptions {
   credentials?: RequestCredentials;
   /** A bearer token for servers that use them instead of a session cookie. */
   token?: string | (() => string | null);
+  /**
+   * Called with the update a successful action's result carries ([10.35]), to apply to the screen the
+   * Button was pressed on: usually `(text) => parser.update(text)`. The pressed Button's id is sent so
+   * the server can write the update for it.
+   */
+  onUpdate?: (update: string, call: MutationCall) => void;
 }
 
 export function createMutationHandler(options: MutationClientOptions = {}): (call: MutationCall) => Promise<void> {
-  const { baseUrl = "", fetch: doFetch = globalThis.fetch, onResult, credentials = "same-origin", token } = options;
+  const { baseUrl = "", fetch: doFetch = globalThis.fetch, onResult, credentials = "same-origin", token, onUpdate } = options;
 
   return async (call) => {
     const bearer = typeof token === "function" ? token() : token;
@@ -41,7 +47,7 @@ export function createMutationHandler(options: MutationClientOptions = {}): (cal
         "idempotency-key": globalThis.crypto.randomUUID(),
         ...(bearer ? { authorization: `Bearer ${bearer}` } : {}),
       },
-      body: JSON.stringify({ tool: call.tool, params: call.params }),
+      body: JSON.stringify({ tool: call.tool, params: call.params, ...(onUpdate ? { button: call.target } : {}) }),
     };
     let response: Response;
     try {
@@ -54,9 +60,10 @@ export function createMutationHandler(options: MutationClientOptions = {}): (cal
       }
     }
     const body = (await response.json().catch(() => null)) as
-      | { result?: Record<string, unknown>; error?: { code?: string; message?: string } }
+      | { result?: Record<string, unknown>; update?: unknown; error?: { code?: string; message?: string } }
       | null;
     if (!response.ok) throw new MutationRejectedError(body?.error?.message ?? `The action failed (${response.status}).`, body?.error?.code);
     onResult?.(call, body?.result ?? {});
+    if (onUpdate && typeof body?.update === "string") onUpdate(body.update, call);
   };
 }

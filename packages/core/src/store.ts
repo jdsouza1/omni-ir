@@ -20,6 +20,21 @@ export interface OmniDocument {
   readonly complete: boolean;
   /** Line 1 was a version marker for a newer Omni-IR version than this one ([3.9]). */
   readonly newerVersion: boolean;
+  /**
+   * The last update applied after the stream ended ([10.29]): how many have been applied, and the ids
+   * and $keys it assigned. Renderers use it to announce changed Notices ([8.8]).
+   */
+  readonly lastUpdate?: { readonly count: number; readonly assigned: readonly string[] };
+}
+
+/** An update the parser has checked (SPEC.md [10.33]), applied to the store in one step. */
+export interface StoreUpdate {
+  /** Components, McpMutations and state the update assigned and the screen kept. */
+  assigned: readonly Statement[];
+  /** Ids of components and McpMutations it took off the screen, with the targets of those McpMutations. */
+  removed: readonly { id: string; target?: string }[];
+  /** References nothing defines after the update. */
+  missing: readonly string[];
 }
 
 export interface ApplyResult {
@@ -40,6 +55,8 @@ export interface OmniStore {
   finish(): void;
   /** Local state edit from an Input (R1). The key must already be declared by the stream. */
   setState(key: string, value: Primitive): void;
+  /** Apply a checked update ([10.29]). Called by the parser only. */
+  applyUpdate?(update: StoreUpdate): void;
 }
 
 const EMPTY: OmniDocument = {
@@ -113,6 +130,35 @@ export function createStore(): OmniStore {
     finish() {
       if (doc.complete) return;
       commit({ ...doc, pending: new Set(), missing: new Set(doc.pending), complete: true });
+    },
+
+    applyUpdate(update) {
+      for (const { id, target } of update.removed) {
+        nodes.delete(id);
+        if (target !== undefined && mutations.get(target)?.id === id) mutations.delete(target);
+      }
+      let changedState = false;
+      const assigned: string[] = [];
+      for (const s of update.assigned) {
+        if (s.kind === "state") {
+          assigned.push(s.key);
+          if (!changedState) {
+            state = { ...state };
+            changedState = true;
+          }
+          state[s.key] = s.value;
+        } else if (s.kind === "node") {
+          assigned.push(s.id);
+          nodes.set(s.id, s);
+        } else {
+          assigned.push(s.id);
+          // A replaced McpMutation may govern another Button now.
+          for (const [target, m] of mutations) if (m.id === s.id) mutations.delete(target);
+          mutations.set(s.target, s);
+        }
+      }
+      const count = (doc.lastUpdate?.count ?? 0) + 1;
+      commit({ ...doc, nodes, mutations, state, missing: new Set(update.missing), lastUpdate: { count, assigned } });
     },
 
     setState(key, value) {

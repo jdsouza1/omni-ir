@@ -30,7 +30,7 @@ const LIMIT_LABELS: Record<keyof typeof LIMITS, string> = {
   stateKeys: "$state keys one stream may declare ([5.25])",
 };
 
-const STAGE_LABEL = { line: "when the line arrives", end: "at end of stream", renderer: "in the renderer" } as const;
+const STAGE_LABEL = { line: "when the line arrives", end: "at end of stream", renderer: "in the renderer", update: "when an update arrives (nothing in it applies)" } as const;
 
 const EXAMPLES: { title: string; file: string; note: string }[] = [
   { title: "Payment confirmation", file: "payment-confirmation.omni", note: "Root first, state, an Input, a governed Pay button and a local Cancel button." },

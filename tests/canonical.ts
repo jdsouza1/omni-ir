@@ -45,6 +45,24 @@ export interface ParseOptions {
  * canonical result. Any exception escapes, so a test sees it.
  */
 export function parseCanonical(chunks: readonly (string | Uint8Array)[], { tools = ["payments.confirm"], assets = [], components = {}, pictures = [] }: ParseOptions = {}): Canonical {
+  return parseWithUpdates(chunks, [], { tools, assets, components, pictures }).screen;
+}
+
+/** The canonical result of an update: whether it applied, and its distinct issues (SPEC.md [10.33]). */
+export interface CanonicalUpdate {
+  applied: boolean;
+  issues: CanonicalIssue[];
+}
+
+/**
+ * Parse a stream, end it, then apply each update in order ([10.29]). `screen` is the canonical result
+ * after the last update, with the stream's issues; `updates` each update's own result.
+ */
+export function parseWithUpdates(
+  chunks: readonly (string | Uint8Array)[],
+  updates: readonly string[],
+  { tools = ["payments.confirm"], assets = [], components = {}, pictures = [] }: ParseOptions = {},
+): { screen: Canonical; updates: CanonicalUpdate[] } {
   const parser = createParser({
     tools: Object.fromEntries(tools.map((name) => [name, z.any()])),
     assets: Object.fromEntries(assets.map((name) => [name, {}])),
@@ -57,5 +75,9 @@ export function parseCanonical(chunks: readonly (string | Uint8Array)[], { tools
   });
   for (const chunk of chunks) parser.write(chunk);
   parser.end();
-  return canonical(parser.getSnapshot(), issues);
+  const results = updates.map((text): CanonicalUpdate => {
+    const result = parser.update(text);
+    return { applied: result.applied, issues: canonical(parser.getSnapshot(), result.issues.map((x) => ({ line: x.line ?? null, code: x.code }))).issues };
+  });
+  return { screen: canonical(parser.getSnapshot(), issues), updates: results };
 }

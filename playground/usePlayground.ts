@@ -191,6 +191,7 @@ export function usePlayground(deps: PlaygroundDeps = {}) {
       end: () => inner.end(),
       subscribe: (listener) => inner.subscribe(listener),
       getSnapshot: () => inner.getSnapshot(),
+      update: (text) => inner.update(text),
     };
     dispatch({ type: "start", runId, parser, mode, ...(prompt !== undefined ? { prompt } : {}) });
     return { runId, parser };

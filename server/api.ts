@@ -38,6 +38,8 @@ export function promptOf(input: z.infer<typeof AgUiRunInput>): string | null {
 // used: it silently drops a "__proto__" key instead of rejecting it.)
 export const MutateBody = z.strictObject({
   tool: z.string().min(1).max(128),
+  /** The pressed Button's id, used only to write the result's update for it ([10.35]). */
+  button: z.string().max(64).optional(),
   params: z.custom<Record<string, unknown>>(
     (v) => typeof v === "object" && v !== null && !Array.isArray(v),
     "params must be an object",
@@ -97,7 +99,16 @@ export interface MutationRequest {
   user: User | null;
   /** The Idempotency-Key header ([10.14]): null when absent. */
   idempotencyKey: string | null;
+  /** The pressed Button's id, if the client sent it ([10.35]). Trusted for nothing but the update. */
+  button?: string | undefined;
 }
+
+/** Writes the update an action's result carries, from the result and the pressed Button's id ([10.35]). */
+export type ActionUpdate = (result: Record<string, unknown>, button: string) => string;
+
+/** An id the update may name: the grammar's identifier ([4.3]), never a reserved word. */
+const BUTTON_ID = /^[A-Za-z_][A-Za-z0-9_]{0,63}$/;
+const NOT_IDS = new Set(["true", "false", "null", "__proto__", "constructor", "prototype"]);
 
 /** An idempotency key: 1-200 letters, digits and `_-:.` ([10.14]). */
 const IDEMPOTENCY_KEY = /^[A-Za-z0-9_\-:.]{1,200}$/;
@@ -120,9 +131,14 @@ function stableJson(value: unknown): string {
  */
 export async function runMutation(
   request: MutationRequest,
-  { tools, handlers, ctx }: { tools: ToolRegistry; handlers: Readonly<Record<string, ToolHandler>>; ctx: ToolContext },
+  {
+    tools,
+    handlers,
+    ctx,
+    updates = {},
+  }: { tools: ToolRegistry; handlers: Readonly<Record<string, ToolHandler>>; ctx: ToolContext; updates?: Readonly<Record<string, ActionUpdate>> },
 ): Promise<MutationAnswer> {
-  const { tool, params, user, idempotencyKey } = request;
+  const { tool, params, user, idempotencyKey, button } = request;
   const answer = await decide();
   await ctx.store.audit.add({
     at: ctx.now,
@@ -176,7 +192,10 @@ export async function runMutation(
     try {
       const output =
         handler.access === "public" ? await handler.run(valid, { ...ctx, user }) : await handler.run(valid, { ...ctx, user: user as User });
-      result = { status: 200, body: { ok: true, tool, result: output }, outcome: "ok" };
+      // The update is the app's own text, written by its code for the pressed Button ([10.35]).
+      const write = Object.hasOwn(updates, tool) ? updates[tool] : undefined;
+      const update = write && button !== undefined && BUTTON_ID.test(button) && !NOT_IDS.has(button) ? write(output, button) : undefined;
+      result = { status: 200, body: { ok: true, tool, result: output, ...(update === undefined ? {} : { update }) }, outcome: "ok" };
     } catch (err) {
       if (err instanceof ToolError) {
         result = { status: err.status, body: errorBody(err.code, err.message), outcome: err.code };
