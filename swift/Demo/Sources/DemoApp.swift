@@ -125,6 +125,17 @@ struct ScreenView: View {
     .background(Color(uiColor: .systemGroupedBackground))
     .navigationTitle(source.title)
     .navigationBarTitleDisplayMode(.inline)
+    .overlay(alignment: .bottomTrailing) {
+      // Recording mode: a 2-point speck that changes every frame, too faint to see, so the simulator's
+      // recorder writes frames at real time instead of skipping the still moments (PLAN-VIDEO.md).
+      if video {
+        TimelineView(.animation) { context in
+          Color.black.opacity(0.01 + 0.01 * context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 1))
+            .frame(width: 2, height: 2)
+        }
+        .accessibilityHidden(true)
+      }
+    }
     .task { await stream() }
   }
 
