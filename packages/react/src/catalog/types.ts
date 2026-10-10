@@ -16,12 +16,25 @@ export interface Picture {
   height: number;
 }
 
+/**
+ * What a form field shows about its own checks (SPEC.md [8.1]–[8.5]). Optional, so an app's own
+ * catalog that ignores them still compiles; the press is blocked by the renderer either way ([8.6]).
+ */
+export interface FieldFeedback {
+  /** The renderer's own sentence for the field's problem, once it should be shown. */
+  error?: string | undefined;
+  /** The id to give the message, for the field's aria-describedby. */
+  errorId?: string | undefined;
+  /** Call when the person leaves the field: its message may show from then on. */
+  onBlur?: (() => void) | undefined;
+}
+
 /** Extra props the renderer supplies to interactive components and pictures. */
 export interface InteractionProps {
-  Input: { value: string; onChange: (value: string) => void };
-  DateInput: { value: string; onChange: (value: string) => void };
-  Select: { value: string; onChange: (value: string) => void };
-  Switch: { value: boolean; onChange: (value: boolean) => void };
+  Input: { value: string; onChange: (value: string) => void } & FieldFeedback;
+  DateInput: { value: string; onChange: (value: string) => void } & FieldFeedback;
+  Select: { value: string; onChange: (value: string) => void } & FieldFeedback;
+  Switch: { value: boolean; onChange: (value: boolean) => void } & FieldFeedback;
   /** Each Tab child's label, in order; undefined while that Tab's line hasn't arrived. */
   Tabs: { tabs: readonly { id: string; label: string | undefined }[] };
   /** Each Series child's data, in order; undefined while that Series' line hasn't arrived. */

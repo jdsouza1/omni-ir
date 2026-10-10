@@ -120,6 +120,7 @@ function validSamples(d: Def): Sample[] {
     if (d.type === "number") out.push((d.minimum ?? 0) + 0.5);
     return out.map(num);
   }
+  if (d.type === "boolean") return [{ src: ["true"], value: true }, { src: ["false"], value: false }];
   throw new Error(`catalog cases: no valid sample for ${JSON.stringify(d)}`);
 }
 

@@ -1,6 +1,6 @@
 # Omni-IR Specification
 
-**Specification 0.10 (draft) · stream format 0.5** · Apache-2.0
+**Specification 0.10 (draft) · stream format 0.8** · Apache-2.0
 
 Omni-IR is a text format that an AI model writes to describe a user interface, one short line at a time, and that a trusted client renders with its own components as the lines arrive. This document says exactly what a stream may contain and how a conforming parser and renderer must treat it. It describes what is implemented and tested in this repository; nothing here is aspirational.
 
@@ -133,6 +133,10 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.21]** A Table MUST contain only TableRows, and a TableRow MUST be a child of a Table. Each TableRow MUST have exactly as many cells as its Table has columns. Breaking any of these is a `table_mismatch` error, reported on whichever of the two lines arrives second.
 - **[5.22]** A Tabs MUST contain only Tab components, and a Tab MUST be a child of a Tabs. Breaking either rule is a `tabs_mismatch` error, reported on whichever of the two lines arrives second.
 
+### Form fields
+
+- **[5.26]** A field MAY declare constraints for the renderer to check before an action that reads it can run (section 8, Fields): `required` (`true` or `false`) on an Input, DateInput, Select or Switch; `format` (`"email"`, `"number"`, `"phone"` or `"url"`), `minLength` and `maxLength` (whole numbers from 1 to 2,000) on an Input. When an Input gives both, `minLength` MUST NOT be more than `maxLength`. Anything else is an `invalid_props` error, like any other prop ([5.9]). Constraints never change a field's state, and they are not the security boundary: the backend still checks every action's params against the tool's own schema (section 9).
+
 ### Charts
 
 - **[5.23]** A BarChart or LineChart MUST contain only Series, and a PieChart only Slices; a Series MUST be a child of a BarChart or LineChart, and a Slice of a PieChart. Each Series MUST have exactly as many values as its chart has labels. Breaking any of these is a `chart_mismatch` error, reported on whichever of the two lines arrives second.
@@ -145,7 +149,7 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.15]** An McpMutation's `target` MUST be a Button with an `action`. A target that never arrives is `dangling_ref`; a target without an action is `mutation_target_not_interactive`.
 - **[5.16]** McpMutation `params` is an object whose keys are identifiers (not reserved words) and whose values are literals or `$key` references. A component id as a value, a repeated key or a reserved key is an `invalid_props` error.
 
-## 6. Component catalog (format 0.5)
+## 6. Component catalog (format 0.8)
 
 A component has exactly the props listed; any other prop is rejected ([5.9]). "Values" lists what each prop accepts; `$state` means a `$key` reference ([5.11]), and `id` means a component id. The styling of every value (what `"muted"` or `"primary"` looks like) belongs to the renderer. In each signature, positional props are written bare in their order, props written `name=…` can only be given by name, and props in [brackets] are optional: `Image(asset, alt=…, [ratio=…])` is written `Image("cabin-pines", alt="A cabin", ratio="16:9")`.
 
@@ -201,7 +205,7 @@ Text(text, [format=…], [currency=…], [tone=…])
 ### Input
 
 ```
-Input(value, label=…, [placeholder=…], [lines=…])
+Input(value, label=…, [placeholder=…], [lines=…], [required=…], [format=…], [minLength=…], [maxLength=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -210,6 +214,10 @@ Input(value, label=…, [placeholder=…], [lines=…])
 | `label` | named only | yes | text (min 1, max 200) |
 | `placeholder` | named only | no | text (max 200) |
 | `lines` | named only | no | whole number 1-10 |
+| `required` | named only | no | true \| false |
+| `format` | named only | no | "email" \| "number" \| "phone" \| "url" |
+| `minLength` | named only | no | whole number 1-2000 |
+| `maxLength` | named only | no | whole number 1-2000 |
 
 ### Button
 
@@ -278,7 +286,7 @@ Rating(value, [max=…])
 ### DateInput
 
 ```
-DateInput(value, label=…, [min=…], [max=…])
+DateInput(value, label=…, [min=…], [max=…], [required=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -287,6 +295,7 @@ DateInput(value, label=…, [min=…], [max=…])
 | `label` | named only | yes | text (min 1, max 200) |
 | `min` | named only | no | date "YYYY-MM-DD" |
 | `max` | named only | no | date "YYYY-MM-DD" |
+| `required` | named only | no | true \| false |
 
 ### List
 
@@ -325,7 +334,7 @@ Message(text, from=…)
 ### Select
 
 ```
-Select(value, label=…, options=…, [placeholder=…])
+Select(value, label=…, options=…, [placeholder=…], [required=…])
 ```
 
 | Prop | Position | Required | Values |
@@ -334,17 +343,19 @@ Select(value, label=…, options=…, [placeholder=…])
 | `label` | named only | yes | text (min 1, max 200) |
 | `options` | named only | yes | [text (min 1, max 200), …] (max 50) |
 | `placeholder` | named only | no | text (max 200) |
+| `required` | named only | no | true \| false |
 
 ### Switch
 
 ```
-Switch(value, label=…)
+Switch(value, label=…, [required=…])
 ```
 
 | Prop | Position | Required | Values |
 |---|---|---|---|
 | `value` | 1 | yes | $state |
 | `label` | named only | yes | text (min 1, max 200) |
+| `required` | named only | no | true \| false |
 
 ### Table
 
@@ -565,6 +576,17 @@ These rules apply to anything that displays an Omni-IR screen. There are three r
 - When the parser reports `newer_version` ([3.9]), a renderer SHOULD tell the person, near the screen, that the app needs an update to show all of it.
 - *Tested by:* `tests/renderer.test.tsx`.
 
+**Fields**
+
+A field is an Input, DateInput, Select or Switch. Its constraints ([5.26]) let the person see and fix a mistake before anything is sent; the stream only declares them, and the renderer checks them. Messages are the renderer's own words (keys in brackets below), never text from the stream, and the app may replace them.
+- **[8.1]** A renderer MUST check every field against its state's current value as [8.2]–[8.4] say. A field that declares no constraint always passes.
+- **[8.2]** `required`: an Input or DateInput whose value, without surrounding white space, is empty (or isn't text) fails with `required`; a Select whose value isn't one of its options fails with `chooseOption`; a Switch whose value isn't `true` fails with `turnOn`.
+- **[8.3]** An Input whose value, without surrounding white space, is empty passes every other check. Otherwise its checks run in this order, on that trimmed value, and stop at the first failure: `format`, then `minLength`, then `maxLength`. `"email"`: text, one `@`, then a host with at least one dot, and no white space (`invalidEmail`). `"number"`: an optional `+` or `-`, digits, and an optional decimal part after one `.` or `,` (`invalidNumber`). `"phone"`: only digits, spaces, `(`, `)`, `-` and `.`, with an optional `+` first, and 7 to 15 digits (`invalidPhone`). `"url"`: `http://` or `https://` (in any case), then a host of at least two parts separated by dots, then optionally `/`, `?` or `#` and more, with no white space (`invalidUrl`). Lengths count Unicode code points: fewer than `minLength` fails with `tooShort` and `{min}`, more than `maxLength` with `tooLong` and `{max}`.
+- **[8.4]** A DateInput whose value isn't empty fails with `dateTooEarly` and `{min}` when it is before `min`, and with `dateTooLate` and `{max}` when it is after `max`, comparing the `YYYY-MM-DD` text.
+- **[8.5]** A field's message SHOULD show only after the person leaves the field, so nobody sees an error while still typing, and MUST show when a press checks the field ([8.6]). Once shown, it stays until the field passes. It MUST be tied to the field for assistive technology (for example `aria-describedby` and `aria-invalid`) and SHOULD be announced when it appears.
+- **[8.6]** When a governed Button is pressed, the renderer MUST first check every field whose `$key` its McpMutation's params read. If any fails, it MUST show those fields' messages and MUST NOT go on: no params check, no confirmation, no handler. It SHOULD move focus to the first field that failed. A field that no params read is checked and shown, but blocks nothing.
+- *Tested by:* `conformance/fields/fields.json` (every renderer), `tests/fields.test.ts`, `tests/renderer.forms.test.tsx`; Swift and Kotlin in their field tests.
+
 **Themes and the renderer's own words**
 - Colours, fonts and shapes come only from the app: the renderer's defaults, or design tokens the app sets. Nothing in the stream chooses them, beyond picking among the catalog's own styles through enum props such as `tone`. The reference renderers share one list of tokens with light and dark defaults (`conformance/theme.json`).
 - A renderer's default themes MUST give text at least 4.5:1 contrast against its background, and the edges of controls and focus indicators at least 3:1 (WCAG 2.2 AA).
@@ -588,6 +610,12 @@ These rules apply to anything that displays an Omni-IR screen. There are three r
 - An action's result SHOULD carry only what the screen needs, never other people's data, and logs SHOULD NOT hold param values, which may be personal.
 - A Button without an `action` never contacts the backend.
 - *Tested by:* `tests/renderer.test.tsx`, `tests/server.mutate.test.ts`, `tests/backend.api.test.ts`, `tests/e2e.client.test.tsx`.
+
+**Confirmations**
+- **[9.1]** An app MAY give its renderer a sentence for each tool whose actions need the person's confirmation. Pressing a governed Button for such a tool MUST open the renderer's own confirmation with that sentence, a way to cancel and a way to confirm, and the action MUST run only when the person confirms. Each `{name}` in the sentence is replaced, once, by the value of that param as plain text, so nothing in a value is read as a placeholder or markup. Instead of a sentence, an app MAY give a function that writes it from the params after they pass the tool's check, for example to show an amount as currency; if the function fails, the action MUST NOT run. Either way the sentence MUST be shown as plain text. Cancelling MUST NOT run anything.
+- **[9.2]** Whether a tool needs confirmation, and its words, MUST come only from the app. Nothing in the stream can skip, change, add or draw a confirmation: the catalog has no prop for it ([5.9]), and a confirmation the stream draws is just part of the screen.
+- **[9.3]** The checks of a press run in this order, each stopping the press if it fails: the fields its params read ([8.6]), the tool and params against the app's registry, then the confirmation. Only then does the handler run. A confirmation protects the person from slips and misleading screens; it is not a security boundary, which stays with the backend (above).
+- *Tested by:* `tests/renderer.forms.test.tsx`; Swift and Kotlin in their store tests.
 
 ## 10. Transport
 
@@ -688,12 +716,12 @@ What the app must still handle:
 
 ## 12. Versioning and limits
 
-This is specification 0.10, a draft, describing **stream format 0.5**. The two numbers move separately:
+This is specification 0.10, a draft, describing **stream format 0.8**. The two numbers move separately:
 
 - The **stream format** is what sections 3 to 7 define: the grammar, the document rules, the catalog, the issue codes and the limits. Its version changes only when one of those does. A stream MAY declare it with a version marker ([3.9]), and a client MAY ask for one ([10.1]).
 - The **specification** also covers renderers, actions and transport (sections 8 to 11), which improve with each release without changing the format. Its number follows the reference packages' releases; changes are listed in CHANGELOG.md.
 
-Until 1.0, a new format version only adds: new components, props, allowed values, issue codes or rules that accept more. It never removes or changes the meaning of something an older format had, so a parser reads its own format and every older one, and a server can serve any client that reads its format or a newer one ([10.12]). The format after 0.5 is numbered **0.8**, above every number a released parser has used, so parsers for 0.5 to 0.7 recognise it as newer.
+Until 1.0, a new format version only adds: new components, props, allowed values, issue codes or rules that accept more. It never removes or changes the meaning of something an older format had, so a parser reads its own format and every older one, and a server can serve any client that reads its format or a newer one ([10.12]). Format **0.8** added field constraints ([5.26]); it followed 0.5 directly, because the release numbers 0.6 and 0.7 name format 0.5 ([3.9]). The next format is numbered **0.9**.
 
 Adding to the catalog is a format change. Because the catalog is strict ([5.9]), a parser built for an older format rejects a new component (`unknown_component`), a new prop or a new allowed value (`invalid_props`), and its renderer shows a fallback in that place. A server SHOULD therefore ask a model only for what its clients' format accepts. The reference server generates its system prompt from its own schema.
 
@@ -754,7 +782,7 @@ root = Card([title, intro, email, actions, fine])
 title = Heading("Sign in", level=1)
 intro = Text("We'll email you a one-time link. No password needed.", tone="muted")
 $email = ""
-email = Input($email, label="Email address", placeholder="you@example.com")
+email = Input($email, label="Email address", placeholder="you@example.com", required=true, format="email")
 actions = Stack([send], direction="row")
 send = Button("Email me a link", action="sendLink")
 sendLink = McpMutation(send, tool="auth.sendMagicLink", params={email: $email})
@@ -785,5 +813,5 @@ Issues reported:
 ## Not yet specified
 
 - Data-driven lists. A List's items are written out one by one; there are no loops or bindings to collections.
-- A way to update or remove a component after its line has arrived. In format 0.5 an id can't be reassigned ([5.3]).
+- A way to update or remove a component after its line has arrived. In format 0.8 an id can't be reassigned ([5.3]).
 - Renderers other than the web reference renderer.

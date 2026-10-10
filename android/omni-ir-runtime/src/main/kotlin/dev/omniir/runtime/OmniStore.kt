@@ -3,6 +3,7 @@
 package dev.omniir.runtime
 
 import dev.omniir.core.ComponentType
+import dev.omniir.core.FieldProblem
 import dev.omniir.core.Issue
 import dev.omniir.core.IssueCode
 import dev.omniir.core.Mutation
@@ -12,11 +13,15 @@ import dev.omniir.core.OmniParser
 import dev.omniir.core.Primitive
 import dev.omniir.core.PropValue
 import dev.omniir.core.ToolRegistry
+import dev.omniir.core.checkField
+import dev.omniir.core.fieldKey
+import dev.omniir.core.fieldsReadBy
 import dev.omniir.core.isMutating
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 /** A governed action, ready to send. Params have their `$state` values filled in and passed the tool's check. */
 public data class MutationCall(
@@ -61,6 +66,19 @@ public sealed interface Governance {
   public data class Blocked(val tool: String, val message: String) : Governance
 }
 
+/**
+ * The app's confirmation for one tool ([9.1]): writes the sentence from the checked params, for example
+ * to show an amount as currency. [template] makes one from a sentence whose `{name}` placeholders are
+ * filled with the params as plain text. Shown as plain text either way.
+ */
+public fun interface Confirmation {
+  public fun text(params: Map<String, Primitive>): String
+
+  public companion object {
+    public fun template(sentence: String): Confirmation = Confirmation { params -> fillTemplate(sentence, params.mapValues { displayText(it.value) }) }
+  }
+}
+
 /** Per-button action state the views observe: blocked presses and actions in flight. */
 public data class ActionState(
   val blocked: Map<String, Pair<String, Map<String, Primitive>>> = emptyMap(),
@@ -76,12 +94,18 @@ public class OmniStore(
   public val tools: ToolRegistry,
   /** Names of the pictures the app provides. */
   public val assets: Set<String> = emptySet(),
+  /**
+   * The app's confirmation for each tool whose actions need the person's say-so ([9.1]), such as
+   * `"payments.confirm" to Confirmation.template("Pay {amount}?")`. Set by the app, never by the stream.
+   */
+  public val confirm: Map<String, Confirmation> = emptyMap(),
 ) {
   private val parser = OmniParser(tools, assets)
   private val lock = Any()
   private val documentFlow = MutableStateFlow(OmniDocument())
   private val issuesFlow = MutableStateFlow<List<Issue>>(emptyList())
   private val actionsFlow = MutableStateFlow(ActionState())
+  private val shownFlow = MutableStateFlow<Set<String>>(emptySet())
 
   /** Everything accepted so far. */
   public val document: StateFlow<OmniDocument> = documentFlow.asStateFlow()
@@ -90,6 +114,9 @@ public class OmniStore(
   public val issues: StateFlow<List<Issue>> = issuesFlow.asStateFlow()
 
   public val actions: StateFlow<ActionState> = actionsFlow.asStateFlow()
+
+  /** The fields whose messages show: left by the person, or checked by a press ([8.5]). */
+  public val shownFields: StateFlow<Set<String>> = shownFlow.asStateFlow()
 
   // MARK: Feeding the stream
 
@@ -175,6 +202,24 @@ public class OmniStore(
     sync()
   }
 
+  // MARK: Fields (SPEC.md section 8)
+
+  /** A field's problem with its current value, shown or not; null when it passes or isn't a field. */
+  public fun fieldProblem(id: String, doc: OmniDocument = document.value): FieldProblem? {
+    val node = doc.nodes[id] ?: return null
+    val key = fieldKey(node) ?: return null
+    return checkField(node.type, node.props, doc.state[key])
+  }
+
+  /** The problem to show under a field: only once the person has left it or a press checked it ([8.5]). */
+  public fun visibleFieldProblem(id: String, doc: OmniDocument = document.value, shown: Set<String> = shownFields.value): FieldProblem? =
+    if (id in shown) fieldProblem(id, doc) else null
+
+  /** The person left a field: from now on its message shows while it fails. */
+  public fun showField(id: String) {
+    shownFlow.update { it + id }
+  }
+
   // MARK: Actions (McpMutation governance)
 
   public fun governance(buttonId: String, doc: OmniDocument = document.value, actions: ActionState = this.actions.value): Governance {
@@ -190,25 +235,47 @@ public class OmniStore(
   public fun isRunning(buttonId: String): Boolean = buttonId in actions.value.running
 
   /**
-   * A press: a Button without an action only reports it; a governed one fills in its params, checks
-   * them with the tool, and only then calls the handler.
+   * A press: a Button without an action only reports it. A governed one checks, in order ([9.3]), the
+   * fields its params read, its params against the tool, and the app's confirmation, and only then
+   * calls the handler. [askConfirmation] shows the app's sentence and returns true when the person
+   * confirms; without one, a tool that needs confirmation never runs. Returns the first field that
+   * failed, for the view to move focus to ([8.6]), or null.
    */
-  public suspend fun press(buttonId: String, onMutation: suspend (MutationCall) -> Unit, report: (RendererEvent) -> Unit) {
+  public suspend fun press(
+    buttonId: String,
+    onMutation: suspend (MutationCall) -> Unit,
+    report: (RendererEvent) -> Unit,
+    askConfirmation: suspend (String) -> Boolean = { false },
+  ): String? {
     val doc = document.value
-    val node = doc.nodes[buttonId] ?: return
-    if (node.type != dev.omniir.core.ComponentType.BUTTON) return
-    if (!isMutating(node)) return report(RendererEvent.Press(buttonId))
-    if (governance(buttonId, doc) !is Governance.Ready || isRunning(buttonId)) return
-    val mutation = doc.mutations[buttonId] ?: return
-    val tool = tools[mutation.tool] ?: return
+    val node = doc.nodes[buttonId] ?: return null
+    if (node.type != ComponentType.BUTTON) return null
+    if (!isMutating(node)) {
+      report(RendererEvent.Press(buttonId))
+      return null
+    }
+    if (governance(buttonId, doc) !is Governance.Ready || isRunning(buttonId)) return null
+    val mutation = doc.mutations[buttonId] ?: return null
+    val tool = tools[mutation.tool] ?: return null
 
+    // [8.6]: the fields its params read must pass first; their messages show, and nothing is sent.
+    val fields = fieldsReadBy(mutation, doc)
+    val failing = fields.firstOrNull { fieldProblem(it, doc) != null }
+    if (failing != null) {
+      shownFlow.update { it + fields }
+      return failing
+    }
     val params = params(mutation, doc)
     val problems = tool.validate(params)
     if (problems.isNotEmpty()) {
       val message = problems.joinToString("; ")
       actionsFlow.value = actionsFlow.value.let { it.copy(blocked = it.blocked + (buttonId to (message to params))) }
-      return report(RendererEvent.Error(Issue(IssueCode.MUTATION_BLOCKED, message, mutation.id)))
+      report(RendererEvent.Error(Issue(IssueCode.MUTATION_BLOCKED, message, mutation.id)))
+      return null
     }
+    // [9.1]: the app's own sentence for this tool, written from the checked params as plain text.
+    val confirmation = confirm[mutation.tool]
+    if (confirmation != null && !askConfirmation(confirmation.text(params))) return null
     actionsFlow.value = actionsFlow.value.let { it.copy(running = it.running + buttonId) }
     try {
       onMutation(MutationCall(mutation.id, mutation.target, mutation.tool, params))
@@ -219,6 +286,7 @@ public class OmniStore(
     } finally {
       actionsFlow.value = actionsFlow.value.let { it.copy(running = it.running - buttonId) }
     }
+    return null
   }
 
   private fun params(mutation: Mutation, doc: OmniDocument): Map<String, Primitive> =

@@ -11,3 +11,22 @@ private val PLACEHOLDER = Regex("""\{([A-Za-z]+)\}""")
  */
 public fun fillTemplate(template: String, values: Map<String, String>): String =
   PLACEHOLDER.replace(template) { match -> values[match.groupValues[1]] ?: match.value }
+
+/** A field problem in these words, with its placeholders such as `{max}` filled (SPEC.md section 8). */
+public fun OmniStrings.field(problem: dev.omniir.core.FieldProblem): String {
+  val template = when (problem.message) {
+    "required" -> required
+    "chooseOption" -> chooseOption
+    "turnOn" -> turnOn
+    "invalidEmail" -> invalidEmail
+    "invalidNumber" -> invalidNumber
+    "invalidPhone" -> invalidPhone
+    "invalidUrl" -> invalidUrl
+    "tooShort" -> tooShort
+    "tooLong" -> tooLong
+    "dateTooEarly" -> dateTooEarly
+    "dateTooLate" -> dateTooLate
+    else -> required
+  }
+  return fillTemplate(template, problem.values)
+}

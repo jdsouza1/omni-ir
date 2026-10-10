@@ -21,6 +21,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -54,6 +55,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
@@ -65,10 +69,14 @@ import androidx.compose.ui.semantics.collectionInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import dev.omniir.core.ComponentType
 import dev.omniir.core.OmniNode
@@ -79,6 +87,7 @@ import dev.omniir.runtime.Format
 import dev.omniir.runtime.Governance
 import dev.omniir.runtime.OmniPalette
 import dev.omniir.runtime.Slot
+import dev.omniir.runtime.field
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -92,19 +101,19 @@ internal fun NodeContent(node: OmniNode, context: RenderContext) {
     ComponentType.CARD -> CardView(node, props)
     ComponentType.HEADING -> HeadingView(props)
     ComponentType.TEXT -> TextView(props)
-    ComponentType.INPUT -> InputView(props)
+    ComponentType.INPUT -> FieldFrame(node, context) { InputView(props, it) }
     ComponentType.BUTTON -> ButtonView(node, props, context)
     ComponentType.DIVIDER -> HorizontalDivider()
     ComponentType.BADGE -> BadgeView(props)
     ComponentType.SKELETON -> SkeletonLines(props.number("lines")?.toInt() ?: 1)
     ComponentType.IMAGE -> ImageView(props, context)
     ComponentType.RATING -> RatingView(props)
-    ComponentType.DATE_INPUT -> DateInputView(props)
+    ComponentType.DATE_INPUT -> FieldFrame(node, context) { DateInputView(props, it) }
     ComponentType.LIST -> ListView(node)
     ComponentType.LIST_ITEM -> ListItemView(props, context)
     ComponentType.MESSAGE -> MessageView(props)
-    ComponentType.SELECT -> SelectView(props, context)
-    ComponentType.SWITCH -> SwitchView(props, context)
+    ComponentType.SELECT -> FieldFrame(node, context) { SelectView(props, context, it) }
+    ComponentType.SWITCH -> FieldFrame(node, context) { SwitchView(props, context, it) }
     ComponentType.TABLE -> TableView(node, props, context)
     ComponentType.TABLE_ROW -> TableRowLine(node, context)
     ComponentType.TABS -> TabsView(node, context)
@@ -335,9 +344,55 @@ private fun ListItemView(props: Props, context: RenderContext) {
 
 // MARK: Interactive components
 
+/** What a field's control draws with: its modifier (focus, error semantics), its message, and "the person left it". */
+internal class FieldState(val modifier: Modifier, val message: String?, val leave: () -> Unit)
+
+/**
+ * A field (SPEC.md section 8, Fields): its control, then its message once the person has left it or a
+ * press checked it ([8.5]). The message is the renderer's own words, announced when it appears and set
+ * as the control's error for TalkBack.
+ */
+@Composable
+private fun FieldFrame(node: OmniNode, context: RenderContext, control: @Composable (FieldState) -> Unit) {
+  val strings = LocalOmniStrings.current
+  val requester = remember(node.id) { FocusRequester() }
+  context.focus[node.id] = requester
+  val message = context.store.visibleFieldProblem(node.id, context.document, context.shown)?.let(strings::field)
+  var focused by remember(node.id) { mutableStateOf(false) }
+  val leave = { context.store.showField(node.id) }
+  val modifier = Modifier
+    .focusRequester(requester)
+    .onFocusChanged { state ->
+      // Leaving the field (not the first report, which is "not focused") shows its message from now on.
+      if (focused && !state.hasFocus) leave()
+      focused = state.hasFocus
+    }
+    .then(if (message != null) Modifier.semantics { error(message) } else Modifier)
+  Column(verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
+    control(FieldState(modifier, message, leave))
+    if (message != null) {
+      Text(
+        message,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.error,
+        modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+      )
+    }
+  }
+}
+
+/** The keyboard for an Input's `format`: a hint only; the field check still runs ([8.3]). */
+private fun keyboardFor(format: String?): KeyboardType = when (format) {
+  "email" -> KeyboardType.Email
+  "number" -> KeyboardType.Decimal
+  "phone" -> KeyboardType.Phone
+  "url" -> KeyboardType.Uri
+  else -> KeyboardType.Text
+}
+
 /** An Input edits its `$key` locally; it never calls the backend by itself (R1). */
 @Composable
-private fun InputView(props: Props) {
+private fun InputView(props: Props, field: FieldState) {
   // More than one line: a fixed-height box that shows `lines` lines; longer text scrolls inside it.
   val lines = props.number("lines")?.toInt()?.coerceIn(1, 10) ?: 1
   OutlinedTextField(
@@ -348,14 +403,16 @@ private fun InputView(props: Props) {
     singleLine = lines == 1,
     minLines = lines,
     maxLines = lines,
-    modifier = Modifier.fillMaxWidth(),
+    isError = field.message != null,
+    keyboardOptions = KeyboardOptions(keyboardType = keyboardFor(props.option("format"))),
+    modifier = field.modifier.fillMaxWidth(),
   )
 }
 
 /** A DateInput edits a `$key` holding "YYYY-MM-DD" (or "" for no date), the same day in every time zone. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DateInputView(props: Props) {
+private fun DateInputView(props: Props, field: FieldState) {
   val strings = LocalOmniStrings.current
   val label = props.text("label")
   val day = Format.day(props.stateText())
@@ -365,7 +422,7 @@ private fun DateInputView(props: Props) {
   var open by remember { mutableStateOf(false) }
   Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
     Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    FilledTonalButton(onClick = { open = true }, modifier = Modifier.semantics { contentDescription = "$label: ${shown ?: "choose a date"}" }) {
+    FilledTonalButton(onClick = { open = true }, modifier = field.modifier.semantics { contentDescription = "$label: ${shown ?: "choose a date"}" }) {
       Text(shown ?: strings.chooseDate)
     }
   }
@@ -380,14 +437,23 @@ private fun DateInputView(props: Props) {
       },
     )
     DatePickerDialog(
-      onDismissRequest = { open = false },
+      onDismissRequest = {
+        open = false
+        field.leave()
+      },
       confirmButton = {
         TextButton(onClick = {
           state.selectedDateMillis?.let { props.setState(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate().toString()) }
           open = false
+          field.leave()
         }) { Text(strings.ok) }
       },
-      dismissButton = { TextButton(onClick = { open = false }) { Text(strings.cancel) } },
+      dismissButton = {
+        TextButton(onClick = {
+          open = false
+          field.leave()
+        }) { Text(strings.cancel) }
+      },
     ) { DatePicker(state) }
   }
 }
@@ -395,7 +461,7 @@ private fun DateInputView(props: Props) {
 /** A Select edits a text `$key`; a value that isn't one of its options shows as nothing chosen. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SelectView(props: Props, context: RenderContext) {
+private fun SelectView(props: Props, context: RenderContext, field: FieldState) {
   val options = props.texts("options")
   val chosen = context.store.chosenOption(props.stateKey(), options, context.document)
   var expanded by remember { mutableStateOf(false) }
@@ -407,13 +473,18 @@ private fun SelectView(props: Props, context: RenderContext) {
       label = { Text(props.text("label")) },
       placeholder = if (props.has("placeholder")) ({ Text(props.text("placeholder")) }) else null,
       trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-      modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+      isError = field.message != null,
+      modifier = field.modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
     )
-    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+    ExposedDropdownMenu(expanded = expanded, onDismissRequest = {
+      expanded = false
+      field.leave()
+    }) {
       for (option in options) {
         DropdownMenuItem(text = { Text(option) }, onClick = {
           props.setState(option)
           expanded = false
+          field.leave()
         })
       }
     }
@@ -422,14 +493,14 @@ private fun SelectView(props: Props, context: RenderContext) {
 
 /** A Switch edits a true/false `$key`. */
 @Composable
-private fun SwitchView(props: Props, context: RenderContext) {
+private fun SwitchView(props: Props, context: RenderContext, field: FieldState) {
   val key = props.stateKey()
   val on = context.store.stateBool(key, context.document)
   val label = props.text("label")
   Row(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.spacedBy(16.dp),
-    modifier = Modifier.fillMaxWidth().toggleable(value = on, role = Role.Switch, onValueChange = { context.store.setState(key, Primitive.Bool(it)) }),
+    modifier = field.modifier.fillMaxWidth().toggleable(value = on, role = Role.Switch, onValueChange = { context.store.setState(key, Primitive.Bool(it)) }),
   ) {
     Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
     Switch(checked = on, onCheckedChange = null)

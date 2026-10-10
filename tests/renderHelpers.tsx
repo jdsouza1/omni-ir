@@ -5,7 +5,7 @@ import type { Catalog } from "@omni-ir/react";
 import { createParser, type OmniParser } from "@omni-ir/core";
 import type { ToolRegistry } from "@omni-ir/core";
 import { OmniRenderer } from "@omni-ir/react";
-import type { MutationCall, RendererEvent } from "@omni-ir/react";
+import type { MutationCall, OmniRendererProps, RendererEvent } from "@omni-ir/react";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 
@@ -28,6 +28,8 @@ export function renderOmni(
     parser?: OmniParser;
     /** Real onMutation implementation (e.g. the client's /api/mutate handler); still wrapped in a spy. */
     onMutation?: (call: MutationCall) => void | Promise<void>;
+    /** More of the renderer's options, such as confirm or strings. */
+    rendererProps?: Partial<OmniRendererProps>;
   } = {},
 ): Harness {
   const tools = options.tools ?? TOOLS;
@@ -47,6 +49,7 @@ export function renderOmni(
       onMutation={onMutation}
       onEvent={onEvent}
       {...(options.catalog ? { catalog: options.catalog } : {})}
+      {...options.rendererProps}
     />,
   );
 

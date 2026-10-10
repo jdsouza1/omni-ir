@@ -48,6 +48,7 @@ describe("hosted playground (no server, no network)", () => {
     const user = await open();
     await run(user, "a payment confirmation for $42.50");
     await user.click(screen.getByRole("button", { name: "Pay now" }));
+    await user.click(await screen.findByRole("button", { name: "Confirm" }));
     const panel = within(screen.getByRole("region", { name: "Actions" }));
     await panel.findByText(/payments\.confirm → .*"receiptId":"rcpt_/);
     expect(network).not.toHaveBeenCalled();

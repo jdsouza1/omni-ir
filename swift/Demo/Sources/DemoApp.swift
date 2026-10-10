@@ -83,7 +83,7 @@ struct RootView: View {
 struct ScreenView: View {
   let source: Source
   let instant: Bool
-  @State private var store = OmniStore(tools: demoTools, assets: Set(demoPictureNames))
+  @State private var store = OmniStore(tools: demoTools, assets: Set(demoPictureNames), confirm: demoConfirm)
   @State private var log: [String] = []
   @State private var done = false
 

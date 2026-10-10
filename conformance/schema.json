@@ -1,7 +1,7 @@
 {
   "$comment": "Generated from packages/core/src/schema.ts by `npm run schema:export`; do not edit. In props, a value written `$key` is {kind: \"state\", key: \"$key\"}, a bare identifier is {kind: \"ref\", id}, and a children list is an array of refs. See conformance/README.md.",
   "version": "0.10.1",
-  "formatVersion": "0.5",
+  "formatVersion": "0.8",
   "rootId": "root",
   "limits": {
     "lineLength": 16384,
@@ -319,6 +319,28 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 10
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "email",
+              "number",
+              "phone",
+              "url"
+            ]
+          },
+          "minLength": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2000
+          },
+          "maxLength": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2000
           }
         },
         "required": [
@@ -579,6 +601,9 @@
           "max": {
             "type": "string",
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "required": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -822,6 +847,9 @@
           "placeholder": {
             "type": "string",
             "maxLength": 200
+          },
+          "required": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -863,6 +891,9 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200
+          },
+          "required": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -1458,6 +1489,11 @@
     {
       "component": "Rating",
       "rule": "When value is a number, it must not be more than max (5 when max is absent).",
+      "code": "invalid_props"
+    },
+    {
+      "component": "Input",
+      "rule": "When both are given, minLength must not be more than maxLength.",
       "code": "invalid_props"
     }
   ],

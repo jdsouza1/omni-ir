@@ -55,6 +55,7 @@ Write \`root = …\` first and its parts after it; referring to an id before its
   \`actions = Stack([confirm])\`, \`confirm = Button("Pay now", action="pay")\` and \`pay = McpMutation(confirm, tool="payments.confirm", params={amount: $amount, note: $note})\`
   A Button without \`action\` stays in the page (for example Cancel).
 - An Input edits a text state: declare \`$note = ""\` and write \`note = Input($note, label="Note")\`. Send typed values to the backend through McpMutation params. For longer text, such as a message or a bio, set \`lines\` (for example \`lines=4\`).
+- Fields can declare checks the app makes before an action that reads them runs: \`required=true\` on an Input, DateInput, Select or Switch (a required Switch must be turned on, for example to accept terms), and on an Input \`format="email"\` (or \`"number"\`, \`"phone"\`, \`"url"\`), \`minLength\` and \`maxLength\`. Declare what the form needs, for example \`email = Input($email, label="Email", required=true, format="email")\`; the app writes the messages.
 - There is no styling, HTML or CSS. Choose among the listed values.
 - An Image or a ListItem's image shows a picture the app provides: name one from the Images list below. There are no URLs.
 - A List holds only ListItems, and a ListItem goes only in a List.

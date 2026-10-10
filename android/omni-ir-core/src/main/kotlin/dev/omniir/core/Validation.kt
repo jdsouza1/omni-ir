@@ -195,6 +195,12 @@ private fun crossPropRule(type: ComponentType, props: List<Pair<String, Value>>)
     val value = (given["value"] as? Value.Num)?.value
     if (value != null && value > max) return "value must not be more than max (default 5)"
   }
+  if (type == ComponentType.INPUT) {
+    val given = props.toMap()
+    val min = (given["minLength"] as? Value.Num)?.value
+    val max = (given["maxLength"] as? Value.Num)?.value
+    if (min != null && max != null && min > max) return "minLength must not be more than maxLength"
+  }
   return null
 }
 

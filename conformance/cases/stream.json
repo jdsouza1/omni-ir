@@ -211,7 +211,7 @@
       "rules": [
         "3.9"
       ],
-      "description": "Versions compare by MAJOR, then MINOR, as numbers: 0.999 is newer than 0.5 (not a decimal fraction).",
+      "description": "Versions compare by MAJOR, then MINOR, as numbers: 0.999 is newer than 0.8 (not a decimal fraction).",
       "input": "# omni-ir 0.999\nroot = Divider()\n",
       "expect": {
         "issues": [
@@ -290,12 +290,30 @@
       }
     },
     {
+      "id": "version-marker-current-format",
+      "rules": [
+        "3.9"
+      ],
+      "description": "Format 0.8 (field constraints) is this specification's format: its marker is not newer.",
+      "input": "# omni-ir 0.8\nroot = Divider()\n",
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Divider",
+            "props": {},
+            "children": []
+          }
+        }
+      }
+    },
+    {
       "id": "version-marker-next-format",
       "rules": [
         "3.9"
       ],
-      "description": "The next format version after 0.5 is 0.8: newer than format 0.5.",
-      "input": "# omni-ir 0.8\nroot = Divider()\n",
+      "description": "The next format version after 0.8 is 0.9: newer than format 0.8.",
+      "input": "# omni-ir 0.9\nroot = Divider()\n",
       "expect": {
         "issues": [
           {

@@ -21,3 +21,24 @@ public func fillTemplate(_ template: String, _ values: [String: String]) -> Stri
   }
   return out
 }
+
+extension OmniStrings {
+  /// A field problem in these words, with its placeholders such as `{max}` filled (SPEC.md section 8).
+  public func field(_ problem: FieldProblem) -> String {
+    let template: String =
+      switch problem.message {
+      case "chooseOption": chooseOption
+      case "turnOn": turnOn
+      case "invalidEmail": invalidEmail
+      case "invalidNumber": invalidNumber
+      case "invalidPhone": invalidPhone
+      case "invalidUrl": invalidUrl
+      case "tooShort": tooShort
+      case "tooLong": tooLong
+      case "dateTooEarly": dateTooEarly
+      case "dateTooLate": dateTooLate
+      default: required
+      }
+    return fillTemplate(template, problem.values)
+  }
+}

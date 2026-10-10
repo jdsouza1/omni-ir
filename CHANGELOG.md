@@ -2,6 +2,29 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+Stream format **0.8**, the first change to the format since it got its own version (Step 19, PLAN-FORMS.md).
+
+### Added
+- **Fields that check themselves:** `required` on Input, DateInput, Select and Switch; `format` (`"email"`, `"number"`, `"phone"`, `"url"`), `minLength` and `maxLength` on Input, with `minLength` no more than `maxLength` (SPEC.md [5.26]). Before a governed Button's action runs, the renderer checks every field its params read; a failing field shows the renderer's own message and gets focus, and nothing is sent ([8.1]–[8.6]). Messages also appear once the person leaves a field, and are announced. The checks run the same on the web, iPhone and Android, held to shared cases in `conformance/fields/fields.json`; the backend still checks every action against the tool's schema. New words in `OmniStrings` (`required`, `invalidEmail`, `tooLong`, … and `confirm`).
+- **Confirmations in the app's words:** `OmniRenderer`'s `confirm` prop, such as `{ "payments.confirm": "Pay {amount}?" }`, `OmniStore(confirm:)` in Swift and Kotlin. The renderer's own dialog shows the sentence, filled once with the params as plain text, or written by the app's own function from the checked params, for example to show an amount as currency (`Confirmation` in Swift and Kotlin); the action runs only on Confirm. A press checks the fields, then the params, then asks ([9.1]–[9.3]). Nothing in a stream can skip, change or add a confirmation. The playground and the iOS and Android demo apps confirm payments ("Pay $42.50?").
+- **Screens as text:** `describeScreen(document)` in `@omni-ir/core`, a plain-text outline, one component per line; what the person typed stays out unless `{ values: true }`. `show_screen` in `@omni-ir/mcp` returns it (`outline`) for hosts that can't draw the view.
+- The system prompt and the MCP guide explain the new props; the sign-in and support fixtures use them. Guide: Forms and confirmations.
+
+### Changed
+- `FORMAT_VERSION` is `0.8`; the version marker is `# omni-ir 0.8`. The next format version is `0.9`.
+
+### Compatibility
+
+| | 0.8 server (format 0.8) |
+|---|---|
+| **This release's apps** | works |
+| **0.8.0 to 0.10.x apps** (format 0.5) | refused, then works on the retry without a version: the update notice shows, and a field using a new prop shows a fallback |
+| **0.6 or 0.7 apps** | refused (they don't retry) |
+
+A server from 0.8.0 to 0.10.x still serves this release's apps: they read format 0.5 as well.
+
 ## 0.10.1 (2026-10-07)
 
 The first release of `@omni-ir/mcp` (with `@omni-ir/core` and `@omni-ir/react` at the same version). Its first version, 0.10.0, was published by hand, while npm 11 warned that its `bin` path, written `./dist/bin.js`, was invalid. 0.10.1 writes the path as npm expects and is published from GitHub with provenance like the others, and the pack check now fails whenever npm would change a package's manifest at publish time. `@omni-ir/core` and `@omni-ir/react` 0.10.0 were never published.

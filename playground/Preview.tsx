@@ -3,7 +3,7 @@
 // Only a data attribute is toggled on the rendered element; its content is never touched.
 import { useEffect, useRef } from "react";
 import { ASSETS } from "../app/assets";
-import { TOOLS } from "../app/tools";
+import { CONFIRMATIONS, TOOLS } from "../app/tools";
 import type { OmniStore } from "@omni-ir/core";
 import { OmniRenderer } from "@omni-ir/react";
 import type { MutationCall, RendererEvent } from "@omni-ir/react";
@@ -51,7 +51,7 @@ export function Preview({ runId, store, onMutation, onEvent, highlightedId, onHi
       onFocus={(e) => onHighlight(idAt(e.target))}
       onBlur={() => onHighlight(null)}
     >
-      <OmniRenderer key={runId} store={store} tools={TOOLS} assets={ASSETS} onMutation={onMutation} onEvent={onEvent} theme={pageTheme()} />
+      <OmniRenderer key={runId} store={store} tools={TOOLS} assets={ASSETS} confirm={CONFIRMATIONS} onMutation={onMutation} onEvent={onEvent} theme={pageTheme()} />
     </div>
   );
 }

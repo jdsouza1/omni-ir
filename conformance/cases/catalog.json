@@ -804,9 +804,9 @@
         "5.8",
         "5.9"
       ],
-      "description": "Every prop of Input: 4 accepted lines and 37 rejected ones. Generated from schema.json.",
+      "description": "Every prop of Input: 14 accepted lines and 70 rejected ones. Generated from schema.json.",
       "input": [
-        "root = Stack([a1, a2, a3, a4])\n$s = \"\"\na1 = Input($s, label=\"Hello\")\na2 = Input($s, label=\"Hello\", placeholder=\"Hello\")\na3 = Input($s, label=\"Hello\", lines=1)\na4 = Input($s, label=\"Hello\", lines=10)\nr1 = Input(true, label=\"Hello\")\nr2 = Input(null, label=\"Hello\")\nr3 = Input(\"nope\", label=\"Hello\")\nr4 = Input(4, label=\"Hello\")\nr5 = Input(1.5, label=\"Hello\")\nr6 = Input([], label=\"Hello\")\nr7 = Input(other, label=\"Hello\")\nr8 = Input(label=\"Hello\")\nr9 = Input($s, label=true)\nr10 = Input($s, label=null)\nr11 = Input($s, label=4)\nr12 = Input($s, label=1.5)\nr13 = Input($s, label=$s)\nr14 = Input($s, label=[])\nr15 = Input($s, label=other)\nr16 = Input($s, label=\"",
+        "root = Stack([a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14])\n$s = \"\"\na1 = Input($s, label=\"Hello\")\na2 = Input($s, label=\"Hello\", placeholder=\"Hello\")\na3 = Input($s, label=\"Hello\", lines=1)\na4 = Input($s, label=\"Hello\", lines=10)\na5 = Input($s, label=\"Hello\", required=true)\na6 = Input($s, label=\"Hello\", required=false)\na7 = Input($s, label=\"Hello\", format=\"email\")\na8 = Input($s, label=\"Hello\", format=\"number\")\na9 = Input($s, label=\"Hello\", format=\"phone\")\na10 = Input($s, label=\"Hello\", format=\"url\")\na11 = Input($s, label=\"Hello\", minLength=1)\na12 = Input($s, label=\"Hello\", minLength=2000)\na13 = Input($s, label=\"Hello\", maxLength=1)\na14 = Input($s, label=\"Hello\", maxLength=2000)\nr1 = Input(true, label=\"Hello\")\nr2 = Input(null, label=\"Hello\")\nr3 = Input(\"nope\", label=\"Hello\")\nr4 = Input(4, label=\"Hello\")\nr5 = Input(1.5, label=\"Hello\")\nr6 = Input([], label=\"Hello\")\nr7 = Input(other, label=\"Hello\")\nr8 = Input(label=\"Hello\")\nr9 = Input($s, label=true)\nr10 = Input($s, label=null)\nr11 = Input($s, label=4)\nr12 = Input($s, label=1.5)\nr13 = Input($s, label=$s)\nr14 = Input($s, label=[])\nr15 = Input($s, label=other)\nr16 = Input($s, label=\"",
         {
           "repeat": "x",
           "times": 201
@@ -816,53 +816,13 @@
           "repeat": "x",
           "times": 201
         },
-        "\")\nr27 = Input($s, label=\"Hello\", lines=true)\nr28 = Input($s, label=\"Hello\", lines=null)\nr29 = Input($s, label=\"Hello\", lines=\"nope\")\nr30 = Input($s, label=\"Hello\", lines=1.5)\nr31 = Input($s, label=\"Hello\", lines=$s)\nr32 = Input($s, label=\"Hello\", lines=[])\nr33 = Input($s, label=\"Hello\", lines=other)\nr34 = Input($s, label=\"Hello\", lines=0)\nr35 = Input($s, label=\"Hello\", lines=11)\nr36 = Input($s, label=\"Hello\", style=\"color: red\")\nr37 = Input($s, \"extra\", label=\"Hello\")\n"
+        "\")\nr27 = Input($s, label=\"Hello\", lines=true)\nr28 = Input($s, label=\"Hello\", lines=null)\nr29 = Input($s, label=\"Hello\", lines=\"nope\")\nr30 = Input($s, label=\"Hello\", lines=1.5)\nr31 = Input($s, label=\"Hello\", lines=$s)\nr32 = Input($s, label=\"Hello\", lines=[])\nr33 = Input($s, label=\"Hello\", lines=other)\nr34 = Input($s, label=\"Hello\", lines=0)\nr35 = Input($s, label=\"Hello\", lines=11)\nr36 = Input($s, label=\"Hello\", required=null)\nr37 = Input($s, label=\"Hello\", required=\"nope\")\nr38 = Input($s, label=\"Hello\", required=4)\nr39 = Input($s, label=\"Hello\", required=1.5)\nr40 = Input($s, label=\"Hello\", required=$s)\nr41 = Input($s, label=\"Hello\", required=[])\nr42 = Input($s, label=\"Hello\", required=other)\nr43 = Input($s, label=\"Hello\", format=true)\nr44 = Input($s, label=\"Hello\", format=null)\nr45 = Input($s, label=\"Hello\", format=\"nope\")\nr46 = Input($s, label=\"Hello\", format=4)\nr47 = Input($s, label=\"Hello\", format=1.5)\nr48 = Input($s, label=\"Hello\", format=$s)\nr49 = Input($s, label=\"Hello\", format=[])\nr50 = Input($s, label=\"Hello\", format=other)\nr51 = Input($s, label=\"Hello\", minLength=true)\nr52 = Input($s, label=\"Hello\", minLength=null)\nr53 = Input($s, label=\"Hello\", minLength=\"nope\")\nr54 = Input($s, label=\"Hello\", minLength=1.5)\nr55 = Input($s, label=\"Hello\", minLength=$s)\nr56 = Input($s, label=\"Hello\", minLength=[])\nr57 = Input($s, label=\"Hello\", minLength=other)\nr58 = Input($s, label=\"Hello\", minLength=0)\nr59 = Input($s, label=\"Hello\", minLength=2001)\nr60 = Input($s, label=\"Hello\", maxLength=true)\nr61 = Input($s, label=\"Hello\", maxLength=null)\nr62 = Input($s, label=\"Hello\", maxLength=\"nope\")\nr63 = Input($s, label=\"Hello\", maxLength=1.5)\nr64 = Input($s, label=\"Hello\", maxLength=$s)\nr65 = Input($s, label=\"Hello\", maxLength=[])\nr66 = Input($s, label=\"Hello\", maxLength=other)\nr67 = Input($s, label=\"Hello\", maxLength=0)\nr68 = Input($s, label=\"Hello\", maxLength=2001)\nr69 = Input($s, label=\"Hello\", style=\"color: red\")\nr70 = Input($s, \"extra\", label=\"Hello\")\n"
       ],
       "assets": [
         "cabin-pines"
       ],
       "expect": {
         "issues": [
-          {
-            "line": 7,
-            "code": "invalid_props"
-          },
-          {
-            "line": 8,
-            "code": "invalid_props"
-          },
-          {
-            "line": 9,
-            "code": "invalid_props"
-          },
-          {
-            "line": 10,
-            "code": "invalid_props"
-          },
-          {
-            "line": 11,
-            "code": "invalid_props"
-          },
-          {
-            "line": 12,
-            "code": "invalid_props"
-          },
-          {
-            "line": 13,
-            "code": "invalid_props"
-          },
-          {
-            "line": 14,
-            "code": "invalid_props"
-          },
-          {
-            "line": 15,
-            "code": "invalid_props"
-          },
-          {
-            "line": 16,
-            "code": "invalid_props"
-          },
           {
             "line": 17,
             "code": "invalid_props"
@@ -970,6 +930,178 @@
           {
             "line": 43,
             "code": "invalid_props"
+          },
+          {
+            "line": 44,
+            "code": "invalid_props"
+          },
+          {
+            "line": 45,
+            "code": "invalid_props"
+          },
+          {
+            "line": 46,
+            "code": "invalid_props"
+          },
+          {
+            "line": 47,
+            "code": "invalid_props"
+          },
+          {
+            "line": 48,
+            "code": "invalid_props"
+          },
+          {
+            "line": 49,
+            "code": "invalid_props"
+          },
+          {
+            "line": 50,
+            "code": "invalid_props"
+          },
+          {
+            "line": 51,
+            "code": "invalid_props"
+          },
+          {
+            "line": 52,
+            "code": "invalid_props"
+          },
+          {
+            "line": 53,
+            "code": "invalid_props"
+          },
+          {
+            "line": 54,
+            "code": "invalid_props"
+          },
+          {
+            "line": 55,
+            "code": "invalid_props"
+          },
+          {
+            "line": 56,
+            "code": "invalid_props"
+          },
+          {
+            "line": 57,
+            "code": "invalid_props"
+          },
+          {
+            "line": 58,
+            "code": "invalid_props"
+          },
+          {
+            "line": 59,
+            "code": "invalid_props"
+          },
+          {
+            "line": 60,
+            "code": "invalid_props"
+          },
+          {
+            "line": 61,
+            "code": "invalid_props"
+          },
+          {
+            "line": 62,
+            "code": "invalid_props"
+          },
+          {
+            "line": 63,
+            "code": "invalid_props"
+          },
+          {
+            "line": 64,
+            "code": "invalid_props"
+          },
+          {
+            "line": 65,
+            "code": "invalid_props"
+          },
+          {
+            "line": 66,
+            "code": "invalid_props"
+          },
+          {
+            "line": 67,
+            "code": "invalid_props"
+          },
+          {
+            "line": 68,
+            "code": "invalid_props"
+          },
+          {
+            "line": 69,
+            "code": "invalid_props"
+          },
+          {
+            "line": 70,
+            "code": "invalid_props"
+          },
+          {
+            "line": 71,
+            "code": "invalid_props"
+          },
+          {
+            "line": 72,
+            "code": "invalid_props"
+          },
+          {
+            "line": 73,
+            "code": "invalid_props"
+          },
+          {
+            "line": 74,
+            "code": "invalid_props"
+          },
+          {
+            "line": 75,
+            "code": "invalid_props"
+          },
+          {
+            "line": 76,
+            "code": "invalid_props"
+          },
+          {
+            "line": 77,
+            "code": "invalid_props"
+          },
+          {
+            "line": 78,
+            "code": "invalid_props"
+          },
+          {
+            "line": 79,
+            "code": "invalid_props"
+          },
+          {
+            "line": 80,
+            "code": "invalid_props"
+          },
+          {
+            "line": 81,
+            "code": "invalid_props"
+          },
+          {
+            "line": 82,
+            "code": "invalid_props"
+          },
+          {
+            "line": 83,
+            "code": "invalid_props"
+          },
+          {
+            "line": 84,
+            "code": "invalid_props"
+          },
+          {
+            "line": 85,
+            "code": "invalid_props"
+          },
+          {
+            "line": 86,
+            "code": "invalid_props"
           }
         ],
         "nodes": {
@@ -980,7 +1112,17 @@
               "a1",
               "a2",
               "a3",
-              "a4"
+              "a4",
+              "a5",
+              "a6",
+              "a7",
+              "a8",
+              "a9",
+              "a10",
+              "a11",
+              "a12",
+              "a13",
+              "a14"
             ]
           },
           "a1": {
@@ -1023,6 +1165,116 @@
               },
               "label": "Hello",
               "lines": 10
+            },
+            "children": []
+          },
+          "a5": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "required": true
+            },
+            "children": []
+          },
+          "a6": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "required": false
+            },
+            "children": []
+          },
+          "a7": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "format": "email"
+            },
+            "children": []
+          },
+          "a8": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "format": "number"
+            },
+            "children": []
+          },
+          "a9": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "format": "phone"
+            },
+            "children": []
+          },
+          "a10": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "format": "url"
+            },
+            "children": []
+          },
+          "a11": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "minLength": 1
+            },
+            "children": []
+          },
+          "a12": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "minLength": 2000
+            },
+            "children": []
+          },
+          "a13": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "maxLength": 1
+            },
+            "children": []
+          },
+          "a14": {
+            "type": "Input",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "maxLength": 2000
             },
             "children": []
           }
@@ -1878,28 +2130,20 @@
         "5.8",
         "5.9"
       ],
-      "description": "Every prop of DateInput: 3 accepted lines and 38 rejected ones. Generated from schema.json.",
+      "description": "Every prop of DateInput: 5 accepted lines and 45 rejected ones. Generated from schema.json.",
       "input": [
-        "root = Stack([a1, a2, a3])\n$s = \"\"\na1 = DateInput($s, label=\"Hello\")\na2 = DateInput($s, label=\"Hello\", min=\"2026-10-14\")\na3 = DateInput($s, label=\"Hello\", max=\"2026-10-14\")\nr1 = DateInput(true, label=\"Hello\")\nr2 = DateInput(null, label=\"Hello\")\nr3 = DateInput(\"nope\", label=\"Hello\")\nr4 = DateInput(4, label=\"Hello\")\nr5 = DateInput(1.5, label=\"Hello\")\nr6 = DateInput([], label=\"Hello\")\nr7 = DateInput(other, label=\"Hello\")\nr8 = DateInput(label=\"Hello\")\nr9 = DateInput($s, label=true)\nr10 = DateInput($s, label=null)\nr11 = DateInput($s, label=4)\nr12 = DateInput($s, label=1.5)\nr13 = DateInput($s, label=$s)\nr14 = DateInput($s, label=[])\nr15 = DateInput($s, label=other)\nr16 = DateInput($s, label=\"",
+        "root = Stack([a1, a2, a3, a4, a5])\n$s = \"\"\na1 = DateInput($s, label=\"Hello\")\na2 = DateInput($s, label=\"Hello\", min=\"2026-10-14\")\na3 = DateInput($s, label=\"Hello\", max=\"2026-10-14\")\na4 = DateInput($s, label=\"Hello\", required=true)\na5 = DateInput($s, label=\"Hello\", required=false)\nr1 = DateInput(true, label=\"Hello\")\nr2 = DateInput(null, label=\"Hello\")\nr3 = DateInput(\"nope\", label=\"Hello\")\nr4 = DateInput(4, label=\"Hello\")\nr5 = DateInput(1.5, label=\"Hello\")\nr6 = DateInput([], label=\"Hello\")\nr7 = DateInput(other, label=\"Hello\")\nr8 = DateInput(label=\"Hello\")\nr9 = DateInput($s, label=true)\nr10 = DateInput($s, label=null)\nr11 = DateInput($s, label=4)\nr12 = DateInput($s, label=1.5)\nr13 = DateInput($s, label=$s)\nr14 = DateInput($s, label=[])\nr15 = DateInput($s, label=other)\nr16 = DateInput($s, label=\"",
         {
           "repeat": "x",
           "times": 201
         },
-        "\")\nr17 = DateInput($s, label=\"\")\nr18 = DateInput($s)\nr19 = DateInput($s, label=\"Hello\", min=true)\nr20 = DateInput($s, label=\"Hello\", min=null)\nr21 = DateInput($s, label=\"Hello\", min=\"nope\")\nr22 = DateInput($s, label=\"Hello\", min=4)\nr23 = DateInput($s, label=\"Hello\", min=1.5)\nr24 = DateInput($s, label=\"Hello\", min=$s)\nr25 = DateInput($s, label=\"Hello\", min=[])\nr26 = DateInput($s, label=\"Hello\", min=other)\nr27 = DateInput($s, label=\"Hello\", min=\"14/10/2026\")\nr28 = DateInput($s, label=\"Hello\", max=true)\nr29 = DateInput($s, label=\"Hello\", max=null)\nr30 = DateInput($s, label=\"Hello\", max=\"nope\")\nr31 = DateInput($s, label=\"Hello\", max=4)\nr32 = DateInput($s, label=\"Hello\", max=1.5)\nr33 = DateInput($s, label=\"Hello\", max=$s)\nr34 = DateInput($s, label=\"Hello\", max=[])\nr35 = DateInput($s, label=\"Hello\", max=other)\nr36 = DateInput($s, label=\"Hello\", max=\"14/10/2026\")\nr37 = DateInput($s, label=\"Hello\", style=\"color: red\")\nr38 = DateInput($s, \"extra\", label=\"Hello\")\n"
+        "\")\nr17 = DateInput($s, label=\"\")\nr18 = DateInput($s)\nr19 = DateInput($s, label=\"Hello\", min=true)\nr20 = DateInput($s, label=\"Hello\", min=null)\nr21 = DateInput($s, label=\"Hello\", min=\"nope\")\nr22 = DateInput($s, label=\"Hello\", min=4)\nr23 = DateInput($s, label=\"Hello\", min=1.5)\nr24 = DateInput($s, label=\"Hello\", min=$s)\nr25 = DateInput($s, label=\"Hello\", min=[])\nr26 = DateInput($s, label=\"Hello\", min=other)\nr27 = DateInput($s, label=\"Hello\", min=\"14/10/2026\")\nr28 = DateInput($s, label=\"Hello\", max=true)\nr29 = DateInput($s, label=\"Hello\", max=null)\nr30 = DateInput($s, label=\"Hello\", max=\"nope\")\nr31 = DateInput($s, label=\"Hello\", max=4)\nr32 = DateInput($s, label=\"Hello\", max=1.5)\nr33 = DateInput($s, label=\"Hello\", max=$s)\nr34 = DateInput($s, label=\"Hello\", max=[])\nr35 = DateInput($s, label=\"Hello\", max=other)\nr36 = DateInput($s, label=\"Hello\", max=\"14/10/2026\")\nr37 = DateInput($s, label=\"Hello\", required=null)\nr38 = DateInput($s, label=\"Hello\", required=\"nope\")\nr39 = DateInput($s, label=\"Hello\", required=4)\nr40 = DateInput($s, label=\"Hello\", required=1.5)\nr41 = DateInput($s, label=\"Hello\", required=$s)\nr42 = DateInput($s, label=\"Hello\", required=[])\nr43 = DateInput($s, label=\"Hello\", required=other)\nr44 = DateInput($s, label=\"Hello\", style=\"color: red\")\nr45 = DateInput($s, \"extra\", label=\"Hello\")\n"
       ],
       "assets": [
         "cabin-pines"
       ],
       "expect": {
         "issues": [
-          {
-            "line": 6,
-            "code": "invalid_props"
-          },
-          {
-            "line": 7,
-            "code": "invalid_props"
-          },
           {
             "line": 8,
             "code": "invalid_props"
@@ -2043,6 +2287,42 @@
           {
             "line": 43,
             "code": "invalid_props"
+          },
+          {
+            "line": 44,
+            "code": "invalid_props"
+          },
+          {
+            "line": 45,
+            "code": "invalid_props"
+          },
+          {
+            "line": 46,
+            "code": "invalid_props"
+          },
+          {
+            "line": 47,
+            "code": "invalid_props"
+          },
+          {
+            "line": 48,
+            "code": "invalid_props"
+          },
+          {
+            "line": 49,
+            "code": "invalid_props"
+          },
+          {
+            "line": 50,
+            "code": "invalid_props"
+          },
+          {
+            "line": 51,
+            "code": "invalid_props"
+          },
+          {
+            "line": 52,
+            "code": "invalid_props"
           }
         ],
         "nodes": {
@@ -2052,7 +2332,9 @@
             "children": [
               "a1",
               "a2",
-              "a3"
+              "a3",
+              "a4",
+              "a5"
             ]
           },
           "a1": {
@@ -2084,6 +2366,28 @@
               },
               "label": "Hello",
               "max": "2026-10-14"
+            },
+            "children": []
+          },
+          "a4": {
+            "type": "DateInput",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "required": true
+            },
+            "children": []
+          },
+          "a5": {
+            "type": "DateInput",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "required": false
             },
             "children": []
           }
@@ -2563,9 +2867,9 @@
         "5.8",
         "5.9"
       ],
-      "description": "Every prop of Select: 3 accepted lines and 39 rejected ones. Generated from schema.json.",
+      "description": "Every prop of Select: 5 accepted lines and 46 rejected ones. Generated from schema.json.",
       "input": [
-        "root = Stack([a1, a2, a3])\n$s = \"\"\na1 = Select($s, label=\"Hello\", options=[\"Hello\"])\na2 = Select($s, label=\"Hello\", options=[\"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\"])\na3 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=\"Hello\")\nr1 = Select(true, label=\"Hello\", options=[\"Hello\"])\nr2 = Select(null, label=\"Hello\", options=[\"Hello\"])\nr3 = Select(\"nope\", label=\"Hello\", options=[\"Hello\"])\nr4 = Select(4, label=\"Hello\", options=[\"Hello\"])\nr5 = Select(1.5, label=\"Hello\", options=[\"Hello\"])\nr6 = Select([], label=\"Hello\", options=[\"Hello\"])\nr7 = Select(other, label=\"Hello\", options=[\"Hello\"])\nr8 = Select(label=\"Hello\", options=[\"Hello\"])\nr9 = Select($s, label=true, options=[\"Hello\"])\nr10 = Select($s, label=null, options=[\"Hello\"])\nr11 = Select($s, label=4, options=[\"Hello\"])\nr12 = Select($s, label=1.5, options=[\"Hello\"])\nr13 = Select($s, label=$s, options=[\"Hello\"])\nr14 = Select($s, label=[], options=[\"Hello\"])\nr15 = Select($s, label=other, options=[\"Hello\"])\nr16 = Select($s, label=\"",
+        "root = Stack([a1, a2, a3, a4, a5])\n$s = \"\"\na1 = Select($s, label=\"Hello\", options=[\"Hello\"])\na2 = Select($s, label=\"Hello\", options=[\"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\", \"Hello\"])\na3 = Select($s, label=\"Hello\", options=[\"Hello\"], placeholder=\"Hello\")\na4 = Select($s, label=\"Hello\", options=[\"Hello\"], required=true)\na5 = Select($s, label=\"Hello\", options=[\"Hello\"], required=false)\nr1 = Select(true, label=\"Hello\", options=[\"Hello\"])\nr2 = Select(null, label=\"Hello\", options=[\"Hello\"])\nr3 = Select(\"nope\", label=\"Hello\", options=[\"Hello\"])\nr4 = Select(4, label=\"Hello\", options=[\"Hello\"])\nr5 = Select(1.5, label=\"Hello\", options=[\"Hello\"])\nr6 = Select([], label=\"Hello\", options=[\"Hello\"])\nr7 = Select(other, label=\"Hello\", options=[\"Hello\"])\nr8 = Select(label=\"Hello\", options=[\"Hello\"])\nr9 = Select($s, label=true, options=[\"Hello\"])\nr10 = Select($s, label=null, options=[\"Hello\"])\nr11 = Select($s, label=4, options=[\"Hello\"])\nr12 = Select($s, label=1.5, options=[\"Hello\"])\nr13 = Select($s, label=$s, options=[\"Hello\"])\nr14 = Select($s, label=[], options=[\"Hello\"])\nr15 = Select($s, label=other, options=[\"Hello\"])\nr16 = Select($s, label=\"",
         {
           "repeat": "x",
           "times": 201
@@ -2575,21 +2879,13 @@
           "repeat": "x",
           "times": 201
         },
-        "\")\nr38 = Select($s, label=\"Hello\", options=[\"Hello\"], style=\"color: red\")\nr39 = Select($s, \"extra\", label=\"Hello\", options=[\"Hello\"])\n"
+        "\")\nr38 = Select($s, label=\"Hello\", options=[\"Hello\"], required=null)\nr39 = Select($s, label=\"Hello\", options=[\"Hello\"], required=\"nope\")\nr40 = Select($s, label=\"Hello\", options=[\"Hello\"], required=4)\nr41 = Select($s, label=\"Hello\", options=[\"Hello\"], required=1.5)\nr42 = Select($s, label=\"Hello\", options=[\"Hello\"], required=$s)\nr43 = Select($s, label=\"Hello\", options=[\"Hello\"], required=[])\nr44 = Select($s, label=\"Hello\", options=[\"Hello\"], required=other)\nr45 = Select($s, label=\"Hello\", options=[\"Hello\"], style=\"color: red\")\nr46 = Select($s, \"extra\", label=\"Hello\", options=[\"Hello\"])\n"
       ],
       "assets": [
         "cabin-pines"
       ],
       "expect": {
         "issues": [
-          {
-            "line": 6,
-            "code": "invalid_props"
-          },
-          {
-            "line": 7,
-            "code": "invalid_props"
-          },
           {
             "line": 8,
             "code": "invalid_props"
@@ -2737,6 +3033,42 @@
           {
             "line": 44,
             "code": "invalid_props"
+          },
+          {
+            "line": 45,
+            "code": "invalid_props"
+          },
+          {
+            "line": 46,
+            "code": "invalid_props"
+          },
+          {
+            "line": 47,
+            "code": "invalid_props"
+          },
+          {
+            "line": 48,
+            "code": "invalid_props"
+          },
+          {
+            "line": 49,
+            "code": "invalid_props"
+          },
+          {
+            "line": 50,
+            "code": "invalid_props"
+          },
+          {
+            "line": 51,
+            "code": "invalid_props"
+          },
+          {
+            "line": 52,
+            "code": "invalid_props"
+          },
+          {
+            "line": 53,
+            "code": "invalid_props"
           }
         ],
         "nodes": {
@@ -2746,7 +3078,9 @@
             "children": [
               "a1",
               "a2",
-              "a3"
+              "a3",
+              "a4",
+              "a5"
             ]
           },
           "a1": {
@@ -2837,6 +3171,34 @@
               "placeholder": "Hello"
             },
             "children": []
+          },
+          "a4": {
+            "type": "Select",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "options": [
+                "Hello"
+              ],
+              "required": true
+            },
+            "children": []
+          },
+          "a5": {
+            "type": "Select",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "options": [
+                "Hello"
+              ],
+              "required": false
+            },
+            "children": []
           }
         },
         "state": {
@@ -2850,28 +3212,20 @@
         "5.8",
         "5.9"
       ],
-      "description": "Every prop of Switch: 1 accepted lines and 20 rejected ones. Generated from schema.json.",
+      "description": "Every prop of Switch: 3 accepted lines and 27 rejected ones. Generated from schema.json.",
       "input": [
-        "root = Stack([a1])\n$s = false\na1 = Switch($s, label=\"Hello\")\nr1 = Switch(true, label=\"Hello\")\nr2 = Switch(null, label=\"Hello\")\nr3 = Switch(\"nope\", label=\"Hello\")\nr4 = Switch(4, label=\"Hello\")\nr5 = Switch(1.5, label=\"Hello\")\nr6 = Switch([], label=\"Hello\")\nr7 = Switch(other, label=\"Hello\")\nr8 = Switch(label=\"Hello\")\nr9 = Switch($s, label=true)\nr10 = Switch($s, label=null)\nr11 = Switch($s, label=4)\nr12 = Switch($s, label=1.5)\nr13 = Switch($s, label=$s)\nr14 = Switch($s, label=[])\nr15 = Switch($s, label=other)\nr16 = Switch($s, label=\"",
+        "root = Stack([a1, a2, a3])\n$s = false\na1 = Switch($s, label=\"Hello\")\na2 = Switch($s, label=\"Hello\", required=true)\na3 = Switch($s, label=\"Hello\", required=false)\nr1 = Switch(true, label=\"Hello\")\nr2 = Switch(null, label=\"Hello\")\nr3 = Switch(\"nope\", label=\"Hello\")\nr4 = Switch(4, label=\"Hello\")\nr5 = Switch(1.5, label=\"Hello\")\nr6 = Switch([], label=\"Hello\")\nr7 = Switch(other, label=\"Hello\")\nr8 = Switch(label=\"Hello\")\nr9 = Switch($s, label=true)\nr10 = Switch($s, label=null)\nr11 = Switch($s, label=4)\nr12 = Switch($s, label=1.5)\nr13 = Switch($s, label=$s)\nr14 = Switch($s, label=[])\nr15 = Switch($s, label=other)\nr16 = Switch($s, label=\"",
         {
           "repeat": "x",
           "times": 201
         },
-        "\")\nr17 = Switch($s, label=\"\")\nr18 = Switch($s)\nr19 = Switch($s, label=\"Hello\", style=\"color: red\")\nr20 = Switch($s, \"extra\", label=\"Hello\")\n"
+        "\")\nr17 = Switch($s, label=\"\")\nr18 = Switch($s)\nr19 = Switch($s, label=\"Hello\", required=null)\nr20 = Switch($s, label=\"Hello\", required=\"nope\")\nr21 = Switch($s, label=\"Hello\", required=4)\nr22 = Switch($s, label=\"Hello\", required=1.5)\nr23 = Switch($s, label=\"Hello\", required=$s)\nr24 = Switch($s, label=\"Hello\", required=[])\nr25 = Switch($s, label=\"Hello\", required=other)\nr26 = Switch($s, label=\"Hello\", style=\"color: red\")\nr27 = Switch($s, \"extra\", label=\"Hello\")\n"
       ],
       "assets": [
         "cabin-pines"
       ],
       "expect": {
         "issues": [
-          {
-            "line": 4,
-            "code": "invalid_props"
-          },
-          {
-            "line": 5,
-            "code": "invalid_props"
-          },
           {
             "line": 6,
             "code": "invalid_props"
@@ -2943,6 +3297,42 @@
           {
             "line": 23,
             "code": "invalid_props"
+          },
+          {
+            "line": 24,
+            "code": "invalid_props"
+          },
+          {
+            "line": 25,
+            "code": "invalid_props"
+          },
+          {
+            "line": 26,
+            "code": "invalid_props"
+          },
+          {
+            "line": 27,
+            "code": "invalid_props"
+          },
+          {
+            "line": 28,
+            "code": "invalid_props"
+          },
+          {
+            "line": 29,
+            "code": "invalid_props"
+          },
+          {
+            "line": 30,
+            "code": "invalid_props"
+          },
+          {
+            "line": 31,
+            "code": "invalid_props"
+          },
+          {
+            "line": 32,
+            "code": "invalid_props"
           }
         ],
         "nodes": {
@@ -2950,7 +3340,9 @@
             "type": "Stack",
             "props": {},
             "children": [
-              "a1"
+              "a1",
+              "a2",
+              "a3"
             ]
           },
           "a1": {
@@ -2960,6 +3352,28 @@
                 "state": "$s"
               },
               "label": "Hello"
+            },
+            "children": []
+          },
+          "a2": {
+            "type": "Switch",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "required": true
+            },
+            "children": []
+          },
+          "a3": {
+            "type": "Switch",
+            "props": {
+              "value": {
+                "state": "$s"
+              },
+              "label": "Hello",
+              "required": false
             },
             "children": []
           }

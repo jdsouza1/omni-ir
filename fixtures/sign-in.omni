@@ -3,7 +3,7 @@ root = Card([title, intro, email, actions, fine])
 title = Heading("Sign in", level=1)
 intro = Text("We'll email you a one-time link. No password needed.", tone="muted")
 $email = ""
-email = Input($email, label="Email address", placeholder="you@example.com")
+email = Input($email, label="Email address", placeholder="you@example.com", required=true, format="email")
 actions = Stack([send], direction="row")
 send = Button("Email me a link", action="sendLink")
 sendLink = McpMutation(send, tool="auth.sendMagicLink", params={email: $email})

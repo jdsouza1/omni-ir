@@ -51,6 +51,8 @@ console.log(doc.nodes.get("title")?.props); // { text: "Hello" }
 - `LIMITS`: line length, text length, children and other limits.
 - `validateStatement`, `validateDocument`, `parseLine`, `LineBuffer`, `createStore`: the pipeline's individual stages.
 - `describeComponent`, `describeValue`: plain-language descriptions of the schema, used to write system prompts.
+- `checkField`, `fieldsReadBy`: the field checks every renderer runs before an action (SPEC.md section 8, Fields).
+- `describeScreen`: a plain-text outline of a screen, for logs, tests and hosts that can't draw it; what the person typed stays out unless asked.
 
 ## Security model
 

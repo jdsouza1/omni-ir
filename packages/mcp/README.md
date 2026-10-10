@@ -43,6 +43,8 @@ serveStdio(() =>
 );
 ```
 
+`show_screen`'s result tells the model which lines were rejected, if any, and gives the screen as plain text (`describeScreen` from `@omni-ir/core`), so a host that can't draw the view still shows something useful.
+
 Over HTTP, use the MCP SDK's `createMcpHandler` with a factory that passes who is calling (from MCP's authorization) as `user`, so each action runs as that person.
 
 ## In the repository

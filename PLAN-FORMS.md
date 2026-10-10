@@ -1,6 +1,6 @@
 # Omni-IR — Step 19: forms, confirmations and screens as text
 
-Status: **DRAFT 2026-10-09**, for the owner's approval. Free: no paid API; tests use mock data. Field validation adds props to the catalog, so this is the first format change under the versioning rules of `v0.8.0`: stream format `0.5` → `0.8`.
+Status: **APPROVED 2026-10-09** with the recommendations (all eight decisions). Free: no paid API; tests use mock data. Field validation adds props to the catalog, so this is the first format change under the versioning rules of `v0.8.0`: stream format `0.5` → `0.8`.
 
 ## Goal
 
@@ -102,27 +102,27 @@ Pressing a button for one of these tools opens the renderer's own dialog with th
 Work on branch `wip/forms`. Each part starts with failing tests (constraint 4).
 
 **A. Field validation** *(tests first)*
-- [ ] A.1 The new props in the schema (`required`, `format`, `minLength`, `maxLength`), with cross-prop rules (for example `minLength` ≤ `maxLength`); conformance cases; `schema.json`, Swift and Kotlin generated schemas
-- [ ] A.2 One shared definition of each check and its message key, with the renderer's new English words (`required`, `invalidEmail`, …) in `strings.ts`, generated into `OmniStrings`
-- [ ] A.3 Web: messages under fields, governed buttons blocked by the fields their params read, announced to screen readers
-- [ ] A.4 iOS and Android: the same, on CI; the demo apps' UI tests cover a blocked and an unblocked button
+- [x] A.1 The new props in the schema (`required`, `format`, `minLength`, `maxLength`), with cross-prop rules (for example `minLength` ≤ `maxLength`); conformance cases; `schema.json`, Swift and Kotlin generated schemas
+- [x] A.2 One shared definition of each check and its message key, with the renderer's new English words (`required`, `invalidEmail`, …) in `strings.ts`, generated into `OmniStrings`
+- [x] A.3 Web: messages under fields, governed buttons blocked by the fields their params read, announced to screen readers
+- [x] A.4 iOS and Android: the same, on CI; the demo apps' UI tests cover a blocked and an unblocked button
 
 **B. Confirmations** *(tests first)*
-- [ ] B.1 The `confirm` option and its plain-text template on all three renderers; the action runs only on Confirm
-- [ ] B.2 Tests that a stream can't skip or alter it (no prop, no line, no param changes it)
+- [x] B.1 The `confirm` option and its plain-text template on all three renderers; the action runs only on Confirm
+- [x] B.2 Tests that a stream can't skip or alter it (no prop, no line, no param changes it)
 
 **C. Screens as text** *(tests first)*
-- [ ] C.1 `describeScreen` in `@omni-ir/core`, values hidden by default
-- [ ] C.2 The MCP bridge adds it to `show_screen`'s result
+- [x] C.1 `describeScreen` in `@omni-ir/core`, values hidden by default
+- [x] C.2 The MCP bridge adds it to `show_screen`'s result
 
 **D. Format version, spec and docs**
-- [ ] D.1 `FORMAT_VERSION` `0.8`, the fingerprint, the system prompt and the MCP guide; a `0.5` client against a `0.8` stream, tested
-- [ ] D.2 SPEC.md: the new props' rules (section 5), renderer rules for validation and confirmations (sections 8 and 9), conformance coverage; guides; CHANGELOG
-- [ ] D.3 The decision log: this step's entry and decisions
+- [x] D.1 `FORMAT_VERSION` `0.8`, the fingerprint, the system prompt and the MCP guide; a `0.5` client against a `0.8` stream, tested
+- [x] D.2 SPEC.md: the new props' rules (section 5), renderer rules for validation and confirmations (sections 8 and 9), conformance coverage; guides; CHANGELOG
+- [x] D.3 The decision log: this step's entry and decisions
 
 **E. Review and release** *(checkpoint: you review)*
-- [ ] E.1 A short review page with screenshots on web, iPhone and Android (CI)
-- [ ] E.2 Merge with your approval
+- [x] E.1 A short review page with screenshots on web, iPhone and Android (CI)
+- [x] E.2 Merge with your approval
 - [ ] E.3 Release: a separate go-ahead from you
 
 ## What I need from you

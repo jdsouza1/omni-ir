@@ -5,7 +5,7 @@
 public let omniIRVersion = "0.10.1"
 
 /// The stream format's version: what the version marker, requests and version checks carry.
-public let omniIRFormatVersion = "0.5"
+public let omniIRFormatVersion = "0.8"
 
 /// The components in the Trusted Catalog.
 public enum ComponentType: String, Sendable, CaseIterable, Hashable {
@@ -248,6 +248,10 @@ enum Catalog {
         PropSpec(name: "label", required: true, value: .text(minLength: 1, maxLength: 200, pattern: nil)),
         PropSpec(name: "placeholder", required: false, value: .text(minLength: nil, maxLength: 200, pattern: nil)),
         PropSpec(name: "lines", required: false, value: .number(minimum: 1, maximum: 10, integer: true)),
+        PropSpec(name: "required", required: false, value: .boolean),
+        PropSpec(name: "format", required: false, value: .oneOf(["email", "number", "phone", "url"])),
+        PropSpec(name: "minLength", required: false, value: .number(minimum: 1, maximum: 2000, integer: true)),
+        PropSpec(name: "maxLength", required: false, value: .number(minimum: 1, maximum: 2000, integer: true)),
       ]
     ),
     .button: ComponentSpec(
@@ -298,6 +302,7 @@ enum Catalog {
         PropSpec(name: "label", required: true, value: .text(minLength: 1, maxLength: 200, pattern: nil)),
         PropSpec(name: "min", required: false, value: .text(minLength: nil, maxLength: nil, pattern: "^\\d{4}-\\d{2}-\\d{2}$")),
         PropSpec(name: "max", required: false, value: .text(minLength: nil, maxLength: nil, pattern: "^\\d{4}-\\d{2}-\\d{2}$")),
+        PropSpec(name: "required", required: false, value: .boolean),
       ]
     ),
     .list: ComponentSpec(
@@ -329,6 +334,7 @@ enum Catalog {
         PropSpec(name: "label", required: true, value: .text(minLength: 1, maxLength: 200, pattern: nil)),
         PropSpec(name: "options", required: true, value: .list(item: .text(minLength: 1, maxLength: 200, pattern: nil), minItems: 1, maxItems: 50)),
         PropSpec(name: "placeholder", required: false, value: .text(minLength: nil, maxLength: 200, pattern: nil)),
+        PropSpec(name: "required", required: false, value: .boolean),
       ]
     ),
     .switch: ComponentSpec(
@@ -336,6 +342,7 @@ enum Catalog {
       props: [
         PropSpec(name: "value", required: true, value: .state),
         PropSpec(name: "label", required: true, value: .text(minLength: 1, maxLength: 200, pattern: nil)),
+        PropSpec(name: "required", required: false, value: .boolean),
       ]
     ),
     .table: ComponentSpec(

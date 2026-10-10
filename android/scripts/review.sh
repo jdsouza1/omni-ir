@@ -33,6 +33,34 @@ adb shell settings put system font_scale 1.0
 
 for s in variants/dangling-child variants/unknown-tool; do shot "${s//\//-}-light" --es fixture "$s" --es appearance light --es instant true; done
 
+# Fields and confirmations (Step 19): a press blocked by an empty required field, and the app's
+# confirmation before paying. Buttons are found through the accessibility tree.
+tap_text() {
+  adb shell uiautomator dump /sdcard/ui.xml >/dev/null
+  adb pull /sdcard/ui.xml review/ui.xml >/dev/null
+  local bounds
+  bounds=$(grep -o "text=\"$1\"[^>]*bounds=\"\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]\"" review/ui.xml | grep -o 'bounds="[^"]*"' | head -1 || true)
+  if [ -n "$bounds" ]; then
+    read -r x1 y1 x2 y2 <<<"$(echo "$bounds" | grep -oE '[0-9]+' | tr '\n' ' ')"
+    adb shell input tap $(( (x1 + x2) / 2 )) $(( (y1 + y2) / 2 ))
+  else
+    echo "$1 not found in the accessibility tree"
+  fi
+  sleep 2
+}
+adb shell am force-stop "$APP"
+adb shell am start -W -n "$APP/.MainActivity" --es fixture sign-in --es appearance light --es instant true >/dev/null
+sleep 4
+tap_text "Email me a link"
+adb exec-out screencap -p > review/screenshots/forms-sign-in-required.png
+echo "screenshot forms-sign-in-required"
+adb shell am force-stop "$APP"
+adb shell am start -W -n "$APP/.MainActivity" --es fixture payment-confirmation --es appearance light --es instant true >/dev/null
+sleep 4
+tap_text "Pay now"
+adb exec-out screencap -p > review/screenshots/forms-confirmation.png
+echo "screenshot forms-confirmation"
+
 # Recording: the booking screen streams in, then Reserve is tapped (found through the accessibility tree).
 adb shell am force-stop "$APP"
 adb shell screenrecord --time-limit 30 /sdcard/streaming.mp4 &

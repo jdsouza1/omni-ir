@@ -27,11 +27,11 @@ function fingerprint(): string {
 }
 
 /**
- * The fingerprint of format 0.5. When this test fails, the format changed: bump FORMAT_VERSION (the next
- * one is 0.8, above every number a shipped app has used), add the old number to the table only if it was
+ * The fingerprint of format 0.8. When this test fails, the format changed: bump FORMAT_VERSION (the next
+ * one is 0.9), add the old number to the table only if it was
  * a release without a format change, and update this value.
  */
-const FORMAT_FINGERPRINT = "bfb80cbd7a8edf361fd9d9dd75f5f6d44daa011a67dc6656a641e9b900170e86";
+const FORMAT_FINGERPRINT = "50db4ae736381564f7710072791d3168ecabc3de578d884b129cc3494cc2b857";
 
 describe("package and format versions", () => {
   it("keeps the package version equal to the packages' and the exported schema's", () => {
@@ -40,13 +40,13 @@ describe("package and format versions", () => {
     }
   });
 
-  it("gives the stream format its own version, 0.5, exported for other renderers", () => {
-    expect(FORMAT_VERSION).toBe("0.5");
+  it("gives the stream format its own version, 0.8 since Step 19's field constraints, exported for other renderers", () => {
+    expect(FORMAT_VERSION).toBe("0.8");
     expect((JSON.parse(readFileSync("conformance/schema.json", "utf8")) as { formatVersion: string }).formatVersion).toBe(FORMAT_VERSION);
   });
 
   it("writes the format version in the marker [3.9] [10.13]", () => {
-    expect(versionMarker()).toBe("# omni-ir 0.5");
+    expect(versionMarker()).toBe("# omni-ir 0.8");
     expect(majorMinor("0.8.0")).toBe("0.8");
   });
 
@@ -57,11 +57,14 @@ describe("package and format versions", () => {
   });
 
   it("serves any client that can read the format it writes [10.12]", () => {
-    for (const asked of ["0.5", "0.6", "0.7", "0.8", "1.0", "99.0", "0.10"]) expect(canRead(asked), asked).toBe(true);
-    for (const asked of ["0.4", "0.1", "0.0"]) expect(canRead(asked), asked).toBe(false);
+    for (const asked of ["0.8", "0.9", "1.0", "99.0", "0.10"]) expect(canRead(asked), asked).toBe(true);
+    // 0.6 and 0.7 name format 0.5, which can't read 0.8's field constraints.
+    for (const asked of ["0.5", "0.6", "0.7", "0.4", "0.1", "0.0"]) expect(canRead(asked), asked).toBe(false);
+    // A server still writing format 0.5 serves every client from 0.5 on.
+    for (const asked of ["0.5", "0.6", "0.7", "0.8"]) expect(canRead(asked, "0.5"), asked).toBe(true);
   });
 
   it("fails when the format changes without a new format version (see FORMAT_FINGERPRINT)", () => {
-    expect(fingerprint(), `the format changed: bump FORMAT_VERSION (next: 0.8) and update FORMAT_FINGERPRINT`).toBe(FORMAT_FINGERPRINT);
+    expect(fingerprint(), `the format changed: bump FORMAT_VERSION (next: 0.9) and update FORMAT_FINGERPRINT`).toBe(FORMAT_FINGERPRINT);
   });
 });

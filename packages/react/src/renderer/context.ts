@@ -29,11 +29,87 @@ export interface OmniContextValue {
   locale: string;
   /** The renderer's own words: the app's, or English. */
   strings: OmniStrings;
+  /** Which fields show their messages ([8.5]): after the person leaves them, or after a press reads them. */
+  fields: FieldVisibility;
+  /** The app's confirmation for each tool that needs one ([9.1]). */
+  confirm: Readonly<Record<string, Confirmation>>;
+  /** Show the renderer's own confirmation with this text; resolves true only on Confirm. */
+  askConfirmation: (text: string) => Promise<boolean>;
+  /** The renderer's root element, to move focus to a field that needs attention. */
+  root: { current: HTMLElement | null };
   onMutation: (call: MutationCall) => void | Promise<void>;
   report: (event: RendererEvent) => void;
 }
 
 export const OmniContext = createContext<OmniContextValue | null>(null);
+
+export interface FieldVisibility {
+  subscribe(listener: () => void): () => void;
+  isShown(id: string): boolean;
+  show(ids: readonly string[]): void;
+}
+
+/** The fields whose messages are showing. Shown once, a message stays until the field passes. */
+export function createFieldVisibility(): FieldVisibility {
+  const shown = new Set<string>();
+  const listeners = new Set<() => void>();
+  return {
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    isShown: (id) => shown.has(id),
+    show(ids) {
+      const added = ids.filter((id) => !shown.has(id));
+      if (added.length === 0) return;
+      for (const id of added) shown.add(id);
+      for (const listener of listeners) listener();
+    },
+  };
+}
+
+/**
+ * The app's confirmation for one tool ([9.1]): a sentence whose `{name}` placeholders are filled with
+ * the params as plain text, or a function that writes the sentence from the checked params, for
+ * example to show an amount as currency. Either way the result is shown as plain text.
+ */
+export type Confirmation = string | ((params: Readonly<Record<string, unknown>>) => string);
+
+/** The confirmation that is open, if any: its text and how to answer it. */
+export interface PendingConfirmation {
+  text: string;
+  answer: (confirmed: boolean) => void;
+}
+
+export function createConfirmations() {
+  let pending: PendingConfirmation | null = null;
+  const listeners = new Set<() => void>();
+  const set = (next: PendingConfirmation | null) => {
+    pending = next;
+    for (const listener of listeners) listener();
+  };
+  return {
+    subscribe(listener: () => void) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    current: () => pending,
+    ask(text: string): Promise<boolean> {
+      // A second press while one is open answers the first with Cancel: one question at a time.
+      pending?.answer(false);
+      return new Promise<boolean>((resolve) => {
+        const entry: PendingConfirmation = {
+          text,
+          answer: (confirmed) => {
+            if (pending === entry) set(null);
+            resolve(confirmed);
+          },
+        };
+        set(entry);
+      });
+    },
+  };
+}
 
 export function useOmni(): OmniContextValue {
   const ctx = useContext(OmniContext);

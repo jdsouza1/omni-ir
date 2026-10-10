@@ -5,8 +5,8 @@
 //   ([10.12]) carry. A test fingerprints the format and fails if it changes without a new number.
 export const OMNI_IR_VERSION = "0.10.1";
 
-/** The stream format, MAJOR.MINOR. The next one is 0.8, above every number a shipped app has used. */
-export const FORMAT_VERSION = "0.5";
+/** The stream format, MAJOR.MINOR: 0.8 since field constraints (Step 19); before that 0.5. The next one is 0.9. */
+export const FORMAT_VERSION = "0.8";
 
 /**
  * Releases that carried their package number in the marker and requests but didn't change the format:

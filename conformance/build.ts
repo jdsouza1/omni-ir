@@ -7,6 +7,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { catalogCases } from "./catalog";
 import { renderTransportFiles, TRANSPORT_CASES } from "./transport";
+import { FIELD_CASES, renderFieldFiles } from "./fields";
 
 export type InputPart = string | { repeat: string; times: number };
 export interface ExpectedIssue {
@@ -106,7 +107,7 @@ export const CASES: Record<string, ConformanceCase[]> = {
     {
       id: "version-marker-newer-minor",
       rules: ["3.9"],
-      description: "Versions compare by MAJOR, then MINOR, as numbers: 0.999 is newer than 0.5 (not a decimal fraction).",
+      description: "Versions compare by MAJOR, then MINOR, as numbers: 0.999 is newer than 0.8 (not a decimal fraction).",
       input: lines("# omni-ir 0.999", "root = Divider()"),
       expect: { issues: [i(1, "newer_version")], nodes: { root: node("Divider") } },
     },
@@ -132,10 +133,17 @@ export const CASES: Record<string, ConformanceCase[]> = {
       expect: { issues: [], nodes: { root: node("Divider") } },
     },
     {
+      id: "version-marker-current-format",
+      rules: ["3.9"],
+      description: "Format 0.8 (field constraints) is this specification's format: its marker is not newer.",
+      input: lines("# omni-ir 0.8", "root = Divider()"),
+      expect: { issues: [], nodes: { root: node("Divider") } },
+    },
+    {
       id: "version-marker-next-format",
       rules: ["3.9"],
-      description: "The next format version after 0.5 is 0.8: newer than format 0.5.",
-      input: lines("# omni-ir 0.8", "root = Divider()"),
+      description: "The next format version after 0.8 is 0.9: newer than format 0.8.",
+      input: lines("# omni-ir 0.9", "root = Divider()"),
       expect: { issues: [i(1, "newer_version")], nodes: { root: node("Divider") } },
     },
     {
@@ -763,6 +771,37 @@ export const CASES: Record<string, ConformanceCase[]> = {
         },
       },
     },
+    {
+      id: "field-constraints",
+      rules: ["5.26", "5.9"],
+      description:
+        "Fields may declare constraints for the renderer to check: required on Input, DateInput, Select and Switch; format, minLength and maxLength on Input. minLength must not be more than maxLength (schema.json crossPropRules); a format outside the list, or a constraint on another component, is invalid_props.",
+      input: lines(
+        "root = Stack([a, b, c, d])",
+        '$email = ""',
+        'a = Input($email, label="Email", required=true, format="email", minLength=3, maxLength=120)',
+        '$day = ""',
+        'b = DateInput($day, label="Day", required=true)',
+        '$size = ""',
+        'c = Select($size, label="Size", options=["S", "M"], required=true)',
+        "$terms = false",
+        'd = Switch($terms, label="I accept", required=true)',
+        'e = Input($email, label="Email", minLength=10, maxLength=5)',
+        'f = Input($email, label="Email", format="postcode")',
+        'g = Heading("Hi", required=true)',
+        'h = Input($email, label="Email", maxLength=0)',
+      ),
+      expect: {
+        issues: [i(10, "invalid_props"), i(11, "invalid_props"), i(12, "invalid_props"), i(13, "invalid_props")],
+        nodes: {
+          root: node("Stack", {}, ["a", "b", "c", "d"]),
+          a: node("Input", { value: st("$email"), label: "Email", required: true, format: "email", minLength: 3, maxLength: 120 }),
+          b: node("DateInput", { value: st("$day"), label: "Day", required: true }),
+          c: node("Select", { value: st("$size"), label: "Size", options: ["S", "M"], required: true }),
+          d: node("Switch", { value: st("$terms"), label: "I accept", required: true }),
+        },
+      },
+    },
   ],
   catalog: catalogCases(),
 };
@@ -783,4 +822,8 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   mkdirSync(transport, { recursive: true });
   for (const [name, text] of Object.entries(renderTransportFiles())) writeFileSync(join(transport, name), text);
   console.log(`wrote ${TRANSPORT_CASES.length} transport cases to conformance/transport/`);
+  const fields = resolve("conformance", "fields");
+  mkdirSync(fields, { recursive: true });
+  for (const [name, text] of Object.entries(renderFieldFiles())) writeFileSync(join(fields, name), text);
+  console.log(`wrote ${FIELD_CASES.length} field cases to conformance/fields/`);
 }

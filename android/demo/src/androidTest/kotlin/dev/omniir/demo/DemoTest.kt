@@ -5,16 +5,20 @@ package dev.omniir.demo
 import android.content.Intent
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
@@ -55,6 +59,37 @@ class DemoTest {
     waitUntilDone()
     compose.onNodeWithText("Pay now").assertIsNotEnabled()
     compose.onNodeWithText("Cancel").assertIsEnabled()
+  }
+
+  /** A field its action reads blocks the press until it passes, with its message shown (SPEC.md [8.6]). */
+  @Test
+  fun fieldBlocksThenSends() {
+    launch("fixture" to "sign-in", "instant" to "true")
+    waitUntilDone()
+    compose.onNodeWithText("Email me a link").performScrollTo().performClick()
+    waitForText("This is required.")
+    compose.onNodeWithText("Email address").performTextInput("ann@")
+    compose.onNodeWithText("Email me a link").performClick()
+    waitForText("Enter an email address")
+    compose.onNodeWithText("Email address").performTextInput("example.com")
+    compose.onNodeWithText("Email me a link").performClick()
+    waitForText("Sent auth.sendMagicLink")
+  }
+
+  /** The app's confirmation: Cancel sends nothing, Confirm sends ([9.1]). */
+  @Test
+  fun confirmationBeforePaying() {
+    launch("fixture" to "payment-confirmation", "instant" to "true")
+    waitUntilDone()
+    compose.onNodeWithText("Pay now").performScrollTo().performClick()
+    waitForText("Pay \$42.50?")
+    compose.onNode(hasText("Cancel") and hasAnyAncestor(isDialog())).performClick()
+    compose.waitForIdle()
+    assertTrue(compose.onAllNodes(hasText("Sent payments.confirm", substring = true)).fetchSemanticsNodes().isEmpty())
+    compose.onNodeWithText("Pay now").performClick()
+    waitForText("Pay \$42.50?")
+    compose.onNodeWithText("Confirm").performClick()
+    waitForText("Sent payments.confirm")
   }
 
   /** Charts draw, and each is read to TalkBack as its title followed by its values. */

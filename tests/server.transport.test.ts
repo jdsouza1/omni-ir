@@ -1,7 +1,7 @@
 // The server's side of the transport (SPEC.md section 10), for the Express app and the in-browser API
 // the hosted playground uses: framing, the terminal event, the version marker, the requested version,
 // error bodies, and rate limits behind a proxy. The client's side is in transport.conformance.test.ts.
-import { versionMarker } from "@omni-ir/core";
+import { isNewerMarker, versionMarker } from "@omni-ir/core";
 import { createInBrowserApi } from "../server/inBrowser";
 import { ConfigError, loadConfig } from "../server/config";
 import { MockModel } from "../server/models/mock";
@@ -49,7 +49,7 @@ describe("the stream [10.4] [10.5] [10.13]", () => {
   it("starts with the version marker, written by the server, not the model", async () => {
     for (const [where, call] of await apis()) {
       const { events } = await readSse(await call("/api/generate", { ...json, body: prompt }));
-      expect(textOf(events).startsWith("# omni-ir 0.5\n"), where).toBe(true); // the format's version, not the package's
+      expect(textOf(events).startsWith("# omni-ir 0.8\n"), where).toBe(true); // the format's version, not the package's
       expect((events[0]!.data as { text: string }).text, where).toBe(`${versionMarker()}\n`);
     }
   });
@@ -58,7 +58,7 @@ describe("the stream [10.4] [10.5] [10.13]", () => {
 describe("the requested version [10.1] [10.12] [10.2]", () => {
   it("streams to any client that can read its format: its own, old release numbers, newer formats, or none", async () => {
     for (const [where, call] of await apis()) {
-      for (const path of ["/api/generate?version=0.5", "/api/generate?version=0.6", "/api/generate?version=0.7", "/api/generate?version=0.8", "/api/generate?version=99.0", "/api/generate"]) {
+      for (const path of ["/api/generate?version=0.8", "/api/generate?version=0.9", "/api/generate?version=99.0", "/api/generate"]) {
         const response = await call(path, { ...json, body: prompt });
         expect(response.status, `${where} ${path}`).toBe(200);
         await response.text();
@@ -68,13 +68,29 @@ describe("the requested version [10.1] [10.12] [10.2]", () => {
 
   it("refuses only a client that asks for an older format, before streaming, with unsupported_version", async () => {
     for (const [where, call] of await apis()) {
-      for (const version of ["0.4", "0.1", "0.0"]) {
+      for (const version of ["0.7", "0.6", "0.5", "0.4", "0.1", "0.0"]) {
         const response = await call(`/api/generate?version=${version}`, { ...json, body: prompt });
         expect(response.status, `${where} ${version}`).toBe(400);
         expect(await response.json(), `${where} ${version}`).toEqual({
-          error: { code: "unsupported_version", message: expect.stringContaining("0.5"), retryable: false },
+          error: { code: "unsupported_version", message: expect.stringContaining("0.8"), retryable: false },
         });
       }
+    }
+  });
+
+  it("still reaches an app on format 0.5 (releases 0.8.0 to 0.10.x) through its retry, which then shows the update notice", async () => {
+    // Those apps ask for 0.5, are refused, and retry once without a version (CHANGELOG 0.8.0). Their
+    // parser then reads the 0.8 marker as newer ([3.9]): the update notice shows, and a line using a
+    // prop it doesn't know becomes a fallback, while the rest of the screen shows.
+    for (const [where, call] of await apis()) {
+      const refused = await call("/api/generate?version=0.5", { ...json, body: prompt });
+      expect(refused.status, where).toBe(400);
+      await refused.text();
+      const retry = await call("/api/generate", { ...json, body: prompt });
+      expect(retry.status, where).toBe(200);
+      const firstLine = textOf((await readSse(retry)).events).split("\n")[0]!;
+      expect(isNewerMarker(firstLine, "0.5"), where).toBe(true);
+      expect(isNewerMarker(firstLine), where).toBe(false);
     }
   });
 

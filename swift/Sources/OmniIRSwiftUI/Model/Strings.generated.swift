@@ -18,6 +18,18 @@ public struct OmniStrings: Sendable, Equatable {
   public var sections: String
   public var newerVersion: String
   public var blocked: String
+  public var required: String
+  public var chooseOption: String
+  public var turnOn: String
+  public var invalidEmail: String
+  public var invalidNumber: String
+  public var invalidPhone: String
+  public var invalidUrl: String
+  public var tooShort: String
+  public var tooLong: String
+  public var dateTooEarly: String
+  public var dateTooLate: String
+  public var confirm: String
 
   public init(
     loading: String = "Loading",
@@ -32,7 +44,19 @@ public struct OmniStrings: Sendable, Equatable {
     cancel: String = "Cancel",
     sections: String = "Sections",
     newerVersion: String = "This screen was made for a newer version of the app. The app needs an update to show all of it.",
-    blocked: String = "This can't be sent. Check the details and try again."
+    blocked: String = "This can't be sent. Check the details and try again.",
+    required: String = "This is required.",
+    chooseOption: String = "Choose an option.",
+    turnOn: String = "Turn this on to continue.",
+    invalidEmail: String = "Enter an email address, like name@example.com.",
+    invalidNumber: String = "Enter a number.",
+    invalidPhone: String = "Enter a phone number.",
+    invalidUrl: String = "Enter a web address that starts with https://.",
+    tooShort: String = "Use at least {min} characters.",
+    tooLong: String = "Use {max} characters or fewer.",
+    dateTooEarly: String = "Choose {min} or later.",
+    dateTooLate: String = "Choose {max} or earlier.",
+    confirm: String = "Confirm"
   ) {
     self.loading = loading
     self.failedToLoad = failedToLoad
@@ -47,6 +71,18 @@ public struct OmniStrings: Sendable, Equatable {
     self.sections = sections
     self.newerVersion = newerVersion
     self.blocked = blocked
+    self.required = required
+    self.chooseOption = chooseOption
+    self.turnOn = turnOn
+    self.invalidEmail = invalidEmail
+    self.invalidNumber = invalidNumber
+    self.invalidPhone = invalidPhone
+    self.invalidUrl = invalidUrl
+    self.tooShort = tooShort
+    self.tooLong = tooLong
+    self.dateTooEarly = dateTooEarly
+    self.dateTooLate = dateTooLate
+    self.confirm = confirm
   }
 
   public static let english = OmniStrings()

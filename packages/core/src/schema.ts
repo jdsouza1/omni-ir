@@ -86,6 +86,8 @@ const AssetName = z
   .regex(ASSET_NAME, "asset names are lowercase letters, digits and hyphens");
 export const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const IsoDate = z.string().regex(ISO_DATE, "dates are written YYYY-MM-DD");
+/** A field the person must fill in, choose or turn on before an action that reads it can run. */
+const Required = z.boolean().optional();
 const CurrencyCode = z.string().regex(/^[A-Z]{3}$/, "currency must be an ISO 4217 code");
 
 // Charts carry data only: a title, labels and numbers. Colours, styles, tooltips and animation are
@@ -138,13 +140,23 @@ export const COMPONENTS = {
   },
   Input: {
     positional: ["value"],
-    props: z.strictObject({
-      value: StateRef,
-      label: z.string().min(1).max(200),
-      placeholder: z.string().max(200).optional(),
-      /** Lines the box shows; more than 1 makes it a multi-line box (text scrolls inside it). */
-      lines: z.number().int().min(1).max(10).optional(),
-    }),
+    props: z
+      .strictObject({
+        value: StateRef,
+        label: z.string().min(1).max(200),
+        placeholder: z.string().max(200).optional(),
+        /** Lines the box shows; more than 1 makes it a multi-line box (text scrolls inside it). */
+        lines: z.number().int().min(1).max(10).optional(),
+        // Constraints the renderer checks before an action that reads this field can run (SPEC.md [8.2]–[8.3]).
+        required: Required,
+        format: z.enum(["email", "number", "phone", "url"]).optional(),
+        minLength: z.number().int().min(1).max(MAX_TEXT).optional(),
+        maxLength: z.number().int().min(1).max(MAX_TEXT).optional(),
+      })
+      .refine((p) => p.minLength === undefined || p.maxLength === undefined || p.minLength <= p.maxLength, {
+        message: "minLength must not be more than maxLength",
+        path: ["minLength"],
+      }),
   },
   Button: {
     positional: ["label"],
@@ -196,6 +208,7 @@ export const COMPONENTS = {
       label: z.string().min(1).max(200),
       min: IsoDate.optional(),
       max: IsoDate.optional(),
+      required: Required,
     }),
   },
   List: {
@@ -226,11 +239,12 @@ export const COMPONENTS = {
       label: Label,
       options: z.array(z.string().min(1).max(200)).min(1).max(50),
       placeholder: z.string().max(200).optional(),
+      required: Required,
     }),
   },
   Switch: {
     positional: ["value"],
-    props: z.strictObject({ value: StateRef, label: Label }),
+    props: z.strictObject({ value: StateRef, label: Label, required: Required }),
   },
   Table: {
     positional: ["columns", "children"],
@@ -318,6 +332,7 @@ export const MCP_MUTATION = { positional: MUTATION_POSITIONAL, props: MutationPr
  */
 export const CROSS_PROP_RULES = [
   { component: "Rating", rule: "When value is a number, it must not be more than max (5 when max is absent).", code: "invalid_props" },
+  { component: "Input", rule: "When both are given, minLength must not be more than maxLength.", code: "invalid_props" },
 ] as const;
 
 // ---------------------------------------------------------------------------

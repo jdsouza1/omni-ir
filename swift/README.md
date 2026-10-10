@@ -69,6 +69,7 @@ let outcome = await client.generate("a payment confirmation for $42.50", into: s
 - **Only the catalog's components.** Colours, fonts and layout come from the system (light and dark mode, Dynamic Type); stream text is always plain text, never Markdown.
 - **Streaming:** each component keeps its identity by id while more lines arrive. Parts that haven't arrived show a placeholder; parts that never arrive show a small fallback.
 - **Governed actions:** a Button with an action stays disabled until an `McpMutation` approves it. A press fills in `$state` params and runs the tool's check before your handler is called; if the check fails, the button stays blocked until a value it used changes.
+- **Fields and confirmations:** a press first checks the fields its params read (`required`, `format`, lengths); a failing field shows the renderer's message and gets focus, and nothing is sent. Tools you list in `OmniStore(confirm:)` ask the person in an alert, in your words, before your handler runs.
 - **Pictures** come only from the `pictures` you pass, by name. A stream can never load an image from a URL.
 - **Rendering can't fail on stream data:** views only receive validated props, and the sources contain no forced unwraps (a test in the repo enforces this).
 

@@ -89,6 +89,8 @@ public struct Mutation: Sendable, Hashable, Identifiable {
 public struct OmniDocument: Sendable {
   /// Components by id.
   public var nodes: [String: OmniNode] = [:]
+  /// Component ids in the order their lines arrived.
+  public var order: [String] = []
   /// McpMutations by the id of the Button they govern.
   public var mutations: [String: Mutation] = [:]
   /// Current state: declared by the stream, then edited by Input and DateInput.
