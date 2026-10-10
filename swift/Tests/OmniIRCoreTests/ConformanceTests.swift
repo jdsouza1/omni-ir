@@ -60,11 +60,24 @@ struct ConformanceCase: Sendable, Decodable, CustomTestStringConvertible {
   let components: JSON?
   let pictures: JSON?
   let expect: Expect
+  /// Updates applied in order after the stream ends ([10.29]), each with its expected result.
+  let updates: [Update]?
+
+  struct Update: Sendable, Decodable {
+    struct Expect: Sendable, Decodable, Equatable {
+      let applied: Bool
+      let issues: [ExpectedIssue]
+    }
+    let input: JSON
+    let expect: Expect
+  }
 
   var testDescription: String { id }
 
   /// The stream: a string, or parts joined in order, where {repeat, times} is a long run of text.
-  var text: String {
+  var text: String { textOf(input) }
+
+  func textOf(_ input: JSON) -> String {
     switch input {
     case .string(let s): return s
     case .array(let parts):
@@ -99,6 +112,21 @@ enum CaseFiles {
   }
 
   static let corpus: [ConformanceCase] = (try? loadCorpus()) ?? []
+
+  /// The update corpus (fuzz/live-corpus.json): fixtures with generated updates and the TypeScript parser's results.
+  static func loadLiveCorpus() throws -> [ConformanceCase] {
+    struct File: Decodable { let cases: [ConformanceCase] }
+    return try JSONDecoder().decode(File.self, from: Data(contentsOf: repoRoot.appendingPathComponent("fuzz/live-corpus.json"))).cases
+  }
+
+  static let liveCorpus: [ConformanceCase] = (try? loadLiveCorpus()) ?? []
+}
+
+/// One update's result, as the cases write it: whether it applied and its distinct issues.
+struct UpdateOutcome: Equatable, CustomStringConvertible {
+  var applied: Bool
+  var issues: Set<ExpectedIssue>
+  var description: String { "\(applied) \(issues)" }
 }
 
 extension JSON {
@@ -123,6 +151,7 @@ struct Canonical: Equatable, CustomStringConvertible {
   var state: [String: JSON]
   var mutations: [String: JSON]
   var missing: [String]
+  var updates: [UpdateOutcome] = []
 
   var description: String {
     "issues: \(issues.sorted { ($0.line ?? .max, $0.code) < ($1.line ?? .max, $1.code) })\nnodes: \(JSON.object(nodes))\nstate: \(JSON.object(state))\nmutations: \(JSON.object(mutations))\nmissing: \(missing)"
@@ -168,6 +197,10 @@ func run(_ c: ConformanceCase, chunkSize: Int?) -> Canonical {
     parser.write(text)
   }
   parser.end()
+  let updates = (c.updates ?? []).map { u -> UpdateOutcome in
+    let result = parser.update(c.textOf(u.input))
+    return UpdateOutcome(applied: result.applied, issues: Set(result.issues.map { ExpectedIssue(line: $0.line, code: $0.code.rawValue) }))
+  }
   let doc = parser.document
   return Canonical(
     issues: Set(parser.issues.map { ExpectedIssue(line: $0.line, code: $0.code.rawValue) }),
@@ -181,8 +214,13 @@ func run(_ c: ConformanceCase, chunkSize: Int?) -> Canonical {
     mutations: doc.mutations.mapValues { m in
       .object(["id": .string(m.id), "tool": .string(m.tool), "params": .object(m.params.mapValues(json))])
     },
-    missing: doc.missing.sorted()
+    missing: doc.missing.sorted(),
+    updates: updates
   )
+}
+
+func expectedUpdates(_ c: ConformanceCase) -> [UpdateOutcome] {
+  (c.updates ?? []).map { UpdateOutcome(applied: $0.expect.applied, issues: Set($0.expect.issues)) }
 }
 
 // MARK: - Tests
@@ -207,6 +245,19 @@ struct ConformanceTests {
     if let state = c.expect.state { #expect(whole.state == state, "state") }
     if let mutations = c.expect.mutations { #expect(whole.mutations == mutations, "mutations") }
     if let missing = c.expect.missing { #expect(whole.missing == missing, "missing") }
+    #expect(whole.updates == expectedUpdates(c), "updates")
+  }
+
+  // The same for updates (SPEC.md [10.29]-[10.34]): fixtures with generated updates.
+  @Test("agrees with the TypeScript parser on the update corpus", arguments: CaseFiles.liveCorpus)
+  func agreesOnUpdates(_ c: ConformanceCase) {
+    let whole = run(c, chunkSize: nil)
+    #expect(whole.issues == Set(c.expect.issues), "issues")
+    if let nodes = c.expect.nodes { #expect(whole.nodes == nodes, "nodes") }
+    if let state = c.expect.state { #expect(whole.state == state, "state") }
+    if let mutations = c.expect.mutations { #expect(whole.mutations == mutations, "mutations") }
+    if let missing = c.expect.missing { #expect(whole.missing == missing, "missing") }
+    #expect(whole.updates == expectedUpdates(c), "updates")
   }
 
   // PLAN-HARDENING.md B.2: the Swift parser must reach exactly the TypeScript parser's result on
