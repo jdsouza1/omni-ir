@@ -149,6 +149,6 @@ addM = McpMutation(add, tool="cart.add", params={productId: "1042", quantity: $q
 
 **E. Spec, docs, review**
 - [x] E.1 SPEC.md: app-defined components (document rules, what they may and may not do, picture patterns); a guide; CHANGELOG; the decision log
-- [ ] E.2 A review page with screenshots on web, iPhone and Android (CI)
-- [ ] E.3 Merge with your approval
+- [x] E.2 A review page with screenshots on web, iPhone and Android (CI)
+- [x] E.3 Merge with your approval
 - [ ] E.4 Release: a separate go-ahead from you
