@@ -124,4 +124,18 @@ class DemoTest {
     compose.onNodeWithText("Reserve · \$642").performScrollTo().assertIsEnabled().performClick()
     waitForText("bookingId")
   }
+
+  /** Live screens (Step 22): the server keeps the order current, and the return's result updates its Button. */
+  @Test
+  fun orderMovesOnThenReturn() {
+    val server = InstrumentationRegistry.getArguments().getString("server")
+    assumeTrue("no server URL given", server != null)
+    launch("server" to (server ?: ""), "prompt" to "where is my order?", "appearance" to "light")
+    waitUntilDone(60_000)
+    waitForText("Shipped")
+    waitForText("Out for delivery", 20_000)
+    waitForText("Delivered", 20_000)
+    compose.onNodeWithText("Request a return").performScrollTo().performClick()
+    waitForText("Return requested")
+  }
 }

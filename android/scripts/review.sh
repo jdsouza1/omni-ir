@@ -61,6 +61,21 @@ tap_text "Pay now"
 adb exec-out screencap -p > review/screenshots/forms-confirmation.png
 echo "screenshot forms-confirmation"
 
+# Live screens (Step 22): the order from the server moves on by itself, then a return updates its Button.
+if [ -n "${OMNI_SERVER:-}" ]; then
+  adb shell am force-stop "$APP"
+  adb shell am start -W -n "$APP/.MainActivity" --es server "$OMNI_SERVER" --es prompt "where is my order?" --es appearance light >/dev/null
+  sleep 3
+  adb exec-out screencap -p > review/screenshots/live-1-shipped.png
+  sleep 4
+  adb exec-out screencap -p > review/screenshots/live-2-out-for-delivery.png
+  sleep 6
+  adb exec-out screencap -p > review/screenshots/live-3-delivered.png
+  tap_text "Request a return"
+  adb exec-out screencap -p > review/screenshots/live-4-return-requested.png
+  echo "screenshots live-1 to live-4"
+fi
+
 # Recording: the booking screen streams in, then Reserve is tapped (found through the accessibility tree).
 adb shell am force-stop "$APP"
 adb shell screenrecord --time-limit 30 /sdcard/streaming.mp4 &
