@@ -82,6 +82,10 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - *Goal:* a screen can change after it arrives (a delivery status moves on, a chart gets this hour's numbers) while the stream still has no logic and every change is checked like a new line.
    - *Fit:* the last open item in the spec's "Not yet specified"; builds on Step 14's transport (updates travel the same way) and Step 15's backend (the data comes from the app's own handlers, never the model).
    - *Who benefits:* developers can use Omni-IR for dashboards and status pages, not only one-off screens; the people using their apps see current information; and the person's real data reaches the screen from the app without being sent to the model.
+5. **A product demo video** (plan for approval: [PLAN-VIDEO.md](../PLAN-VIDEO.md)). Not a protocol step: it shows what is already built, in one story of about 70 seconds. An order streams in natively on iPhone, Android and the web, the app keeps it current, a return is checked by the server, and a button the app never allowed stays off. Recorded and captioned automatically on CI with the free mock model, and rebuilt with one click when the product changes.
+   - *Goal:* anyone who watches it can say what Omni-IR is and why it's different, in about a minute.
+   - *Fit:* everything it shows is built (Steps 6, 7, 15, 19 and 22); what's missing is a quick way to show it. It reuses the iOS and Android demo recordings and the playground's pre-written screens.
+   - *Who benefits:* developers see all three platforms at once without installing anything; people deciding whether to adopt it see the trust story without reading the spec; the project gets a link to share on the site, the README and in conversations.
 
 ## Later
 
