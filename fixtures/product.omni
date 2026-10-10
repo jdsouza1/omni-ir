@@ -1,0 +1,9 @@
+# Omni-IR: a product page using the demo app's own components (Step 20): ProductCard and QuantityPicker.
+root = Card([title, card, qty])
+title = Heading("Canvas tote", level=1)
+card = ProductCard("Canvas tote", [add, later], price=24, currency="USD", picture="product-1042", rating=4.5, badges=["Organic cotton"])
+$qty = 1
+qty = QuantityPicker($qty, label="How many", min=1, max=5, required=true)
+add = Button("Add to bag", action="addToBag")
+addToBag = McpMutation(add, tool="cart.add", params={productId: "1042", quantity: $qty})
+later = Button("Save for later", variant="secondary")

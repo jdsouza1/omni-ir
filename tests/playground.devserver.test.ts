@@ -31,7 +31,7 @@ describe("npm run playground (dev server)", () => {
   it("serves the API in-process with the free mock model", async () => {
     const health = await (await fetch(`${base}/api/health`)).json();
     expect(health).toEqual({ ok: true, model: "mock", auth: "demo", modelCheck: { mode: "off" } }); // the playground acts as the labelled demo visitor
-  });
+  }, 20_000); // the first API call has Vite compile the server on demand
 
   it("streams /api/generate from the same origin", async () => {
     const response = await fetch(`${base}/api/generate`, {

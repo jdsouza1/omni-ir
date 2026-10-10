@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { COMPONENT_TYPES } from "@omni-ir/core";
 import { ASSETS } from "../app/assets";
+import { APP_COMPONENTS } from "../app/components";
 import { CHALLENGES, type Challenge } from "../app/challenges";
 import { TOOLS } from "../app/tools";
 import { createMemoryStore } from "../server/backend/memoryStore";
@@ -71,7 +72,7 @@ describe("the challenge pool (app/challenges.ts)", () => {
 
   it("asks only for components and tools that exist", () => {
     for (const c of CHALLENGES) {
-      for (const type of c.expect.components ?? []) expect(COMPONENT_TYPES, c.id).toContain(type);
+      for (const type of c.expect.components ?? []) expect([...COMPONENT_TYPES, ...Object.keys(APP_COMPONENTS)], c.id).toContain(type);
       for (const tool of c.expect.tools ?? []) expect(Object.keys(TOOLS), c.id).toContain(tool);
       expect(c.text.length, c.id).toBeLessThanOrEqual(2000);
     }

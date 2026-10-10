@@ -6,7 +6,7 @@
 // the seed and the smallest failing stream, which belongs in a conformance case once understood.
 import fc from "fast-check";
 import { ISSUE_CODES } from "@omni-ir/core";
-import { fixtureTexts, FUZZ_ASSETS, FUZZ_TOOLS, mutatedFixture, splitBytes, splitPoints, stream } from "../fuzz/arbitraries";
+import { fixtureTexts, FUZZ_ASSETS, FUZZ_COMPONENTS, FUZZ_PICTURES, FUZZ_TOOLS, mutatedFixture, splitBytes, splitPoints, stream } from "../fuzz/arbitraries";
 import { parseCanonical, type Canonical } from "./canonical";
 
 const numRuns = Number(process.env.FUZZ_RUNS ?? 1000);
@@ -14,7 +14,7 @@ const seed = Number(process.env.FUZZ_SEED ?? 20261005);
 const options = { numRuns, seed, endOnFailure: false };
 /** Two minutes for the CI run; scales up for the weekly long run (.github/workflows/fuzz.yml). */
 const timeout = Math.max(120_000, numRuns * 30);
-const registry = { tools: FUZZ_TOOLS, assets: FUZZ_ASSETS };
+const registry = { tools: FUZZ_TOOLS, assets: FUZZ_ASSETS, components: FUZZ_COMPONENTS, pictures: FUZZ_PICTURES };
 const encoder = new TextEncoder();
 const fixtures = fixtureTexts();
 

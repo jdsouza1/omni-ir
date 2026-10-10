@@ -16,8 +16,8 @@ export interface Challenge {
   text: string;
   /** What a good reply contains, beyond passing the parser. */
   expect: {
-    /** Each of these components appears at least once. */
-    components?: ComponentType[];
+    /** Each of these components appears at least once: the catalog's, or the app's own by name. */
+    components?: (ComponentType | string)[];
     /** Each of these tools is named by an McpMutation. */
     tools?: string[];
     /** At least this many components: the closest screen, not a refusal. */
@@ -27,7 +27,7 @@ export interface Challenge {
   };
 }
 
-const build = (id: string, text: string, components: ComponentType[], tools: string[] = []): Challenge => ({
+const build = (id: string, text: string, components: (ComponentType | string)[], tools: string[] = []): Challenge => ({
   id,
   kind: "build",
   text,
@@ -36,6 +36,9 @@ const build = (id: string, text: string, components: ComponentType[], tools: str
 const probe = (id: string, text: string, expect: Challenge["expect"]): Challenge => ({ id, kind: "probe", text, expect });
 
 export const CHALLENGES: readonly Challenge[] = [
+  // The demo app's own components (app/components.ts, Step 20): checked like the catalog's.
+  build("product-page", "A product page for the canvas tote (product 1042, $24) where I choose how many and add it to my bag.", ["ProductCard", "QuantityPicker"], ["cart.add"]),
+  build("product-compare", "Show products 1042 (canvas tote, $24) and 1043 (linen shirt, $48) side by side, each with an add to bag button for one item.", ["ProductCard", "Button"], ["cart.add"]),
   // Forms whose action is one of the app's tools.
   build("cabin-booking", "A booking screen for a lakeside cabin with check-in and check-out dates and a reserve button.", ["DateInput", "Button"], ["bookings.reserve"]),
   build("invoice-payment", "Confirm a payment of $42.50 for invoice 1182, with a note and a pay button.", ["Button"], ["payments.confirm"]),
