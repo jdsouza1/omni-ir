@@ -1,5 +1,6 @@
 // Edits the demo video (PLAN-VIDEO.md) from the recordings the `video` workflow makes, with ffmpeg:
-// lines the three platforms up by the server's own log, adds the Golden Circle cards (why, how, what),
+// lines the three platforms up by the server's own log, adds the Golden Circle cards (why, how, what;
+// the owner chose the universal-language angle, 2026-10-10),
 // the captions and the corner note, and writes the full video, a short cut, a GIF and a poster.
 //
 //   node scripts/video/compose.mjs rec out
@@ -93,17 +94,17 @@ const input = (clip, start, seconds) =>
   clip.concat ? ["-f", "concat", "-safe", "0", "-ss", String(start), "-t", String(seconds), "-i", clip.file] : ["-ss", String(start), "-t", String(seconds), "-i", clip.file];
 
 // Why: three cards.
-segments.push(card("why-1", 3, [text("AI can now design the screens in your app.", { size: 64 })]));
-segments.push(card("why-2", 3, [text("But should it be trusted to run your app?", { size: 64 })]));
-segments.push(card("why-3", 3.5, [
-  text("We believe the AI should describe.", { size: 64, y: "(h/2)-90" }),
-  text("Your app should decide.", { size: 64, color: ACCENT, y: "(h/2)+10" }),
+segments.push(card("why-1", 3, [text("AI writes most of the code now.", { size: 68 })]));
+segments.push(card("why-2", 3.5, [
+  text("But it still writes every screen three times.", { size: 64, y: "(h/2)-70" }),
+  text("React  ·  Swift  ·  Kotlin", { size: 40, color: MUTED, font: FONT_REGULAR, y: "(h/2)+30" }),
 ]));
+segments.push(card("why-3", 3, [text("What if it wrote the screen once?", { size: 68, color: ACCENT })]));
 
 // How, 1: the lines the AI writes, appearing one by one.
 const lines = readFileSync("fixtures/order-status.omni", "utf8").split("\n").filter((l) => l.trim() && !l.startsWith("#")).slice(0, 7);
 segments.push(card("how-lines", 4.5, [
-  text("The AI describes the screen in a few plain lines.", { size: 52, y: "120" }),
+  text("One description, in a few plain lines.", { size: 52, y: "120" }),
   ...lines.map((l, i) => text(l.length > 70 ? `${l.slice(0, 67)}...` : l, { size: 30, font: MONO, x: "300", y: String(300 + i * 62), enable: `gte(t,${0.3 + i * 0.45})` })),
 ]));
 
@@ -127,8 +128,8 @@ const PANEL_H = 780;
     `color=c=${BG}:s=${W}x${H}:d=${sideBy}:r=30[bg];${scaled};` +
     `[bg][p0]overlay=${xs[0]}:160[a];[a][p1]overlay=${xs[1]}:160[b];[b][p2]overlay=${xs[2]}:160,` +
     [
-      text("Each platform draws it with its own components.", { size: 50, y: "70", enable: `lt(t,${captionSwitch})` }),
-      text("Your app keeps it current. The AI never touches it again.", { size: 50, y: "70", enable: `gte(t,${captionSwitch})` }),
+      text("Every platform draws it natively.", { size: 50, y: "70", enable: `lt(t,${captionSwitch})` }),
+      text("Your app keeps it current, everywhere at once.", { size: 50, y: "70", enable: `gte(t,${captionSwitch})` }),
       ...labels.map((l, i) => text(l, { size: 26, color: MUTED, font: FONT_REGULAR, x: `${xs[i]}+(${widths[i]}-text_w)/2`, y: String(160 + PANEL_H + 14) })),
       note(),
     ].join(",") + `,fade=t=in:st=0:d=0.3[v]`;
@@ -146,14 +147,14 @@ function phone(name, clip, start, seconds, caption) {
   return file;
 }
 const returnAt = ret ? Date.parse(ret.time) / 1000 : ios.E + 12;
-segments.push(phone("how-return", ios, returnAt - 2.5, 7.5, "Every action is checked by your server first."));
+segments.push(phone("how-return", ios, returnAt - 2.5, 7.5, "Every action is still checked by your server."));
 segments.push(phone("how-delete", del, del.G - 0.3, 8, "The AI can ask. Your app decides."));
 
 // What: the end card.
 segments.push(card("what", 7, [
   text("Omni-IR", { size: 110, y: "(h/2)-190" }),
-  text("Generative UI you can trust.", { size: 60, color: ACCENT, y: "(h/2)-40" }),
-  text("Open source  ·  iPhone  ·  Android  ·  Web", { size: 34, color: MUTED, font: FONT_REGULAR, y: "(h/2)+70" }),
+  text("A universal UI language for AI.", { size: 60, color: ACCENT, y: "(h/2)-40" }),
+  text("Write the screen once  ·  native on iPhone, Android and the web  ·  open source", { size: 30, color: MUTED, font: FONT_REGULAR, y: "(h/2)+70" }),
   text("jdsouza1.github.io/omni-ir", { size: 34, color: INK, font: FONT_REGULAR, y: "(h/2)+150" }),
 ]));
 

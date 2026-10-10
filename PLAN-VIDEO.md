@@ -31,20 +31,23 @@ what Omni-IR is.
 
 ## The story, scene by scene (the example walked end to end)
 
-Told as a Golden Circle (owner's request, 2026-10-10): **why** first (what we believe), then **how** (what
-makes it work), then **what** (the product). Each scene says what the AI writes, what the app does, and
+Told as a Golden Circle (owner's request, 2026-10-10): **why** first, then **how** (what makes it work), then
+**what** (the product). Each scene says what the AI writes, what the app does, and
 what the person sees. The AI's part is the free mock model streaming pre-written screens, as the
 playground does.
 
+The angle is a **universal UI language** (owner's choice, 2026-10-10, option D): lead with "AI writes every
+screen three times; write it once", and keep "every action is checked" as one supporting line.
+
 | Ring | # | Time | What the person sees | What happens underneath | Caption (large, plain) |
 |---|---|---|---|---|---|
-| **Why** | 1 | 0:00–0:09 | Three plain title cards, one after another | — | **AI can now design the screens in your app.** · **But should it be trusted to run your app?** · **We believe the AI should describe. Your app should decide.** |
-| **How** | 2 | 0:09–0:13 | A card with the few lines the AI writes, appearing one by one | The order screen's Omni-IR, from the fixture: `order_status = Badge("Shipped")`… | **The AI describes the screen in a few plain lines.** |
-| **How** | 3 | 0:13–0:25 | "Where is my order?": the screen streams in on an iPhone, an Android phone and a browser, side by side | Each platform's own renderer checks every line and draws it with native components | **Each platform draws it with its own components.** |
-| **How** | 4 | 0:25–0:35 | The status changes on all three: "Out for delivery", then "Delivered" | The server's live feed sends the new status; each client checks it before applying it | **Your app keeps it current. The AI never touches it again.** |
-| **How** | 5 | 0:35–0:43 | On the iPhone, "Request a return" is pressed; it becomes "Return requested. We'll email you a label." | The press goes to the app's server, which checks the person, the order and the params first; its result replaces the Button | **Every action is checked by your server first.** |
-| **How** | 6 | 0:43–0:51 | "A button that deletes my account": it appears, greyed out; pressing it does nothing | The AI named a tool the app never registered; that line is rejected, so the button has no permission to act | **The AI can ask. Your app decides.** |
-| **What** | 7 | 0:51–1:00 | End card | — | **Omni-IR** · **Generative UI you can trust.** · *Open source · iPhone · Android · Web* · the site address |
+| **Why** | 1 | 0:00–0:10 | Three plain title cards | — | **AI writes most of the code now.** · **But it still writes every screen three times.** *React · Swift · Kotlin* · **What if it wrote the screen once?** |
+| **How** | 2 | 0:10–0:14 | The few lines the AI writes, appearing one by one | The order screen's Omni-IR, from the fixture | **One description, in a few plain lines.** |
+| **How** | 3 | 0:14–0:26 | "Where is my order?": the screen streams in on an iPhone, an Android phone and a browser, side by side | Each platform's own renderer checks every line and draws it with native components | **Every platform draws it natively.** |
+| **How** | 4 | 0:26–0:35 | The status changes on all three: "Out for delivery", then "Delivered" | The server's live feed sends the new status; each client checks it before applying it | **Your app keeps it current, everywhere at once.** |
+| **How** | 5 | 0:35–0:43 | On the iPhone, "Request a return" becomes "Return requested. We'll email you a label." | The app's server checks the person, the order and the params before running it | **Every action is still checked by your server.** |
+| **How** | 6 | 0:43–0:51 | "A button that deletes my account": it appears, greyed out; pressing it does nothing | The AI named a tool the app never registered; that line is rejected | **The AI can ask. Your app decides.** |
+| **What** | 7 | 0:51–0:58 | End card | — | **Omni-IR** · **A universal UI language for AI.** · *Write the screen once · native on iPhone, Android and the web · open source* · the site address |
 
 A small line in the corner throughout the screen scenes: *Demo with pre-written screens; no AI model was called.*
 
