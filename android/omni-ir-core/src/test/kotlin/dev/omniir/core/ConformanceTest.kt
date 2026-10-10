@@ -46,7 +46,15 @@ private class Case(val json: JsonObject) {
   val expect: JsonObject = json.getValue("expect").jsonObject
 
   /** The stream: a string, or parts joined in order, where {repeat, times} is a long run of text. */
-  val text: String = when (val input = json.getValue("input")) {
+  val text: String = textOf(json.getValue("input"))
+
+  /** Updates applied in order after the stream ends ([10.29]), each with its expected result. */
+  val updates: List<Pair<String, UpdateOutcome>> = json["updates"]?.jsonArray?.map { u ->
+    val e = u.jsonObject.getValue("expect").jsonObject
+    textOf(u.jsonObject.getValue("input")) to UpdateOutcome(e.getValue("applied").jsonPrimitive.content == "true", issuesOf(e))
+  } ?: emptyList()
+
+  private fun textOf(input: JsonElement): String = when (input) {
     is JsonPrimitive -> input.content
     is JsonArray -> input.joinToString("") { part ->
       if (part is JsonPrimitive) part.content
@@ -56,6 +64,12 @@ private class Case(val json: JsonObject) {
   }
 }
 
+private data class UpdateOutcome(val applied: Boolean, val issues: Set<ExpectedIssue>)
+
+private fun issuesOf(expect: JsonObject): Set<ExpectedIssue> = expect.getValue("issues").jsonArray.map {
+  ExpectedIssue(it.jsonObject["line"]?.jsonPrimitive?.intOrNull, it.jsonObject.getValue("code").jsonPrimitive.content)
+}.toSet()
+
 private fun loadCases(): List<Case> {
   val dir = File(repoRoot, "conformance/cases")
   return dir.listFiles { f -> f.name.endsWith(".json") }.orEmpty().sortedBy { it.name }.flatMap { file ->
@@ -64,8 +78,8 @@ private fun loadCases(): List<Case> {
 }
 
 /** The differential corpus (fuzz/corpus.json): generated streams with the TypeScript parser's results. */
-private fun loadCorpus(): List<Case> =
-  Json.parseToJsonElement(File(repoRoot, "fuzz/corpus.json").readText()).jsonObject.getValue("cases").jsonArray.map { Case(it.jsonObject) }
+private fun loadCorpus(file: String = "fuzz/corpus.json"): List<Case> =
+  Json.parseToJsonElement(File(repoRoot, file).readText()).jsonObject.getValue("cases").jsonArray.map { Case(it.jsonObject) }
 
 private data class Canonical(
   val issues: Set<ExpectedIssue>,
@@ -73,6 +87,7 @@ private data class Canonical(
   val state: Map<String, Any?>,
   val mutations: Map<String, Any?>,
   val missing: List<String>,
+  val updates: List<UpdateOutcome>,
 )
 
 private fun plain(p: Primitive): Any? = when (p) {
@@ -102,6 +117,10 @@ private fun run(case: Case, chunkSize: Int?): Canonical {
     for (at in bytes.indices step chunkSize) parser.write(bytes.copyOfRange(at, minOf(at + chunkSize, bytes.size)))
   }
   parser.end()
+  val updates = case.updates.map { (text, _) ->
+    val result = parser.update(text)
+    UpdateOutcome(result.applied, result.issues.map { ExpectedIssue(it.line, it.code.wireName) }.toSet())
+  }
   val doc = parser.document
   return Canonical(
     issues = parser.issues.map { ExpectedIssue(it.line, it.code.wireName) }.toSet(),
@@ -114,6 +133,7 @@ private fun run(case: Case, chunkSize: Int?): Canonical {
     state = doc.state.mapValues { plain(it.value) },
     mutations = doc.mutations.mapValues { (_, m) -> mapOf("id" to m.id, "tool" to m.tool, "params" to m.params.mapValues { plain(it.value) }) },
     missing = doc.missing.sorted(),
+    updates = updates,
   )
 }
 
@@ -137,16 +157,21 @@ class ConformanceTest {
     DynamicTest.dynamicTest(case.id) { check(case, listOf(7)) }
   }
 
+  // The same for updates (SPEC.md [10.29]-[10.34]): fixtures with generated updates.
+  @TestFactory
+  fun `agrees with the TypeScript parser on the update corpus`(): List<DynamicTest> = loadCorpus("fuzz/live-corpus.json").map { case ->
+    DynamicTest.dynamicTest(case.id) { check(case, emptyList()) }
+  }
+
   private fun check(case: Case, chunkSizes: List<Int>) {
     val whole = run(case, null)
     for (size in chunkSizes) assertEquals(whole, run(case, size), "${case.id}: chunks of $size bytes")
-    val expected = case.expect.getValue("issues").jsonArray.map {
-      ExpectedIssue(it.jsonObject["line"]?.jsonPrimitive?.intOrNull, it.jsonObject.getValue("code").jsonPrimitive.content)
-    }.toSet()
+    val expected = issuesOf(case.expect)
     assertEquals(expected, whole.issues, "${case.id}: issues")
     case.expect["nodes"]?.let { assertEquals(plain(it), whole.nodes, "${case.id}: nodes") }
     case.expect["state"]?.let { assertEquals(plain(it), whole.state, "${case.id}: state") }
     case.expect["mutations"]?.let { assertEquals(plain(it), whole.mutations, "${case.id}: mutations") }
     case.expect["missing"]?.let { assertEquals(plain(it), whole.missing, "${case.id}: missing") }
+    assertEquals(case.updates.map { it.second }, whole.updates, "${case.id}: updates")
   }
 }

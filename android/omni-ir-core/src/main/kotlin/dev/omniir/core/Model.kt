@@ -6,7 +6,7 @@ package dev.omniir.core
 public enum class IssueSeverity { ERROR, WARNING }
 
 /** When an issue is found: on its own line, at the end of the stream, or while rendering. */
-public enum class IssueStage { LINE, END, RENDERER }
+public enum class IssueStage { LINE, END, RENDERER, UPDATE }
 
 public data class Issue(
   public val code: IssueCode,
@@ -98,6 +98,8 @@ public data class OmniDocument(
   public val newerVersion: Boolean = false,
   /** Increases with every change, so two documents from different moments never compare equal. */
   public val revision: Long = 0,
+  /** The last update applied after the stream ended ([10.29]), if any. */
+  public val lastUpdate: LastUpdate? = null,
 )
 
 /** One backend action the UI may trigger, with a check for its params. */
