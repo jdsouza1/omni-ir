@@ -101,19 +101,19 @@ A developer using any web framework, or none, can draw Omni-IR screens with one 
 ## Checklist
 
 **A. The element** *(tests first)*
-- [ ] A.1 `@omni-ir/elements`: `<omni-screen>` with properties, attributes, methods and events; the React renderer built on Preact into one module with the styles inside a shadow root
-- [ ] A.2 The React renderer's tests run again against the Preact build; the element's own tests (registries as properties, `generate()` against the mock server, actions, fields, confirmations, fallbacks, themes)
-- [ ] A.3 Tool params as JSON Schema or Zod
+- [x] A.1 `@omni-ir/elements`: `<omni-screen>` with properties, attributes, methods and events; the React renderer built on Preact into one module with the styles inside a shadow root
+- [x] A.2 The React renderer's tests run again against the Preact build; the element's own tests (registries as properties, `generate()` against the mock server, actions, fields, confirmations, fallbacks, themes)
+- [x] A.3 Tool params as JSON Schema or Zod
 
 **B. App components**
-- [ ] B.1 App components as the app's custom elements by tag name: props and field as properties, children slotted, field messages and focus
+- [x] B.1 App components as the app's custom elements by tag name: props and field as properties, children slotted, field messages and focus
 
 **C. Delivery**
-- [ ] C.1 The package (pack check, install test), the module served from the site, the size budget
-- [ ] C.2 Examples for plain HTML, Vue, Svelte and Angular, built and checked in CI
+- [x] C.1 The package (pack check, install test), the module served from the site, the size budget
+- [x] C.2 Examples for plain HTML, Vue, Svelte and Angular, built and checked in CI
 
 **D. Docs**
-- [ ] D.1 A guide, “Any web framework”; README; SPEC.md's renderer list; CHANGELOG; the decision log
+- [x] D.1 A guide, “Any web framework”; README; SPEC.md's renderer list; CHANGELOG; the decision log
 
 **E. Review**
 - [ ] E.1 A review page with screenshots from the four examples
