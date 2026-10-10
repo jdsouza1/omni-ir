@@ -124,7 +124,8 @@ describe("rendering the new components", () => {
     const input = screen.getByLabelText("Check-in") as HTMLInputElement;
     expect(input.type).toBe("date");
     expect(screen.getByText("2026-10-14")).toBeTruthy();
-    fireEvent.change(input, { target: { value: "2026-10-20" } });
+    // Browsers fire "input" when a date is picked (React and Preact both handle it as onChange).
+    fireEvent.input(input, { target: { value: "2026-10-20" } });
     expect(screen.getByText("2026-10-20")).toBeTruthy();
   });
 

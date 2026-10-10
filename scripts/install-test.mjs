@@ -19,7 +19,7 @@ const write = (file, text) => {
 
 try {
   const tarballs = {};
-  for (const pkg of ["core", "react", "mcp"]) {
+  for (const pkg of ["core", "react", "mcp", "elements"]) {
     const out = execSync(`npm pack --json --workspace packages/${pkg} --pack-destination "${dir}"`, { encoding: "utf8" });
     const [{ name, filename }] = JSON.parse(out);
     tarballs[name] = `file:./${filename}`;
@@ -197,6 +197,30 @@ createRoot(document.getElementById("root")).render(createElement(OmniRenderer, {
 `,
   );
 
+  // <omni-screen> (Step 21): typed without React's types, and bundled by Vite into a plain page.
+  write(
+    "src/elements-types.ts",
+    `import "@omni-ir/elements";
+import type { ElementComponent, OmniScreenElement } from "@omni-ir/elements";
+const screen: OmniScreenElement = document.createElement("omni-screen");
+screen.tools = { "payments.confirm": { type: "object", properties: { amount: { type: "number" } } } };
+screen.onMutation = async (call) => console.log(call.tool, call.params);
+screen.addEventListener("omni-event", (event) => console.log(event.detail.type));
+const card: ElementComponent = { description: "A card", props: { name: { kind: "text" } }, tag: "shop-card" };
+screen.components = { ShopCard: card };
+void screen.generate("a payment confirmation").then((outcome) => outcome.status);
+`,
+  );
+  write(
+    "src/elements.js",
+    `import "@omni-ir/elements";
+const screen = document.createElement("omni-screen");
+document.body.append(screen);
+screen.write('root = Text("Hello from omni-screen")\\n');
+`,
+  );
+  write("elements.html", '<!doctype html><html><body><script type="module" src="/src/elements.js"></script></body></html>\n');
+
   console.log(`\ninstall test in ${dir}`);
   run("npm install --no-audit --no-fund --loglevel=error");
   run("node render.mjs");
@@ -208,6 +232,14 @@ createRoot(document.getElementById("root")).render(createElement(OmniRenderer, {
   run("npx tsc -p tsconfig.mcp.json");
   console.log("types (@omni-ir/mcp, nodenext): ok");
   run("npx vite build --logLevel warn");
+  // The element's page, built on its own: the bundle must carry <omni-screen>.
+  write("vite.elements.config.js", 'export default { build: { outDir: "dist-elements", rollupOptions: { input: "elements.html" } } };\n');
+  run("npx vite build --config vite.elements.config.js --logLevel warn");
+  const elementsAssets = join(dir, "dist-elements", "assets");
+  if (!readdirSync(elementsAssets).some((f) => f.endsWith(".js") && readFileSync(join(elementsAssets, f), "utf8").includes("omni-screen"))) {
+    throw new Error("the Vite build of the element's page has no <omni-screen>");
+  }
+  console.log("vite build: ok (<omni-screen> bundled)");
   const assetsDir = join(dir, "dist", "assets");
   const css = readdirSync(assetsDir).filter((f) => f.endsWith(".css"));
   if (!css.length || !readFileSync(join(assetsDir, css[0]), "utf8").includes(".omni-")) {

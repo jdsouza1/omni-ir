@@ -27,7 +27,7 @@ cancel = Button("Cancel", variant="secondary")
 npm install @omni-ir/core @omni-ir/react
 ```
 
-[`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) parses and validates a stream; [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) renders it with the Trusted Catalog. Their READMEs have examples.
+[`@omni-ir/core`](https://www.npmjs.com/package/@omni-ir/core) parses and validates a stream; [`@omni-ir/react`](https://www.npmjs.com/package/@omni-ir/react) renders it with the Trusted Catalog. Not on React? [`@omni-ir/elements`](https://www.npmjs.com/package/@omni-ir/elements) gives you `<omni-screen>` for Vue, Svelte, Angular or plain HTML. Their READMEs have examples.
 
 **iPhone, iPad and Mac (SwiftUI):** add the package `https://github.com/jdsouza1/omni-ir` with Swift Package Manager and use `OmniIRSwiftUI` (iOS 17+, macOS 14+). See [swift/README.md](swift/README.md).
 
@@ -107,6 +107,8 @@ To check how well a model follows the protocol without paying for API calls, pas
 |---|---|
 | `packages/core/` | `@omni-ir/core`: line buffer, tokenizer, parser, store; `schema.ts` is the single authority on the protocol |
 | `packages/react/` | `@omni-ir/react`: the Trusted Catalog components, `OmniRenderer` and browser helpers |
+| `packages/elements/` | `@omni-ir/elements`: `<omni-screen>`, the React renderer on Preact in a custom element, for any web framework |
+| `examples/` | `<omni-screen>` in plain HTML, Vue, Svelte and Angular, checked in a browser in CI |
 | `packages/mcp/` | `@omni-ir/mcp`: Omni-IR screens in MCP Apps hosts (Claude, ChatGPT, VS Code, Cursor): an MCP server and a view built from the parser and catalog |
 | `server/` | Express SSE server, mock and Claude models |
 | `playground/` | The Interactive Playground |

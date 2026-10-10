@@ -12,4 +12,7 @@ for (const pkg of ["core", "react", "mcp"]) {
 }
 copyFileSync(join("packages", "react", "src", "catalog", "omni.css"), join("packages", "react", "dist", "omni.css"));
 execSync("npx tsx scripts/mcp-view.ts", { stdio: "inherit" });
-console.log("built packages/core/dist, packages/react/dist and packages/mcp/dist");
+// <omni-screen>: one bundled module (the renderer on Preact, PLAN-ELEMENTS.md), not compiled by tsc.
+rmSync(join("packages", "elements", "dist"), { recursive: true, force: true });
+execSync("npx tsx scripts/elements-build.ts", { stdio: "inherit" });
+console.log("built packages/core/dist, packages/react/dist, packages/mcp/dist and packages/elements/dist");

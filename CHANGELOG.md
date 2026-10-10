@@ -2,6 +2,18 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+A Web Components renderer (Step 21, PLAN-ELEMENTS.md). The stream format stays 0.8.
+
+### Added
+- **`@omni-ir/elements`: `<omni-screen>`**, Omni-IR screens in any web framework or none (Vue, Svelte, Angular, plain HTML), with the same catalog, field checks, confirmations, governed actions and app components as `@omni-ir/react`. Properties for what only the app may set (`tools`, `assets`, `components`, `pictures`, `confirm`, `strings`, `onMutation`, `resolvePicture`), attributes for plain settings (`theme`, `locale`, `endpoint`), methods `write`, `end`, `reset`, `generate`, `describe`, and events `omni-event` and `omni-done`. The catalog draws in the element's shadow root, themed by the design tokens set on the element.
+- Tool params as JSON Schema or Zod, so a plain-HTML app needs no build step.
+- App components as the app's own custom elements, by tag name: the renderer sets their checked `props`, `picture` and `field`, and puts their children inside.
+- One ES module of about 80 KB compressed (budget 140 KB, tested), also served from the site at `/omni-ir/elements/omni-elements.js` with a page to try it.
+- The element is the React renderer run on Preact (MIT): the React renderer's tests run again on Preact (`npm run test:preact`, part of `npm test`).
+- Examples for plain HTML, Vue, Svelte and Angular (`examples/`), each installed from the packed package, built and checked in headless Chrome in CI (`npm run examples:test`). Guide: Any web framework.
+
 ## 0.12.0 (2026-10-10)
 
 App-defined components (Step 20, PLAN-APPCOMPONENTS.md). The stream format stays 0.8.

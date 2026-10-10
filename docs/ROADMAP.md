@@ -74,7 +74,7 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - [x] App components: declared once, checked like the catalog's on all three platforms, drawn by the app's own views
    - [x] Pictures looked up by the app when the screen is drawn (for example `product-123`), for shops and user pictures that can't all be registered in advance; the model still never writes a URL
    - [x] Keep the system prompt small as the catalog grows: measured and budgeted per component (sending only the components a request needs comes later if the numbers call for it; timing a real model's first line is tabled)
-3. **Step 21 · A Web Components renderer** (plan approved 2026-10-10: [PLAN-ELEMENTS.md](../PLAN-ELEMENTS.md)). One `<omni-screen>` element that draws Omni-IR in any web framework, Vue, Svelte, Angular or plain HTML, instead of one renderer per framework. The most requested feature in the review: Vue, Svelte, Angular and web components were asked of [json-render](https://github.com/vercel-labs/json-render/issues/34), [Tambo](https://github.com/tambo-ai/tambo/issues/1721), [OpenUI](https://github.com/thesysdev/openui/issues/318) and others.
+3. **Step 21 · A Web Components renderer** (plan approved 2026-10-10: [PLAN-ELEMENTS.md](../PLAN-ELEMENTS.md); merged 2026-10-10). One `<omni-screen>` element that draws Omni-IR in any web framework, Vue, Svelte, Angular or plain HTML, instead of one renderer per framework. The most requested feature in the review: Vue, Svelte, Angular and web components were asked of [json-render](https://github.com/vercel-labs/json-render/issues/34), [Tambo](https://github.com/tambo-ai/tambo/issues/1721), [OpenUI](https://github.com/thesysdev/openui/issues/318) and others.
    - *Goal:* a developer using any web framework can render Omni-IR screens with one element, with the same catalog, checks and governance as the React renderer.
    - *Fit:* the conformance suite already defines what any renderer must do, and the design tokens (Step 16) style it the same way; a fourth renderer after React, SwiftUI and Compose, covering every other web framework at once.
    - *Who benefits:* developers who don't use React, the largest group the project can't serve today; the people using their apps get the same accessible catalog; organisations with several front-end stacks can standardise on one format.
@@ -91,6 +91,8 @@ Ideas worth keeping, with no step number, no date and no plan yet. When one is n
   - File upload: a `FileInput` whose file goes only to a registered tool, with size and type limits the app sets (asked of [A2UI](https://github.com/a2ui-project/a2ui/issues/287))
   - Restore a screen after a reload with what the person had typed, so chat history reopens screens as they were left (asked of MCP Apps and CopilotKit)
   - Smoother streaming: a renderer option that paces how fast arriving lines appear (asked of [OpenUI](https://github.com/thesysdev/openui/issues/751))
+
+- **A lighter parser** (from Step 21's size budget): the parser is most of every web bundle (about 107 KB compressed on its own, mostly its schema library). A smaller schema layer would shrink `@omni-ir/react`, `<omni-screen>` and the MCP view together.
 
 - **Running the reference server for real**, for teams that self-host:
   - Model adapters beyond Claude: OpenAI, Gemini, and any OpenAI-compatible endpoint (which covers open models), each with a fake client for tests

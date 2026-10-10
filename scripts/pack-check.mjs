@@ -6,7 +6,7 @@ import { execSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const PACKAGES = ["core", "react", "mcp"];
+const PACKAGES = ["core", "react", "mcp", "elements"];
 const ALLOWED = [/^package\.json$/, /^README\.md$/, /^LICENSE$/, /^dist\/.+\.(js|d\.ts)$/, /^dist\/omni\.css$/, /^dist\/view\.html$/];
 // Absolute paths from a developer machine or CI runner, plain or as file URLs (file:///…). A bare
 // "file://" is fine: the MCP SDK's schemas check that a root's URI starts with it.
@@ -62,6 +62,9 @@ for (const pkg of ["react", "mcp"]) {
     problems.push(`${manifest.name} should depend on @omni-ir/core ^${core.version}, not ${manifest.dependencies?.["@omni-ir/core"]}`);
   }
 }
+// elements bundles the parser and renderer, so it depends on nothing, but is released with the same version.
+if (manifests.elements.version !== core.version) problems.push(`versions differ: core ${core.version}, elements ${manifests.elements.version}`);
+if (Object.keys(manifests.elements.dependencies ?? {}).length > 0) problems.push("@omni-ir/elements should have no dependencies: everything is bundled");
 
 if (problems.length) {
   console.error(`pack check failed:\n${problems.map((p) => `  - ${p}`).join("\n")}`);

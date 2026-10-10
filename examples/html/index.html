@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Omni-IR in plain HTML</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 0; padding: 24px; background: #f5f6f8; color: #1b2230; }
+      main { max-width: 520px; margin: 0 auto; display: grid; gap: 16px; }
+      /* The app's brand, through the design tokens. */
+      omni-screen { --omni-accent: #2456d6; }
+      #log { font-size: 14px; color: #5b6577; min-height: 1.4em; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Plain HTML</h1>
+      <omni-screen id="screen" theme="light"></omni-screen>
+      <p id="log" aria-live="polite"></p>
+      <pre id="omni-check" hidden></pre>
+    </main>
+    <script type="module">
+      import "@omni-ir/elements";
+
+      // The app's own component, as a plain custom element: the renderer sets `props` and puts the
+      // component's children inside it.
+      class DemoProductCard extends HTMLElement {
+        set props(props) {
+          this._props = props;
+          this.render();
+        }
+        get props() {
+          return this._props;
+        }
+        connectedCallback() {
+          this.render();
+        }
+        render() {
+          if (!this.shadowRoot) this.attachShadow({ mode: "open" });
+          const p = this._props ?? {};
+          this.shadowRoot.innerHTML = `<style>:host{display:block;border:1px solid #dde2ea;border-radius:12px;padding:12px;background:#fff}strong{display:block}</style><strong></strong><span></span><slot></slot>`;
+          this.shadowRoot.querySelector("strong").textContent = String(p.name ?? "");
+          this.shadowRoot.querySelector("span").textContent = p.price === undefined ? "" : `$${Number(p.price).toFixed(2)}`;
+        }
+      }
+      customElements.define("demo-product-card", DemoProductCard);
+
+      const screen = document.getElementById("screen");
+      const log = document.getElementById("log");
+      const sent = [];
+
+      // What screens may do: tool params as JSON Schema, no build step needed for them.
+      screen.tools = {
+        "payments.confirm": { type: "object", properties: { amount: { type: "number", exclusiveMinimum: 0 } }, required: ["amount"] },
+      };
+      screen.components = {
+        ProductCard: { description: "A product with its name and price.", positional: ["name"], props: { name: { kind: "text" }, price: { kind: "number" } }, tag: "demo-product-card" },
+      };
+      screen.onMutation = async (call) => {
+        sent.push(call.tool);
+        log.textContent = `Sent ${call.tool} ${JSON.stringify(call.params)}`;
+      };
+
+      // A screen as a model would stream it (here, written at once).
+      screen.write(
+        [
+          "root = Card([title, card, pay])",
+          'title = Heading("Confirm payment")',
+          'card = ProductCard("Canvas tote", price=24)',
+          'pay = Button("Pay now", action="go")',
+          'go = McpMutation(pay, tool="payments.confirm", params={amount: 24})',
+          "",
+        ].join("\n"),
+      );
+      screen.end();
+
+      // ?check: the example checks itself (scripts/examples-test.mjs).
+      if (new URLSearchParams(location.search).has("check")) {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        const root = screen.shadowRoot;
+        [...root.querySelectorAll("button")].find((b) => b.textContent.trim() === "Pay now")?.click();
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        document.getElementById("omni-check").textContent = JSON.stringify({
+          framework: "html",
+          drawn: root.textContent.includes("Confirm payment"),
+          appComponent: root.querySelector("demo-product-card")?.props?.name === "Canvas tote",
+          sent,
+        });
+      }
+    </script>
+  </body>
+</html>
