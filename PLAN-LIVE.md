@@ -1,6 +1,6 @@
 # Omni-IR — Step 22: live screens
 
-Status: **Approved 2026-10-10 with the recommendations (all eight decisions); built, in review.** Free: no paid API; the live demo's updates come from the reference server's own code and the mock model.
+Status: **Approved 2026-10-10 with the recommendations (all eight decisions); built, reviewed and merged 2026-10-10; not yet released.** Free: no paid API; the live demo's updates come from the reference server's own code and the mock model.
 
 **Decided while building** (within the approved decisions):
 - *How the model knows what the app will update:* the system prompt lists the app's **live parts** (`LIVE_PARTS`, `app/live.ts`), the ids and `$keys` it keeps current, so a model's screen uses them (decision 2 needed it: only the app writes updates, so it must know the ids).
@@ -111,14 +111,14 @@ Each update is checked like a screen: catalog, props, types, tree rules and gove
 
 **C. Renderers**
 - [x] C.1 React and `<omni-screen>`: replaced components keep their place and focus; Notices announced
-- [ ] C.2 SwiftUI and Compose: the same (CI on a `wip/**` branch)
+- [x] C.2 SwiftUI and Compose: the same (CI on a `wip/**` branch)
 
 **D. Demo and docs**
 - [x] D.1 The order moving and the chart updating in the playground and both demo apps; a returned item updating its screen
 - [x] D.2 A guide, CHANGELOG, the decision log; "Not yet specified" updated
 
 **E. Review**
-- [ ] E.1 A review page with screenshots and a recording on web, iPhone and Android
-- [ ] E.2 Merge with your approval
+- [x] E.1 A review page with screenshots and a recording on web, iPhone and Android
+- [x] E.2 Merge with your approval
 - [ ] E.3 Release: a separate go-ahead from you
 - [ ] E.4 A retrospective through every step (1 to 22), like the earlier one in the decision log: what worked, what didn't, lessons, and proposed fixes for your approval
