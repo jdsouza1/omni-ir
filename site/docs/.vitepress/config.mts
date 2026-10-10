@@ -42,6 +42,7 @@ export default withMermaid(
             { text: "Running real actions", link: "/guide/actions" },
             { text: "Forms and confirmations", link: "/guide/forms" },
             { text: "Your own components", link: "/guide/app-components" },
+            { text: "Live screens", link: "/guide/live-screens" },
             { text: "Themes and wording", link: "/guide/themes" },
             { text: "Checking the model", link: "/guide/model-check" },
           ],

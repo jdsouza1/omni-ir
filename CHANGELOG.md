@@ -2,6 +2,21 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+Live screens (Step 22, PLAN-LIVE.md). The stream format stays 0.8: a stream is read exactly as before.
+
+### Added
+- **Updates:** a screen can change after its stream ends, through Omni-IR text from the app's own code, never from the model (SPEC.md [10.29]–[10.34]). A line for an id or `$key` the screen has replaces it, other lines add, and a component its parent stops listing leaves, with what it governs. An update is checked on its own lines and then as the whole screen it would leave, and is applied whole or not at all. It can't change a `$key` a field reads (`live_field_conflict`) and holds at most 2,000 lines (`update_too_large`); both codes are reported only for updates. `parser.update(text)` in `@omni-ir/core`, `OmniStore.update` in Swift and Kotlin, `update()` on `<omni-screen>`; 21 conformance cases (`conformance/cases/live.json`) and an update corpus (`fuzz/live-corpus.json`) that Swift and Kotlin match exactly.
+- **Renderers keep the screen steady:** what stays keeps its place, focus and what the person typed; nothing moves focus; a Notice an update adds or changes is read out, politely, and nothing else ([8.8]). On the web, iPhone and Android.
+- **Updates in action results:** a handler's result may carry `update`, written for the pressed Button, whose id the client sends (`button` in `/api/mutate`, `io.omni-ir/button` over MCP) ([10.35]). `createMutationHandler({ onUpdate })`, `mutationHandler(onUpdate:)` in Swift and Kotlin; `<omni-screen>` and the MCP view apply them by themselves.
+- **Screens kept current:** a server that follows a screen sends a `live` event with its id; clients follow `GET /api/live?screen=…&after=N`, numbered updates that pick up after a drop, with one catch-up update when the missed ones are gone ([10.36]–[10.40]). `followScreen()` in `@omni-ir/react`, `OmniClient.follow` in Swift and Kotlin; `<omni-screen>` follows after `generate()`. The reference server checks each update against its own copy before sending it.
+- **Live parts:** the system prompt lists the ids and `$keys` the app keeps current, so a model's screen uses them (`LIVE_PARTS` in `app/live.ts`). Demo: the order goes out for delivery and arrives, today's orders chart gains an hour at a time, and "Request a return" becomes a Notice in its place, in the playground (also the hosted one) and both demo apps. Guide: Live screens.
+
+### Changed
+- Kotlin: `OmniClient.mutationHandler` takes `onUpdate` first, so a trailing lambda is still `onResult`. Swift: `GenerateOutcome.done` gains `screen` (defaults to nil); a `switch` that binds its values needs one more `_`. `IssueStage` gains `update` in Swift and Kotlin.
+- The `order-status` and `sales-dashboard` fixtures use the demo's live parts (`order_status`, `sales_today`).
+
 ## 0.13.0 (2026-10-10)
 
 A Web Components renderer (Step 21, PLAN-ELEMENTS.md). The stream format stays 0.8.
