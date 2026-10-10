@@ -6,7 +6,7 @@ import { ASSETS } from "../app/assets";
 import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
 import { generate as defaultGenerate, type GenerateClientOptions, type GenerateOutcome } from "@omni-ir/react";
-import { createMutationHandler } from "@omni-ir/react";
+import { createMutationHandler, followScreen } from "@omni-ir/react";
 import { createParser, type OmniParser, type ParserEvent } from "@omni-ir/core";
 import type { MutationCall, RendererEvent } from "@omni-ir/react";
 
@@ -121,6 +121,17 @@ export function reducer(state: PlaygroundState, action: Action): PlaygroundState
         }
         case "end":
           return { ...state, log: addLog(state.log, { ms, kind: "end", text: `${e.issues.length} end-of-stream issue(s)`, tone: "info" }) };
+        // An update from the app's code after the stream ended (SPEC.md [10.29]).
+        case "update":
+          return {
+            ...state,
+            log: addLog(state.log, {
+              ms,
+              kind: "update",
+              text: e.applied ? "update applied" : `update rejected: ${e.issues.map((i) => `${i.code} (line ${i.line ?? "-"})`).join(", ")}`,
+              tone: e.applied ? "info" : "error",
+            }),
+          };
       }
       return state;
     }
@@ -169,7 +180,7 @@ export interface PlaygroundDeps {
 
 export function usePlayground(deps: PlaygroundDeps = {}) {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
-  const runRef = useRef({ id: 0, controller: null as AbortController | null, started: 0 });
+  const runRef = useRef({ id: 0, controller: null as AbortController | null, started: 0, parser: null as OmniParser | null });
   const generateFn = deps.generate ?? defaultGenerate;
   const baseUrl = deps.baseUrl ?? "";
 
@@ -194,6 +205,7 @@ export function usePlayground(deps: PlaygroundDeps = {}) {
       update: (text) => inner.update(text),
     };
     dispatch({ type: "start", runId, parser, mode, ...(prompt !== undefined ? { prompt } : {}) });
+    runRef.current.parser = parser;
     return { runId, parser };
   }, []);
 
@@ -211,6 +223,10 @@ export function usePlayground(deps: PlaygroundDeps = {}) {
         ...(deps.fetch ? { fetch: deps.fetch } : {}),
       });
       dispatch({ type: "outcome", runId, outcome });
+      // A screen the server keeps current: follow it until it ends or the next run starts ([10.37]).
+      if (outcome.status === "done" && outcome.screen !== undefined && !controller.signal.aborted) {
+        void followScreen(outcome.screen, { parser, signal: controller.signal, baseUrl, ...(deps.fetch ? { fetch: deps.fetch } : {}) });
+      }
     },
     [beginRun, generateFn, baseUrl, deps.fetch],
   );
@@ -235,6 +251,8 @@ export function usePlayground(deps: PlaygroundDeps = {}) {
         baseUrl,
         ...(deps.fetch ? { fetch: deps.fetch } : {}),
         onResult: (call, result) => dispatch({ type: "result", runId: runRef.current.id, call, result }),
+        // An action's result may update the screen its Button was on ([10.35]).
+        onUpdate: (text) => runRef.current.parser?.update(text),
       }),
     [baseUrl, deps.fetch],
   );
