@@ -68,7 +68,17 @@ Fields can declare `required`, `format`, `minLength` and `maxLength`; the render
 
 The action runs only after the person confirms in the renderer's dialog. Nothing in a stream can skip or change it.
 
-### Your own components
+### App components
+
+Components your app adds to the catalog (`defineComponents` in `@omni-ir/core`), drawn by your own views. Pass the same components to the parser:
+
+```tsx
+<OmniRenderer components={{ ProductCard, QuantityPicker }} resolvePicture={(name) => productPicture(name)} … />
+```
+
+Each view gets checked props with `$state` read, its children, pictures by name and, for a field, its value and message. `missingViews(components, views)` lists any without a view.
+
+### Your own catalog
 
 `catalog` replaces the built-in components with your own (trusted) ones. It must provide every component type; start from `DEFAULT_CATALOG`:
 

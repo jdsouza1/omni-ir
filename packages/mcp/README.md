@@ -45,6 +45,8 @@ serveStdio(() =>
 
 `show_screen`'s result tells the model which lines were rejected, if any, and gives the screen as plain text (`describeScreen` from `@omni-ir/core`), so a host that can't draw the view still shows something useful.
 
+An app's own components (`components`, with `pictures` for picture families) are checked and described to the model too. The built-in view has no code for them and shows its fallback; build a view with your components and pass it as `viewHtml` to draw them.
+
 Over HTTP, use the MCP SDK's `createMcpHandler` with a factory that passes who is calling (from MCP's authorization) as `user`, so each action runs as that person.
 
 ## In the repository

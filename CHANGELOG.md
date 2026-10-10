@@ -2,6 +2,23 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## Unreleased
+
+App-defined components (Step 20, PLAN-APPCOMPONENTS.md). The stream format stays 0.8.
+
+### Added
+- **Your own components:** `defineComponents` in `@omni-ir/core` declares an app's components with the catalog's kinds of value (text, number, true or false, one of a list, a picture, a list of values, the `$state` it edits) and children. Lines that use them are checked like built-in components on the web, iPhone and Android, held to new conformance cases (`conformance/cases/app.json`) and to the fuzz corpus. An app component can show values, edit one `$state` (a field gets `required` and joins the checks before a press) and hold children; it never runs an action, carries styling or loads a URL (SPEC.md [5.27]–[5.29]). A bad declaration throws when the app starts.
+- **Views by the app:** `OmniRenderer`'s `components`, `OmniView(appViews:)` and Compose's `appViews` take the app's views by name; each gets checked props with `$state` read, its children, pictures and its field. Where a view is missing, the renderer shows its fallback ([8.7]); `missingViews()` checks in a test.
+- **Pictures looked up when drawn:** picture families such as `product-{id}` (`picturePattern`) are accepted wherever a registered picture is; `resolvePicture` turns a name into a picture ([5.30]).
+- **The model learns them:** the system prompt and the MCP guide describe the app's components from their declarations, with token budgets tested (the guide's fixed part within 1,350 tokens, each tool within 40, each component within 120). They join the model check's fingerprint, and an app can add its own challenge requests; the demo pool has two.
+- **Declarations as JSON:** `componentDeclarations()`; `appRegistryFromJson` (Kotlin) and `appRegistry(fromJSON:)` (Swift) read the same file. The demo's are in `app/components.ts`, exported to `app/components.json` (`npm run components:export`).
+- `createOmniMcpServer` accepts `components` and `pictures` (the built-in view shows its fallback for them; pass your own view to draw them).
+- Demo: a ProductCard and a QuantityPicker on all three platforms, a `cart.add` tool, a product screen for the mock model ("a product page"), and a "Your components" tab on the landing page. Guide: Your own components.
+
+### Changed
+- Swift and Kotlin: `ComponentType` has a new case, `app` (`APP`), for app components, whose name is the node's `appName`. Code that switches over every component type needs a branch for it. `OmniNode` gains `appName`, `holds` and `isField` (with defaults).
+- The `unknown_component` description now reads "isn't in the catalog or among the app's own components".
+
 ## 0.11.0 (2026-10-09)
 
 Stream format **0.8**, the first change to the format since it got its own version (Step 19, PLAN-FORMS.md).

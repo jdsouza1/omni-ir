@@ -40,6 +40,7 @@ export default withMermaid(
             { text: "In Claude and ChatGPT (MCP Apps)", link: "/guide/mcp" },
             { text: "Running real actions", link: "/guide/actions" },
             { text: "Forms and confirmations", link: "/guide/forms" },
+            { text: "Your own components", link: "/guide/app-components" },
             { text: "Themes and wording", link: "/guide/themes" },
             { text: "Checking the model", link: "/guide/model-check" },
           ],

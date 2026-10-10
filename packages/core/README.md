@@ -52,6 +52,7 @@ console.log(doc.nodes.get("title")?.props); // { text: "Hello" }
 - `validateStatement`, `validateDocument`, `parseLine`, `LineBuffer`, `createStore`: the pipeline's individual stages.
 - `describeComponent`, `describeValue`: plain-language descriptions of the schema, used to write system prompts.
 - `checkField`, `fieldsReadBy`: the field checks every renderer runs before an action (SPEC.md section 8, Fields).
+- `defineComponents`, `picturePattern`, `componentDeclarations`: an app's own components and picture families (Step 20), checked like the catalog's; pass them to `createParser` as `components` and `pictures`.
 - `describeScreen`: a plain-text outline of a screen, for logs, tests and hosts that can't draw it; what the person typed stays out unless asked.
 
 ## Security model
