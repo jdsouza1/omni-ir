@@ -70,6 +70,9 @@ jobs:
             xcodebuild test-without-building -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo \
               -destination "id=$UDID" -derivedDataPath build -only-testing:"OmniIRDemoUITests/VideoTests/$2" -quiet
             status=$?
+            # The simulator's recorder drops the idle seconds at the start, so its clips are lined up
+            # from the moment they stop instead (compose.mjs).
+            python3 -c 'import time; print(time.time())' > "rec/$1.t1"
             kill -INT "$recorder"; wait "$recorder" || true
             return $status
           }
