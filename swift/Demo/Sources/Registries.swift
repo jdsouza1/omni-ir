@@ -47,6 +47,14 @@ let demoTools: ToolRegistry = [
   "assistant.ask": Tool { p in
     problems([rule(trimmed(p["question"]).map { (1...500).contains($0.count) } ?? false, "question: 1 to 500 characters")])
   },
+  // The demo's own components (Step 20): a ProductCard's button adds to the bag.
+  "cart.add": Tool { p in
+    let quantity = number(p["quantity"])
+    return problems([
+      rule(text(p["productId"]).map { (1...8).contains($0.count) && $0.allSatisfy { ("0"..."9").contains($0) } } ?? false, "productId: 1 to 8 digits"),
+      rule(quantity.map { $0 == $0.rounded() && (1...99).contains($0) } ?? false, "quantity: a whole number from 1 to 99"),
+    ])
+  },
   "settings.update": Tool { p in
     problems([
       rule(trimmed(p["language"]).map { (1...40).contains($0.count) } ?? false, "language: 1 to 40 characters"),

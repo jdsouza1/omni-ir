@@ -56,6 +56,7 @@ struct NodeView: View {
     case .barChart: XYChartView(node: node, store: store, line: false)
     case .lineChart: XYChartView(node: node, store: store, line: true)
     case .pieChart: PieChartView(node: node, store: store)
+    case .app: AppComponentNode(node: node, context: context)
     // A Series or Slice is drawn by its chart; on its own (which the parser rejects) it shows nothing.
     case .series, .slice: EmptyView()
     }
@@ -209,7 +210,7 @@ struct NodeView: View {
     default: nil
     }
     let frame = Color.clear.aspectRatio(ratio ?? 16.0 / 9, contentMode: .fit).frame(maxWidth: .infinity)
-    if let image = context.pictures[text("asset")] {
+    if let image = context.picture(text("asset")) {
       frame
         .overlay { image.resizable().scaledToFill() }
         .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -248,7 +249,7 @@ struct NodeView: View {
       if node.props["image"] != nil {
         // Decorative: the title already says what it shows.
         Group {
-          if let image = context.pictures[text("image")] {
+          if let image = context.picture(text("image")) {
             image.resizable().scaledToFill()
           } else {
             Color.clear.background(.quaternary)
@@ -277,6 +278,79 @@ struct NodeView: View {
 // MARK: - Interactive components
 
 /// An Input edits its `$key` locally; it never calls the backend by itself (R1).
+// MARK: - App components (Step 20)
+
+/// What an app's view for its own component receives: checked props with each `$state` read, its
+/// children (place them where they belong), pictures by name, and for a component that edits a
+/// `$state` its value, how to change it, and the field's message ([8.5]). The view is the app's code;
+/// the stream only chose the values.
+public struct AppViewProps {
+  public let id: String
+  /// The component's name, such as "ProductCard".
+  public let name: String
+  public let props: [String: PropValue]
+  /// Its children, in order, each in its own slot.
+  public let children: AnyView
+  /// A picture by name: the app's registered ones, then its lookup. Nil when there is none.
+  public let picture: @MainActor (String?) -> Image?
+  /// For a component that edits a `$state`.
+  public let field: AppField?
+}
+
+/// An app component's edited `$state`: its value, how to change it, and the field's message.
+public struct AppField {
+  public let value: Primitive
+  public let set: @MainActor (Primitive) -> Void
+  /// The renderer's message once it should show ([8.5]), or nil. The renderer draws it under the view.
+  public let message: String?
+  /// Call when the person has finished with the control, such as after a choice.
+  public let leave: @MainActor () -> Void
+}
+
+/// The app's view for one of its components.
+public typealias AppView = @MainActor (AppViewProps) -> AnyView
+
+/// An app's own component: its view, or the renderer's fallback where the app gave none ([8.7]).
+struct AppComponentNode: View {
+  @Environment(\.omniStrings) private var strings
+  let node: OmniNode
+  let context: RenderContext
+
+  var body: some View {
+    let store = context.store
+    if let name = node.appName, let view = context.appViews[name] {
+      let children = AnyView(VStack(alignment: .leading, spacing: 8) { Children(ids: node.children) })
+      let picture: @MainActor (String?) -> Image? = { [context] in context.picture($0) }
+      if case .state(let key)? = node.props["value"], node.holds != nil {
+        let value = store.document.state[key] ?? .null
+        let field = AppField(
+          value: value,
+          set: { store.setState(key, $0) },
+          message: store.visibleFieldProblem(node.id).map { strings.field($0) },
+          leave: { store.showField(node.id) }
+        )
+        if node.isField {
+          FieldFrame(node: node, store: store) {
+            view(AppViewProps(id: node.id, name: name, props: store.appProps(node), children: children, picture: picture, field: field))
+          }
+        } else {
+          view(AppViewProps(id: node.id, name: name, props: store.appProps(node), children: children, picture: picture, field: field))
+        }
+      } else {
+        view(AppViewProps(id: node.id, name: name, props: store.appProps(node), children: children, picture: picture, field: nil))
+      }
+    } else {
+      Text(verbatim: strings.unsupported)
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(.secondary.opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [4, 3])))
+    }
+  }
+}
+
 /// A field (SPEC.md section 8, Fields): its control, then its message once the person has left it or
 /// a press checked it ([8.5]). The message is the renderer's own words, also given to VoiceOver as the
 /// control's hint.

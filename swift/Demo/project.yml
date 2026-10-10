@@ -28,6 +28,9 @@ targets:
       - path: ../../fixtures
         type: folder
         buildPhase: resources
+      # The demo's own components (Step 20), the same declarations the web and Android demos use.
+      - path: ../../app/components.json
+        buildPhase: resources
     dependencies:
       - package: OmniIR
         product: OmniIRSwiftUI

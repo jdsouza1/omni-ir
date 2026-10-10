@@ -8,6 +8,8 @@ public struct OmniView: View {
   private let pictures: [String: Image]
   private let onMutation: @MainActor (MutationCall) async throws -> Void
   private let onEvent: @MainActor (RendererEvent) -> Void
+  private let appViews: [String: AppView]
+  private let resolvePicture: @MainActor (String) -> Image?
   @State private var ui = ViewState()
   @Environment(\.omniStrings) private var strings
 
@@ -17,6 +19,10 @@ public struct OmniView: View {
   ///     to the store; a stream can never show a picture from anywhere else.
   ///   - onMutation: Runs a governed action. Its params are resolved and already checked by the tool.
   ///   - onEvent: Blocked actions, failed handlers and presses of Buttons without an action.
+  ///   - appViews: The app's views for its own components (Step 20), by name; give the store the same
+  ///     components. A declared component without one shows the renderer's fallback.
+  ///   - resolvePicture: Pictures the app looks up when a screen is drawn, for names that match the
+  ///     store's picture patterns (Step 20), such as `product-1042`. Nil when there is none.
   ///
   /// Tools that need the person's confirmation are set on the store (`OmniStore(confirm:)`); the view
   /// asks with its own alert (SPEC.md section 9, Confirmations).
@@ -24,16 +30,23 @@ public struct OmniView: View {
     store: OmniStore,
     pictures: [String: Image] = [:],
     onMutation: @escaping @MainActor (MutationCall) async throws -> Void,
-    onEvent: @escaping @MainActor (RendererEvent) -> Void = { _ in }
+    onEvent: @escaping @MainActor (RendererEvent) -> Void = { _ in },
+    appViews: [String: AppView] = [:],
+    resolvePicture: @escaping @MainActor (String) -> Image? = { _ in nil }
   ) {
     self.store = store
     self.pictures = pictures
     self.onMutation = onMutation
     self.onEvent = onEvent
+    self.appViews = appViews
+    self.resolvePicture = resolvePicture
   }
 
   public var body: some View {
-    let context = RenderContext(store: store, pictures: pictures, onMutation: onMutation, onEvent: onEvent, ui: ui, strings: strings)
+    let context = RenderContext(
+      store: store, pictures: pictures, onMutation: onMutation, onEvent: onEvent, ui: ui, strings: strings,
+      appViews: appViews, resolvePicture: resolvePicture
+    )
     Group {
       // The marker is line 1, so the notice appears before anything else and never moves the screen.
       if context.store.document.newerVersion {
@@ -106,6 +119,15 @@ final class RenderContext {
   let onEvent: @MainActor (RendererEvent) -> Void
   let ui: ViewState
   let strings: OmniStrings
+  /// The app's views for its own components (Step 20).
+  let appViews: [String: AppView]
+  let resolvePicture: @MainActor (String) -> Image?
+
+  /// A picture by name: the app's registered ones, then its lookup (Step 20).
+  func picture(_ name: String?) -> Image? {
+    guard let name else { return nil }
+    return pictures[name] ?? resolvePicture(name)
+  }
 
   init(
     store: OmniStore,
@@ -113,7 +135,9 @@ final class RenderContext {
     onMutation: @escaping @MainActor (MutationCall) async throws -> Void,
     onEvent: @escaping @MainActor (RendererEvent) -> Void,
     ui: ViewState,
-    strings: OmniStrings
+    strings: OmniStrings,
+    appViews: [String: AppView] = [:],
+    resolvePicture: @escaping @MainActor (String) -> Image? = { _ in nil }
   ) {
     self.store = store
     self.pictures = pictures
@@ -121,6 +145,8 @@ final class RenderContext {
     self.onEvent = onEvent
     self.ui = ui
     self.strings = strings
+    self.appViews = appViews
+    self.resolvePicture = resolvePicture
   }
 
   func press(_ id: String) {

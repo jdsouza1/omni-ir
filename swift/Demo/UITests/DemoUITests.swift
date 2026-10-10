@@ -21,7 +21,7 @@ final class ScreenshotTests: XCTestCase {
   private let screens = [
     "landing/booking", "landing/checkout", "landing/assistant",
     "payment-confirmation", "sign-in", "order-status", "profile-settings", "support-contact",
-    "account-settings", "order-history", "sales-dashboard", "order-breakdown",
+    "account-settings", "order-history", "sales-dashboard", "order-breakdown", "product",
   ]
 
   func testScreenshots() {
@@ -116,6 +116,25 @@ final class FormTests: XCTestCase {
     XCTAssertTrue(alert.waitForExistence(timeout: 5))
     alert.buttons["Confirm"].tap()
     XCTAssertTrue(sent.waitForExistence(timeout: 5), "confirm sends")
+  }
+}
+
+/// The app's own components (Step 20): drawn by its views; the chosen quantity reaches the action.
+final class AppComponentTests: XCTestCase {
+  func testProductAddsToBag() {
+    let app = launch("product")
+    waitUntilDone(app, self)
+    let stepper = app.steppers.firstMatch
+    XCTAssertTrue(stepper.waitForExistence(timeout: 5), "the QuantityPicker is drawn by the app's own view")
+    stepper.buttons.element(boundBy: 1).tap()
+    let attachment = XCTAttachment(screenshot: app.screenshot())
+    attachment.name = "app-components-product"
+    attachment.lifetime = .keepAlways
+    add(attachment)
+    app.buttons["Add to bag"].tap()
+    let sent = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Sent cart.add")).firstMatch
+    XCTAssertTrue(sent.waitForExistence(timeout: 5), "the action reached the app's handler")
+    XCTAssertTrue(sent.label.contains("quantity: 2"), sent.label)
   }
 }
 
