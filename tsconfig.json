@@ -21,10 +21,11 @@
       "@omni-ir/core": ["./packages/core/src/index.ts"],
       "@omni-ir/core/ag-ui": ["./packages/core/src/agui.ts"],
       "@omni-ir/react": ["./packages/react/src/index.ts"],
-      "@omni-ir/mcp": ["./packages/mcp/src/index.ts"]
+      "@omni-ir/mcp": ["./packages/mcp/src/index.ts"],
+      "@omni-ir/elements": ["./packages/elements/src/index.ts"]
     }
   },
-  "include": ["app", "benchmarks", "packages/core/src", "packages/react/src", "packages/mcp/src", "server", "playground", "site", "fuzz", "conformance", "tests", "scripts", "vitest.config.ts"],
+  "include": ["app", "benchmarks", "packages/core/src", "packages/react/src", "packages/mcp/src", "packages/elements/src", "server", "playground", "site", "fuzz", "conformance", "tests", "scripts", "vitest.config.ts"],
   // Pinned third-party files kept for reference, not compiled.
   "exclude": ["benchmarks/sources"]
 }

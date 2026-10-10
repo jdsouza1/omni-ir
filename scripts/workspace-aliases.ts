@@ -9,4 +9,5 @@ export const WORKSPACE_ALIASES = [
   { find: /^@omni-ir\/react$/, replacement: resolve("packages/react/src/index.ts") },
   { find: /^@omni-ir\/react\/omni\.css$/, replacement: resolve("packages/react/src/catalog/omni.css") },
   { find: /^@omni-ir\/mcp$/, replacement: resolve("packages/mcp/src/index.ts") },
+  { find: /^@omni-ir\/elements$/, replacement: resolve("packages/elements/src/index.ts") },
 ];

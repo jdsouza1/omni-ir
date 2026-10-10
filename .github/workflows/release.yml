@@ -1,4 +1,4 @@
-# Publishes @omni-ir/core, @omni-ir/react and @omni-ir/mcp to npm when a version tag (v0.1.0, v0.2.0, …) is pushed.
+# Publishes @omni-ir/core, @omni-ir/react, @omni-ir/mcp and @omni-ir/elements to npm when a version tag (v0.1.0, v0.2.0, …) is pushed.
 # Uses npm trusted publishing: GitHub proves to npm which repo and workflow is publishing, so no npm
 # token is stored anywhere, and npm adds provenance automatically.
 #
@@ -8,7 +8,7 @@
 # Trusted publishing only works for a package that already exists on npm, so the very first version
 # of each package is published by hand (see PLAN-NPM.md, task G).
 #
-# Releasing: set the same version in packages/core, packages/react and packages/mcp (react and mcp
+# Releasing: set the same version in packages/core, packages/react, packages/mcp and packages/elements (react and mcp
 # depend on ^that version), commit, then `git tag v<version> && git push origin v<version>`. Publishing is permanent:
 # a version can never be reused. Nothing here calls a paid API.
 name: Release
@@ -55,7 +55,7 @@ jobs:
       - name: Check the tag matches every package version
         run: |
           tag="${GITHUB_REF_NAME#v}"
-          for pkg in core react mcp; do
+          for pkg in core react mcp elements; do
             version="$(node -p "require('./packages/$pkg/package.json').version")"
             if [ "$version" != "$tag" ]; then
               echo "::error::packages/$pkg is $version but the tag is v$tag"; exit 1
@@ -73,7 +73,7 @@ jobs:
       # run can be re-run safely.
       - name: Publish
         run: |
-          for pkg in core react mcp; do
+          for pkg in core react mcp elements; do
             name="$(node -p "require('./packages/$pkg/package.json').name")"
             version="$(node -p "require('./packages/$pkg/package.json').version")"
             if npm view "$name@$version" version >/dev/null 2>&1; then
