@@ -15,6 +15,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { ASSETS } from "../app/assets";
+import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
 import { createParser, type ParserEvent } from "@omni-ir/core";
 
@@ -59,7 +60,7 @@ export function loadLandingTabs(projectDir: string): LandingTab[] {
   return config.tabs.map((tab) => {
     const source = readFileSync(join(dir, tab.file), "utf8");
     const problems: string[] = [];
-    const parser = createParser({ tools: TOOLS, assets: ASSETS });
+    const parser = createParser({ tools: TOOLS, assets: ASSETS, components: APP_COMPONENTS, pictures: PICTURES });
     parser.subscribe((e: ParserEvent) => {
       if (e.type === "error" || e.type === "warning") problems.push(`line ${e.issue.line ?? "?"}: ${e.issue.code}: ${e.issue.message}`);
     });

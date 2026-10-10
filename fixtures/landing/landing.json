@@ -137,6 +137,37 @@
           "explain": "Sends the typed question to the one tool the app allows for this."
         }
       ]
+    },
+    {
+      "key": "own",
+      "label": "Your components",
+      "file": "product.omni",
+      "lines": [
+        {
+          "part": "root",
+          "explain": "One card holding the app's product and a quantity. Everything after this line is checked the same way as before."
+        },
+        {
+          "part": "card",
+          "explain": "ProductCard isn't in Omni-IR: this app declared it, with a name, a price, a picture and room for buttons. The model uses it like any component, and the app's own code draws it."
+        },
+        {
+          "part": "qty",
+          "explain": "State holding how many, a number."
+        },
+        {
+          "part": "qty",
+          "explain": "QuantityPicker, also the app's own. It edits $qty, like an Input edits text, and the app draws the minus and plus buttons."
+        },
+        {
+          "part": "add",
+          "explain": "The product's button, listed among the ProductCard's children. An app component never sends anything itself."
+        },
+        {
+          "part": "add",
+          "explain": "The action stays governed: only this McpMutation lets the button add to the bag, with the chosen quantity, through a tool the app allows."
+        }
+      ]
     }
   ]
 }

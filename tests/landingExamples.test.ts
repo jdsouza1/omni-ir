@@ -17,12 +17,13 @@ const TEMPLATE = [
 ].join("\n");
 
 describe("landing examples", () => {
-  it("loads all three tabs from the fixtures, each line split and explained", () => {
+  it("loads all four tabs from the fixtures, each line split and explained", () => {
     const tabs = loadLandingTabs(".");
     expect(tabs.map((t) => [t.label, t.lines.length])).toEqual([
       ["Booking", 12],
       ["Checkout", 8],
       ["Assistant", 9],
+      ["Your components", 6],
     ]);
     expect(tabs[0]!.lines[0]).toMatchObject({ kw: "root", name: "Card", rest: "([photo, title, stars, place, dates, reserve])", part: "root" });
     expect(tabs[0]!.lines[6]).toMatchObject({ kw: "$checkIn", name: "", rest: '"2026-10-14"', part: "checkIn" });
