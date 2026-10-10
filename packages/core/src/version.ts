@@ -3,7 +3,7 @@
 // - FORMAT_VERSION is the stream format's, which changes only when the grammar, the catalog or the
 //   document rules do. It is what the version marker ([3.9]), requests ([10.1]) and the server's check
 //   ([10.12]) carry. A test fingerprints the format and fails if it changes without a new number.
-export const OMNI_IR_VERSION = "0.12.0";
+export const OMNI_IR_VERSION = "0.13.0";
 
 /** The stream format, MAJOR.MINOR: 0.8 since field constraints (Step 19); before that 0.5. The next one is 0.9. */
 export const FORMAT_VERSION = "0.8";

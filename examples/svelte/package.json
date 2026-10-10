@@ -7,7 +7,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@omni-ir/elements": "^0.12.0"
+    "@omni-ir/elements": "^0.13.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "7.3.1",

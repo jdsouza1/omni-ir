@@ -11,7 +11,7 @@
     "@angular/compiler": "22.2.0",
     "@angular/core": "22.2.0",
     "@angular/platform-browser": "22.2.0",
-    "@omni-ir/elements": "^0.12.0",
+    "@omni-ir/elements": "^0.13.0",
     "rxjs": "7.8.2",
     "tslib": "2.8.1"
   },

@@ -2,7 +2,7 @@
 // The single authority is packages/core/src/schema.ts (TypeScript), exported with `npm run schema:export`.
 
 /// The package release this catalog was exported from.
-public let omniIRVersion = "0.12.0"
+public let omniIRVersion = "0.13.0"
 
 /// The stream format's version: what the version marker, requests and version checks carry.
 public let omniIRFormatVersion = "0.8"

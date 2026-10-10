@@ -7,7 +7,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@omni-ir/elements": "^0.12.0",
+    "@omni-ir/elements": "^0.13.0",
     "vue": "3.5.43"
   },
   "devDependencies": {
