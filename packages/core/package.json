@@ -1,6 +1,6 @@
 {
   "name": "@omni-ir/core",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Omni-IR protocol core: streaming parser, Zod schema and document store for line-oriented generative UI",
   "license": "Apache-2.0",
   "type": "module",

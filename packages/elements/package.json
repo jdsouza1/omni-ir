@@ -1,6 +1,6 @@
 {
   "name": "@omni-ir/elements",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "<omni-screen>: Omni-IR generative UI screens in any web framework or none (Vue, Svelte, Angular, plain HTML), with the Trusted Catalog, checks and governed actions",
   "license": "Apache-2.0",
   "type": "module",

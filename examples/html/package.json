@@ -7,7 +7,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@omni-ir/elements": "^0.13.0"
+    "@omni-ir/elements": "^0.14.0"
   },
   "devDependencies": {
     "vite": "8.3.1"
