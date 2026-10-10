@@ -9,8 +9,9 @@ import OmniIRCore
 
 /// How a `generate` call ended.
 public enum GenerateOutcome: Sendable, Equatable {
-  /// The stream finished. `stopReason` is "end_turn", "max_tokens" or "refusal".
-  case done(stopReason: String, model: String, milliseconds: Double)
+  /// The stream finished. `stopReason` is "end_turn", "max_tokens" or "refusal". `screen`: the server
+  /// keeps this screen current; pass it to `follow` (SPEC.md [10.36]).
+  case done(stopReason: String, model: String, milliseconds: Double, screen: String? = nil)
   /// The server or the connection failed; `retryable` says whether trying again may help.
   case error(code: String, message: String, retryable: Bool)
   /// The caller cancelled.
@@ -18,6 +19,15 @@ public enum GenerateOutcome: Sendable, Equatable {
 }
 
 /// The server refused an action, with its message.
+/// How following a screen ended (SPEC.md [10.37]-[10.39]).
+public enum FollowOutcome: Sendable, Equatable {
+  /// The server sent `end`: the screen won't change again.
+  case ended
+  case aborted
+  /// The server refused for good: `not_found`, or another error that isn't retryable.
+  case failed(code: String, message: String)
+}
+
 public struct MutationRejectedError: Error, Sendable, Equatable, CustomStringConvertible {
   public let message: String
   public var description: String { message }
@@ -76,6 +86,8 @@ struct ServerEventDecoder {
 enum StreamStep: Equatable {
   case text(String)
   case finished(GenerateOutcome)
+  /// The id of a screen the server keeps current ([10.36]).
+  case live(String)
   case ignored
 }
 
@@ -93,8 +105,39 @@ func interpret(_ event: ServerEvent) -> StreamStep {
       milliseconds: (payload["ms"] as? NSNumber)?.doubleValue ?? 0))
   case "error":
     return .finished(errorOutcome(payload))
+  case "live":
+    guard let screen = payload["screen"] as? String, !screen.isEmpty else { return .ignored }
+    return .live(screen)
   default:
     return .ignored
+  }
+}
+
+/// One step of a live feed ([10.37]).
+enum LiveStep: Equatable {
+  case update(seq: Int, text: String)
+  case end
+}
+
+/// The events of one `GET /api/live` response, read as [10.6] says; anything else is skipped.
+struct LiveReader {
+  private var decoder = ServerEventDecoder()
+
+  mutating func feed(_ bytes: some Sequence<UInt8>) -> [LiveStep] {
+    decoder.feed(bytes).compactMap { event in
+      guard let object = try? JSONSerialization.jsonObject(with: Data(event.data.utf8)), let payload = object as? [String: Any] else { return nil }
+      switch event.event {
+      case "end":
+        return .end
+      case "update":
+        guard let number = payload["seq"] as? NSNumber, let text = payload["text"] as? String else { return nil }
+        let seq = number.doubleValue
+        guard seq >= 1, seq == seq.rounded(), seq < Double(Int32.max) else { return nil }
+        return .update(seq: Int(seq), text: text)
+      default:
+        return nil
+      }
+    }
   }
 }
 
@@ -103,6 +146,7 @@ func interpret(_ event: ServerEvent) -> StreamStep {
 struct StreamReader {
   private var decoder = ServerEventDecoder()
   private(set) var outcome: GenerateOutcome?
+  private var screen: String?
 
   mutating func feed(_ bytes: some Sequence<UInt8>) -> [String] {
     var texts: [String] = []
@@ -110,7 +154,13 @@ struct StreamReader {
       if outcome != nil { break }
       switch interpret(event) {
       case .text(let text): texts.append(text)
-      case .finished(let result): outcome = result
+      case .live(let id): screen = id
+      case .finished(let result):
+        if case .done(let stopReason, let model, let milliseconds, _) = result {
+          outcome = .done(stopReason: stopReason, model: model, milliseconds: milliseconds, screen: screen)
+        } else {
+          outcome = result
+        }
       case .ignored: break
       }
     }
@@ -234,7 +284,13 @@ public struct OmniClient: Sendable {
   /// An `onMutation` handler for OmniView that posts governed actions to `/api/mutate`. The server
   /// checks the tool and params again. A refusal throws `MutationRejectedError`, which the renderer
   /// reports as `handler_failed`. `onResult` gets the server's result as JSON.
-  public func mutationHandler(onResult: (@MainActor (MutationCall, Data) -> Void)? = nil) -> @MainActor (MutationCall) async throws -> Void {
+  /// `onUpdate` gets the update a successful action's result carries ([10.35]), to apply to the screen the
+  /// Button was on: usually `{ text, _ in store.update(text) }`. The pressed Button's id is sent so the
+  /// server can write the update for it.
+  public func mutationHandler(
+    onUpdate: (@MainActor (String, MutationCall) -> Void)? = nil,
+    onResult: (@MainActor (MutationCall, Data) -> Void)? = nil
+  ) -> @MainActor (MutationCall) async throws -> Void {
     let url = baseURL.appendingPathComponent("api/mutate")
     let session = session
     let token = token
@@ -245,7 +301,9 @@ public struct OmniClient: Sendable {
       // One key per press, kept for the retry, so a server that honours keys never runs it twice.
       request.setValue(UUID().uuidString, forHTTPHeaderField: "idempotency-key")
       if let token = token() { request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization") }
-      request.httpBody = try JSONSerialization.data(withJSONObject: ["tool": call.tool, "params": jsonParams(call.params)])
+      var body: [String: Any] = ["tool": call.tool, "params": jsonParams(call.params)]
+      if onUpdate != nil { body["button"] = call.target }
+      request.httpBody = try JSONSerialization.data(withJSONObject: body)
       let data: Data
       let response: URLResponse
       do {
@@ -264,7 +322,66 @@ public struct OmniClient: Sendable {
       }
       let result = json?["result"].flatMap { try? JSONSerialization.data(withJSONObject: $0) } ?? Data("{}".utf8)
       onResult?(call, result)
+      if let update = json?["update"] as? String { onUpdate?(update, call) }
     }
+  }
+
+  /// Follows a screen the server keeps current ([10.37]-[10.39]): applies each update to `store`, in
+  /// order, until the server says the screen won't change again or the task is cancelled. A dropped
+  /// connection is followed again from the last update received, waiting longer each time, up to a minute.
+  /// `onUpdate` gets each result; a rejected update is a bug in the app's code.
+  @MainActor
+  public func follow(
+    _ screen: String, into store: OmniStore, retry: TimeInterval = 1, onUpdate: (@MainActor (UpdateResult, Int) -> Void)? = nil
+  ) async -> FollowOutcome {
+    var last = 0
+    var failures = 0
+    while !Task.isCancelled {
+      var gotSomething = false
+      var components = URLComponents(url: baseURL.appendingPathComponent("api/live"), resolvingAgainstBaseURL: false)
+      components?.queryItems = [URLQueryItem(name: "screen", value: screen), URLQueryItem(name: "after", value: String(last))]
+      var request = URLRequest(url: components?.url ?? baseURL.appendingPathComponent("api/live"))
+      request.timeoutInterval = idleTimeout
+      request.setValue("text/event-stream", forHTTPHeaderField: "accept")
+      if let token = token() { request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization") }
+      do {
+        let (bytes, response) = try await session.bytes(for: request)
+        if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
+          var body: [UInt8] = []
+          do { for try await byte in bytes { body.append(byte) } } catch {}
+          if case .error(let code, let message, let retryable) = errorResponseOutcome(status: http.statusCode, body: body), !retryable {
+            return .failed(code: code, message: message)
+          }
+        } else {
+          var reader = LiveReader()
+          var line: [UInt8] = []
+          for try await byte in bytes {
+            line.append(byte)
+            guard byte == 0x0A else { continue }
+            for step in reader.feed(line) {
+              gotSomething = true
+              switch step {
+              case .end:
+                return .ended
+              case .update(let seq, let text) where seq > last:
+                last = seq  // a rejected update still counts as received ([10.38])
+                onUpdate?(store.update(text), seq)
+              case .update:
+                continue
+              }
+            }
+            line.removeAll(keepingCapacity: true)
+          }
+        }
+      } catch {
+        // dropped: follow again below
+      }
+      if Task.isCancelled { break }
+      failures = gotSomething ? 0 : failures + 1
+      let wait = min(60, retry * pow(2, Double(max(0, failures - 1))))
+      try? await Task.sleep(nanoseconds: UInt64(wait * 1_000_000_000))
+    }
+    return .aborted
   }
 }
 #endif

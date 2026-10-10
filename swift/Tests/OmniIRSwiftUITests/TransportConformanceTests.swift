@@ -84,7 +84,7 @@ struct TransportConformanceTests {
       #expect(result.ended == c.expect.ended, label)
       let expected = c.expect.outcome
       switch result.outcome {
-      case .done(let stopReason, let model, let milliseconds):
+      case .done(let stopReason, let model, let milliseconds, _):
         #expect(expected.status == "done", label)
         if let value = expected.stopReason { #expect(stopReason == value, label) }
         if let value = expected.model { #expect(model == value, label) }

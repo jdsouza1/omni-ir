@@ -138,6 +138,15 @@ public final class OmniStore {
     return found
   }
 
+  /// Apply an update from the app's own code to the ended screen (SPEC.md [10.29]): the same lines, where
+  /// an id or `$key` the screen has is replaced. Applied whole or not at all. Never pass text a model wrote.
+  @discardableResult
+  public func update(_ text: String) -> UpdateResult {
+    let result = parser.update(text)
+    sync()
+    return result
+  }
+
   private func sync() {
     revision &+= 1
   }
