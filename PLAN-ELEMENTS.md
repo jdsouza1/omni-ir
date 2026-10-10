@@ -1,6 +1,6 @@
 # Omni-IR — Step 21: a Web Components renderer
 
-Status: **APPROVED 2026-10-10** with the recommendations (all eight decisions). Free: no paid API; tests and examples use the mock model. Example apps download free packages from npm in CI. Nothing here is built until you approve it.
+Status: **DONE 2026-10-10: released as `v0.13.0`.** Approved 2026-10-10 with the recommendations (all eight decisions). Free: no paid API; tests and examples use the mock model. Example apps download free packages from npm in CI. Nothing here is built until you approve it.
 
 ## Goal
 
@@ -118,4 +118,4 @@ A developer using any web framework, or none, can draw Omni-IR screens with one 
 **E. Review**
 - [x] E.1 A review page with screenshots from the four examples
 - [x] E.2 Merge with your approval
-- [ ] E.3 Release: a separate go-ahead from you, and the first publish of `@omni-ir/elements` by hand by you
+- [x] E.3 Release: a separate go-ahead from you, and the first publish of `@omni-ir/elements` by hand by you
