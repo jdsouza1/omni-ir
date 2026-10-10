@@ -1,6 +1,6 @@
 # Omni-IR — Step 20: app-defined components
 
-Status: **DRAFT for approval (2026-10-10).** Free: no paid API; tests, demos and measurements use the mock model and token counts. Nothing here is built until you approve it.
+Status: **APPROVED 2026-10-10** with the recommendations (all ten decisions); timing a real model's first line is tabled by the owner. Free: no paid API; tests, demos and measurements use the mock model and token counts. Nothing here is built until you approve it.
 
 ## Goal
 
@@ -107,7 +107,7 @@ addM = McpMutation(add, tool="cart.add", params={productId: "1042", quantity: $q
 - *Pros:* each app component costs about 40–80 tokens in the prompt; a test measures the system prompt and the MCP guide with the demo components and fails over a budget (the built-in part of the guide stays within its 1,500 tokens; app components get their own budget per component). Measurement is free: token counts, no model calls.
 - *Cons:* an app with dozens of components pays for all of them in every request until selection exists.
 - *Alternative:* choose components per request now (smaller prompts, but a selection step that can drop the component a request needed, and harder to test).
-- *Trade-off:* simple and predictable first; selection is a separate step once a real app needs it. Time to the first line with a real model would cost money, so it's measured only with your go-ahead.
+- *Trade-off:* simple and predictable first; selection is a separate step once a real app needs it. Time to the first line with a real model would cost money: tabled by the owner (2026-10-10).
 
 **9. The model check covers app components** (recommended).
 - *Pros:* the declarations become part of the setup's fingerprint (Step 17), so adding or changing a component triggers a new check; an app can add its own test requests that use its components, scored by the same parser.
