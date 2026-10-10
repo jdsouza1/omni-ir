@@ -133,6 +133,7 @@ export function createApp({
   app.locals.modelCheck = gate;
   const mcp = config.mcp
     ? referenceMcp({
+        // No app components here: the built-in view has no code to draw them (an app passes its own view).
         tools,
         assets,
         handlers,

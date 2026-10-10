@@ -5,7 +5,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { z } from "zod";
 import type { App } from "@modelcontextprotocol/ext-apps";
-import { createParser, type Issue, type OmniStore, type ToolRegistry } from "@omni-ir/core";
+import { createParser, defineComponents, type Issue, type OmniStore, type ToolRegistry } from "@omni-ir/core";
 import { MutationRejectedError, OmniRenderer, type MutationCall, type RendererEvent } from "@omni-ir/react";
 import type { ViewConfig } from "../config.js";
 import { IDEMPOTENCY_META_KEY } from "../constants.js";
@@ -32,6 +32,8 @@ export interface ViewController {
 /** Wire the view to the host. Call before `app.connect()`, so no notification is missed. */
 export function createViewController(app: App, config: ViewConfig): ViewController {
   // The first check before sending: the server checks again with the tool's full schema.
+  // The app's own components (Step 20): accepted and checked; this view draws the renderer's fallback for them.
+  const components = defineComponents(config.components ?? {});
   const tools: ToolRegistry = Object.fromEntries(
     Object.entries(config.tools).map(([name, json]) => [name, z.fromJSONSchema(json as Parameters<typeof z.fromJSONSchema>[0])]),
   );
@@ -49,7 +51,7 @@ export function createViewController(app: App, config: ViewConfig): ViewControll
   };
 
   const writer = createInputWriter(() => {
-    const parser = createParser({ tools, assets: config.assets });
+    const parser = createParser({ tools, assets: config.assets, components, pictures: config.pictures ?? [] });
     parser.subscribe((event) => {
       if (event.type === "error") addIssue(event.issue);
     });

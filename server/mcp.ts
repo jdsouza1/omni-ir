@@ -5,7 +5,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { ToolRegistry } from "@omni-ir/core";
+import type { AppComponents, PicturePattern, ToolRegistry } from "@omni-ir/core";
 import { createOmniMcpServer, type ActionResult, type OmniMcpEvent } from "@omni-ir/mcp";
 import { OMNI_IR_VERSION } from "@omni-ir/core";
 import type { AssetRegistry } from "../app/assets";
@@ -38,6 +38,9 @@ export interface McpCounts {
 export interface ReferenceMcpOptions {
   tools: ToolRegistry;
   assets: AssetRegistry;
+  /** The app's own components and picture families (Step 20). */
+  components?: AppComponents;
+  pictures?: readonly PicturePattern[];
   handlers: Readonly<Record<string, ToolHandler>>;
   /** The handlers' context, at the time of each action. */
   context: () => ToolContext;
@@ -46,7 +49,7 @@ export interface ReferenceMcpOptions {
 }
 
 /** One MCP server per request (or connection), for the person calling; counts shared across them. */
-export function referenceMcp({ tools, assets, handlers, context, viewHtml, log }: ReferenceMcpOptions) {
+export function referenceMcp({ tools, assets, components, pictures, handlers, context, viewHtml, log }: ReferenceMcpOptions) {
   const counts: McpCounts = { screens: 0, rejectedLines: 0, actions: {} };
   const onEvent = (event: OmniMcpEvent) => {
     if (event.type === "screen") {
@@ -66,6 +69,8 @@ export function referenceMcp({ tools, assets, handlers, context, viewHtml, log }
       version: OMNI_IR_VERSION,
       tools,
       assets,
+      ...(components !== undefined ? { components } : {}),
+      ...(pictures !== undefined ? { pictures } : {}),
       viewHtml,
       user,
       onEvent,
