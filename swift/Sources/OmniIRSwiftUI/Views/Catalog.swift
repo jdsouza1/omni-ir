@@ -35,19 +35,19 @@ struct NodeView: View {
     case .card: card
     case .heading: heading
     case .text: textView
-    case .input: InputField(node: node, store: store)
+    case .input: FieldFrame(node: node, store: store) { InputField(node: node, store: store) }
     case .button: GovernedButton(node: node, context: context)
     case .divider: Divider()
     case .badge: badge
     case .skeleton: SkeletonLines(lines: Int(number("lines") ?? 1))
     case .image: picture
     case .rating: rating
-    case .dateInput: DateField(node: node, store: store)
+    case .dateInput: FieldFrame(node: node, store: store) { DateField(node: node, store: store) }
     case .list: list
     case .listItem: listItem
     case .message: message
-    case .select: SelectField(node: node, store: store)
-    case .switch: SwitchField(node: node, store: store)
+    case .select: FieldFrame(node: node, store: store) { SelectField(node: node, store: store) }
+    case .switch: FieldFrame(node: node, store: store) { SwitchField(node: node, store: store) }
     case .table: TableView(node: node, store: store)
     case .tableRow: tableRow
     case .tabs: TabsView(node: node, store: store)
@@ -277,7 +277,34 @@ struct NodeView: View {
 // MARK: - Interactive components
 
 /// An Input edits its `$key` locally; it never calls the backend by itself (R1).
+/// A field (SPEC.md section 8, Fields): its control, then its message once the person has left it or
+/// a press checked it ([8.5]). The message is the renderer's own words, also given to VoiceOver as the
+/// control's hint.
+struct FieldFrame<Control: View>: View {
+  @Environment(\.omniStrings) private var strings
+  @Environment(\.colorScheme) private var colorScheme
+  let node: OmniNode
+  let store: OmniStore
+  @ViewBuilder let control: () -> Control
+
+  var body: some View {
+    let message = store.visibleFieldProblem(node.id).map { strings.field($0) }
+    VStack(alignment: .leading, spacing: 4) {
+      control()
+        .accessibilityHint(Text(verbatim: message ?? ""))
+      if let message {
+        Text(verbatim: message)
+          .font(.footnote)
+          .foregroundStyle(Color(omni: omniPalette(colorScheme).dangerText))
+          .accessibilityHidden(true)
+      }
+    }
+  }
+}
+
 struct InputField: View {
+  @Environment(\.omniContext) private var context
+  @FocusState private var focused: Bool
   let node: OmniNode
   let store: OmniStore
 
@@ -288,21 +315,50 @@ struct InputField: View {
     let prompt = node.props["placeholder"] == nil ? nil : Text(verbatim: store.text(node.props["placeholder"]))
     var lines = 1
     if case .number(let n)? = node.props["lines"] { lines = Int(n) }
+    var format: String?
+    if case .text(let f)? = node.props["format"] { format = f }
     return VStack(alignment: .leading, spacing: 6) {
       Text(verbatim: label).font(.subheadline.weight(.medium)).foregroundStyle(.secondary)
-      if lines > 1 {
-        // A fixed-height box: it keeps room for `lines` lines and longer text scrolls inside it.
-        TextField(text: text, prompt: prompt, axis: .vertical) { Text(verbatim: label) }
-          .lineLimit(lines, reservesSpace: true)
-          .labelsHidden()
-          .textFieldStyle(.roundedBorder)
-      } else {
-        TextField(text: text, prompt: prompt) { Text(verbatim: label) }
-          .labelsHidden()
-          .textFieldStyle(.roundedBorder)
+      Group {
+        if lines > 1 {
+          // A fixed-height box: it keeps room for `lines` lines and longer text scrolls inside it.
+          TextField(text: text, prompt: prompt, axis: .vertical) { Text(verbatim: label) }
+            .lineLimit(lines, reservesSpace: true)
+        } else {
+          TextField(text: text, prompt: prompt) { Text(verbatim: label) }
+        }
       }
+      .labelsHidden()
+      .textFieldStyle(.roundedBorder)
+      .focused($focused)
+      #if os(iOS)
+      // A hint for the keyboard only; the field check still runs ([8.3]).
+      .keyboardType(keyboard(format))
+      .textInputAutocapitalization(format == "email" || format == "url" ? .never : nil)
+      #endif
+    }
+    // Leaving the field shows its message from now on ([8.5]).
+    .onChange(of: focused) { was, now in
+      if was && !now { store.showField(node.id) }
+    }
+    .onChange(of: context?.ui.focusRequest) { _, id in
+      guard id == node.id else { return }
+      focused = true
+      context?.ui.focusRequest = nil
     }
   }
+
+  #if os(iOS)
+  private func keyboard(_ format: String?) -> UIKeyboardType {
+    switch format {
+    case "email": .emailAddress
+    case "number": .decimalPad
+    case "phone": .phonePad
+    case "url": .URL
+    default: .default
+    }
+  }
+  #endif
 }
 
 /// A DateInput edits a `$key` holding "YYYY-MM-DD" (or "" for no date), shown as that day in every time zone.
@@ -349,6 +405,7 @@ struct DateField: View {
         .accessibilityLabel(Text(verbatim: "\(label): choose a date"))
       }
     }
+    .onChange(of: store.stateText(key)) { store.showField(node.id) }
   }
 
   private func dateProp(_ name: String) -> Date? {
@@ -380,6 +437,7 @@ struct SelectField: View {
       .labelsHidden()
       .pickerStyle(.menu)
     }
+    .onChange(of: store.stateText(key)) { store.showField(node.id) }
   }
 }
 
@@ -392,6 +450,7 @@ struct SwitchField: View {
     let key = stateKey(node)
     let isOn = Binding(get: { store.stateBool(key) }, set: { store.setState(key, .bool($0)) })
     Toggle(isOn: isOn) { Text(verbatim: store.text(node.props["label"])) }
+      .onChange(of: store.stateBool(key)) { store.showField(node.id) }
   }
 }
 

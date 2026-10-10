@@ -4,6 +4,9 @@ import Foundation
 import OmniIRSwiftUI
 import SwiftUI
 
+/// The tools whose actions need the person's confirmation, in the app's own words (SPEC.md section 9).
+let demoConfirm = ["payments.confirm": "Pay {amount} USD?"]
+
 let demoTools: ToolRegistry = [
   "payments.confirm": Tool { p in
     problems([

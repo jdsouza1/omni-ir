@@ -12,18 +12,24 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -38,6 +44,7 @@ import dev.omniir.runtime.OmniStore
 import dev.omniir.runtime.OmniStrings
 import dev.omniir.runtime.RendererEvent
 import dev.omniir.runtime.Slot
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -48,6 +55,9 @@ import kotlinx.coroutines.launch
  *   to the store; a stream can never show a picture from anywhere else.
  * @param onMutation Runs a governed action. Its params are resolved and already checked by the tool.
  * @param onEvent Blocked actions, failed handlers and presses of Buttons without an action.
+ *
+ * Tools that need the person's confirmation are set on the store (`OmniStore(confirm = …)`); the view
+ * asks with its own dialog (SPEC.md section 9, Confirmations).
  */
 @Composable
 public fun OmniView(
@@ -60,8 +70,20 @@ public fun OmniView(
 ) {
   val document by store.document.collectAsState()
   val actions by store.actions.collectAsState()
+  val shown by store.shownFields.collectAsState()
   val scope = rememberCoroutineScope()
-  val context = RenderContext(store, document, actions, pictures, onMutation, onEvent, scope)
+  val focus = remember(store) { mutableMapOf<String, FocusRequester>() }
+  var asking by remember(store) { mutableStateOf<Confirmation?>(null) }
+  val context = RenderContext(store, document, actions, shown, focus, pictures, onMutation, onEvent, scope) { text ->
+    val confirmation = Confirmation(text)
+    asking = confirmation
+    try {
+      confirmation.answer.await()
+    } finally {
+      asking = null
+    }
+  }
+  asking?.let { ConfirmDialog(it, strings) }
   CompositionLocalProvider(LocalRender provides context, LocalOmniStrings provides strings) {
     // The marker is line 1, so the notice appears before anything else and never moves the screen.
     if (document.newerVersion) {
@@ -88,17 +110,41 @@ private fun VersionNotice() {
   )
 }
 
+/** The app's sentence for a press that needs confirmation, waiting for the person's answer. */
+internal class Confirmation(val text: String) {
+  val answer = CompletableDeferred<Boolean>()
+}
+
+/** The renderer's own confirmation ([9.1]): the app's sentence, Cancel and Confirm; dismissing cancels. */
+@Composable
+private fun ConfirmDialog(confirmation: Confirmation, strings: OmniStrings) {
+  AlertDialog(
+    onDismissRequest = { confirmation.answer.complete(false) },
+    text = { Text(confirmation.text) },
+    confirmButton = { TextButton(onClick = { confirmation.answer.complete(true) }) { Text(strings.confirm) } },
+    dismissButton = { TextButton(onClick = { confirmation.answer.complete(false) }) { Text(strings.cancel) } },
+  )
+}
+
 internal class RenderContext(
   val store: OmniStore,
   val document: OmniDocument,
   val actions: ActionState,
+  /** Fields whose messages show ([8.5]). */
+  val shown: Set<String>,
+  /** Each field's focus, so a press can move focus to the first one that failed ([8.6]). */
+  val focus: MutableMap<String, FocusRequester>,
   val pictures: Map<String, Painter>,
   val onMutation: suspend (MutationCall) -> Unit,
   val onEvent: (RendererEvent) -> Unit,
   private val scope: CoroutineScope,
+  private val askConfirmation: suspend (String) -> Boolean,
 ) {
   fun press(id: String) {
-    scope.launch { store.press(id, onMutation, onEvent) }
+    scope.launch {
+      val failed = store.press(id, onMutation, onEvent, askConfirmation)
+      if (failed != null) runCatching { focus[failed]?.requestFocus() }
+    }
   }
 }
 

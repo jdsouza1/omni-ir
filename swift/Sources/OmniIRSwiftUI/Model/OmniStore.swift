@@ -64,14 +64,20 @@ public final class OmniStore {
   public let tools: ToolRegistry
   /// Names of the pictures the app provides.
   public let assets: Set<String>
+  /// The app's sentence for each tool whose actions need the person's confirmation ([9.1]), such as
+  /// `["payments.confirm": "Pay {amount}?"]`. Set by the app, never by the stream.
+  public let confirm: [String: String]
+  /// The fields whose messages show: left by the person, or checked by a press ([8.5]).
+  public private(set) var shownFields: Set<String> = []
 
   @ObservationIgnored private let parser: OmniParser
   private var blocked: [String: (message: String, params: [String: Primitive])] = [:]
   private var running: Set<String> = []
 
-  public init(tools: ToolRegistry, assets: Set<String> = []) {
+  public init(tools: ToolRegistry, assets: Set<String> = [], confirm: [String: String] = [:]) {
     self.tools = tools
     self.assets = assets
+    self.confirm = confirm
     parser = OmniParser(tools: tools, assets: assets)
   }
 
@@ -181,6 +187,24 @@ public final class OmniStore {
     sync()
   }
 
+  // MARK: Fields (SPEC.md section 8)
+
+  /// A field's problem with its current value, shown or not; nil when it passes or isn't a field.
+  public func fieldProblem(_ id: String) -> FieldProblem? {
+    guard let node = document.nodes[id], let key = fieldKey(node) else { return nil }
+    return checkField(node.type, props: node.props, value: document.state[key])
+  }
+
+  /// The problem to show under a field: only once the person has left it or a press checked it ([8.5]).
+  public func visibleFieldProblem(_ id: String) -> FieldProblem? {
+    shownFields.contains(id) ? fieldProblem(id) : nil
+  }
+
+  /// The person left a field: from now on its message shows while it fails.
+  public func showField(_ id: String) {
+    shownFields.insert(id)
+  }
+
   // MARK: Actions (McpMutation governance)
 
   public func governance(for buttonId: String) -> Governance {
@@ -198,25 +222,44 @@ public final class OmniStore {
     running.contains(buttonId)
   }
 
-  /// A press: a Button without an action only reports it; a governed one fills in its params,
-  /// checks them with the tool, and only then calls the handler.
+  /// A press: a Button without an action only reports it. A governed one checks, in order ([9.3]),
+  /// the fields its params read, its params against the tool, and the app's confirmation, and only
+  /// then calls the handler. `askConfirmation` shows the app's sentence and returns true when the
+  /// person confirms; without one, a tool that needs confirmation never runs. Returns the first field
+  /// that failed, for the view to move focus to ([8.6]), or nil.
+  @discardableResult
   public func press(
     _ buttonId: String,
     onMutation: @MainActor (MutationCall) async throws -> Void,
-    report: @MainActor (RendererEvent) -> Void
-  ) async {
-    guard let node = document.nodes[buttonId], node.type == .button else { return }
-    guard isMutating(node) else { return report(.press(id: buttonId)) }
+    report: @MainActor (RendererEvent) -> Void,
+    askConfirmation: @MainActor (String) async -> Bool = { _ in false }
+  ) async -> String? {
+    guard let node = document.nodes[buttonId], node.type == .button else { return nil }
+    guard isMutating(node) else {
+      report(.press(id: buttonId))
+      return nil
+    }
     guard case .ready = governance(for: buttonId), !running.contains(buttonId),
       let mutation = document.mutations[buttonId], let tool = tools[mutation.tool]
-    else { return }
+    else { return nil }
 
+    // [8.6]: the fields its params read must pass first; their messages show, and nothing is sent.
+    let fields = fieldsReadBy(mutation, in: document)
+    if let failing = fields.first(where: { fieldProblem($0) != nil }) {
+      shownFields.formUnion(fields)
+      return failing
+    }
     let params = params(of: mutation)
     let problems = tool.validate(params)
     if !problems.isEmpty {
       let message = problems.joined(separator: "; ")
       blocked[buttonId] = (message, params)
-      return report(.error(Issue(code: .mutationBlocked, message: message, id: mutation.id)))
+      report(.error(Issue(code: .mutationBlocked, message: message, id: mutation.id)))
+      return nil
+    }
+    // [9.1]: the app's own sentence for this tool, filled once with the params as plain text.
+    if let template = confirm[mutation.tool], !(await askConfirmation(fillTemplate(template, params.mapValues(displayText)))) {
+      return nil
     }
     running.insert(buttonId)
     defer { running.remove(buttonId) }
@@ -225,6 +268,7 @@ public final class OmniStore {
     } catch {
       report(.error(Issue(code: .handlerFailed, message: "\(error)", id: buttonId)))
     }
+    return nil
   }
 
   private func params(of mutation: Mutation) -> [String: Primitive] {

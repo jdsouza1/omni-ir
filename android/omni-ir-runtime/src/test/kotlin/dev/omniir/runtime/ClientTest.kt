@@ -157,14 +157,14 @@ class ClientTest {
   @Test
   fun `the request carries this package's format version (10_1)`() = runBlocking {
     client.generate("a payment", store())
-    assertEquals("version=0.5", generateQueries.single())
+    assertEquals("version=0.8", generateQueries.single())
   }
 
   @Test
   fun `a server that refuses the version gets one retry without it (10_12)`() = runBlocking {
     val store = store()
     assertEquals(GenerateOutcome.Done("end_turn", "mock", 5.0), client.generate("old server", store))
-    assertEquals(listOf("version=0.5", null), generateQueries)
+    assertEquals(listOf("version=0.8", null), generateQueries)
     assertTrue(store.document.value.complete)
   }
 

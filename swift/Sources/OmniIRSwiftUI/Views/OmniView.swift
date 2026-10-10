@@ -4,7 +4,12 @@
 import SwiftUI
 
 public struct OmniView: View {
-  private let context: RenderContext
+  private let store: OmniStore
+  private let pictures: [String: Image]
+  private let onMutation: @MainActor (MutationCall) async throws -> Void
+  private let onEvent: @MainActor (RendererEvent) -> Void
+  @State private var ui = ViewState()
+  @Environment(\.omniStrings) private var strings
 
   /// - Parameters:
   ///   - store: The document, fed by `store.write(_:)` as the stream arrives.
@@ -12,16 +17,23 @@ public struct OmniView: View {
   ///     to the store; a stream can never show a picture from anywhere else.
   ///   - onMutation: Runs a governed action. Its params are resolved and already checked by the tool.
   ///   - onEvent: Blocked actions, failed handlers and presses of Buttons without an action.
+  ///
+  /// Tools that need the person's confirmation are set on the store (`OmniStore(confirm:)`); the view
+  /// asks with its own alert (SPEC.md section 9, Confirmations).
   public init(
     store: OmniStore,
     pictures: [String: Image] = [:],
     onMutation: @escaping @MainActor (MutationCall) async throws -> Void,
     onEvent: @escaping @MainActor (RendererEvent) -> Void = { _ in }
   ) {
-    context = RenderContext(store: store, pictures: pictures, onMutation: onMutation, onEvent: onEvent)
+    self.store = store
+    self.pictures = pictures
+    self.onMutation = onMutation
+    self.onEvent = onEvent
   }
 
   public var body: some View {
+    let context = RenderContext(store: store, pictures: pictures, onMutation: onMutation, onEvent: onEvent, ui: ui, strings: strings)
     Group {
       // The marker is line 1, so the notice appears before anything else and never moves the screen.
       if context.store.document.newerVersion {
@@ -34,6 +46,39 @@ public struct OmniView: View {
       }
     }
     .environment(\.omniContext, context)
+    // [9.1]: the app's sentence, Cancel and Confirm. Only the buttons answer, so a dismissal can't
+    // be taken for a confirmation.
+    .alert(Text(verbatim: ui.question ?? ""), isPresented: Binding(get: { ui.question != nil }, set: { _ in })) {
+      Button(role: .cancel) { ui.reply(false) } label: { Text(verbatim: strings.cancel) }
+      Button { ui.reply(true) } label: { Text(verbatim: strings.confirm) }
+    }
+  }
+}
+
+/// What the view shows on top of the screen: the app's confirmation, and which field to focus.
+@MainActor
+@Observable
+final class ViewState {
+  /// The app's sentence for a press waiting for the person's answer ([9.1]).
+  private(set) var question: String?
+  /// The field a press asked to focus because it failed ([8.6]); the field clears it.
+  var focusRequest: String?
+  @ObservationIgnored private var answer: CheckedContinuation<Bool, Never>?
+
+  /// Ask, and wait for Cancel or Confirm. One question at a time: a new one cancels the last.
+  func ask(_ text: String) async -> Bool {
+    answer?.resume(returning: false)
+    return await withCheckedContinuation { continuation in
+      answer = continuation
+      question = text
+    }
+  }
+
+  func reply(_ confirmed: Bool) {
+    let pending = answer
+    answer = nil
+    question = nil
+    pending?.resume(returning: confirmed)
   }
 }
 
@@ -59,21 +104,37 @@ final class RenderContext {
   let pictures: [String: Image]
   let onMutation: @MainActor (MutationCall) async throws -> Void
   let onEvent: @MainActor (RendererEvent) -> Void
+  let ui: ViewState
+  let strings: OmniStrings
 
   init(
     store: OmniStore,
     pictures: [String: Image],
     onMutation: @escaping @MainActor (MutationCall) async throws -> Void,
-    onEvent: @escaping @MainActor (RendererEvent) -> Void
+    onEvent: @escaping @MainActor (RendererEvent) -> Void,
+    ui: ViewState,
+    strings: OmniStrings
   ) {
     self.store = store
     self.pictures = pictures
     self.onMutation = onMutation
     self.onEvent = onEvent
+    self.ui = ui
+    self.strings = strings
   }
 
   func press(_ id: String) {
-    Task { await store.press(id, onMutation: onMutation, report: onEvent) }
+    let ui = ui
+    let strings = strings
+    Task {
+      let failed = await store.press(id, onMutation: onMutation, report: onEvent, askConfirmation: { await ui.ask($0) })
+      guard let failed else { return }
+      // [8.6]: focus the first field that failed and read its message out.
+      ui.focusRequest = failed
+      if let problem = store.visibleFieldProblem(failed) {
+        AccessibilityNotification.Announcement(strings.field(problem)).post()
+      }
+    }
   }
 }
 

@@ -236,6 +236,12 @@ private func crossPropRule(_ type: ComponentType, _ props: [(String, Value)]) ->
     if case .number(let m)? = given["max"] { max = m }
     if case .number(let v)? = given["value"], v > max { return "value must not be more than max (default 5)" }
   }
+  if type == .input {
+    let given = Dictionary(props, uniquingKeysWith: { first, _ in first })
+    if case .number(let min)? = given["minLength"], case .number(let max)? = given["maxLength"], min > max {
+      return "minLength must not be more than maxLength"
+    }
+  }
   return nil
 }
 

@@ -68,6 +68,57 @@ final class StreamingTests: XCTestCase {
   }
 }
 
+/// Fields and confirmations (SPEC.md sections 8 and 9), with screenshots for the review page.
+final class FormTests: XCTestCase {
+  private func shot(_ app: XCUIApplication, _ name: String) {
+    let attachment = XCTAttachment(screenshot: app.screenshot())
+    attachment.name = name
+    attachment.lifetime = .keepAlways
+    add(attachment)
+  }
+
+  /// A field its action reads blocks the press until it passes, with its message shown ([8.6]).
+  func testFieldBlocksThenSends() {
+    let app = launch("sign-in")
+    waitUntilDone(app, self)
+    let send = app.buttons["Email me a link"]
+    XCTAssertTrue(send.waitForExistence(timeout: 5))
+    send.tap()
+    XCTAssertTrue(app.staticTexts["This is required."].waitForExistence(timeout: 5), "the message shows on press")
+    shot(app, "forms-sign-in-required")
+    let email = app.textFields.firstMatch
+    email.tap()
+    email.typeText("ann@")
+    send.tap()
+    XCTAssertTrue(app.staticTexts["Enter an email address, like name@example.com."].waitForExistence(timeout: 5))
+    shot(app, "forms-sign-in-invalid-email")
+    email.tap()
+    email.typeText("example.com")
+    send.tap()
+    let sent = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Sent auth.sendMagicLink")).firstMatch
+    XCTAssertTrue(sent.waitForExistence(timeout: 5), "once the field passes, the action reaches the handler")
+  }
+
+  /// The app's confirmation: Cancel sends nothing, Confirm sends ([9.1]).
+  func testConfirmationBeforePaying() {
+    let app = launch("payment-confirmation")
+    waitUntilDone(app, self)
+    let pay = app.buttons["Pay now"]
+    XCTAssertTrue(pay.waitForExistence(timeout: 5))
+    pay.tap()
+    let alert = app.alerts["Pay 42.5 USD?"]
+    XCTAssertTrue(alert.waitForExistence(timeout: 5), "the app's sentence, filled with the amount")
+    shot(app, "forms-confirmation")
+    alert.buttons["Cancel"].tap()
+    let sent = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Sent payments.confirm")).firstMatch
+    XCTAssertFalse(sent.waitForExistence(timeout: 2), "cancel sends nothing")
+    pay.tap()
+    XCTAssertTrue(alert.waitForExistence(timeout: 5))
+    alert.buttons["Confirm"].tap()
+    XCTAssertTrue(sent.waitForExistence(timeout: 5), "confirm sends")
+  }
+}
+
 /// End to end with the repo's Express server (started by the workflow with the free mock model):
 /// the Swift client streams a screen over server-sent events, and a governed action goes to /api/mutate.
 final class ServerTests: XCTestCase {

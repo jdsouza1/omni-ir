@@ -150,7 +150,7 @@ extension OmniDocument {
       state[key] = value
       define(key)
     case .node(let n):
-      nodes[n.id] = n
+      if nodes.updateValue(n, forKey: n.id) == nil { order.append(n.id) }
       define(n.id)
       refs = n.children + stateKeys(n.props)
     case .mutation(let m):

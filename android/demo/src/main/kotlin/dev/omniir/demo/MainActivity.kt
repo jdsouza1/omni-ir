@@ -145,7 +145,7 @@ private fun Home(fixtures: List<String>, open: (Source) -> Unit) {
 /** One screen, streamed into an OmniView from a fixture or a server. */
 @Composable
 private fun ScreenView(source: Source, instant: Boolean, read: (String) -> String) {
-  val store = remember(source) { OmniStore(DemoRegistries.tools, DemoRegistries.pictureNames) }
+  val store = remember(source) { OmniStore(DemoRegistries.tools, DemoRegistries.pictureNames, confirm = DemoRegistries.confirm) }
   val log = remember(source) { mutableStateListOf<String>() }
   var done by remember(source) { mutableStateOf(false) }
   val issues by store.issues.collectAsState()
@@ -234,4 +234,7 @@ object DemoRegistries {
   )
 
   val tools = DemoTools.registry
+
+  /** The tools whose actions need the person's confirmation, in the app's own words (SPEC.md section 9). */
+  val confirm = mapOf("payments.confirm" to "Pay {amount} USD?")
 }
