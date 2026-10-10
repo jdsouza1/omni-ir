@@ -8,7 +8,7 @@ public const val OMNI_IR_VERSION: String = "0.11.0"
 /** The stream format's version: what the version marker, requests and version checks carry. */
 public const val FORMAT_VERSION: String = "0.8"
 
-/** The components in the Trusted Catalog. */
+/** The components in the Trusted Catalog, and APP for the app's own (Step 20). */
 public enum class ComponentType(public val wireName: String) {
   STACK("Stack"),
   CARD("Card"),
@@ -37,11 +37,14 @@ public enum class ComponentType(public val wireName: String) {
   PIE_CHART("PieChart"),
   SERIES("Series"),
   SLICE("Slice"),
+
+  /** One of the app's own components (Step 20): its name is the node's appName. A stream never writes "App". */
+  APP("App"),
   ;
 
   public companion object {
-    /** The component a stream names, or null if it isn't in the catalog. */
-    public fun fromWireName(name: String): ComponentType? = entries.firstOrNull { it.wireName == name }
+    /** The catalog component a stream names, or null if it isn't in the catalog. */
+    public fun fromWireName(name: String): ComponentType? = entries.firstOrNull { it.wireName == name && it != APP }
   }
 }
 
@@ -57,7 +60,7 @@ public enum class IssueCode(
   UNTERMINATED_STRING("unterminated_string", IssueSeverity.ERROR, IssueStage.LINE, "A string has no closing double quote."),
   LINE_TOO_LONG("line_too_long", IssueSeverity.ERROR, IssueStage.LINE, "The line is longer than the line length limit."),
   NOT_FLAT("not_flat", IssueSeverity.ERROR, IssueStage.LINE, "A component call appears inside another statement's arguments."),
-  UNKNOWN_COMPONENT("unknown_component", IssueSeverity.ERROR, IssueStage.LINE, "The component isn't in the catalog."),
+  UNKNOWN_COMPONENT("unknown_component", IssueSeverity.ERROR, IssueStage.LINE, "The component isn't in the catalog or among the app's own components."),
   INVALID_PROPS("invalid_props", IssueSeverity.ERROR, IssueStage.LINE, "An argument or value breaks the component's rules: wrong type, unknown prop, value not allowed, too long or repeated."),
   UNKNOWN_TOOL("unknown_tool", IssueSeverity.ERROR, IssueStage.LINE, "An McpMutation names a tool that isn't in the app's tool registry."),
   DUPLICATE_ID("duplicate_id", IssueSeverity.ERROR, IssueStage.LINE, "An id or \$state key is assigned a second time. The first assignment stays."),

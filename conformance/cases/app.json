@@ -1,0 +1,581 @@
+{
+  "area": "app",
+  "cases": [
+    {
+      "id": "app-component-accepted",
+      "rules": [
+        "5.27",
+        "5.28"
+      ],
+      "description": "A component the app declared is accepted like a catalog component and reported by its own name. Its positional arguments, children and $state values follow its declaration; a text or number prop may also be a $state unless declared state: false.",
+      "input": "root = Stack([t, q])\n$name = \"Tote\"\nt = Tile($name, [buy], price=24, size=\"M\", tags=[\"New\"], sale=true, code=\"A1\")\n$n = 1\nq = Stepper($n, label=\"How many\", max=5, required=true)\nbuy = Button(\"Buy\")\n",
+      "components": {
+        "Tile": {
+          "description": "A product tile; its children are its buttons.",
+          "positional": [
+            "name",
+            "children"
+          ],
+          "props": {
+            "name": {
+              "kind": "text",
+              "maxLength": 20
+            },
+            "price": {
+              "kind": "number",
+              "minimum": 0
+            },
+            "size": {
+              "kind": "oneOf",
+              "values": [
+                "S",
+                "M"
+              ],
+              "optional": true
+            },
+            "photo": {
+              "kind": "picture",
+              "optional": true
+            },
+            "tags": {
+              "kind": "list",
+              "item": "text",
+              "maxItems": 2,
+              "optional": true
+            },
+            "sale": {
+              "kind": "boolean",
+              "optional": true
+            },
+            "code": {
+              "kind": "text",
+              "state": false,
+              "optional": true
+            }
+          },
+          "children": {
+            "max": 2
+          }
+        },
+        "Stepper": {
+          "description": "Choose how many.",
+          "positional": [
+            "value"
+          ],
+          "props": {
+            "value": {
+              "kind": "state",
+              "holds": "number"
+            },
+            "label": {
+              "kind": "text"
+            },
+            "max": {
+              "kind": "number",
+              "integer": true,
+              "state": false
+            }
+          },
+          "field": true
+        }
+      },
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "t",
+              "q"
+            ]
+          },
+          "t": {
+            "type": "Tile",
+            "app": true,
+            "props": {
+              "name": {
+                "state": "$name"
+              },
+              "price": 24,
+              "size": "M",
+              "tags": [
+                "New"
+              ],
+              "sale": true,
+              "code": "A1"
+            },
+            "children": [
+              "buy"
+            ]
+          },
+          "q": {
+            "type": "Stepper",
+            "app": true,
+            "props": {
+              "value": {
+                "state": "$n"
+              },
+              "label": "How many",
+              "max": 5,
+              "required": true
+            },
+            "children": []
+          },
+          "buy": {
+            "type": "Button",
+            "props": {
+              "label": "Buy"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "id": "app-component-props-checked",
+      "rules": [
+        "5.27",
+        "5.28",
+        "5.9"
+      ],
+      "description": "An app component's props are checked against its declaration: a missing required prop, an unknown prop, a value of the wrong kind or outside its limits, a choice not listed, too many list items or children, a $state where state: false, or required on a component that isn't a field, is invalid_props. A name neither in the catalog nor declared, App included, is unknown_component.",
+      "input": "root = Stack([])\na = Tile(\"Tote\")\nb = Tile(\"Tote\", price=1, colour=\"red\")\nc = Tile(\"Tote\", price=-1)\nd = Tile(\"A name far longer than twenty\", price=1)\ne = Tile(\"Tote\", price=1, size=\"XL\")\nf = Tile(\"Tote\", price=1, tags=[\"a\", \"b\", \"c\"])\ng = Tile(\"Tote\", [x, y, z], price=1)\n$c = \"A1\"\nh = Tile(\"Tote\", price=1, code=$c)\nk = Tile(\"Tote\", price=1, required=true)\nm = Stepper($n, label=\"n\", max=1.5)\nn = SeatMap(\"A\")\no = App(\"Tile\")\n",
+      "components": {
+        "Tile": {
+          "description": "A product tile; its children are its buttons.",
+          "positional": [
+            "name",
+            "children"
+          ],
+          "props": {
+            "name": {
+              "kind": "text",
+              "maxLength": 20
+            },
+            "price": {
+              "kind": "number",
+              "minimum": 0
+            },
+            "size": {
+              "kind": "oneOf",
+              "values": [
+                "S",
+                "M"
+              ],
+              "optional": true
+            },
+            "photo": {
+              "kind": "picture",
+              "optional": true
+            },
+            "tags": {
+              "kind": "list",
+              "item": "text",
+              "maxItems": 2,
+              "optional": true
+            },
+            "sale": {
+              "kind": "boolean",
+              "optional": true
+            },
+            "code": {
+              "kind": "text",
+              "state": false,
+              "optional": true
+            }
+          },
+          "children": {
+            "max": 2
+          }
+        },
+        "Stepper": {
+          "description": "Choose how many.",
+          "positional": [
+            "value"
+          ],
+          "props": {
+            "value": {
+              "kind": "state",
+              "holds": "number"
+            },
+            "label": {
+              "kind": "text"
+            },
+            "max": {
+              "kind": "number",
+              "integer": true,
+              "state": false
+            }
+          },
+          "field": true
+        }
+      },
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "invalid_props"
+          },
+          {
+            "line": 3,
+            "code": "invalid_props"
+          },
+          {
+            "line": 4,
+            "code": "invalid_props"
+          },
+          {
+            "line": 5,
+            "code": "invalid_props"
+          },
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "invalid_props"
+          },
+          {
+            "line": 8,
+            "code": "invalid_props"
+          },
+          {
+            "line": 10,
+            "code": "invalid_props"
+          },
+          {
+            "line": 11,
+            "code": "invalid_props"
+          },
+          {
+            "line": 12,
+            "code": "invalid_props"
+          },
+          {
+            "line": 13,
+            "code": "unknown_component"
+          },
+          {
+            "line": 14,
+            "code": "unknown_component"
+          }
+        ]
+      }
+    },
+    {
+      "id": "app-component-undeclared",
+      "rules": [
+        "5.27",
+        "5.9"
+      ],
+      "description": "Without declarations, an app component's name is unknown_component like any name outside the catalog.",
+      "input": "root = Tile(\"Tote\", price=1)\n",
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "unknown_component"
+          },
+          {
+            "line": null,
+            "code": "missing_root"
+          }
+        ]
+      }
+    },
+    {
+      "id": "app-component-state-type",
+      "rules": [
+        "5.28",
+        "5.12"
+      ],
+      "description": "The $state an app component edits must hold what its declaration says (here a number), or null; anything else is input_state_type, whichever of the two lines arrives second. The rejected state line has no effect, so the component's state is then missing.",
+      "input": "root = Stack([a, b])\na = Stepper($n, label=\"n\", max=5)\n$n = \"one\"\n$m = null\nb = Stepper($m, label=\"m\", max=5)\n",
+      "components": {
+        "Tile": {
+          "description": "A product tile; its children are its buttons.",
+          "positional": [
+            "name",
+            "children"
+          ],
+          "props": {
+            "name": {
+              "kind": "text",
+              "maxLength": 20
+            },
+            "price": {
+              "kind": "number",
+              "minimum": 0
+            },
+            "size": {
+              "kind": "oneOf",
+              "values": [
+                "S",
+                "M"
+              ],
+              "optional": true
+            },
+            "photo": {
+              "kind": "picture",
+              "optional": true
+            },
+            "tags": {
+              "kind": "list",
+              "item": "text",
+              "maxItems": 2,
+              "optional": true
+            },
+            "sale": {
+              "kind": "boolean",
+              "optional": true
+            },
+            "code": {
+              "kind": "text",
+              "state": false,
+              "optional": true
+            }
+          },
+          "children": {
+            "max": 2
+          }
+        },
+        "Stepper": {
+          "description": "Choose how many.",
+          "positional": [
+            "value"
+          ],
+          "props": {
+            "value": {
+              "kind": "state",
+              "holds": "number"
+            },
+            "label": {
+              "kind": "text"
+            },
+            "max": {
+              "kind": "number",
+              "integer": true,
+              "state": false
+            }
+          },
+          "field": true
+        }
+      },
+      "expect": {
+        "issues": [
+          {
+            "line": 2,
+            "code": "missing_state"
+          },
+          {
+            "line": 3,
+            "code": "input_state_type"
+          }
+        ]
+      }
+    },
+    {
+      "id": "app-component-no-action",
+      "rules": [
+        "5.29",
+        "5.15"
+      ],
+      "description": "An app component never has an action: an McpMutation can't target it, and action isn't a prop it can be given.",
+      "input": "root = Stack([t])\nt = Tile(\"Tote\", price=1)\nm = McpMutation(t, tool=\"payments.confirm\", params={amount: 1})\nu = Tile(\"Tote\", price=1, action=\"pay\")\n",
+      "components": {
+        "Tile": {
+          "description": "A product tile; its children are its buttons.",
+          "positional": [
+            "name",
+            "children"
+          ],
+          "props": {
+            "name": {
+              "kind": "text",
+              "maxLength": 20
+            },
+            "price": {
+              "kind": "number",
+              "minimum": 0
+            },
+            "size": {
+              "kind": "oneOf",
+              "values": [
+                "S",
+                "M"
+              ],
+              "optional": true
+            },
+            "photo": {
+              "kind": "picture",
+              "optional": true
+            },
+            "tags": {
+              "kind": "list",
+              "item": "text",
+              "maxItems": 2,
+              "optional": true
+            },
+            "sale": {
+              "kind": "boolean",
+              "optional": true
+            },
+            "code": {
+              "kind": "text",
+              "state": false,
+              "optional": true
+            }
+          },
+          "children": {
+            "max": 2
+          }
+        },
+        "Stepper": {
+          "description": "Choose how many.",
+          "positional": [
+            "value"
+          ],
+          "props": {
+            "value": {
+              "kind": "state",
+              "holds": "number"
+            },
+            "label": {
+              "kind": "text"
+            },
+            "max": {
+              "kind": "number",
+              "integer": true,
+              "state": false
+            }
+          },
+          "field": true
+        }
+      },
+      "expect": {
+        "issues": [
+          {
+            "line": 3,
+            "code": "mutation_target_not_interactive"
+          },
+          {
+            "line": 4,
+            "code": "invalid_props"
+          }
+        ]
+      }
+    },
+    {
+      "id": "picture-patterns",
+      "rules": [
+        "5.30",
+        "5.17"
+      ],
+      "description": "A picture name matching one of the app's families is accepted wherever a registered picture is, in Images and app components alike. A name that matches no family and isn't registered is unknown_asset; a value not shaped like a picture name, such as a URL, is invalid_props.",
+      "input": "root = Stack([a, b, c, d, e, f])\na = Image(\"item-42\", alt=\"A tote\")\nb = Tile(\"Tote\", price=1, photo=\"item-7\")\nc = Image(\"item-abc\", alt=\"Letters\")\nd = Image(\"item-1234567\", alt=\"Too long\")\ne = Tile(\"Tote\", price=1, photo=\"https://example.com/a.png\")\nf = Image(\"photo-1\", alt=\"Other family\")\n",
+      "components": {
+        "Tile": {
+          "description": "A product tile; its children are its buttons.",
+          "positional": [
+            "name",
+            "children"
+          ],
+          "props": {
+            "name": {
+              "kind": "text",
+              "maxLength": 20
+            },
+            "price": {
+              "kind": "number",
+              "minimum": 0
+            },
+            "size": {
+              "kind": "oneOf",
+              "values": [
+                "S",
+                "M"
+              ],
+              "optional": true
+            },
+            "photo": {
+              "kind": "picture",
+              "optional": true
+            },
+            "tags": {
+              "kind": "list",
+              "item": "text",
+              "maxItems": 2,
+              "optional": true
+            },
+            "sale": {
+              "kind": "boolean",
+              "optional": true
+            },
+            "code": {
+              "kind": "text",
+              "state": false,
+              "optional": true
+            }
+          },
+          "children": {
+            "max": 2
+          }
+        },
+        "Stepper": {
+          "description": "Choose how many.",
+          "positional": [
+            "value"
+          ],
+          "props": {
+            "value": {
+              "kind": "state",
+              "holds": "number"
+            },
+            "label": {
+              "kind": "text"
+            },
+            "max": {
+              "kind": "number",
+              "integer": true,
+              "state": false
+            }
+          },
+          "field": true
+        }
+      },
+      "pictures": [
+        {
+          "prefix": "item-",
+          "id": "digits",
+          "maxLength": 6
+        }
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          },
+          {
+            "line": 4,
+            "code": "unknown_asset"
+          },
+          {
+            "line": 5,
+            "code": "unknown_asset"
+          },
+          {
+            "line": 6,
+            "code": "invalid_props"
+          },
+          {
+            "line": 7,
+            "code": "unknown_asset"
+          }
+        ]
+      }
+    }
+  ]
+}

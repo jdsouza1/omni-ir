@@ -106,14 +106,17 @@ public const val OMNI_IR_VERSION: String = ${lit(schema.version)}
 /** The stream format's version: what the version marker, requests and version checks carry. */
 public const val FORMAT_VERSION: String = ${lit(schema.formatVersion)}
 
-/** The components in the Trusted Catalog. */
+/** The components in the Trusted Catalog, and APP for the app's own (Step 20). */
 public enum class ComponentType(public val wireName: String) {
 ${types.map((t) => `  ${snake(t)}(${lit(t)}),`).join("\n")}
+
+  /** One of the app's own components (Step 20): its name is the node's appName. A stream never writes "App". */
+  APP("App"),
   ;
 
   public companion object {
-    /** The component a stream names, or null if it isn't in the catalog. */
-    public fun fromWireName(name: String): ComponentType? = entries.firstOrNull { it.wireName == name }
+    /** The catalog component a stream names, or null if it isn't in the catalog. */
+    public fun fromWireName(name: String): ComponentType? = entries.firstOrNull { it.wireName == name && it != APP }
   }
 }
 

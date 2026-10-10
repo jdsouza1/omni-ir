@@ -142,6 +142,14 @@ The known limit of [4.5]: a Windows path written as `"C:\new"` contains the vali
 - **[5.23]** A BarChart or LineChart MUST contain only Series, and a PieChart only Slices; a Series MUST be a child of a BarChart or LineChart, and a Slice of a PieChart. Each Series MUST have exactly as many values as its chart has labels. Breaking any of these is a `chart_mismatch` error, reported on whichever of the two lines arrives second.
 - **[5.24]** Charts carry data only: a title, labels, names and numbers, and an optional number `format`. Like every component, a chart, Series or Slice accepts only the props in section 6, so a prop such as `color`, `style`, `animation` or `tooltip` is an `invalid_props` error. A Slice's value MUST NOT be negative.
 
+### App-defined components
+
+An app MAY add components of its own (Step 20). They are declared by the app, like its tools, never by the stream, and lines that use them are checked like catalog components.
+- **[5.27]** An app MAY declare components: each has a name (a capital letter, then letters and digits, at most 64 characters, and not a catalog component, `McpMutation` or `App`), a one-sentence description for the model, its props, optionally which props may be given positionally, at most how many children it holds, and whether it is a field. A parser given these declarations MUST accept lines naming a declared component and check them as [5.9] says; a name neither in the catalog nor declared is `unknown_component`. A parser MUST refuse a malformed declaration when it is given, not while reading a stream. A declaration is the app's code: nothing in a stream can add, change or remove one.
+- **[5.28]** Each declared prop is one of these kinds, and may be marked optional: text (with optional lengths in UTF-16 code units, up to 2,000), a number (with optional limits, or a whole number), true or false, one of a list of text values, a picture name ([5.30]), a list of text or of numbers (at most 50 items), or the `$key` the component edits. A text or number prop also accepts a `$key` whose value is shown, unless it is declared `state: false`. The edited `$key` is the prop named `value`, declares what it holds (text, a number, or true or false), and that state MUST hold such a value or `null`; anything else is `input_state_type`, as in [5.12]. A component that holds children takes them as a list of ids, at most its declared number, under the usual tree rules ([5.4]–[5.6]). A component declared as a field also accepts `required` ([5.26]). Anything else is `invalid_props`.
+- **[5.29]** An app component never has an action: `action`, `children`, `required` and `kind` can't be declared as props, and an McpMutation targeting an app component is `mutation_target_not_interactive` ([5.15]). Only a Button with an McpMutation reaches the backend. An app component carries no styling or code: its props are the checked values above.
+- **[5.30]** An app MAY declare families of picture names, each a prefix of lowercase letters, digits and hyphens ending in `-`, followed by an id of digits, or of lowercase letters and digits, up to a declared length, the whole name at most 64 characters (for example `product-` with digits: `product-1042`). A name that matches a family is accepted wherever a registered picture is ([5.17]), in Images, ListItems and app components; the renderer asks the app for the picture when it draws it. A stream still never supplies a location.
+
 ### Actions
 
 - **[5.13]** A Button with an `action` triggers a backend action. It MUST be governed by exactly one McpMutation by the end of the stream; otherwise it is an `ungoverned_mutation` error. A second McpMutation for the same Button is a `duplicate_mutation` error.
@@ -503,7 +511,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 | `unterminated_string` | error | when the line arrives | A string has no closing double quote. |
 | `line_too_long` | error | when the line arrives | The line is longer than the line length limit. |
 | `not_flat` | error | when the line arrives | A component call appears inside another statement's arguments. |
-| `unknown_component` | error | when the line arrives | The component isn't in the catalog. |
+| `unknown_component` | error | when the line arrives | The component isn't in the catalog or among the app's own components. |
 | `invalid_props` | error | when the line arrives | An argument or value breaks the component's rules: wrong type, unknown prop, value not allowed, too long or repeated. |
 | `unknown_tool` | error | when the line arrives | An McpMutation names a tool that isn't in the app's tool registry. |
 | `duplicate_id` | error | when the line arrives | An id or $state key is assigned a second time. The first assignment stays. |
@@ -586,6 +594,10 @@ A field is an Input, DateInput, Select or Switch. Its constraints ([5.26]) let t
 - **[8.5]** A field's message SHOULD show only after the person leaves the field, so nobody sees an error while still typing, and MUST show when a press checks the field ([8.6]). Once shown, it stays until the field passes. It MUST be tied to the field for assistive technology (for example `aria-describedby` and `aria-invalid`) and SHOULD be announced when it appears.
 - **[8.6]** When a governed Button is pressed, the renderer MUST first check every field whose `$key` its McpMutation's params read. If any fails, it MUST show those fields' messages and MUST NOT go on: no params check, no confirmation, no handler. It SHOULD move focus to the first field that failed. A field that no params read is checked and shown, but blocks nothing.
 - *Tested by:* `conformance/fields/fields.json` (every renderer), `tests/fields.test.ts`, `tests/renderer.forms.test.tsx`; Swift and Kotlin in their field tests.
+
+**App components**
+- **[8.7]** A renderer MUST draw an app component ([5.27]) only with the app's own view for that name, giving it the component's checked props with each `$key` replaced by its current value, its children in order, pictures by name ([5.30]), and, for a component that edits a `$state`, a way to change that state through the renderer. A component declared as a field gets the field's message as [8.5] says, and a press checks it as [8.6] says. Where the app has no view for a declared component, the renderer MUST show its own fallback in that place and draw the rest of the screen.
+- *Tested by:* `tests/renderer.app.test.tsx`; Swift and Kotlin in their store and demo tests.
 
 **Themes and the renderer's own words**
 - Colours, fonts and shapes come only from the app: the renderer's defaults, or design tokens the app sets. Nothing in the stream chooses them, beyond picking among the catalog's own styles through enum props such as `tone`. The reference renderers share one list of tokens with light and dark defaults (`conformance/theme.json`).
@@ -724,6 +736,8 @@ This is specification 0.10, a draft, describing **stream format 0.8**. The two n
 Until 1.0, a new format version only adds: new components, props, allowed values, issue codes or rules that accept more. It never removes or changes the meaning of something an older format had, so a parser reads its own format and every older one, and a server can serve any client that reads its format or a newer one ([10.12]). Format **0.8** added field constraints ([5.26]); it followed 0.5 directly, because the release numbers 0.6 and 0.7 name format 0.5 ([3.9]). The next format is numbered **0.9**.
 
 Adding to the catalog is a format change. Because the catalog is strict ([5.9]), a parser built for an older format rejects a new component (`unknown_component`), a new prop or a new allowed value (`invalid_props`), and its renderer shows a fallback in that place. A server SHOULD therefore ask a model only for what its clients' format accepts. The reference server generates its system prompt from its own schema.
+
+An app's own components ([5.27]) and picture families ([5.30]) don't change the format version: like its tools, they are agreed between an app and its own server, which describes them to the model. A parser without the app's declarations reports such a line as `unknown_component`, and its renderer shows a fallback there.
 
 <!-- generated:limits -->
 | Limit | Maximum |

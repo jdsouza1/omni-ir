@@ -160421,7 +160421,7 @@
    "id": "fuzz-1213",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its sct = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these ppts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = \"product-x\"Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by th\"product-x\"e mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams -written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: miss\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -160525,23 +160525,30 @@
    "expect": {
     "issues": [
      {
-      "line": 7,
+      "line": 2,
       "code": "dangling_ref"
      },
      {
-      "line": 13,
+      "line": 16,
       "code": "duplicate_id"
      },
      {
-      "line": 16,
+      "line": 19,
       "code": "syntax"
-     },
-     {
-      "line": null,
-      "code": "missing_root"
      }
     ],
     "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
      "header": {
       "type": "Stack",
       "props": {
@@ -160572,7 +160579,7 @@
      "intro": {
       "type": "Text",
       "props": {
-       "text": "This server streams pre-written screens. Try one of these ppts:",
+       "text": "This server streams -written screens. Try one of these prompts:",
        "tone": "muted"
       },
       "children": []
@@ -160595,7 +160602,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -160647,11 +160655,17 @@
       },
       "children": []
      },
-     "failures": {
+     "e8": {
       "type": "Text",
       "props": {
-       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
-       "tone": "muted"
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      }
@@ -160659,7 +160673,7 @@
     "state": {},
     "mutations": {},
     "missing": [
-     "e8"
+     "failures"
     ]
    }
   },
@@ -165578,7 +165592,7 @@
    "id": "fuzz-1241",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -165688,10 +165702,6 @@
      {
       "line": 8,
       "code": "dangling_ref"
-     },
-     {
-      "line": 14,
-      "code": "syntax"
      }
     ],
     "nodes": {
@@ -165759,7 +165769,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -165782,28 +165793,17 @@
        "text": "edit my profile"
       },
       "children": []
-     },
-     "e4": {
-      "type": "Text",
-      "props": {
-       "text": "where is my order?"
-      },
-      "children": []
-     },
-     "e5": {
-      "type": "Text",
-      "props": {
-       "text": "contact support"
-      },
-      "children": []
      }
     },
     "state": {},
     "mutations": {},
     "missing": [
+     "e4",
+     "e5",
      "e6",
      "e7",
      "e8",
+     "e9",
      "failures"
     ]
    }
@@ -166419,7 +166419,7 @@
    "id": "fuzz-1245",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card\"product-1042\"([header, intro, sep, examples, failur",
+   "input": "# Omni-IR: shown by the mock model when a prompt \"product-1042\"matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"w",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -166524,17 +166524,58 @@
     "issues": [
      {
       "line": 2,
-      "code": "syntax"
+      "code": "dangling_ref"
      },
      {
-      "line": null,
-      "code": "missing_root"
+      "line": 3,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 5,
+      "code": "unterminated_string"
      }
     ],
-    "nodes": {},
+    "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
+     "header": {
+      "type": "Stack",
+      "props": {
+       "direction": "row",
+       "gap": "sm",
+       "align": "center"
+      },
+      "children": [
+       "title",
+       "mode"
+      ]
+     },
+     "title": {
+      "type": "Heading",
+      "props": {
+       "text": "Demo mode"
+      },
+      "children": []
+     }
+    },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "examples",
+     "failures",
+     "intro",
+     "mode",
+     "sep"
+    ]
    }
   },
   {
@@ -169983,7 +170024,265 @@
    "id": "fuzz-1266",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "tools": [
+    "payments.confirm",
+    "auth.sendMagicLink",
+    "profile.update",
+    "orders.requestReturn",
+    "support.createTicket",
+    "bookings.reserve",
+    "assistant.ask",
+    "settings.update",
+    "cart.add"
+   ],
+   "assets": [
+    "cabin-pines",
+    "shirt",
+    "tote"
+   ],
+   "components": {
+    "ProductCard": {
+     "description": "A product with its picture, name and price. Its children are the product's buttons.",
+     "positional": [
+      "name",
+      "children"
+     ],
+     "props": {
+      "name": {
+       "kind": "text",
+       "maxLength": 80
+      },
+      "price": {
+       "kind": "number",
+       "minimum": 0
+      },
+      "currency": {
+       "kind": "oneOf",
+       "values": [
+        "USD",
+        "EUR",
+        "GBP"
+       ],
+       "optional": true
+      },
+      "picture": {
+       "kind": "picture",
+       "optional": true
+      },
+      "rating": {
+       "kind": "number",
+       "minimum": 0,
+       "maximum": 5,
+       "optional": true
+      },
+      "badges": {
+       "kind": "list",
+       "item": "text",
+       "maxItems": 3,
+       "optional": true
+      }
+     },
+     "children": {
+      "max": 3
+     }
+    },
+    "QuantityPicker": {
+     "description": "Choose how many, from min to max, with minus and plus buttons. Edits a number $state.",
+     "positional": [
+      "value"
+     ],
+     "props": {
+      "value": {
+       "kind": "state",
+       "holds": "number"
+      },
+      "label": {
+       "kind": "text",
+       "maxLength": 80
+      },
+      "min": {
+       "kind": "number",
+       "integer": true,
+       "minimum": 0,
+       "state": false
+      },
+      "max": {
+       "kind": "number",
+       "integer": true,
+       "minimum": 1,
+       "maximum": 99,
+       "state": false
+      }
+     },
+     "field": true
+    }
+   },
+   "pictures": [
+    {
+     "prefix": "product-",
+     "id": "digits",
+     "maxLength": 8
+    }
+   ],
+   "expect": {
+    "issues": [
+     {
+      "line": 12,
+      "code": "duplicate_id"
+     }
+    ],
+    "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
+     "header": {
+      "type": "Stack",
+      "props": {
+       "direction": "row",
+       "gap": "sm",
+       "align": "center"
+      },
+      "children": [
+       "title",
+       "mode"
+      ]
+     },
+     "title": {
+      "type": "Heading",
+      "props": {
+       "text": "Demo mode"
+      },
+      "children": []
+     },
+     "mode": {
+      "type": "Badge",
+      "props": {
+       "text": "No AI model connected",
+       "tone": "warning"
+      },
+      "children": []
+     },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
+     },
+     "e1": {
+      "type": "Text",
+      "props": {
+       "text": "a payment confirmation for $42.50"
+      },
+      "children": []
+     },
+     "e2": {
+      "type": "Text",
+      "props": {
+       "text": "a sign-in page"
+      },
+      "children": []
+     },
+     "e3": {
+      "type": "Text",
+      "props": {
+       "text": "edit my profile"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
+      },
+      "children": []
+     },
+     "e5": {
+      "type": "Text",
+      "props": {
+       "text": "contact support"
+      },
+      "children": []
+     },
+     "e6": {
+      "type": "Text",
+      "props": {
+       "text": "book a stay"
+      },
+      "children": []
+     },
+     "e7": {
+      "type": "Text",
+      "props": {
+       "text": "my shopping bag"
+      },
+      "children": []
+     },
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
+     "failures": {
+      "type": "Text",
+      "props": {
+       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
+       "tone": "muted"
+      },
+      "children": []
+     }
+    },
+    "state": {},
+    "mutations": {},
+    "missing": []
+   }
+  },
+  {
+   "id": "fuzz-1267",
+   "rules": [],
+   "description": "edited fixture",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\nroot = Card([header, intro, sep, examples, failures])\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\ne4 = Text(\"where is my order?\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\ne5 = Text(\"contact support\")\ne6 = T",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -170088,21 +170387,18 @@
     "issues": [
      {
       "line": 3,
-      "code": "duplicate_id"
+      "code": "dangling_ref"
+     },
+     {
+      "line": 8,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 14,
+      "code": "syntax"
      }
     ],
     "nodes": {
-     "root": {
-      "type": "Card",
-      "props": {},
-      "children": [
-       "header",
-       "intro",
-       "sep",
-       "examples",
-       "failures"
-      ]
-     },
      "header": {
       "type": "Stack",
       "props": {
@@ -170113,6 +170409,17 @@
       "children": [
        "title",
        "mode"
+      ]
+     },
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
       ]
      },
      "title": {
@@ -170130,11 +170437,10 @@
       },
       "children": []
      },
-     "intro": {
+     "e4": {
       "type": "Text",
       "props": {
-       "text": "This server streams pre-written screens. Try one of these prompts:",
-       "tone": "muted"
+       "text": "where is my order?"
       },
       "children": []
      },
@@ -170156,7 +170462,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -170180,10 +170487,11 @@
       },
       "children": []
      },
-     "e4": {
+     "intro": {
       "type": "Text",
       "props": {
-       "text": "where is my order?"
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
       },
       "children": []
      },
@@ -170193,158 +170501,17 @@
        "text": "contact support"
       },
       "children": []
-     },
-     "e6": {
-      "type": "Text",
-      "props": {
-       "text": "book a stay"
-      },
-      "children": []
-     },
-     "e7": {
-      "type": "Text",
-      "props": {
-       "text": "my shopping bag"
-      },
-      "children": []
-     },
-     "e8": {
-      "type": "Text",
-      "props": {
-       "text": "a trip assistant"
-      },
-      "children": []
-     },
-     "failures": {
-      "type": "Text",
-      "props": {
-       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
-       "tone": "muted"
-      },
-      "children": []
      }
     },
     "state": {},
     "mutations": {},
-    "missing": []
-   }
-  },
-  {
-   "id": "fuzz-1267",
-   "rules": [],
-   "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt ",
-   "tools": [
-    "payments.confirm",
-    "auth.sendMagicLink",
-    "profile.update",
-    "orders.requestReturn",
-    "support.createTicket",
-    "bookings.reserve",
-    "assistant.ask",
-    "settings.update",
-    "cart.add"
-   ],
-   "assets": [
-    "cabin-pines",
-    "shirt",
-    "tote"
-   ],
-   "components": {
-    "ProductCard": {
-     "description": "A product with its picture, name and price. Its children are the product's buttons.",
-     "positional": [
-      "name",
-      "children"
-     ],
-     "props": {
-      "name": {
-       "kind": "text",
-       "maxLength": 80
-      },
-      "price": {
-       "kind": "number",
-       "minimum": 0
-      },
-      "currency": {
-       "kind": "oneOf",
-       "values": [
-        "USD",
-        "EUR",
-        "GBP"
-       ],
-       "optional": true
-      },
-      "picture": {
-       "kind": "picture",
-       "optional": true
-      },
-      "rating": {
-       "kind": "number",
-       "minimum": 0,
-       "maximum": 5,
-       "optional": true
-      },
-      "badges": {
-       "kind": "list",
-       "item": "text",
-       "maxItems": 3,
-       "optional": true
-      }
-     },
-     "children": {
-      "max": 3
-     }
-    },
-    "QuantityPicker": {
-     "description": "Choose how many, from min to max, with minus and plus buttons. Edits a number $state.",
-     "positional": [
-      "value"
-     ],
-     "props": {
-      "value": {
-       "kind": "state",
-       "holds": "number"
-      },
-      "label": {
-       "kind": "text",
-       "maxLength": 80
-      },
-      "min": {
-       "kind": "number",
-       "integer": true,
-       "minimum": 0,
-       "state": false
-      },
-      "max": {
-       "kind": "number",
-       "integer": true,
-       "minimum": 1,
-       "maximum": 99,
-       "state": false
-      }
-     },
-     "field": true
-    }
-   },
-   "pictures": [
-    {
-     "prefix": "product-",
-     "id": "digits",
-     "maxLength": 8
-    }
-   ],
-   "expect": {
-    "issues": [
-     {
-      "line": null,
-      "code": "missing_root"
-     }
-    ],
-    "nodes": {},
-    "state": {},
-    "mutations": {},
-    "missing": []
+    "missing": [
+     "e6",
+     "e7",
+     "e8",
+     "e9",
+     "failures"
+    ]
    }
   },
   {
@@ -171810,7 +171977,7 @@
    "id": "fuzz-1276",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -171914,7 +172081,7 @@
    "expect": {
     "issues": [
      {
-      "line": 5,
+      "line": 19,
       "code": "duplicate_id"
      }
     ],
@@ -171983,7 +172150,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -172039,6 +172207,13 @@
       "type": "Text",
       "props": {
        "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      },
@@ -176532,7 +176707,7 @@
    "id": "fuzz-1303",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -176636,7 +176811,7 @@
    "expect": {
     "issues": [
      {
-      "line": 7,
+      "line": 18,
       "code": "duplicate_id"
      }
     ],
@@ -176705,7 +176880,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -176761,6 +176937,13 @@
       "type": "Text",
       "props": {
        "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      },
@@ -187465,7 +187648,7 @@
    "id": "fuzz-1363",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by t\n# Omni-IR: shown by t",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -187569,14 +187752,156 @@
    "expect": {
     "issues": [
      {
-      "line": null,
-      "code": "missing_root"
+      "line": 2,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 13,
+      "code": "duplicate_id"
+     },
+     {
+      "line": 19,
+      "code": "syntax"
      }
     ],
-    "nodes": {},
+    "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
+     "header": {
+      "type": "Stack",
+      "props": {
+       "direction": "row",
+       "gap": "sm",
+       "align": "center"
+      },
+      "children": [
+       "title",
+       "mode"
+      ]
+     },
+     "title": {
+      "type": "Heading",
+      "props": {
+       "text": "Demo mode"
+      },
+      "children": []
+     },
+     "mode": {
+      "type": "Badge",
+      "props": {
+       "text": "No AI model connected",
+       "tone": "warning"
+      },
+      "children": []
+     },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
+     },
+     "e1": {
+      "type": "Text",
+      "props": {
+       "text": "a payment confirmation for $42.50"
+      },
+      "children": []
+     },
+     "e2": {
+      "type": "Text",
+      "props": {
+       "text": "a sign-in page"
+      },
+      "children": []
+     },
+     "e3": {
+      "type": "Text",
+      "props": {
+       "text": "edit my profile"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
+      },
+      "children": []
+     },
+     "e5": {
+      "type": "Text",
+      "props": {
+       "text": "contact support"
+      },
+      "children": []
+     },
+     "e6": {
+      "type": "Text",
+      "props": {
+       "text": "book a stay"
+      },
+      "children": []
+     },
+     "e7": {
+      "type": "Text",
+      "props": {
+       "text": "my shopping bag"
+      },
+      "children": []
+     },
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     }
+    },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "failures"
+    ]
    }
   },
   {
@@ -192207,7 +192532,7 @@
    "id": "fuzz-1391",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: mlistodel error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Textlist(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -192309,7 +192634,16 @@
     }
    ],
    "expect": {
-    "issues": [],
+    "issues": [
+     {
+      "line": 8,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 16,
+      "code": "unknown_component"
+     }
+    ],
     "nodes": {
      "root": {
       "type": "Card",
@@ -192375,7 +192709,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -192427,17 +192762,17 @@
       },
       "children": []
      },
-     "e8": {
+     "e9": {
       "type": "Text",
       "props": {
-       "text": "a trip assistant"
+       "text": "a product page"
       },
       "children": []
      },
      "failures": {
       "type": "Text",
       "props": {
-       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: mlistodel error\"",
+       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
        "tone": "muted"
       },
       "children": []
@@ -192445,7 +192780,9 @@
     },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "e8"
+    ]
    }
   },
   {
@@ -195959,7 +196296,7 @@
    "id": "fuzz-1412",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexampack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these pr tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -196067,8 +196404,8 @@
       "code": "dangling_ref"
      },
      {
-      "line": 8,
-      "code": "syntax"
+      "line": 6,
+      "code": "unterminated_string"
      }
     ],
     "nodes": {
@@ -196110,18 +196447,27 @@
       },
       "children": []
      },
-     "intro": {
-      "type": "Text",
-      "props": {
-       "text": "This server streams pre-written screens. Try one of these prompts:",
-       "tone": "muted"
-      },
-      "children": []
-     },
      "sep": {
       "type": "Divider",
       "props": {},
       "children": []
+     },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
      },
      "e1": {
       "type": "Text",
@@ -196179,6 +196525,13 @@
       },
       "children": []
      },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
      "failures": {
       "type": "Text",
       "props": {
@@ -196191,7 +196544,7 @@
     "state": {},
     "mutations": {},
     "missing": [
-     "examples"
+     "intro"
     ]
    }
   },
@@ -197156,7 +197509,7 @@
    "id": "fuzz-1418",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nseaction=[null, \"TVIOx\", \"\\, __proto__]p = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of taction=[null, \"TVIOx\", \"\\, __proto__]hese prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -197264,8 +197617,8 @@
       "code": "dangling_ref"
      },
      {
-      "line": 7,
-      "code": "unterminated_string"
+      "line": 6,
+      "code": "syntax"
      }
     ],
     "nodes": {
@@ -197307,12 +197660,9 @@
       },
       "children": []
      },
-     "intro": {
-      "type": "Text",
-      "props": {
-       "text": "This server streams pre-written screens. Try one of these prompts:",
-       "tone": "muted"
-      },
+     "sep": {
+      "type": "Divider",
+      "props": {},
       "children": []
      },
      "examples": {
@@ -197328,7 +197678,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -197387,6 +197738,13 @@
       },
       "children": []
      },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
      "failures": {
       "type": "Text",
       "props": {
@@ -197399,7 +197757,7 @@
     "state": {},
     "mutations": {},
     "missing": [
-     "sep"
+     "intro"
     ]
    }
   },
@@ -198638,7 +198996,7 @@
    "id": "fuzz-1427",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\[\"https://e.com/p.png\", row1, $a + 1, tool=\"\"]\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])[\"https://e.com/p.png\", row1, $a + 1, tool=\"\"]\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -198743,25 +199101,14 @@
     "issues": [
      {
       "line": 2,
-      "code": "dangling_ref"
+      "code": "syntax"
      },
      {
-      "line": 17,
-      "code": "syntax"
+      "line": null,
+      "code": "missing_root"
      }
     ],
     "nodes": {
-     "root": {
-      "type": "Card",
-      "props": {},
-      "children": [
-       "header",
-       "intro",
-       "sep",
-       "examples",
-       "failures"
-      ]
-     },
      "header": {
       "type": "Stack",
       "props": {
@@ -198815,7 +199162,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -198873,13 +199221,26 @@
        "text": "a trip assistant"
       },
       "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
+     "failures": {
+      "type": "Text",
+      "props": {
+       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
+       "tone": "muted"
+      },
+      "children": []
      }
     },
     "state": {},
     "mutations": {},
-    "missing": [
-     "failures"
-    ]
+    "missing": []
    }
   },
   {
@@ -199052,7 +199413,7 @@
    "id": "fuzz-1429",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of i#ts screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", ",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"conta#ct support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -199160,8 +199521,8 @@
       "code": "dangling_ref"
      },
      {
-      "line": 17,
-      "code": "syntax"
+      "line": 18,
+      "code": "unterminated_string"
      }
     ],
     "nodes": {
@@ -199229,7 +199590,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -199263,7 +199625,7 @@
      "e5": {
       "type": "Text",
       "props": {
-       "text": "contact support"
+       "text": "conta#ct support"
       },
       "children": []
      },
@@ -199285,6 +199647,13 @@
       "type": "Text",
       "props": {
        "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      }
@@ -204641,7 +205010,7 @@
    "id": "fuzz-1459",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by themock model when a prompt mat\n# Omni-IR: shown by the mock model when a prompt mat",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text\"my shopping bag\")",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -204745,14 +205114,142 @@
    "expect": {
     "issues": [
      {
-      "line": null,
-      "code": "missing_root"
+      "line": 2,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 6,
+      "code": "duplicate_id"
+     },
+     {
+      "line": 9,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 16,
+      "code": "syntax"
      }
     ],
-    "nodes": {},
+    "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
+     "header": {
+      "type": "Stack",
+      "props": {
+       "direction": "row",
+       "gap": "sm",
+       "align": "center"
+      },
+      "children": [
+       "title",
+       "mode"
+      ]
+     },
+     "title": {
+      "type": "Heading",
+      "props": {
+       "text": "Demo mode"
+      },
+      "children": []
+     },
+     "mode": {
+      "type": "Badge",
+      "props": {
+       "text": "No AI model connected",
+       "tone": "warning"
+      },
+      "children": []
+     },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
+     },
+     "e1": {
+      "type": "Text",
+      "props": {
+       "text": "a payment confirmation for $42.50"
+      },
+      "children": []
+     },
+     "e2": {
+      "type": "Text",
+      "props": {
+       "text": "a sign-in page"
+      },
+      "children": []
+     },
+     "e3": {
+      "type": "Text",
+      "props": {
+       "text": "edit my profile"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
+      },
+      "children": []
+     },
+     "e5": {
+      "type": "Text",
+      "props": {
+       "text": "contact support"
+      },
+      "children": []
+     },
+     "e6": {
+      "type": "Text",
+      "props": {
+       "text": "book a stay"
+      },
+      "children": []
+     }
+    },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "e7",
+     "e8",
+     "e9",
+     "failures"
+    ]
    }
   },
   {
@@ -206745,7 +207242,7 @@
    "id": "fuzz-1471",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -206849,15 +207346,15 @@
    "expect": {
     "issues": [
      {
-      "line": 4,
+      "line": 11,
       "code": "duplicate_id"
      },
      {
-      "line": 6,
+      "line": 13,
       "code": "duplicate_id"
      },
      {
-      "line": 20,
+      "line": 21,
       "code": "duplicate_id"
      }
     ],
@@ -206926,7 +207423,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -206982,6 +207480,13 @@
       "type": "Text",
       "props": {
        "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      },
@@ -207367,7 +207872,7 @@
    "id": "fuzz-1474",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge($__proto__\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne5 = Text(\"contact support\")\ne4 = Text(\"where is my order?\")\ne3 = Text(\"edit my profile\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error dem}os: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missi",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nmode = Badge(\"No AI model connected\", tone=\"warning\")\ntit}le = Heading(\"Demo mode\")\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -207475,20 +207980,20 @@
       "code": "dangling_ref"
      },
      {
-      "line": 3,
-      "code": "duplicate_id"
+      "line": 4,
+      "code": "syntax"
      },
      {
-      "line": 4,
+      "line": 5,
       "code": "dangling_ref"
      },
      {
       "line": 6,
-      "code": "syntax"
+      "code": "duplicate_id"
      },
      {
-      "line": 18,
-      "code": "unterminated_string"
+      "line": 9,
+      "code": "syntax"
      }
     ],
     "nodes": {
@@ -207503,6 +208008,14 @@
        "failures"
       ]
      },
+     "mode": {
+      "type": "Badge",
+      "props": {
+       "text": "No AI model connected",
+       "tone": "warning"
+      },
+      "children": []
+     },
      "header": {
       "type": "Stack",
       "props": {
@@ -207514,13 +208027,6 @@
        "title",
        "mode"
       ]
-     },
-     "title": {
-      "type": "Heading",
-      "props": {
-       "text": "Demo mode"
-      },
-      "children": []
      },
      "intro": {
       "type": "Text",
@@ -207534,85 +208040,14 @@
       "type": "Divider",
       "props": {},
       "children": []
-     },
-     "examples": {
-      "type": "Stack",
-      "props": {
-       "gap": "sm"
-      },
-      "children": [
-       "e1",
-       "e2",
-       "e3",
-       "e4",
-       "e5",
-       "e6",
-       "e7",
-       "e8"
-      ]
-     },
-     "e1": {
-      "type": "Text",
-      "props": {
-       "text": "a payment confirmation for $42.50"
-      },
-      "children": []
-     },
-     "e2": {
-      "type": "Text",
-      "props": {
-       "text": "a sign-in page"
-      },
-      "children": []
-     },
-     "e5": {
-      "type": "Text",
-      "props": {
-       "text": "contact support"
-      },
-      "children": []
-     },
-     "e4": {
-      "type": "Text",
-      "props": {
-       "text": "where is my order?"
-      },
-      "children": []
-     },
-     "e3": {
-      "type": "Text",
-      "props": {
-       "text": "edit my profile"
-      },
-      "children": []
-     },
-     "e6": {
-      "type": "Text",
-      "props": {
-       "text": "book a stay"
-      },
-      "children": []
-     },
-     "e7": {
-      "type": "Text",
-      "props": {
-       "text": "my shopping bag"
-      },
-      "children": []
-     },
-     "e8": {
-      "type": "Text",
-      "props": {
-       "text": "a trip assistant"
-      },
-      "children": []
      }
     },
     "state": {},
     "mutations": {},
     "missing": [
+     "examples",
      "failures",
-     "mode"
+     "title"
     ]
    }
   },
@@ -211793,7 +212228,7 @@
    "id": "fuzz-1497",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\nfailures ",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\ne8 = Text(\"a trip assistant\")\nintro = Text(\"This server streams pre-written screens.",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -211905,8 +212340,8 @@
       "code": "dangling_ref"
      },
      {
-      "line": 4,
-      "code": "syntax"
+      "line": 6,
+      "code": "unterminated_string"
      }
     ],
     "nodes": {
@@ -211932,6 +212367,20 @@
        "title",
        "mode"
       ]
+     },
+     "title": {
+      "type": "Heading",
+      "props": {
+       "text": "Demo mode"
+      },
+      "children": []
+     },
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
      }
     },
     "state": {},
@@ -211941,8 +212390,7 @@
      "failures",
      "intro",
      "mode",
-     "sep",
-     "title"
+     "sep"
     ]
    }
   },
@@ -221549,7 +221997,7 @@
    "id": "fuzz-1551",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\", align=\"center\")\ntit\ntit",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nsep = Divider()\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my sh",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -221657,16 +222105,16 @@
       "code": "dangling_ref"
      },
      {
-      "line": 3,
+      "line": 8,
+      "code": "duplicate_id"
+     },
+     {
+      "line": 9,
+      "code": "syntax"
+     },
+     {
+      "line": 15,
       "code": "unterminated_string"
-     },
-     {
-      "line": 4,
-      "code": "syntax"
-     },
-     {
-      "line": 5,
-      "code": "syntax"
      }
     ],
     "nodes": {
@@ -221680,16 +222128,88 @@
        "examples",
        "failures"
       ]
+     },
+     "header": {
+      "type": "Stack",
+      "props": {
+       "direction": "row",
+       "gap": "sm",
+       "align": "center"
+      },
+      "children": [
+       "title",
+       "mode"
+      ]
+     },
+     "title": {
+      "type": "Heading",
+      "props": {
+       "text": "Demo mode"
+      },
+      "children": []
+     },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
+     "mode": {
+      "type": "Badge",
+      "props": {
+       "text": "No AI model connected",
+       "tone": "warning"
+      },
+      "children": []
+     },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
+     "e2": {
+      "type": "Text",
+      "props": {
+       "text": "a sign-in page"
+      },
+      "children": []
+     },
+     "e3": {
+      "type": "Text",
+      "props": {
+       "text": "edit my profile"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
+      },
+      "children": []
+     },
+     "e5": {
+      "type": "Text",
+      "props": {
+       "text": "contact support"
+      },
+      "children": []
+     },
+     "e6": {
+      "type": "Text",
+      "props": {
+       "text": "book a stay"
+      },
+      "children": []
      }
     },
     "state": {},
     "mutations": {},
     "missing": [
      "examples",
-     "failures",
-     "header",
-     "intro",
-     "sep"
+     "failures"
     ]
    }
   },
@@ -222504,7 +223024,7 @@
    "id": "fuzz-1556",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ne8 = Text(\"a trip assistant\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ntitle = Heading(\"Demo mode\")\ne7 = Text(\"my shopping bag\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nsep = Divider()\ne5 = Text(\"contact support\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -222608,7 +223128,7 @@
    "expect": {
     "issues": [
      {
-      "line": 8,
+      "line": 7,
       "code": "duplicate_id"
      }
     ],
@@ -222636,10 +223156,10 @@
        "mode"
       ]
      },
-     "e8": {
-      "type": "Text",
+     "title": {
+      "type": "Heading",
       "props": {
-       "text": "a trip assistant"
+       "text": "Demo mode"
       },
       "children": []
      },
@@ -222664,21 +223184,12 @@
       "props": {},
       "children": []
      },
-     "examples": {
-      "type": "Stack",
+     "e5": {
+      "type": "Text",
       "props": {
-       "gap": "sm"
+       "text": "contact support"
       },
-      "children": [
-       "e1",
-       "e2",
-       "e3",
-       "e4",
-       "e5",
-       "e6",
-       "e7",
-       "e8"
-      ]
+      "children": []
      },
      "e1": {
       "type": "Text",
@@ -222708,12 +223219,22 @@
       },
       "children": []
      },
-     "e5": {
-      "type": "Text",
+     "examples": {
+      "type": "Stack",
       "props": {
-       "text": "contact support"
+       "gap": "sm"
       },
-      "children": []
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
      },
      "e6": {
       "type": "Text",
@@ -222722,17 +223243,24 @@
       },
       "children": []
      },
-     "title": {
-      "type": "Heading",
-      "props": {
-       "text": "Demo mode"
-      },
-      "children": []
-     },
      "e7": {
       "type": "Text",
       "props": {
        "text": "my shopping bag"
+      },
+      "children": []
+     },
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      },
@@ -223231,7 +223759,7 @@
    "id": "fuzz-1560",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none  = Card([header, intro, sep, exam\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, ",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = es = Stack([e1, e2, e3, e4, e5, e6, e7,e1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -223335,15 +223863,30 @@
    "expect": {
     "issues": [
      {
+      "line": 2,
+      "code": "dangling_ref"
+     },
+     {
       "line": 7,
       "code": "syntax"
      },
      {
-      "line": null,
-      "code": "missing_root"
+      "line": 11,
+      "code": "syntax"
      }
     ],
     "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
      "header": {
       "type": "Stack",
       "props": {
@@ -223379,15 +223922,35 @@
       },
       "children": []
      },
-     "sep": {
-      "type": "Divider",
-      "props": {},
+     "e2": {
+      "type": "Text",
+      "props": {
+       "text": "a sign-in page"
+      },
+      "children": []
+     },
+     "e3": {
+      "type": "Text",
+      "props": {
+       "text": "edit my profile"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
+      },
       "children": []
      }
     },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "examples",
+     "failures",
+     "sep"
+    ]
    }
   },
   {
@@ -225816,7 +226379,7 @@
    "id": "fuzz-1576",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([titleb, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of th\nintro = Text(\"This server streams pre-written screens. Try one of th",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Dibvider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -225924,19 +226487,23 @@
       "code": "dangling_ref"
      },
      {
-      "line": 3,
+      "line": 5,
       "code": "duplicate_id"
      },
      {
-      "line": 4,
-      "code": "dangling_ref"
-     },
-     {
       "line": 7,
-      "code": "unterminated_string"
+      "code": "duplicate_id"
      },
      {
-      "line": 8,
+      "line": 9,
+      "code": "unknown_component"
+     },
+     {
+      "line": 20,
+      "code": "duplicate_id"
+     },
+     {
+      "line": 21,
       "code": "unterminated_string"
      }
     ],
@@ -225960,7 +226527,7 @@
        "align": "center"
       },
       "children": [
-       "titleb",
+       "title",
        "mode"
       ]
      },
@@ -225978,16 +226545,101 @@
        "tone": "warning"
       },
       "children": []
+     },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
+     },
+     "e1": {
+      "type": "Text",
+      "props": {
+       "text": "a payment confirmation for $42.50"
+      },
+      "children": []
+     },
+     "e2": {
+      "type": "Text",
+      "props": {
+       "text": "a sign-in page"
+      },
+      "children": []
+     },
+     "e3": {
+      "type": "Text",
+      "props": {
+       "text": "edit my profile"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
+      },
+      "children": []
+     },
+     "e5": {
+      "type": "Text",
+      "props": {
+       "text": "contact support"
+      },
+      "children": []
+     },
+     "e6": {
+      "type": "Text",
+      "props": {
+       "text": "book a stay"
+      },
+      "children": []
+     },
+     "e7": {
+      "type": "Text",
+      "props": {
+       "text": "my shopping bag"
+      },
+      "children": []
+     },
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
      }
     },
     "state": {},
     "mutations": {},
     "missing": [
-     "examples",
      "failures",
-     "intro",
-     "sep",
-     "titleb"
+     "sep"
     ]
    }
   },
@@ -230422,7 +231074,7 @@
    "id": "fuzz-1602",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ne4 = Text(\"where is my order?\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ntitle = Heading(\"Demo mode\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\ne9 = Text(\"a product page\")\ne8 = Text(\"a trip assistant\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -230549,10 +231201,10 @@
        "mode"
       ]
      },
-     "e4": {
-      "type": "Text",
+     "title": {
+      "type": "Heading",
       "props": {
-       "text": "where is my order?"
+       "text": "Demo mode"
       },
       "children": []
      },
@@ -230590,7 +231242,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -230614,10 +231267,10 @@
       },
       "children": []
      },
-     "title": {
-      "type": "Heading",
+     "e4": {
+      "type": "Text",
       "props": {
-       "text": "Demo mode"
+       "text": "where is my order?"
       },
       "children": []
      },
@@ -230642,18 +231295,25 @@
       },
       "children": []
      },
-     "e8": {
-      "type": "Text",
-      "props": {
-       "text": "a trip assistant"
-      },
-      "children": []
-     },
      "failures": {
       "type": "Text",
       "props": {
        "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
        "tone": "muted"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
       },
       "children": []
      }
@@ -230667,7 +231327,7 @@
    "id": "fuzz-1603",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"c$enter\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\ne8 = Text(\"a trip assistant\")\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne7 = Text(\"my shopping bag\")\nsep = Divider()\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ne6 = Text(\"book a stay\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confir$mation for $42.50\")\ne1 = Text(\"a payment confir$mation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ntitle = Heading(\"Demo mode\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -230771,19 +231431,11 @@
    "expect": {
     "issues": [
      {
-      "line": 2,
-      "code": "dangling_ref"
-     },
-     {
-      "line": 3,
-      "code": "invalid_props"
-     },
-     {
-      "line": 6,
+      "line": 10,
       "code": "duplicate_id"
      },
      {
-      "line": 17,
+      "line": 12,
       "code": "duplicate_id"
      }
     ],
@@ -230799,10 +231451,22 @@
        "failures"
       ]
      },
-     "title": {
-      "type": "Heading",
+     "header": {
+      "type": "Stack",
       "props": {
-       "text": "Demo mode"
+       "direction": "row",
+       "gap": "sm",
+       "align": "center"
+      },
+      "children": [
+       "title",
+       "mode"
+      ]
+     },
+     "e6": {
+      "type": "Text",
+      "props": {
+       "text": "book a stay"
       },
       "children": []
      },
@@ -230822,11 +231486,9 @@
       },
       "children": []
      },
-     "e8": {
-      "type": "Text",
-      "props": {
-       "text": "a trip assistant"
-      },
+     "sep": {
+      "type": "Divider",
+      "props": {},
       "children": []
      },
      "examples": {
@@ -230842,13 +231504,14 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
       "type": "Text",
       "props": {
-       "text": "a payment confirmation for $42.50"
+       "text": "a payment confir$mation for $42.50"
       },
       "children": []
      },
@@ -230880,10 +231543,10 @@
       },
       "children": []
      },
-     "e6": {
-      "type": "Text",
+     "title": {
+      "type": "Heading",
       "props": {
-       "text": "book a stay"
+       "text": "Demo mode"
       },
       "children": []
      },
@@ -230894,9 +231557,18 @@
       },
       "children": []
      },
-     "sep": {
-      "type": "Divider",
-      "props": {},
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
       "children": []
      },
      "failures": {
@@ -230910,9 +231582,7 @@
     },
     "state": {},
     "mutations": {},
-    "missing": [
-     "header"
-    ]
+    "missing": []
    }
   },
   {
@@ -238016,7 +238686,7 @@
    "id": "fuzz-1642",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card(sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:, tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\n\n\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\ne2 = Text(\"a sign-in page\")",
+   "input": "# Omni-IR: shown by the mock model when a prompt mathes none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\n\n\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\ne2 = Text(\"a sign-in page\")",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -238121,18 +238791,29 @@
     "issues": [
      {
       "line": 2,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 8,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 18,
       "code": "syntax"
-     },
-     {
-      "line": 6,
-      "code": "unterminated_string"
-     },
-     {
-      "line": null,
-      "code": "missing_root"
      }
     ],
     "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
      "header": {
       "type": "Stack",
       "props": {
@@ -238160,6 +238841,14 @@
       },
       "children": []
      },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
      "sep": {
       "type": "Divider",
       "props": {},
@@ -238178,7 +238867,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -238230,14 +238920,6 @@
       },
       "children": []
      },
-     "failures": {
-      "type": "Text",
-      "props": {
-       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
-       "tone": "muted"
-      },
-      "children": []
-     },
      "e2": {
       "type": "Text",
       "props": {
@@ -238248,7 +238930,10 @@
     },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "e9",
+     "failures"
+    ]
    }
   },
   {
@@ -242399,7 +243084,7 @@
    "id": "fuzz-1666",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = T1e999ext(\"where is my order?\")\ne5 = Text(\"contact support\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nf1e999ailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -242503,15 +243188,11 @@
    "expect": {
     "issues": [
      {
-      "line": 8,
+      "line": 2,
       "code": "dangling_ref"
      },
      {
-      "line": 12,
-      "code": "unknown_component"
-     },
-     {
-      "line": 14,
+      "line": 13,
       "code": "duplicate_id"
      }
     ],
@@ -242580,7 +243261,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -242601,6 +243283,13 @@
       "type": "Text",
       "props": {
        "text": "edit my profile"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
       },
       "children": []
      },
@@ -242632,7 +243321,14 @@
       },
       "children": []
      },
-     "failures": {
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
+     "f1e999ailures": {
       "type": "Text",
       "props": {
        "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
@@ -242644,7 +243340,7 @@
     "state": {},
     "mutations": {},
     "missing": [
-     "e4"
+     "failures"
     ]
    }
   },
@@ -244460,7 +245156,7 @@
    "id": "fuzz-1677",
    "rules": [],
    "description": "edited fixture",
-   "input": "root = Card([header, intro, sep, examples, failures])\n# Omnbi-IR: shown by t when a prompt matches none of its screens.\nheader = Stack([title, mode], direction=\"ro",
+   "input": "root = Card([hebader, intro, sep, examples, failures])\n# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nheader = Stack([title, ion=\"row\", gap=\"sm\", align=\"c",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -244577,7 +245273,7 @@
       "type": "Card",
       "props": {},
       "children": [
-       "header",
+       "hebader",
        "intro",
        "sep",
        "examples",
@@ -244590,7 +245286,7 @@
     "missing": [
      "examples",
      "failures",
-     "header",
+     "hebader",
      "intro",
      "sep"
     ]
@@ -244753,7 +245449,7 @@
    "id": "fuzz-1679",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt e of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"centetitle = Heading(\"Demo mode\")\nmode = Badg AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant= Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nhea[title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamplee1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my pe\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"d cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -244862,18 +245558,10 @@
      },
      {
       "line": 3,
-      "code": "unterminated_string"
+      "code": "syntax"
      },
      {
-      "line": 4,
-      "code": "unterminated_string"
-     },
-     {
-      "line": 7,
-      "code": "dangling_ref"
-     },
-     {
-      "line": 15,
+      "line": 8,
       "code": "syntax"
      }
     ],
@@ -244889,6 +245577,21 @@
        "failures"
       ]
      },
+     "title": {
+      "type": "Heading",
+      "props": {
+       "text": "Demo mode"
+      },
+      "children": []
+     },
+     "mode": {
+      "type": "Badge",
+      "props": {
+       "text": "No AI model connected",
+       "tone": "warning"
+      },
+      "children": []
+     },
      "intro": {
       "type": "Text",
       "props": {
@@ -244901,22 +245604,6 @@
       "type": "Divider",
       "props": {},
       "children": []
-     },
-     "examples": {
-      "type": "Stack",
-      "props": {
-       "gap": "sm"
-      },
-      "children": [
-       "e1",
-       "e2",
-       "e3",
-       "e4",
-       "e5",
-       "e6",
-       "e7",
-       "e8"
-      ]
      },
      "e1": {
       "type": "Text",
@@ -244935,7 +245622,7 @@
      "e3": {
       "type": "Text",
       "props": {
-       "text": "edit my profile"
+       "text": "edit my pe"
       },
       "children": []
      },
@@ -244966,13 +245653,34 @@
        "text": "my shopping bag"
       },
       "children": []
+     },
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
+     "failures": {
+      "type": "Text",
+      "props": {
+       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"d cut off\", \"demo: model error\"",
+       "tone": "muted"
+      },
+      "children": []
      }
     },
     "state": {},
     "mutations": {},
     "missing": [
-     "e8",
-     "failures",
+     "examples",
      "header"
     ]
    }
@@ -245761,7 +246469,7 @@
    "id": "fuzz-1684",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"dem",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -245869,7 +246577,7 @@
       "code": "dangling_ref"
      },
      {
-      "line": 17,
+      "line": 18,
       "code": "unterminated_string"
      }
     ],
@@ -245938,7 +246646,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -245994,6 +246703,13 @@
       "type": "Text",
       "props": {
        "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      }
@@ -249720,7 +250436,7 @@
    "id": "fuzz-1705",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\nsep = Divider()\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of ",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ne2 = Text(\"a sign-in page\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divid{x: {a b: \"򇫰\", amount: \"product-x\"}, amount: \"k\"}er()\nexamples = Stack([e1,",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -249832,8 +250548,16 @@
       "code": "dangling_ref"
      },
      {
-      "line": 6,
-      "code": "unterminated_string"
+      "line": 4,
+      "code": "duplicate_id"
+     },
+     {
+      "line": 8,
+      "code": "syntax"
+     },
+     {
+      "line": 9,
+      "code": "syntax"
      }
     ],
     "nodes": {
@@ -249860,9 +250584,11 @@
        "mode"
       ]
      },
-     "sep": {
-      "type": "Divider",
-      "props": {},
+     "e2": {
+      "type": "Text",
+      "props": {
+       "text": "a sign-in page"
+      },
       "children": []
      },
      "mode": {
@@ -249872,6 +250598,14 @@
        "tone": "warning"
       },
       "children": []
+     },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
      }
     },
     "state": {},
@@ -249879,7 +250613,7 @@
     "missing": [
      "examples",
      "failures",
-     "intro",
+     "sep",
      "title"
     ]
    }
@@ -250701,7 +251435,7 @@
    "id": "fuzz-1711",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\ne4 = Text(\"where is my order?\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\ne8 = Text(\"a trip assistant\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -250803,7 +251537,12 @@
     }
    ],
    "expect": {
-    "issues": [],
+    "issues": [
+     {
+      "line": 11,
+      "code": "duplicate_id"
+     }
+    ],
     "nodes": {
      "root": {
       "type": "Card",
@@ -250843,10 +251582,11 @@
       },
       "children": []
      },
-     "e4": {
+     "intro": {
       "type": "Text",
       "props": {
-       "text": "where is my order?"
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
       },
       "children": []
      },
@@ -250855,21 +251595,12 @@
       "props": {},
       "children": []
      },
-     "examples": {
-      "type": "Stack",
+     "e8": {
+      "type": "Text",
       "props": {
-       "gap": "sm"
+       "text": "a trip assistant"
       },
-      "children": [
-       "e1",
-       "e2",
-       "e3",
-       "e4",
-       "e5",
-       "e6",
-       "e7",
-       "e8"
-      ]
+      "children": []
      },
      "e1": {
       "type": "Text",
@@ -250892,11 +251623,10 @@
       },
       "children": []
      },
-     "intro": {
+     "e4": {
       "type": "Text",
       "props": {
-       "text": "This server streams pre-written screens. Try one of these prompts:",
-       "tone": "muted"
+       "text": "where is my order?"
       },
       "children": []
      },
@@ -250921,10 +251651,27 @@
       },
       "children": []
      },
-     "e8": {
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
+     },
+     "e9": {
       "type": "Text",
       "props": {
-       "text": "a trip assistant"
+       "text": "a product page"
       },
       "children": []
      },
@@ -254581,7 +255328,7 @@
    "id": "fuzz-1733",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, []examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Tewhere is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by tock model when a prompt ma[]tches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -254683,25 +255430,19 @@
     }
    ],
    "expect": {
-    "issues": [
-     {
-      "line": 2,
-      "code": "syntax"
-     },
-     {
-      "line": 8,
-      "code": "dangling_ref"
-     },
-     {
-      "line": 12,
-      "code": "syntax"
-     },
-     {
-      "line": null,
-      "code": "missing_root"
-     }
-    ],
+    "issues": [],
     "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
      "header": {
       "type": "Stack",
       "props": {
@@ -254755,7 +255496,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -254776,6 +255518,13 @@
       "type": "Text",
       "props": {
        "text": "edit my profile"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
       },
       "children": []
      },
@@ -254807,6 +255556,13 @@
       },
       "children": []
      },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
      "failures": {
       "type": "Text",
       "props": {
@@ -254818,16 +255574,14 @@
     },
     "state": {},
     "mutations": {},
-    "missing": [
-     "e4"
-    ]
+    "missing": []
    }
   },
   {
    "id": "fuzz-1734",
    "rules": [],
    "description": "edited fixture",
-   "input": "e2 = Text(\"a sign-in page\")\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider(Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\n# Omni-IR: shown by the mock model when a prompt matches none of its screens.\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"mu",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\ne4 = Text(\"where is my order?\")\nheader = Stack([title, mode], di gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirma50\")\ne2 = Text(\"a sign-in page\")\ne9 = Text(\"a product page\")\nroot = Card([header, intro, sep, examples, failures])\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne3 = Text(\"edit my profile\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -254931,48 +255685,21 @@
    "expect": {
     "issues": [
      {
-      "line": 2,
-      "code": "dangling_ref"
-     },
-     {
-      "line": 7,
+      "line": 3,
       "code": "syntax"
      },
      {
-      "line": 16,
-      "code": "unterminated_string"
+      "line": 12,
+      "code": "dangling_ref"
      }
     ],
     "nodes": {
-     "e2": {
+     "e4": {
       "type": "Text",
       "props": {
-       "text": "a sign-in page"
+       "text": "where is my order?"
       },
       "children": []
-     },
-     "root": {
-      "type": "Card",
-      "props": {},
-      "children": [
-       "header",
-       "intro",
-       "sep",
-       "examples",
-       "failures"
-      ]
-     },
-     "header": {
-      "type": "Stack",
-      "props": {
-       "direction": "row",
-       "gap": "sm",
-       "align": "center"
-      },
-      "children": [
-       "title",
-       "mode"
-      ]
      },
      "title": {
       "type": "Heading",
@@ -254997,26 +255724,59 @@
       },
       "children": []
      },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
+     },
      "e1": {
       "type": "Text",
       "props": {
-       "text": "a payment confirmation for $42.50"
+       "text": "a payment confirma50"
       },
       "children": []
      },
-     "e3": {
+     "e2": {
       "type": "Text",
       "props": {
-       "text": "edit my profile"
+       "text": "a sign-in page"
       },
       "children": []
      },
-     "e4": {
+     "e9": {
       "type": "Text",
       "props": {
-       "text": "where is my order?"
+       "text": "a product page"
       },
       "children": []
+     },
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
      },
      "e5": {
       "type": "Text",
@@ -255045,14 +255805,27 @@
        "text": "a trip assistant"
       },
       "children": []
+     },
+     "e3": {
+      "type": "Text",
+      "props": {
+       "text": "edit my profile"
+      },
+      "children": []
+     },
+     "failures": {
+      "type": "Text",
+      "props": {
+       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
+       "tone": "muted"
+      },
+      "children": []
      }
     },
     "state": {},
     "mutations": {},
     "missing": [
-     "examples",
-     "failures",
-     "sep"
+     "header"
     ]
    }
   },
@@ -261758,7 +262531,7 @@
    "id": "fuzz-1770",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-I[true]R: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\n\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"d\")\nsep = Divider()",
+   "input": "# Omni-I[true]R: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mod=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -261860,7 +262633,16 @@
     }
    ],
    "expect": {
-    "issues": [],
+    "issues": [
+     {
+      "line": 2,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 3,
+      "code": "syntax"
+     }
+    ],
     "nodes": {
      "root": {
       "type": "Card",
@@ -261871,18 +262653,6 @@
        "sep",
        "examples",
        "failures"
-      ]
-     },
-     "header": {
-      "type": "Stack",
-      "props": {
-       "direction": "row",
-       "gap": "sm",
-       "align": "center"
-      },
-      "children": [
-       "title",
-       "mode"
       ]
      },
      "title": {
@@ -261908,6 +262678,11 @@
       },
       "children": []
      },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
      "examples": {
       "type": "Stack",
       "props": {
@@ -261921,7 +262696,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -261980,22 +262756,27 @@
       },
       "children": []
      },
-     "failures": {
+     "e9": {
       "type": "Text",
       "props": {
-       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"d"
+       "text": "a product page"
       },
       "children": []
      },
-     "sep": {
-      "type": "Divider",
-      "props": {},
+     "failures": {
+      "type": "Text",
+      "props": {
+       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
+       "tone": "muted"
+      },
       "children": []
      }
     },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "header"
+    ]
    }
   },
   {
@@ -262188,7 +262969,7 @@
    "id": "fuzz-1772",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these pro)\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model{amount: TRUE, note: false} error\\\"\", tone=\"muted\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo{amount: TRUE, note: false}: missing mutation\\\",h\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -262292,15 +263073,7 @@
    "expect": {
     "issues": [
      {
-      "line": 2,
-      "code": "dangling_ref"
-     },
-     {
-      "line": 6,
-      "code": "unterminated_string"
-     },
-     {
-      "line": 18,
+      "line": 16,
       "code": "duplicate_id"
      }
     ],
@@ -262343,6 +263116,14 @@
       },
       "children": []
      },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
      "sep": {
       "type": "Divider",
       "props": {},
@@ -262361,7 +263142,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -262420,10 +263202,17 @@
       },
       "children": []
      },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
      "failures": {
       "type": "Text",
       "props": {
-       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model{amount: TRUE, note: false} error\"",
+       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo{amount: TRUE, note: false}: missing mutation\",h\", \"demo: cut off\", \"demo: model error\"",
        "tone": "muted"
       },
       "children": []
@@ -262431,9 +263220,7 @@
     },
     "state": {},
     "mutations": {},
-    "missing": [
-     "intro"
-    ]
+    "missing": []
    }
   },
   {
@@ -263074,7 +263861,7 @@
    "id": "fuzz-1776",
    "rules": [],
    "description": "edited fixture",
-   "input": "#\"product-1042\" Omni-IR: shown by the mock model when a prompt matches none of its screens.\n#\"product-1042\" Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexe1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(rofile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\n# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"c\"product-1042\"enter\")\ntitle = Heading(\"Demo mode\")\nmode = Ba connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product pures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -263182,12 +263969,20 @@
       "code": "dangling_ref"
      },
      {
-      "line": 9,
+      "line": 4,
       "code": "syntax"
      },
      {
-      "line": 12,
+      "line": 6,
       "code": "unterminated_string"
+     },
+     {
+      "line": 9,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 18,
+      "code": "syntax"
      }
     ],
     "nodes": {
@@ -263202,30 +263997,10 @@
        "failures"
       ]
      },
-     "header": {
-      "type": "Stack",
-      "props": {
-       "direction": "row",
-       "gap": "sm",
-       "align": "center"
-      },
-      "children": [
-       "title",
-       "mode"
-      ]
-     },
      "title": {
       "type": "Heading",
       "props": {
        "text": "Demo mode"
-      },
-      "children": []
-     },
-     "mode": {
-      "type": "Badge",
-      "props": {
-       "text": "No AI model connected",
-       "tone": "warning"
       },
       "children": []
      },
@@ -263242,6 +264017,23 @@
       "props": {},
       "children": []
      },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
+     },
      "e1": {
       "type": "Text",
       "props": {
@@ -263253,6 +264045,13 @@
       "type": "Text",
       "props": {
        "text": "a sign-in page"
+      },
+      "children": []
+     },
+     "e3": {
+      "type": "Text",
+      "props": {
+       "text": "edit my profile"
       },
       "children": []
      },
@@ -263290,20 +264089,14 @@
        "text": "a trip assistant"
       },
       "children": []
-     },
-     "failures": {
-      "type": "Text",
-      "props": {
-       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
-       "tone": "muted"
-      },
-      "children": []
      }
     },
     "state": {},
     "mutations": {},
     "missing": [
-     "examples"
+     "e9",
+     "failures",
+     "header"
     ]
    }
   },
@@ -264369,7 +265162,7 @@
    "id": "fuzz-1784",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\ne5 = Text(\"contact support\")\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne7 = Text(\"my shopping bag\")\nder, intro, sep, examples, failures])\ne6 = Text(\"book a stay\")\ne4 = Text(\"where is my order?\")\ne8 = Textip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\n Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(er?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -264473,16 +265266,16 @@
    "expect": {
     "issues": [
      {
+      "line": 2,
+      "code": "syntax"
+     },
+     {
       "line": 8,
       "code": "dangling_ref"
      },
      {
-      "line": 13,
+      "line": 12,
       "code": "syntax"
-     },
-     {
-      "line": 16,
-      "code": "unterminated_string"
      },
      {
       "line": null,
@@ -264490,13 +265283,6 @@
      }
     ],
     "nodes": {
-     "e5": {
-      "type": "Text",
-      "props": {
-       "text": "contact support"
-      },
-      "children": []
-     },
      "header": {
       "type": "Stack",
       "props": {
@@ -264550,7 +265336,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -264574,10 +265361,10 @@
       },
       "children": []
      },
-     "e7": {
+     "e5": {
       "type": "Text",
       "props": {
-       "text": "my shopping bag"
+       "text": "contact support"
       },
       "children": []
      },
@@ -264588,10 +265375,24 @@
       },
       "children": []
      },
-     "e4": {
+     "e7": {
       "type": "Text",
       "props": {
-       "text": "where is my order?"
+       "text": "my shopping bag"
+      },
+      "children": []
+     },
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      },
@@ -264607,7 +265408,7 @@
     "state": {},
     "mutations": {},
     "missing": [
-     "e8"
+     "e4"
     ]
    }
   },
@@ -272498,7 +273299,7 @@
    "id": "fuzz-1829",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\n\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\ne7 = Text(\"my shopping bag\")",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne8 = Text(\"a trip assistant\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne5 = Text(\"contact support\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -272666,7 +273467,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -272697,10 +273499,10 @@
       },
       "children": []
      },
-     "e5": {
+     "e8": {
       "type": "Text",
       "props": {
-       "text": "contact support"
+       "text": "a trip assistant"
       },
       "children": []
      },
@@ -272711,10 +273513,24 @@
       },
       "children": []
      },
-     "e8": {
+     "e7": {
       "type": "Text",
       "props": {
-       "text": "a trip assistant"
+       "text": "my shopping bag"
+      },
+      "children": []
+     },
+     "e5": {
+      "type": "Text",
+      "props": {
+       "text": "contact support"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      },
@@ -272723,13 +273539,6 @@
       "props": {
        "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
        "tone": "muted"
-      },
-      "children": []
-     },
-     "e7": {
-      "type": "Text",
-      "props": {
-       "text": "my shopping bag"
       },
       "children": []
      }
@@ -274781,7 +275590,7 @@
    "id": "fuzz-1841",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\ne4 = Text(\"where is my order?\")\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\nsep = Divider()\ne5 = Text(\"contact support\")\ne7 = Text(\"my shopping bag\")\ne6 = Text(\"book a stay\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "e8 = Text(\"a trip assistant\")\ne4 = Text(\"where is my order?\")\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\nroot = Card([header, intro, sep, examples, failures])\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\n# Omni-IR: shown by the mock model when a prompt matches none of its screens.\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -274885,16 +275694,19 @@
    "expect": {
     "issues": [],
     "nodes": {
-     "root": {
-      "type": "Card",
-      "props": {},
-      "children": [
-       "header",
-       "intro",
-       "sep",
-       "examples",
-       "failures"
-      ]
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
+      },
+      "children": []
      },
      "header": {
       "type": "Stack",
@@ -274931,11 +275743,9 @@
       },
       "children": []
      },
-     "e4": {
-      "type": "Text",
-      "props": {
-       "text": "where is my order?"
-      },
+     "sep": {
+      "type": "Divider",
+      "props": {},
       "children": []
      },
      "examples": {
@@ -274951,7 +275761,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -274975,22 +275786,21 @@
       },
       "children": []
      },
-     "sep": {
-      "type": "Divider",
+     "root": {
+      "type": "Card",
       "props": {},
-      "children": []
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
      },
      "e5": {
       "type": "Text",
       "props": {
        "text": "contact support"
-      },
-      "children": []
-     },
-     "e7": {
-      "type": "Text",
-      "props": {
-       "text": "my shopping bag"
       },
       "children": []
      },
@@ -275001,10 +275811,17 @@
       },
       "children": []
      },
-     "e8": {
+     "e7": {
       "type": "Text",
       "props": {
-       "text": "a trip assistant"
+       "text": "my shopping bag"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
       },
       "children": []
      },
@@ -275433,7 +276250,7 @@
    "id": "fuzz-1844",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Ofalsemni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = DiviStack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Ofalsemni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-writtne of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -275537,15 +276354,7 @@
    "expect": {
     "issues": [
      {
-      "line": 2,
-      "code": "dangling_ref"
-     },
-     {
-      "line": 7,
-      "code": "unknown_component"
-     },
-     {
-      "line": 12,
+      "line": 13,
       "code": "duplicate_id"
      }
     ],
@@ -275591,10 +276400,32 @@
      "intro": {
       "type": "Text",
       "props": {
-       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "text": "This server streams pre-writtne of these prompts:",
        "tone": "muted"
       },
       "children": []
+     },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
      },
      "e1": {
       "type": "Text",
@@ -275652,6 +276483,13 @@
       },
       "children": []
      },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
      "failures": {
       "type": "Text",
       "props": {
@@ -275663,10 +276501,7 @@
     },
     "state": {},
     "mutations": {},
-    "missing": [
-     "examples",
-     "sep"
-    ]
+    "missing": []
    }
   },
   {
@@ -278117,7 +278952,7 @@
    "id": "fuzz-1858",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\"child\\\", \\\"demo: missing mutation\\\", \\\"demo: , \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1,5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a proes = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -278219,7 +279054,20 @@
     }
    ],
    "expect": {
-    "issues": [],
+    "issues": [
+     {
+      "line": 2,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 8,
+      "code": "invalid_props"
+     },
+     {
+      "line": 17,
+      "code": "syntax"
+     }
+    ],
     "nodes": {
      "root": {
       "type": "Card",
@@ -278271,22 +279119,6 @@
       "type": "Divider",
       "props": {},
       "children": []
-     },
-     "examples": {
-      "type": "Stack",
-      "props": {
-       "gap": "sm"
-      },
-      "children": [
-       "e1",
-       "e2",
-       "e3",
-       "e4",
-       "e5",
-       "e6",
-       "e7",
-       "e8"
-      ]
      },
      "e1": {
       "type": "Text",
@@ -278343,19 +279175,14 @@
        "text": "a trip assistant"
       },
       "children": []
-     },
-     "failures": {
-      "type": "Text",
-      "props": {
-       "text": "Error demos: \"demo: unknown tool\"child\", \"demo: missing mutation\", \"demo: , \"demo: cut off\", \"demo: model error\"",
-       "tone": "muted"
-      },
-      "children": []
      }
     },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "examples",
+     "failures"
+    ]
    }
   },
   {
@@ -284684,7 +285511,7 @@
    "id": "fuzz-1895",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos:ol\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Tirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -284786,7 +285613,16 @@
     }
    ],
    "expect": {
-    "issues": [],
+    "issues": [
+     {
+      "line": 8,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 9,
+      "code": "syntax"
+     }
+    ],
     "nodes": {
      "root": {
       "type": "Card",
@@ -284852,15 +285688,9 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
-     },
-     "e1": {
-      "type": "Text",
-      "props": {
-       "text": "a payment confirmation for $42.50"
-      },
-      "children": []
      },
      "e2": {
       "type": "Text",
@@ -284911,10 +285741,17 @@
       },
       "children": []
      },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
      "failures": {
       "type": "Text",
       "props": {
-       "text": "Error demos:ol\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
+       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
        "tone": "muted"
       },
       "children": []
@@ -284922,7 +285759,9 @@
     },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "e1"
+    ]
    }
   },
   {
@@ -290201,7 +291040,7 @@
    "id": "fuzz-1925",
    "rules": [],
    "description": "edited fixture",
-   "input": "-IR: s",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"dut off\\\", \\\"demo: model error\\\"\", tone=\"m",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -290305,18 +291144,152 @@
    "expect": {
     "issues": [
      {
-      "line": 1,
-      "code": "syntax"
+      "line": 2,
+      "code": "dangling_ref"
      },
      {
-      "line": null,
-      "code": "missing_root"
+      "line": 18,
+      "code": "unterminated_string"
      }
     ],
-    "nodes": {},
+    "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
+     "header": {
+      "type": "Stack",
+      "props": {
+       "direction": "row",
+       "gap": "sm",
+       "align": "center"
+      },
+      "children": [
+       "title",
+       "mode"
+      ]
+     },
+     "title": {
+      "type": "Heading",
+      "props": {
+       "text": "Demo mode"
+      },
+      "children": []
+     },
+     "mode": {
+      "type": "Badge",
+      "props": {
+       "text": "No AI model connected",
+       "tone": "warning"
+      },
+      "children": []
+     },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
+     },
+     "e1": {
+      "type": "Text",
+      "props": {
+       "text": "a payment confirmation for $42.50"
+      },
+      "children": []
+     },
+     "e2": {
+      "type": "Text",
+      "props": {
+       "text": "a sign-in page"
+      },
+      "children": []
+     },
+     "e3": {
+      "type": "Text",
+      "props": {
+       "text": "edit my profile"
+      },
+      "children": []
+     },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
+      },
+      "children": []
+     },
+     "e5": {
+      "type": "Text",
+      "props": {
+       "text": "contact support"
+      },
+      "children": []
+     },
+     "e6": {
+      "type": "Text",
+      "props": {
+       "text": "book a stay"
+      },
+      "children": []
+     },
+     "e7": {
+      "type": "Text",
+      "props": {
+       "text": "my shopping bag"
+      },
+      "children": []
+     },
+     "e8": {
+      "type": "Text",
+      "props": {
+       "text": "a trip assistant"
+      },
+      "children": []
+     },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     }
+    },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "failures"
+    ]
    }
   },
   {
@@ -292017,7 +292990,7 @@
    "id": "fuzz-1936",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the( mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")amples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\n\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay}\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\ne4 = Text(\"where is my order?\")",
+   "input": "# Omni-IR: shown by the( mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\ne1 = Text(\"a payment confirmation for $42.50\")\ne1 = Text(\"a payment confirmation for $42.50\")\nexamples = Stack([e1, e2, e3,} e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\",r\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -292125,11 +293098,11 @@
       "code": "dangling_ref"
      },
      {
-      "line": 4,
+      "line": 9,
       "code": "duplicate_id"
      },
      {
-      "line": 7,
+      "line": 10,
       "code": "syntax"
      }
     ],
@@ -292172,6 +293145,19 @@
       },
       "children": []
      },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
      "e1": {
       "type": "Text",
       "props": {
@@ -292193,6 +293179,13 @@
       },
       "children": []
      },
+     "e4": {
+      "type": "Text",
+      "props": {
+       "text": "where is my order?"
+      },
+      "children": []
+     },
      "e5": {
       "type": "Text",
       "props": {
@@ -292203,7 +293196,7 @@
      "e6": {
       "type": "Text",
       "props": {
-       "text": "book a stay}"
+       "text": "book a stay"
       },
       "children": []
      },
@@ -292221,18 +293214,18 @@
       },
       "children": []
      },
-     "failures": {
+     "e9": {
       "type": "Text",
       "props": {
-       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\", \"demo: model error\"",
-       "tone": "muted"
+       "text": "a product page"
       },
       "children": []
      },
-     "e4": {
+     "failures": {
       "type": "Text",
       "props": {
-       "text": "where is my order?"
+       "text": "Error demos: \"demo: unknown tool\", \"demo: missing child\", \"demo: missing mutation\", \"demo: windows path\", \"demo: cut off\",r\"",
+       "tone": "muted"
       },
       "children": []
      }
@@ -292240,9 +293233,7 @@
     "state": {},
     "mutations": {},
     "missing": [
-     "examples",
-     "intro",
-     "sep"
+     "examples"
     ]
    }
   },
@@ -293431,7 +294422,7 @@
    "id": "fuzz-1944",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep =)\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profilText(\"where is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\"a trip assistant\")\ne9 = Text(\"a product page\")\nfailures = Text(\"Error demos: \\\"demo: unknown tool\\\", \\\"demo: missing child\\\", \\\"demo: missing mutation\\\", \\\"demo: windows path\\\", \\\"demo: cut off\\\", \\\"demo: model error\\\"\", tone=\"muted\")\n",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -293535,11 +294526,11 @@
    "expect": {
     "issues": [
      {
-      "line": 2,
+      "line": 8,
       "code": "dangling_ref"
      },
      {
-      "line": 7,
+      "line": 11,
       "code": "syntax"
      }
     ],
@@ -293590,6 +294581,11 @@
       },
       "children": []
      },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
      "examples": {
       "type": "Stack",
       "props": {
@@ -293603,7 +294599,8 @@
        "e5",
        "e6",
        "e7",
-       "e8"
+       "e8",
+       "e9"
       ]
      },
      "e1": {
@@ -293617,20 +294614,6 @@
       "type": "Text",
       "props": {
        "text": "a sign-in page"
-      },
-      "children": []
-     },
-     "e3": {
-      "type": "Text",
-      "props": {
-       "text": "edit my profile"
-      },
-      "children": []
-     },
-     "e4": {
-      "type": "Text",
-      "props": {
-       "text": "where is my order?"
       },
       "children": []
      },
@@ -293662,6 +294645,13 @@
       },
       "children": []
      },
+     "e9": {
+      "type": "Text",
+      "props": {
+       "text": "a product page"
+      },
+      "children": []
+     },
      "failures": {
       "type": "Text",
       "props": {
@@ -293674,7 +294664,8 @@
     "state": {},
     "mutations": {},
     "missing": [
-     "sep"
+     "e3",
+     "e4"
     ]
    }
   },
@@ -294711,7 +295702,7 @@
    "id": "fuzz-1951",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, e",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\ntitle = Heading(\"Demo mode\")\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8, e9], gap=\"sm\")\ne1 = Text(",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -294816,17 +295807,101 @@
     "issues": [
      {
       "line": 2,
-      "code": "syntax"
+      "code": "dangling_ref"
      },
      {
-      "line": null,
-      "code": "missing_root"
+      "line": 8,
+      "code": "dangling_ref"
+     },
+     {
+      "line": 9,
+      "code": "syntax"
      }
     ],
-    "nodes": {},
+    "nodes": {
+     "root": {
+      "type": "Card",
+      "props": {},
+      "children": [
+       "header",
+       "intro",
+       "sep",
+       "examples",
+       "failures"
+      ]
+     },
+     "title": {
+      "type": "Heading",
+      "props": {
+       "text": "Demo mode"
+      },
+      "children": []
+     },
+     "header": {
+      "type": "Stack",
+      "props": {
+       "direction": "row",
+       "gap": "sm",
+       "align": "center"
+      },
+      "children": [
+       "title",
+       "mode"
+      ]
+     },
+     "mode": {
+      "type": "Badge",
+      "props": {
+       "text": "No AI model connected",
+       "tone": "warning"
+      },
+      "children": []
+     },
+     "intro": {
+      "type": "Text",
+      "props": {
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
+      },
+      "children": []
+     },
+     "sep": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+     },
+     "examples": {
+      "type": "Stack",
+      "props": {
+       "gap": "sm"
+      },
+      "children": [
+       "e1",
+       "e2",
+       "e3",
+       "e4",
+       "e5",
+       "e6",
+       "e7",
+       "e8",
+       "e9"
+      ]
+     }
+    },
     "state": {},
     "mutations": {},
-    "missing": []
+    "missing": [
+     "e1",
+     "e2",
+     "e3",
+     "e4",
+     "e5",
+     "e6",
+     "e7",
+     "e8",
+     "e9",
+     "failures"
+    ]
    }
   },
   {
@@ -295257,7 +296332,7 @@
    "id": "fuzz-1954",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"wh",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\n# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failur\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -295361,122 +296436,18 @@
    "expect": {
     "issues": [
      {
-      "line": 2,
-      "code": "dangling_ref"
-     },
-     {
-      "line": 8,
-      "code": "dangling_ref"
-     },
-     {
-      "line": 12,
-      "code": "duplicate_id"
-     },
-     {
-      "line": 13,
+      "line": 3,
       "code": "unterminated_string"
+     },
+     {
+      "line": null,
+      "code": "missing_root"
      }
     ],
-    "nodes": {
-     "root": {
-      "type": "Card",
-      "props": {},
-      "children": [
-       "header",
-       "intro",
-       "sep",
-       "examples",
-       "failures"
-      ]
-     },
-     "header": {
-      "type": "Stack",
-      "props": {
-       "direction": "row",
-       "gap": "sm",
-       "align": "center"
-      },
-      "children": [
-       "title",
-       "mode"
-      ]
-     },
-     "title": {
-      "type": "Heading",
-      "props": {
-       "text": "Demo mode"
-      },
-      "children": []
-     },
-     "mode": {
-      "type": "Badge",
-      "props": {
-       "text": "No AI model connected",
-       "tone": "warning"
-      },
-      "children": []
-     },
-     "intro": {
-      "type": "Text",
-      "props": {
-       "text": "This server streams pre-written screens. Try one of these prompts:",
-       "tone": "muted"
-      },
-      "children": []
-     },
-     "sep": {
-      "type": "Divider",
-      "props": {},
-      "children": []
-     },
-     "examples": {
-      "type": "Stack",
-      "props": {
-       "gap": "sm"
-      },
-      "children": [
-       "e1",
-       "e2",
-       "e3",
-       "e4",
-       "e5",
-       "e6",
-       "e7",
-       "e8"
-      ]
-     },
-     "e1": {
-      "type": "Text",
-      "props": {
-       "text": "a payment confirmation for $42.50"
-      },
-      "children": []
-     },
-     "e2": {
-      "type": "Text",
-      "props": {
-       "text": "a sign-in page"
-      },
-      "children": []
-     },
-     "e3": {
-      "type": "Text",
-      "props": {
-       "text": "edit my profile"
-      },
-      "children": []
-     }
-    },
+    "nodes": {},
     "state": {},
     "mutations": {},
-    "missing": [
-     "e4",
-     "e5",
-     "e6",
-     "e7",
-     "e8",
-     "failures"
-    ]
+    "missing": []
    }
   },
   {
@@ -296499,129 +297470,7 @@
    "id": "fuzz-1960",
    "rules": [],
    "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro",
-   "tools": [
-    "payments.confirm",
-    "auth.sendMagicLink",
-    "profile.update",
-    "orders.requestReturn",
-    "support.createTicket",
-    "bookings.reserve",
-    "assistant.ask",
-    "settings.update",
-    "cart.add"
-   ],
-   "assets": [
-    "cabin-pines",
-    "shirt",
-    "tote"
-   ],
-   "components": {
-    "ProductCard": {
-     "description": "A product with its picture, name and price. Its children are the product's buttons.",
-     "positional": [
-      "name",
-      "children"
-     ],
-     "props": {
-      "name": {
-       "kind": "text",
-       "maxLength": 80
-      },
-      "price": {
-       "kind": "number",
-       "minimum": 0
-      },
-      "currency": {
-       "kind": "oneOf",
-       "values": [
-        "USD",
-        "EUR",
-        "GBP"
-       ],
-       "optional": true
-      },
-      "picture": {
-       "kind": "picture",
-       "optional": true
-      },
-      "rating": {
-       "kind": "number",
-       "minimum": 0,
-       "maximum": 5,
-       "optional": true
-      },
-      "badges": {
-       "kind": "list",
-       "item": "text",
-       "maxItems": 3,
-       "optional": true
-      }
-     },
-     "children": {
-      "max": 3
-     }
-    },
-    "QuantityPicker": {
-     "description": "Choose how many, from min to max, with minus and plus buttons. Edits a number $state.",
-     "positional": [
-      "value"
-     ],
-     "props": {
-      "value": {
-       "kind": "state",
-       "holds": "number"
-      },
-      "label": {
-       "kind": "text",
-       "maxLength": 80
-      },
-      "min": {
-       "kind": "number",
-       "integer": true,
-       "minimum": 0,
-       "state": false
-      },
-      "max": {
-       "kind": "number",
-       "integer": true,
-       "minimum": 1,
-       "maximum": 99,
-       "state": false
-      }
-     },
-     "field": true
-    }
-   },
-   "pictures": [
-    {
-     "prefix": "product-",
-     "id": "digits",
-     "maxLength": 8
-    }
-   ],
-   "expect": {
-    "issues": [
-     {
-      "line": 2,
-      "code": "syntax"
-     },
-     {
-      "line": null,
-      "code": "missing_root"
-     }
-    ],
-    "nodes": {},
-    "state": {},
-    "mutations": {},
-    "missing": []
-   }
-  },
-  {
-   "id": "fuzz-1961",
-   "rules": [],
-   "description": "edited fixture",
-   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo mode\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"mut{}ed\")\nsep = Divider()\nsep = Divider()\nexamples = Stack([e1, e2, e3, e4, e5, e6, e7, e8], gap=\"sm\")\ne1 = Text(\"a payment confirmation for $42.50\")\ne2 = Text(\"a sign-in page\")\ne3 = Text(\"edit my profile\")\ne4 = Text(\"min=$xwhere is my order?\")\ne5 = Text(\"contact support\")\ne6 = Text(\"book a stay\")\ne7 = Text(\"my shopping bag\")\ne8 = Text(\ne8 = Text(",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches non\"\\u0041\"e of its screens.\nroot = Card([header, intro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"ce",
    "tools": [
     "payments.confirm",
     "auth.sendMagicLink",
@@ -296729,24 +297578,8 @@
       "code": "dangling_ref"
      },
      {
-      "line": 6,
-      "code": "invalid_props"
-     },
-     {
-      "line": 8,
-      "code": "duplicate_id"
-     },
-     {
-      "line": 9,
-      "code": "dangling_ref"
-     },
-     {
-      "line": 17,
-      "code": "syntax"
-     },
-     {
-      "line": 18,
-      "code": "syntax"
+      "line": 3,
+      "code": "unterminated_string"
      }
     ],
     "nodes": {
@@ -296760,7 +297593,148 @@
        "examples",
        "failures"
       ]
+     }
+    },
+    "state": {},
+    "mutations": {},
+    "missing": [
+     "examples",
+     "failures",
+     "header",
+     "intro",
+     "sep"
+    ]
+   }
+  },
+  {
+   "id": "fuzz-1961",
+   "rules": [],
+   "description": "edited fixture",
+   "input": "# Omni-IR: shown by the mock model when a prompt matches none of its screens.\nroot = Card([header, i{}ntro, sep, examples, failures])\nheader = Stack([title, mode], direction=\"row\", gap=\"sm\", align=\"center\")\ntitle = Heading(\"Demo modemin=$x\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nmode = Badge(\"No AI model connected\", tone=\"warning\")\nintro = Text(\"This server streams pre-written screens. Try one of these prompts:\", tone=\"muted\")\nse",
+   "tools": [
+    "payments.confirm",
+    "auth.sendMagicLink",
+    "profile.update",
+    "orders.requestReturn",
+    "support.createTicket",
+    "bookings.reserve",
+    "assistant.ask",
+    "settings.update",
+    "cart.add"
+   ],
+   "assets": [
+    "cabin-pines",
+    "shirt",
+    "tote"
+   ],
+   "components": {
+    "ProductCard": {
+     "description": "A product with its picture, name and price. Its children are the product's buttons.",
+     "positional": [
+      "name",
+      "children"
+     ],
+     "props": {
+      "name": {
+       "kind": "text",
+       "maxLength": 80
+      },
+      "price": {
+       "kind": "number",
+       "minimum": 0
+      },
+      "currency": {
+       "kind": "oneOf",
+       "values": [
+        "USD",
+        "EUR",
+        "GBP"
+       ],
+       "optional": true
+      },
+      "picture": {
+       "kind": "picture",
+       "optional": true
+      },
+      "rating": {
+       "kind": "number",
+       "minimum": 0,
+       "maximum": 5,
+       "optional": true
+      },
+      "badges": {
+       "kind": "list",
+       "item": "text",
+       "maxItems": 3,
+       "optional": true
+      }
      },
+     "children": {
+      "max": 3
+     }
+    },
+    "QuantityPicker": {
+     "description": "Choose how many, from min to max, with minus and plus buttons. Edits a number $state.",
+     "positional": [
+      "value"
+     ],
+     "props": {
+      "value": {
+       "kind": "state",
+       "holds": "number"
+      },
+      "label": {
+       "kind": "text",
+       "maxLength": 80
+      },
+      "min": {
+       "kind": "number",
+       "integer": true,
+       "minimum": 0,
+       "state": false
+      },
+      "max": {
+       "kind": "number",
+       "integer": true,
+       "minimum": 1,
+       "maximum": 99,
+       "state": false
+      }
+     },
+     "field": true
+    }
+   },
+   "pictures": [
+    {
+     "prefix": "product-",
+     "id": "digits",
+     "maxLength": 8
+    }
+   ],
+   "expect": {
+    "issues": [
+     {
+      "line": 2,
+      "code": "syntax"
+     },
+     {
+      "line": 6,
+      "code": "duplicate_id"
+     },
+     {
+      "line": 7,
+      "code": "duplicate_id"
+     },
+     {
+      "line": 9,
+      "code": "syntax"
+     },
+     {
+      "line": null,
+      "code": "missing_root"
+     }
+    ],
+    "nodes": {
      "header": {
       "type": "Stack",
       "props": {
@@ -296776,7 +297750,7 @@
      "title": {
       "type": "Heading",
       "props": {
-       "text": "Demo mode"
+       "text": "Demo modemin=$x"
       },
       "children": []
      },
@@ -296788,84 +297762,18 @@
       },
       "children": []
      },
-     "sep": {
-      "type": "Divider",
-      "props": {},
-      "children": []
-     },
-     "examples": {
-      "type": "Stack",
-      "props": {
-       "gap": "sm"
-      },
-      "children": [
-       "e1",
-       "e2",
-       "e3",
-       "e4",
-       "e5",
-       "e6",
-       "e7",
-       "e8"
-      ]
-     },
-     "e1": {
+     "intro": {
       "type": "Text",
       "props": {
-       "text": "a payment confirmation for $42.50"
-      },
-      "children": []
-     },
-     "e2": {
-      "type": "Text",
-      "props": {
-       "text": "a sign-in page"
-      },
-      "children": []
-     },
-     "e3": {
-      "type": "Text",
-      "props": {
-       "text": "edit my profile"
-      },
-      "children": []
-     },
-     "e4": {
-      "type": "Text",
-      "props": {
-       "text": "min=$xwhere is my order?"
-      },
-      "children": []
-     },
-     "e5": {
-      "type": "Text",
-      "props": {
-       "text": "contact support"
-      },
-      "children": []
-     },
-     "e6": {
-      "type": "Text",
-      "props": {
-       "text": "book a stay"
-      },
-      "children": []
-     },
-     "e7": {
-      "type": "Text",
-      "props": {
-       "text": "my shopping bag"
+       "text": "This server streams pre-written screens. Try one of these prompts:",
+       "tone": "muted"
       },
       "children": []
      }
     },
     "state": {},
     "mutations": {},
-    "missing": [
-     "e8",
-     "failures",
-     "intro"
-    ]
+    "missing": []
    }
   },
   {

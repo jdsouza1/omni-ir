@@ -4,6 +4,7 @@ package dev.omniir.core
 
 /** The `input_state_type` issue a bound Input, DateInput, Select or Switch has with this state value, if any. */
 private fun inputStateIssue(n: OmniNode, key: String, value: Primitive): Issue? {
+  if (n.type == ComponentType.APP) return appStateIssue(n, key, value)
   val text = (value as? Primitive.Text)?.value
   val message = when (n.type) {
     ComponentType.INPUT, ComponentType.SELECT ->
@@ -42,7 +43,7 @@ internal class DocumentIndex {
 
   private fun node(id: String) = (byId[id] as? Statement.Node)?.node
 
-  private fun boundKey(n: OmniNode) = if (n.type in BOUND_EDITORS) (n.props["value"] as? PropValue.State)?.key else null
+  private fun boundKey(n: OmniNode) = if (n.type in BOUND_EDITORS) (n.props["value"] as? PropValue.State)?.key else appBoundKey(n)
 
   fun check(s: Statement): List<Issue> {
     if (s is Statement.State) {

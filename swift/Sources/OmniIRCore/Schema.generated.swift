@@ -154,7 +154,7 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .unterminatedString: "A string has no closing double quote."
     case .lineTooLong: "The line is longer than the line length limit."
     case .notFlat: "A component call appears inside another statement's arguments."
-    case .unknownComponent: "The component isn't in the catalog."
+    case .unknownComponent: "The component isn't in the catalog or among the app's own components."
     case .invalidProps: "An argument or value breaks the component's rules: wrong type, unknown prop, value not allowed, too long or repeated."
     case .unknownTool: "An McpMutation names a tool that isn't in the app's tool registry."
     case .duplicateId: "An id or $state key is assigned a second time. The first assignment stays."

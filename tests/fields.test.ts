@@ -21,7 +21,7 @@ describe("field checks (conformance/fields)", () => {
     const spec = readFileSync("SPEC.md", "utf8");
     const section = spec.slice(spec.indexOf("## 8. Renderer requirements"), spec.indexOf("## 9. Actions"));
     const rules = new Set([...section.matchAll(/\*\*\[(8\.\d+)\]\*\*/g)].map((m) => m[1]!));
-    const tests = readFileSync("tests/renderer.forms.test.tsx", "utf8");
+    const tests = readFileSync("tests/renderer.forms.test.tsx", "utf8") + readFileSync("tests/renderer.app.test.tsx", "utf8");
     const covered = new Set([...FIELD_CASES.flatMap((c) => c.rules), ...[...tests.matchAll(/\[(8\.\d+)\]/g)].map((m) => m[1]!)]);
     expect([...rules].filter((r) => !covered.has(r)), "rules without a case or test").toEqual([]);
     expect([...covered].filter((r) => !rules.has(r)), "cited rules that don't exist").toEqual([]);

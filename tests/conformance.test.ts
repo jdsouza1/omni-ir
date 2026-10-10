@@ -2,7 +2,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { z } from "zod";
 import { CASES, renderCaseFiles, type ConformanceCase, type InputPart } from "../conformance/build";
-import { createParser } from "@omni-ir/core";
+import { createParser, defineComponents, type AppComponentDeclarations } from "@omni-ir/core";
 import { canonical } from "./canonical";
 
 const files = readdirSync("conformance/cases").filter((f) => f.endsWith(".json"));
@@ -15,7 +15,8 @@ function expand(input: string | InputPart[]): string {
 function run(c: ConformanceCase, chunkSize: number | null) {
   const tools = Object.fromEntries((c.tools ?? ["payments.confirm"]).map((name) => [name, z.any()]));
   const assets = Object.fromEntries((c.assets ?? []).map((name) => [name, {}]));
-  const parser = createParser({ tools, assets });
+  const components = defineComponents((c.components ?? {}) as AppComponentDeclarations);
+  const parser = createParser({ tools, assets, components, pictures: c.pictures ?? [] });
   const issues: { line: number | null; code: string }[] = [];
   parser.subscribe((e) => {
     if (e.type === "error" || e.type === "warning") issues.push({ line: e.issue.line ?? null, code: e.issue.code });

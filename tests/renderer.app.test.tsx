@@ -58,7 +58,7 @@ function shop(views: AppViews = VIEWS) {
   });
 }
 
-describe("app components [Step 20]", () => {
+describe("app components [8.7]", () => {
   it("are drawn by the app's own view, with checked props and their children as slots", () => {
     shop();
     const card = screen.getByRole("region", { name: "Canvas tote" });

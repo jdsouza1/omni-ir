@@ -25,11 +25,16 @@ export interface ConformanceCase {
   tools?: string[];
   /** Picture names in the asset registry; defaults to none. Renderers map names to pictures; the parser needs only the names. */
   assets?: string[];
+  /** The app's own components, as plain-JSON declarations (SPEC.md [5.27]); defaults to none. */
+  components?: Record<string, unknown>;
+  /** Families of picture names, `{prefix, id, maxLength}` (SPEC.md [5.30]); defaults to none. */
+  pictures?: { prefix: string; id: "digits" | "letters-digits"; maxLength: number }[];
   expect: {
     /** Every issue reported, in any order. Always compared. */
     issues: ExpectedIssue[];
     /** Compared only when present: accepted components by id. */
-    nodes?: Record<string, { type: string; props: Record<string, unknown>; children: string[] }>;
+    /** An app component is written by its own name, with app: true. */
+    nodes?: Record<string, { type: string; app?: true; props: Record<string, unknown>; children: string[] }>;
     /** Compared only when present: declared state at end of stream. */
     state?: Record<string, unknown>;
     /** Compared only when present: McpMutations by the id of the Button they govern. */
@@ -43,6 +48,32 @@ const i = (line: number | null, code: string): ExpectedIssue => ({ line, code })
 const lines = (...l: string[]) => l.join("\n") + "\n";
 const st = (key: string) => ({ state: key });
 const node = (type: string, props: Record<string, unknown> = {}, children: string[] = []) => ({ type, props, children });
+const appNode = (type: string, props: Record<string, unknown> = {}, children: string[] = []) => ({ type, app: true as const, props, children });
+
+/** Two small app components for the app area, declared as an app would (SPEC.md [5.27], [5.28]). */
+const SHOP = {
+  Tile: {
+    description: "A product tile; its children are its buttons.",
+    positional: ["name", "children"],
+    props: {
+      name: { kind: "text", maxLength: 20 },
+      price: { kind: "number", minimum: 0 },
+      size: { kind: "oneOf", values: ["S", "M"], optional: true },
+      photo: { kind: "picture", optional: true },
+      tags: { kind: "list", item: "text", maxItems: 2, optional: true },
+      sale: { kind: "boolean", optional: true },
+      code: { kind: "text", state: false, optional: true },
+    },
+    children: { max: 2 },
+  },
+  Stepper: {
+    description: "Choose how many.",
+    positional: ["value"],
+    props: { value: { kind: "state", holds: "number" }, label: { kind: "text" }, max: { kind: "number", integer: true, state: false } },
+    field: true,
+  },
+};
+const PHOTOS = [{ prefix: "item-", id: "digits" as const, maxLength: 6 }];
 
 export const CASES: Record<string, ConformanceCase[]> = {
   stream: [
@@ -801,6 +832,108 @@ export const CASES: Record<string, ConformanceCase[]> = {
           d: node("Switch", { value: st("$terms"), label: "I accept", required: true }),
         },
       },
+    },
+  ],
+  app: [
+    {
+      id: "app-component-accepted",
+      rules: ["5.27", "5.28"],
+      description:
+        "A component the app declared is accepted like a catalog component and reported by its own name. Its positional arguments, children and $state values follow its declaration; a text or number prop may also be a $state unless declared state: false.",
+      input: lines(
+        "root = Stack([t, q])",
+        '$name = "Tote"',
+        't = Tile($name, [buy], price=24, size="M", tags=["New"], sale=true, code="A1")',
+        "$n = 1",
+        'q = Stepper($n, label="How many", max=5, required=true)',
+        'buy = Button("Buy")',
+      ),
+      components: SHOP,
+      expect: {
+        issues: [],
+        nodes: {
+          root: node("Stack", {}, ["t", "q"]),
+          t: appNode("Tile", { name: st("$name"), price: 24, size: "M", tags: ["New"], sale: true, code: "A1" }, ["buy"]),
+          q: appNode("Stepper", { value: st("$n"), label: "How many", max: 5, required: true }),
+          buy: node("Button", { label: "Buy" }),
+        },
+      },
+    },
+    {
+      id: "app-component-props-checked",
+      rules: ["5.27", "5.28", "5.9"],
+      description:
+        "An app component's props are checked against its declaration: a missing required prop, an unknown prop, a value of the wrong kind or outside its limits, a choice not listed, too many list items or children, a $state where state: false, or required on a component that isn't a field, is invalid_props. A name neither in the catalog nor declared, App included, is unknown_component.",
+      input: lines(
+        "root = Stack([])",
+        'a = Tile("Tote")',
+        'b = Tile("Tote", price=1, colour="red")',
+        'c = Tile("Tote", price=-1)',
+        'd = Tile("A name far longer than twenty", price=1)',
+        'e = Tile("Tote", price=1, size="XL")',
+        'f = Tile("Tote", price=1, tags=["a", "b", "c"])',
+        'g = Tile("Tote", [x, y, z], price=1)',
+        '$c = "A1"',
+        'h = Tile("Tote", price=1, code=$c)',
+        'k = Tile("Tote", price=1, required=true)',
+        'm = Stepper($n, label="n", max=1.5)',
+        'n = SeatMap("A")',
+        'o = App("Tile")',
+      ),
+      components: SHOP,
+      expect: {
+        issues: [
+          i(2, "invalid_props"), i(3, "invalid_props"), i(4, "invalid_props"), i(5, "invalid_props"), i(6, "invalid_props"),
+          i(7, "invalid_props"), i(8, "invalid_props"), i(10, "invalid_props"), i(11, "invalid_props"), i(12, "invalid_props"),
+          i(13, "unknown_component"), i(14, "unknown_component"),
+        ],
+      },
+    },
+    {
+      id: "app-component-undeclared",
+      rules: ["5.27", "5.9"],
+      description: "Without declarations, an app component's name is unknown_component like any name outside the catalog.",
+      input: lines('root = Tile("Tote", price=1)'),
+      expect: { issues: [i(1, "unknown_component"), i(null, "missing_root")] },
+    },
+    {
+      id: "app-component-state-type",
+      rules: ["5.28", "5.12"],
+      description: "The $state an app component edits must hold what its declaration says (here a number), or null; anything else is input_state_type, whichever of the two lines arrives second. The rejected state line has no effect, so the component's state is then missing.",
+      input: lines('root = Stack([a, b])', 'a = Stepper($n, label="n", max=5)', '$n = "one"', '$m = null', 'b = Stepper($m, label="m", max=5)'),
+      components: SHOP,
+      expect: { issues: [i(2, "missing_state"), i(3, "input_state_type")] },
+    },
+    {
+      id: "app-component-no-action",
+      rules: ["5.29", "5.15"],
+      description: "An app component never has an action: an McpMutation can't target it, and action isn't a prop it can be given.",
+      input: lines(
+        'root = Stack([t])',
+        't = Tile("Tote", price=1)',
+        'm = McpMutation(t, tool="payments.confirm", params={amount: 1})',
+        'u = Tile("Tote", price=1, action="pay")',
+      ),
+      components: SHOP,
+      expect: { issues: [i(3, "mutation_target_not_interactive"), i(4, "invalid_props")] },
+    },
+    {
+      id: "picture-patterns",
+      rules: ["5.30", "5.17"],
+      description:
+        "A picture name matching one of the app's families is accepted wherever a registered picture is, in Images and app components alike. A name that matches no family and isn't registered is unknown_asset; a value not shaped like a picture name, such as a URL, is invalid_props.",
+      input: lines(
+        "root = Stack([a, b, c, d, e, f])",
+        'a = Image("item-42", alt="A tote")',
+        'b = Tile("Tote", price=1, photo="item-7")',
+        'c = Image("item-abc", alt="Letters")',
+        'd = Image("item-1234567", alt="Too long")',
+        'e = Tile("Tote", price=1, photo="https://example.com/a.png")',
+        'f = Image("photo-1", alt="Other family")',
+      ),
+      components: SHOP,
+      pictures: PHOTOS,
+      expect: { issues: [i(1, "dangling_ref"), i(4, "unknown_asset"), i(5, "unknown_asset"), i(6, "invalid_props"), i(7, "unknown_asset")] },
     },
   ],
   catalog: catalogCases(),
