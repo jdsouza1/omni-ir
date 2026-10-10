@@ -7,7 +7,10 @@ import "@omni-ir/react/omni.css";
 import { createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { ASSETS } from "../../app/assets";
+import { APP_COMPONENTS, PICTURES } from "../../app/components";
+import { LIVE_PARTS } from "../../app/live";
 import { TOOLS } from "../../app/tools";
+import { APP_VIEWS, resolvePicture } from "../../app/views";
 
 export interface Finding {
   line: number | null;
@@ -21,12 +24,14 @@ export interface CheckResult {
   components: number;
   governed: number;
   codeFences: boolean;
+  /** The app's live parts the reply used (Step 22), by id or $key: the component it wrote, or "state". */
+  live: Record<string, string>;
 }
 
 const roots = new WeakMap<Element, Root>();
 
 export function check(text: string, preview?: HTMLElement): CheckResult {
-  const parser = createParser({ tools: TOOLS, assets: ASSETS });
+  const parser = createParser({ tools: TOOLS, assets: ASSETS, components: APP_COMPONENTS, pictures: PICTURES });
   const errors: Finding[] = [];
   const warnings: Finding[] = [];
   parser.subscribe((e) => {
@@ -40,7 +45,13 @@ export function check(text: string, preview?: HTMLElement): CheckResult {
   if (preview) {
     const root = roots.get(preview) ?? createRoot(preview);
     roots.set(preview, root);
-    root.render(createElement(OmniRenderer, { store: parser.store, tools: TOOLS, assets: ASSETS, onMutation: () => {} }));
+    root.render(createElement(OmniRenderer, { store: parser.store, tools: TOOLS, assets: ASSETS, components: APP_VIEWS, resolvePicture, onMutation: () => {} }));
   }
-  return { errors, warnings, components: doc.nodes.size, governed: doc.mutations.size, codeFences: /^\s*```/m.test(text) };
+  const live: Record<string, string> = {};
+  for (const part of Object.keys(LIVE_PARTS)) {
+    const node = doc.nodes.get(part);
+    if (node) live[part] = node.type === "App" ? node.name : node.type;
+    else if (Object.hasOwn(doc.state, part)) live[part] = "state";
+  }
+  return { errors, warnings, components: doc.nodes.size, governed: doc.mutations.size, codeFences: /^\s*```/m.test(text), live };
 }
