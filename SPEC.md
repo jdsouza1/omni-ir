@@ -543,7 +543,7 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 
 ## 8. Renderer requirements
 
-These rules apply to anything that displays an Omni-IR screen. There are three reference renderers: React (`@omni-ir/react`), SwiftUI (`OmniIRSwiftUI`, in `swift/`) and Jetpack Compose (`omni-ir-compose`, in `android/`). The React renderer's tests are listed after each group; the SwiftUI renderer's are in `swift/Tests/` and the iOS demo's UI tests, and the Compose renderer's in `android/*/src/test` and the Android demo's emulator tests.
+These rules apply to anything that displays an Omni-IR screen. There are four reference renderers: React (`@omni-ir/react`), Web Components (`<omni-screen>` in `@omni-ir/elements`, the React renderer run on Preact, whose tests run again against it), SwiftUI (`OmniIRSwiftUI`, in `swift/`) and Jetpack Compose (`omni-ir-compose`, in `android/`). The React renderer's tests are listed after each group; the SwiftUI renderer's are in `swift/Tests/` and the iOS demo's UI tests, and the Compose renderer's in `android/*/src/test` and the Android demo's emulator tests.
 
 **Content and styling**
 - A renderer MUST display strings only as text. It MUST NOT interpret any value as markup, a style, a script or a URL to load.

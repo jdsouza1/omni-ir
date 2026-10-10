@@ -32,6 +32,7 @@ export default withMermaid(
             { text: "Getting started", link: "/guide/getting-started" },
             { text: "How it works", link: "/guide/how-it-works" },
             { text: "Web (React)", link: "/guide/react" },
+            { text: "Any web framework", link: "/guide/web-components" },
             { text: "The core package", link: "/guide/core" },
             { text: "iPhone, iPad and Mac", link: "/guide/swift" },
             { text: "Android", link: "/guide/android" },

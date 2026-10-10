@@ -40,6 +40,36 @@ jobs:
       - run: npm run pack:check
       - run: npm run install:test
 
+  # <omni-screen> in each framework (PLAN-ELEMENTS.md, decision 7): every example installs the packed
+  # @omni-ir/elements, builds, and checks itself in headless Chrome. Angular gets its own job: its
+  # toolchain is heavy. Screenshots are kept for review.
+  examples:
+    name: Examples (${{ matrix.examples }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        examples: ["html vue svelte", "angular"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build:packages
+      - run: node scripts/examples-test.mjs ${{ matrix.examples }} --screenshots review/examples
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+          NG_CLI_ANALYTICS: "false"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: examples-${{ strategy.job-index }}
+          path: review/examples/
+          retention-days: 30
+
   swift:
     # The Swift package (PLAN-IOS.md): the conformance suite and parser tests on Linux and macOS.
     # The macOS job also builds the SwiftUI library. Free on GitHub-hosted runners for public repos.
