@@ -1,6 +1,6 @@
 # Omni-IR — Step 20: app-defined components
 
-Status: **APPROVED 2026-10-10** with the recommendations (all ten decisions); timing a real model's first line is tabled by the owner. Free: no paid API; tests, demos and measurements use the mock model and token counts. Nothing here is built until you approve it.
+Status: **DONE 2026-10-10: released as `v0.12.0`.** Approved 2026-10-10 with the recommendations (all ten decisions); timing a real model's first line is tabled by the owner. Free: no paid API; tests, demos and measurements use the mock model and token counts. Nothing here is built until you approve it.
 
 ## Goal
 
@@ -151,4 +151,4 @@ addM = McpMutation(add, tool="cart.add", params={productId: "1042", quantity: $q
 - [x] E.1 SPEC.md: app-defined components (document rules, what they may and may not do, picture patterns); a guide; CHANGELOG; the decision log
 - [x] E.2 A review page with screenshots on web, iPhone and Android (CI)
 - [x] E.3 Merge with your approval
-- [ ] E.4 Release: a separate go-ahead from you
+- [x] E.4 Release: a separate go-ahead from you
