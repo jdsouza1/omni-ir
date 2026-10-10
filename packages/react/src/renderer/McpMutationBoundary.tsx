@@ -71,10 +71,12 @@ export function McpMutationBoundary({ id, children }: Props) {
         return;
       }
       // [9.1]: the app's own sentence for this tool, filled once with the params as plain text.
-      const template = Object.hasOwn(ctx.confirm, mutation.tool) ? ctx.confirm[mutation.tool] : undefined;
-      if (template !== undefined) {
+      // A function writes it from the checked params (a failure is reported and runs nothing).
+      const confirmation = Object.hasOwn(ctx.confirm, mutation.tool) ? ctx.confirm[mutation.tool] : undefined;
+      if (confirmation !== undefined) {
         const values = Object.fromEntries(Object.entries(params).map(([name, value]) => [name, value === null ? "" : String(value)]));
-        if (!(await ctx.askConfirmation(fillTemplate(template, values)))) return;
+        const text = typeof confirmation === "function" ? String(confirmation(parsed.data as Record<string, unknown>)) : fillTemplate(confirmation, values);
+        if (!(await ctx.askConfirmation(text))) return;
       }
       return ctx.onMutation({
         id: mutation.id,

@@ -9,6 +9,7 @@ import { checkField, isField, isMutating, ROOT_ID, stateKeysOf, type FieldType, 
 import type { OmniDocument, OmniStore } from "@omni-ir/core";
 import {
   createConfirmations,
+  type Confirmation,
   createFieldVisibility,
   OmniContext,
   runHandler,
@@ -45,12 +46,14 @@ export interface OmniRendererProps {
   /**
    * Actions that need the person's confirmation, by tool, with the app's sentence for each (SPEC.md [9.1]).
    * `{name}` is filled with that param's value, as plain text, once: for example
-   * `{ "payments.confirm": "Pay {amount} now?" }`. The stream can't skip, change or draw it.
+   * `{ "payments.confirm": "Pay {amount} now?" }`. Or a function that writes the sentence from the
+   * checked params, to format them: `(p) => \`Pay ${usd.format(p.amount)}?\``. Shown as plain text
+   * either way. The stream can't skip, change or draw it.
    */
-  confirm?: Readonly<Record<string, string>>;
+  confirm?: Readonly<Record<string, Confirmation>>;
 }
 
-const NO_CONFIRMATIONS: Readonly<Record<string, string>> = {};
+const NO_CONFIRMATIONS: Readonly<Record<string, Confirmation>> = {};
 
 export function OmniRenderer({
   store,

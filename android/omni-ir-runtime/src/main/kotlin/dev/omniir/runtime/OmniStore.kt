@@ -66,6 +66,19 @@ public sealed interface Governance {
   public data class Blocked(val tool: String, val message: String) : Governance
 }
 
+/**
+ * The app's confirmation for one tool ([9.1]): writes the sentence from the checked params, for example
+ * to show an amount as currency. [template] makes one from a sentence whose `{name}` placeholders are
+ * filled with the params as plain text. Shown as plain text either way.
+ */
+public fun interface Confirmation {
+  public fun text(params: Map<String, Primitive>): String
+
+  public companion object {
+    public fun template(sentence: String): Confirmation = Confirmation { params -> fillTemplate(sentence, params.mapValues { displayText(it.value) }) }
+  }
+}
+
 /** Per-button action state the views observe: blocked presses and actions in flight. */
 public data class ActionState(
   val blocked: Map<String, Pair<String, Map<String, Primitive>>> = emptyMap(),
@@ -82,10 +95,10 @@ public class OmniStore(
   /** Names of the pictures the app provides. */
   public val assets: Set<String> = emptySet(),
   /**
-   * The app's sentence for each tool whose actions need the person's confirmation ([9.1]), such as
-   * `"payments.confirm" to "Pay {amount}?"`. Set by the app, never by the stream.
+   * The app's confirmation for each tool whose actions need the person's say-so ([9.1]), such as
+   * `"payments.confirm" to Confirmation.template("Pay {amount}?")`. Set by the app, never by the stream.
    */
-  public val confirm: Map<String, String> = emptyMap(),
+  public val confirm: Map<String, Confirmation> = emptyMap(),
 ) {
   private val parser = OmniParser(tools, assets)
   private val lock = Any()
@@ -260,9 +273,9 @@ public class OmniStore(
       report(RendererEvent.Error(Issue(IssueCode.MUTATION_BLOCKED, message, mutation.id)))
       return null
     }
-    // [9.1]: the app's own sentence for this tool, filled once with the params as plain text.
-    val template = confirm[mutation.tool]
-    if (template != null && !askConfirmation(fillTemplate(template, params.mapValues { displayText(it.value) }))) return null
+    // [9.1]: the app's own sentence for this tool, written from the checked params as plain text.
+    val confirmation = confirm[mutation.tool]
+    if (confirmation != null && !askConfirmation(confirmation.text(params))) return null
     actionsFlow.value = actionsFlow.value.let { it.copy(running = it.running + buttonId) }
     try {
       onMutation(MutationCall(mutation.id, mutation.target, mutation.tool, params))

@@ -50,7 +50,7 @@ describe("Actions panel", () => {
     await user.type(screen.getByLabelText("Note for merchant (optional)"), "Table 4");
     await user.click(screen.getByRole("button", { name: "Pay now" }));
     // The app's confirmation (app/tools.ts CONFIRMATIONS), in the renderer's own dialog.
-    expect((await screen.findByRole("alertdialog")).textContent).toContain("Pay 42.5 USD?");
+    expect((await screen.findByRole("alertdialog")).textContent).toContain("Pay $42.50?");
     await user.click(screen.getByRole("button", { name: "Confirm" }));
     const entry = await actions().findByText("Sent");
     expect(entry.closest("li")!.textContent).toContain("rcpt_1234");

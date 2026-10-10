@@ -50,11 +50,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.omniir.compose.OmniView
 import dev.omniir.core.Primitive
+import dev.omniir.runtime.Confirmation
+import dev.omniir.runtime.Format
 import dev.omniir.runtime.GenerateOutcome
 import dev.omniir.runtime.OmniClient
 import dev.omniir.runtime.OmniStore
 import dev.omniir.runtime.RendererEvent
 import dev.omniir.runtime.displayText
+import java.util.Locale
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
@@ -235,6 +238,11 @@ object DemoRegistries {
 
   val tools = DemoTools.registry
 
-  /** The tools whose actions need the person's confirmation, in the app's own words (SPEC.md section 9). */
-  val confirm = mapOf("payments.confirm" to "Pay {amount} USD?")
+  /**
+   * The tools whose actions need the person's confirmation, in the app's own words (SPEC.md section 9),
+   * with the amount as currency, as the web playground says it.
+   */
+  val confirm = mapOf(
+    "payments.confirm" to Confirmation { params -> "Pay ${Format.text(params["amount"], "currency", "USD", Locale.US)}?" },
+  )
 }

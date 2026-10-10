@@ -43,11 +43,14 @@ export const TOOLS: ToolRegistry = {
   }),
 };
 
+const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+
 /**
  * The tools whose actions need the person's confirmation, in the app's own words (SPEC.md section 9,
- * Confirmations). Application code, like the registry: a stream can't skip, change or add one. The
- * iOS and Android demo apps use the same sentence.
+ * Confirmations). Application code, like the registry: a stream can't skip, change or add one. A
+ * function writes the sentence from the checked params, here to show the amount as currency; the iOS
+ * and Android demo apps say the same.
  */
-export const CONFIRMATIONS: Readonly<Record<string, string>> = {
-  "payments.confirm": "Pay {amount} USD?",
+export const CONFIRMATIONS: Readonly<Record<string, string | ((params: Readonly<Record<string, unknown>>) => string)>> = {
+  "payments.confirm": (params) => `Pay ${usd.format(Number(params.amount))}?`,
 };

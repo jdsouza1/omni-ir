@@ -4,8 +4,14 @@ import Foundation
 import OmniIRSwiftUI
 import SwiftUI
 
-/// The tools whose actions need the person's confirmation, in the app's own words (SPEC.md section 9).
-let demoConfirm = ["payments.confirm": "Pay {amount} USD?"]
+/// The tools whose actions need the person's confirmation, in the app's own words (SPEC.md section 9),
+/// with the amount as currency, as the web playground says it.
+let demoConfirm: [String: Confirmation] = [
+  "payments.confirm": Confirmation { params in
+    guard case .number(let amount)? = params["amount"] else { return "Pay now?" }
+    return "Pay \(amount.formatted(.currency(code: "USD").locale(Locale(identifier: "en_US"))))?"
+  }
+]
 
 let demoTools: ToolRegistry = [
   "payments.confirm": Tool { p in

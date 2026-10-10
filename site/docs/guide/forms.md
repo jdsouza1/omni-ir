@@ -50,10 +50,33 @@ let store = OmniStore(tools: tools, confirm: ["payments.confirm": "Pay {amount}?
 ```
 
 ```kotlin
-val store = OmniStore(tools, confirm = mapOf("payments.confirm" to "Pay {amount}?"))
+val store = OmniStore(tools, confirm = mapOf("payments.confirm" to Confirmation.template("Pay {amount}?")))
 ```
 
 Pressing a governed Button for that tool opens the renderer's own dialog with your sentence, a Cancel and a Confirm. Each `{name}` is filled once with that param's value as plain text, so nothing in a value is read as a placeholder or markup. The action runs only on Confirm.
+
+A sentence shows values as they are ("Pay 42.5?"). To format them, for example an amount as currency, give a function that writes the sentence from the params, once they've passed the tool's check. Its result is still shown as plain text:
+
+```tsx
+const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+const confirm = { "payments.confirm": (p) => `Pay ${usd.format(Number(p.amount))}?` }; // "Pay $42.50?"
+```
+
+```swift
+let confirm: [String: Confirmation] = [
+  "payments.confirm": Confirmation { params in
+    guard case .number(let amount)? = params["amount"] else { return "Pay now?" }
+    return "Pay \(amount.formatted(.currency(code: "USD")))?"
+  }
+]
+```
+
+```kotlin
+val usd = NumberFormat.getCurrencyInstance(Locale.US)
+val confirm = mapOf("payments.confirm" to Confirmation { p -> "Pay ${usd.format((p["amount"] as? Primitive.Number)?.value ?: 0.0)}?" })
+```
+
+If the function fails, nothing runs, and the failure is reported like a failed handler.
 
 A press runs its checks in this order, and stops at the first that fails: the fields its params read, the params against the tool's schema, then the confirmation. Only then is your handler called.
 

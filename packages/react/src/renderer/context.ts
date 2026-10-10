@@ -31,8 +31,8 @@ export interface OmniContextValue {
   strings: OmniStrings;
   /** Which fields show their messages ([8.5]): after the person leaves them, or after a press reads them. */
   fields: FieldVisibility;
-  /** The app's confirmation sentence for each tool that needs one ([9.1]). */
-  confirm: Readonly<Record<string, string>>;
+  /** The app's confirmation for each tool that needs one ([9.1]). */
+  confirm: Readonly<Record<string, Confirmation>>;
   /** Show the renderer's own confirmation with this text; resolves true only on Confirm. */
   askConfirmation: (text: string) => Promise<boolean>;
   /** The renderer's root element, to move focus to a field that needs attention. */
@@ -67,6 +67,13 @@ export function createFieldVisibility(): FieldVisibility {
     },
   };
 }
+
+/**
+ * The app's confirmation for one tool ([9.1]): a sentence whose `{name}` placeholders are filled with
+ * the params as plain text, or a function that writes the sentence from the checked params, for
+ * example to show an amount as currency. Either way the result is shown as plain text.
+ */
+export type Confirmation = string | ((params: Readonly<Record<string, unknown>>) => string);
 
 /** The confirmation that is open, if any: its text and how to answer it. */
 export interface PendingConfirmation {

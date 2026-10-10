@@ -97,6 +97,19 @@ struct FormsTests {
     #expect(sent.count == 1)
   }
 
+  @Test("the app can write the sentence itself, to show the amount as currency")
+  func confirmationClosure() async {
+    let usd = Confirmation { params in
+      guard case .number(let amount)? = params["amount"] else { return "Pay?" }
+      return "Pay \(amount.formatted(.currency(code: "USD").locale(Locale(identifier: "en_US"))))?"
+    }
+    let store = OmniStore(tools: tools, confirm: ["payments.confirm": usd])
+    store.write(payment)
+    var asked: [String] = []
+    await store.press("pay", onMutation: { _ in }, report: { _ in }, askConfirmation: { asked.append($0); return false })
+    #expect(asked == ["Pay $42.50?"])
+  }
+
   @Test("a tool that needs confirmation never runs when the view can't ask")
   func noAsker() async {
     let store = OmniStore(tools: tools, confirm: ["payments.confirm": "Pay {amount}?"])

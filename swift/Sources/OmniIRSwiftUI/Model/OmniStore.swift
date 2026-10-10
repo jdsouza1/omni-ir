@@ -43,6 +43,24 @@ public enum Governance: Equatable, Sendable {
   case blocked(tool: String, message: String)
 }
 
+/// The app's confirmation for one tool ([9.1]): a sentence whose `{name}` placeholders are filled with
+/// the params as plain text (write it as a string literal), or a closure that writes the sentence from
+/// the checked params, for example to show an amount as currency. Shown as plain text either way.
+public struct Confirmation: Sendable, ExpressibleByStringLiteral {
+  private let write: @Sendable ([String: Primitive]) -> String
+
+  public init(_ write: @escaping @Sendable ([String: Primitive]) -> String) {
+    self.write = write
+  }
+
+  public init(stringLiteral template: String) {
+    write = { params in fillTemplate(template, params.mapValues(displayText)) }
+  }
+
+  /// The sentence for these params.
+  public func text(for params: [String: Primitive]) -> String { write(params) }
+}
+
 @MainActor
 @Observable
 public final class OmniStore {
@@ -64,9 +82,9 @@ public final class OmniStore {
   public let tools: ToolRegistry
   /// Names of the pictures the app provides.
   public let assets: Set<String>
-  /// The app's sentence for each tool whose actions need the person's confirmation ([9.1]), such as
+  /// The app's confirmation for each tool whose actions need the person's say-so ([9.1]), such as
   /// `["payments.confirm": "Pay {amount}?"]`. Set by the app, never by the stream.
-  public let confirm: [String: String]
+  public let confirm: [String: Confirmation]
   /// The fields whose messages show: left by the person, or checked by a press ([8.5]).
   public private(set) var shownFields: Set<String> = []
 
@@ -74,7 +92,7 @@ public final class OmniStore {
   private var blocked: [String: (message: String, params: [String: Primitive])] = [:]
   private var running: Set<String> = []
 
-  public init(tools: ToolRegistry, assets: Set<String> = [], confirm: [String: String] = [:]) {
+  public init(tools: ToolRegistry, assets: Set<String> = [], confirm: [String: Confirmation] = [:]) {
     self.tools = tools
     self.assets = assets
     self.confirm = confirm
@@ -257,8 +275,8 @@ public final class OmniStore {
       report(.error(Issue(code: .mutationBlocked, message: message, id: mutation.id)))
       return nil
     }
-    // [9.1]: the app's own sentence for this tool, filled once with the params as plain text.
-    if let template = confirm[mutation.tool], !(await askConfirmation(fillTemplate(template, params.mapValues(displayText)))) {
+    // [9.1]: the app's own sentence for this tool, written from the checked params as plain text.
+    if let confirmation = confirm[mutation.tool], !(await askConfirmation(confirmation.text(for: params))) {
       return nil
     }
     running.insert(buttonId)

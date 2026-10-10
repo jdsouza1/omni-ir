@@ -7,7 +7,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import { createParser } from "@omni-ir/core";
 import { ASSETS } from "../app/assets";
-import { TOOLS } from "../app/tools";
+import { CONFIRMATIONS, TOOLS } from "../app/tools";
 import { renderOmni } from "./renderHelpers";
 
 afterEach(cleanup);
@@ -121,6 +121,33 @@ describe("confirmations [9.1]", () => {
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("alertdialog")).toBeNull();
     expect(h.onMutation).not.toHaveBeenCalled();
+  });
+
+  it("can be written by the app's own function, to format the params, such as an amount as currency", async () => {
+    const h = renderOmni({ lines: PAY, rendererProps: { confirm: { "payments.confirm": CONFIRMATIONS["payments.confirm"]! } } });
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Pay" }));
+    // Still plain text: what the function returns is never read as markup.
+    expect(screen.getByRole("alertdialog").textContent).toContain("Pay $42.50?");
+    await user.click(screen.getByRole("button", { name: "Confirm" }));
+    expect(h.onMutation).toHaveBeenCalledTimes(1);
+  });
+
+  it("a function that fails runs nothing, and is reported", async () => {
+    const h = renderOmni({
+      lines: PAY,
+      rendererProps: {
+        confirm: {
+          "payments.confirm": () => {
+            throw new Error("no words");
+          },
+        },
+      },
+    });
+    await userEvent.setup().click(screen.getByRole("button", { name: "Pay" }));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(h.onMutation).not.toHaveBeenCalled();
+    expect(h.events).toContainEqual(expect.objectContaining({ type: "error", issue: expect.objectContaining({ code: "handler_failed" }) }));
   });
 
   it("tools without a sentence run at once", async () => {

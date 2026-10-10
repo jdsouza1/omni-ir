@@ -9,6 +9,7 @@ import dev.omniir.core.Primitive
 import dev.omniir.core.Tool
 import dev.omniir.core.ToolRegistry
 import kotlinx.coroutines.test.runTest
+import java.util.Locale
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -87,7 +88,7 @@ class FormsTest {
 
   @Test
   fun `the app's confirmation runs last, filled once with the params as plain text, and cancel sends nothing`() = runTest {
-    val store = OmniStore(tools, confirm = mapOf("payments.confirm" to "Pay {amount}? ({note})"))
+    val store = OmniStore(tools, confirm = mapOf("payments.confirm" to Confirmation.template("Pay {amount}? ({note})")))
     store.write(PAYMENT)
     val asked = mutableListOf<String>()
     val sent = mutableListOf<MutationCall>()
@@ -99,8 +100,18 @@ class FormsTest {
   }
 
   @Test
+  fun `the app can write the sentence itself, to show the amount as currency`() = runTest {
+    val usd = Confirmation { params -> "Pay ${Format.text(params["amount"], "currency", "USD", Locale.US)}?" }
+    val store = OmniStore(tools, confirm = mapOf("payments.confirm" to usd))
+    store.write(PAYMENT)
+    val asked = mutableListOf<String>()
+    store.press("pay", {}, {}, askConfirmation = { asked += it; false })
+    assertEquals(listOf("Pay $42.50?"), asked)
+  }
+
+  @Test
   fun `a tool that needs confirmation never runs when the view can't ask`() = runTest {
-    val store = OmniStore(tools, confirm = mapOf("payments.confirm" to "Pay {amount}?"))
+    val store = OmniStore(tools, confirm = mapOf("payments.confirm" to Confirmation.template("Pay {amount}?")))
     store.write(PAYMENT)
     val sent = mutableListOf<MutationCall>()
     store.press("pay", { sent += it }, {})

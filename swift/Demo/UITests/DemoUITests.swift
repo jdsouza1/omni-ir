@@ -106,7 +106,7 @@ final class FormTests: XCTestCase {
     let pay = app.buttons["Pay now"]
     XCTAssertTrue(pay.waitForExistence(timeout: 5))
     pay.tap()
-    let alert = app.alerts["Pay 42.5 USD?"]
+    let alert = app.alerts["Pay $42.50?"]
     XCTAssertTrue(alert.waitForExistence(timeout: 5), "the app's sentence, filled with the amount")
     shot(app, "forms-confirmation")
     alert.buttons["Cancel"].tap()
