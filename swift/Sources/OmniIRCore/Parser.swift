@@ -34,9 +34,19 @@ public final class OmniParser {
   private var lineOf: [String: Int] = [:]
   private var endIssues: [Issue]?
 
-  public init(tools: ToolRegistry, assets: Set<String> = [], maxLineLength: Int = Limits.lineLength) {
+  /// The app's own components (Step 20).
+  public let components: AppComponents
+  /// Families of picture names the app looks up when a screen is drawn (Step 20).
+  public let pictures: [PicturePattern]
+
+  public init(
+    tools: ToolRegistry, assets: Set<String> = [], maxLineLength: Int = Limits.lineLength,
+    components: AppComponents = .none, pictures: [PicturePattern] = []
+  ) {
     self.tools = tools
     self.assets = assets
+    self.components = components
+    self.pictures = pictures
     self.buffer = LineBuffer(maxLineLength: maxLineLength)
   }
 
@@ -112,7 +122,7 @@ public final class OmniParser {
           issues.append(warning)
           onEvent?(.warning(warning))
         }
-        switch validateStatement(raw, ValidationContext(tools: tools, assets: assets)) {
+        switch validateStatement(raw, ValidationContext(tools: tools, assets: assets, components: components, pictures: pictures)) {
         case .failed(let issue):
           reject([issue], line: line)
         case .ok(let statement):

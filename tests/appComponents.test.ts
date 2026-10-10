@@ -19,7 +19,9 @@ import {
   type AppComponents,
   type PicturePattern,
 } from "@omni-ir/core";
+import { readFileSync } from "node:fs";
 import { z } from "zod";
+import { COMPONENTS_FILE, renderComponentsJson } from "../scripts/components-export";
 
 const SHOP = defineComponents({
   ProductCard: {
@@ -198,5 +200,11 @@ describe("app components as fields and as text", () => {
       "QuantityPicker: How many (min: 1, max: 5)",
     ]);
     expect(describeScreen(parser.getSnapshot(), { values: true })).toContain("QuantityPicker: How many (min: 1, max: 5) = 3");
+  });
+});
+
+describe("app/components.json", () => {
+  it("is current: the declarations the Swift and Kotlin demos read (run npm run components:export if this fails)", () => {
+    expect(readFileSync(COMPONENTS_FILE, "utf8")).toBe(renderComponentsJson());
   });
 });

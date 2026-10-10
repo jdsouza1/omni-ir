@@ -22,7 +22,7 @@ shot() {
   echo "screenshot $name"
 }
 
-screens=(landing/booking landing/checkout landing/assistant payment-confirmation sign-in order-status profile-settings support-contact account-settings order-history sales-dashboard order-breakdown)
+screens=(landing/booking landing/checkout landing/assistant payment-confirmation sign-in order-status profile-settings support-contact account-settings order-history sales-dashboard order-breakdown product)
 for appearance in light dark; do
   for s in "${screens[@]}"; do shot "${s//\//-}-$appearance" --es fixture "$s" --es appearance "$appearance" --es instant true; done
 done

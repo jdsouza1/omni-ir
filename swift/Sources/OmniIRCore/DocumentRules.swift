@@ -73,6 +73,9 @@ func validateDocument(_ statements: [Statement], complete: Bool) -> [Issue] {
 
   // Inputs and Selects edit text, so their state must hold a string; DateInputs need a YYYY-MM-DD
   // date or ""; Switches need true or false.
+  for n in nodes {
+    if let key = appBoundKey(n), let value = state[key], let issue = appStateIssue(n, key: key, value: value) { issues.append(issue) }
+  }
   for n in nodes where [.input, .dateInput, .select, .switch].contains(n.type) {
     guard case .state(let key)? = n.props["value"], let value = state[key] else { continue }
     let message: String
@@ -204,4 +207,23 @@ func isISODate(_ s: String) -> Bool {
   let u = Array(s.utf8)
   guard u.count == 10, u[4] == UInt8(ascii: "-"), u[7] == UInt8(ascii: "-") else { return false }
   return [0, 1, 2, 3, 5, 6, 8, 9].allSatisfy { (UInt8(ascii: "0")...UInt8(ascii: "9")).contains(u[$0]) }
+}
+
+/// The `input_state_type` issue an app component (Step 20) has with the state it edits, if any.
+func appStateIssue(_ n: OmniNode, key: String, value: Primitive) -> Issue? {
+  guard let holds = n.holds else { return nil }
+  let ok: Bool
+  switch (holds, value) {
+  case (_, .null), (.text, .text), (.number, .number), (.boolean, .bool): ok = true
+  default: ok = false
+  }
+  if ok { return nil }
+  let what = holds == .text ? "text" : "a \(holds.rawValue)"
+  return Issue(code: .inputStateType, message: "\(n.appName ?? "App") \"\(n.id)\" is bound to \(key), which doesn't hold \(what)", id: n.id)
+}
+
+/// The `$state` an app component edits (its `value` prop), if it edits one.
+func appBoundKey(_ n: OmniNode) -> String? {
+  guard n.type == .app, n.holds != nil, case .state(let key)? = n.props["value"] else { return nil }
+  return key
 }

@@ -2,7 +2,9 @@
 // isn't drawing (resolving $state, governance, actions). Port of swift/Sources/OmniIRSwiftUI/Model.
 package dev.omniir.runtime
 
+import dev.omniir.core.AppComponents
 import dev.omniir.core.ComponentType
+import dev.omniir.core.PicturePattern
 import dev.omniir.core.FieldProblem
 import dev.omniir.core.Issue
 import dev.omniir.core.IssueCode
@@ -99,8 +101,12 @@ public class OmniStore(
    * `"payments.confirm" to Confirmation.template("Pay {amount}?")`. Set by the app, never by the stream.
    */
   public val confirm: Map<String, Confirmation> = emptyMap(),
+  /** The app's own components (Step 20); pass the same to the view with their composables. */
+  public val components: AppComponents = AppComponents.NONE,
+  /** Families of picture names the app looks up when a screen is drawn (Step 20). */
+  public val pictures: List<PicturePattern> = emptyList(),
 ) {
-  private val parser = OmniParser(tools, assets)
+  private val parser = OmniParser(tools, assets, components = components, pictures = pictures)
   private val lock = Any()
   private val documentFlow = MutableStateFlow(OmniDocument())
   private val issuesFlow = MutableStateFlow<List<Issue>>(emptyList())
@@ -158,6 +164,24 @@ public class OmniStore(
     is PropValue.State -> doc.state[value.key] ?: Primitive.Null
     else -> null
   }
+
+  /**
+   * An app component's props for its view (Step 20): each `$state` replaced by its current value, so a
+   * view never sees a reference.
+   */
+  public fun appProps(node: OmniNode, doc: OmniDocument = document.value): Map<String, PropValue> =
+    node.props.mapValues { (_, value) ->
+      if (value !is PropValue.State) {
+        value
+      } else {
+        when (val p = doc.state[value.key] ?: Primitive.Null) {
+          is Primitive.Text -> PropValue.Text(p.value)
+          is Primitive.Number -> PropValue.Number(p.value)
+          is Primitive.Bool -> PropValue.Bool(p.value)
+          Primitive.Null -> PropValue.Null
+        }
+      }
+    }
 
   /** A prop as display text: state resolved, numbers as JavaScript writes them, null as nothing. */
   public fun text(value: PropValue?, doc: OmniDocument = document.value): String = resolve(value, doc)?.let(::displayText) ?: ""

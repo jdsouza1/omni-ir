@@ -5,6 +5,8 @@
 package dev.omniir.compose
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -122,6 +124,7 @@ internal fun NodeContent(node: OmniNode, context: RenderContext) {
     ComponentType.BAR_CHART -> XYChartView(node, context, line = false, locale = locale())
     ComponentType.LINE_CHART -> XYChartView(node, context, line = true, locale = locale())
     ComponentType.PIE_CHART -> PieChartView(node, context, locale = locale())
+    ComponentType.APP -> AppComponentView(node, context)
     // A Series or Slice is drawn by its chart; on its own (which the parser rejects) it shows nothing.
     ComponentType.SERIES, ComponentType.SLICE -> Unit
   }
@@ -285,7 +288,7 @@ private fun ImageView(props: Props, context: RenderContext) {
     else -> 16f / 9
   }
   val frame = Modifier.fillMaxWidth().aspectRatio(ratio).clip(RoundedCornerShape(10.dp))
-  val picture = context.pictures[props.text("asset")]
+  val picture = context.picture(props.text("asset"))
   if (picture != null) {
     Image(picture, contentDescription = alt, contentScale = ContentScale.Crop, modifier = frame)
   } else {
@@ -330,7 +333,7 @@ private fun ListItemView(props: Props, context: RenderContext) {
     if (props.has("image")) {
       // Decorative: the title already says what it shows.
       val thumbnail = Modifier.size(48.dp).clip(RoundedCornerShape(10.dp))
-      val picture = context.pictures[props.text("image")]
+      val picture = context.picture(props.text("image"))
       if (picture != null) Image(picture, contentDescription = null, contentScale = ContentScale.Crop, modifier = thumbnail)
       else Box(thumbnail.background(MaterialTheme.colorScheme.surfaceVariant))
     }
@@ -340,6 +343,80 @@ private fun ListItemView(props: Props, context: RenderContext) {
     }
     if (props.has("trailing")) Text(props.text("trailing"), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
   }
+}
+
+// MARK: App components (Step 20)
+
+/**
+ * What an app's composable for its own component receives: checked props with each `$state` read,
+ * its children (draw them where they belong), pictures by name, and for a component that edits a
+ * `$state` its value, how to change it, and its field message ([8.5]). The composable is the app's
+ * code; the stream only chose the values.
+ */
+public class AppViewProps internal constructor(
+  public val id: String,
+  /** The component's name, such as "ProductCard". */
+  public val name: String,
+  public val props: Map<String, PropValue>,
+  /** Its children, in order, each in its own slot. */
+  public val children: @Composable () -> Unit,
+  /** A picture by name: the app's registered ones, then its lookup. Null when there is none. */
+  public val picture: (String?) -> Painter?,
+  /** For a component that edits a `$state`. */
+  public val field: AppField?,
+)
+
+/** An app component's edited `$state`: its value, how to change it, and the field's message. */
+public class AppField internal constructor(
+  public val value: Primitive,
+  public val onChange: (Primitive) -> Unit,
+  /** The renderer's message once it should show ([8.5]), or null. */
+  public val message: String?,
+  /** Put this on the control: focus (a press moves focus here when the field fails) and the error for TalkBack. */
+  public val modifier: Modifier,
+  /** Call when the person has finished with the control, such as after a choice. */
+  public val leave: () -> Unit,
+)
+
+/** An app's own component: its composable, or the renderer's fallback where the app gave none ([8.7]). */
+@Composable
+private fun AppComponentView(node: OmniNode, context: RenderContext) {
+  val name = node.appName ?: ""
+  val view = context.appViews[name]
+  if (view == null) {
+    Unsupported()
+    return
+  }
+  val props = context.store.appProps(node, context.document)
+  val children: @Composable () -> Unit = { ColumnChildren(node.children, stretch = false) }
+  val key = (node.props["value"] as? PropValue.State)?.key
+  if (key == null || node.holds == null) {
+    view(AppViewProps(node.id, name, props, children, context::picture, null))
+    return
+  }
+  val value = context.document.state[key] ?: Primitive.Null
+  val onChange: (Primitive) -> Unit = { context.store.setState(key, it) }
+  if (!node.isField) {
+    view(AppViewProps(node.id, name, props, children, context::picture, AppField(value, onChange, null, Modifier, {})))
+    return
+  }
+  FieldFrame(node, context) { field ->
+    view(AppViewProps(node.id, name, props, children, context::picture, AppField(value, onChange, field.message, field.modifier, field.leave)))
+  }
+}
+
+/** Shown in place of an app component this app has no composable for. */
+@Composable
+private fun Unsupported() {
+  Text(
+    LocalOmniStrings.current.unsupported,
+    style = MaterialTheme.typography.bodySmall,
+    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    modifier = Modifier
+      .fillMaxWidth()
+      .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(6.dp))
+      .padding(horizontal = 10.dp, vertical = 6.dp),
+  )
 }
 
 // MARK: Interactive components

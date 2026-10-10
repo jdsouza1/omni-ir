@@ -7,7 +7,7 @@ public let omniIRVersion = "0.11.0"
 /// The stream format's version: what the version marker, requests and version checks carry.
 public let omniIRFormatVersion = "0.8"
 
-/// The components in the Trusted Catalog.
+/// The components in the Trusted Catalog, and app for the app's own (Step 20).
 public enum ComponentType: String, Sendable, CaseIterable, Hashable {
   case stack = "Stack"
   case card = "Card"
@@ -36,6 +36,8 @@ public enum ComponentType: String, Sendable, CaseIterable, Hashable {
   case pieChart = "PieChart"
   case series = "Series"
   case slice = "Slice"
+  /// One of the app's own components (Step 20): its name is the node's appName. A stream never writes "App".
+  case app = "App"
 }
 
 /// Every error and warning a parser reports.

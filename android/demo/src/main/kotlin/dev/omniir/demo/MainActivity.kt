@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -148,7 +149,12 @@ private fun Home(fixtures: List<String>, open: (Source) -> Unit) {
 /** One screen, streamed into an OmniView from a fixture or a server. */
 @Composable
 private fun ScreenView(source: Source, instant: Boolean, read: (String) -> String) {
-  val store = remember(source) { OmniStore(DemoRegistries.tools, DemoRegistries.pictureNames, confirm = DemoRegistries.confirm) }
+  val context = LocalContext.current
+  val apps = remember { DemoComponents.load(context) }
+  val store = remember(source) {
+    OmniStore(DemoRegistries.tools, DemoRegistries.pictureNames, confirm = DemoRegistries.confirm, components = apps.components, pictures = apps.pictures)
+  }
+  val pictures = DemoRegistries.pictures()
   val log = remember(source) { mutableStateListOf<String>() }
   var done by remember(source) { mutableStateOf(false) }
   val issues by store.issues.collectAsState()
@@ -188,7 +194,9 @@ private fun ScreenView(source: Source, instant: Boolean, read: (String) -> Strin
     Text(source.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
     OmniView(
       store = store,
-      pictures = DemoRegistries.pictures(),
+      pictures = pictures,
+      appViews = DemoComponents.views,
+      resolvePicture = { name -> apps.productPictures[name]?.let { pictures[it] } },
       onMutation = onMutation,
       onEvent = { event ->
         when (event) {

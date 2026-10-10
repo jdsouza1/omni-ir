@@ -1,0 +1,91 @@
+{
+  "$comment": "Generated from app/components.ts by npm run components:export. Do not edit: a test fails if it is stale.",
+  "components": {
+    "ProductCard": {
+      "description": "A product with its picture, name and price. Its children are the product's buttons.",
+      "positional": [
+        "name",
+        "children"
+      ],
+      "props": {
+        "name": {
+          "kind": "text",
+          "maxLength": 80
+        },
+        "price": {
+          "kind": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "kind": "oneOf",
+          "values": [
+            "USD",
+            "EUR",
+            "GBP"
+          ],
+          "optional": true
+        },
+        "picture": {
+          "kind": "picture",
+          "optional": true
+        },
+        "rating": {
+          "kind": "number",
+          "minimum": 0,
+          "maximum": 5,
+          "optional": true
+        },
+        "badges": {
+          "kind": "list",
+          "item": "text",
+          "maxItems": 3,
+          "optional": true
+        }
+      },
+      "children": {
+        "max": 3
+      }
+    },
+    "QuantityPicker": {
+      "description": "Choose how many, from min to max, with minus and plus buttons. Edits a number $state.",
+      "positional": [
+        "value"
+      ],
+      "props": {
+        "value": {
+          "kind": "state",
+          "holds": "number"
+        },
+        "label": {
+          "kind": "text",
+          "maxLength": 80
+        },
+        "min": {
+          "kind": "number",
+          "integer": true,
+          "minimum": 0,
+          "state": false
+        },
+        "max": {
+          "kind": "number",
+          "integer": true,
+          "minimum": 1,
+          "maximum": 99,
+          "state": false
+        }
+      },
+      "field": true
+    }
+  },
+  "pictures": [
+    {
+      "prefix": "product-",
+      "id": "digits",
+      "maxLength": 8
+    }
+  ],
+  "productPictures": {
+    "product-1042": "tote",
+    "product-1043": "shirt"
+  }
+}
