@@ -2,10 +2,11 @@ import { memo, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore
 import { DEFAULT_CATALOG } from "../catalog/catalog.js";
 import { fillTemplate, resolveStrings, type StringKey } from "../catalog/strings.js";
 import { SkeletonLines } from "../catalog/components.js";
-import type { Catalog, Picture } from "../catalog/types.js";
+import type { AppViews, Catalog, Picture } from "../catalog/types.js";
 
 const NO_ASSETS: Readonly<Record<string, Picture>> = {};
-import { checkField, isField, isMutating, ROOT_ID, stateKeysOf, type FieldType, type OmniNode, type Primitive, type ToolRegistry } from "@omni-ir/core";
+const NO_VIEWS: AppViews = {};
+import { checkField, editedKey, isField, isMutating, ROOT_ID, stateKeysOf, type AppNode, type FieldType, type OmniNode, type Primitive, type ToolRegistry } from "@omni-ir/core";
 import type { OmniDocument, OmniStore } from "@omni-ir/core";
 import {
   createConfirmations,
@@ -32,6 +33,13 @@ export interface OmniRendererProps {
   catalog?: Catalog;
   /** The app's image asset registry. Without it, Images show their alt text. */
   assets?: Readonly<Record<string, Picture>>;
+  /**
+   * Pictures the app looks up when a screen is drawn (Step 20), for names that match the parser's
+   * picture patterns, such as `product-1042`. Return undefined when there is none.
+   */
+  resolvePicture?: (name: string) => Picture | undefined;
+  /** The app's views for its own components (Step 20), by name. Pass the same components to the parser. */
+  components?: AppViews;
   locale?: string;
   /**
    * Light (the default), dark, or the device's setting. The app chooses; the stream can't. Colours,
@@ -66,6 +74,8 @@ export function OmniRenderer({
   theme = "light",
   strings,
   confirm = NO_CONFIRMATIONS,
+  resolvePicture,
+  components = NO_VIEWS,
 }: OmniRendererProps) {
   const words = useMemo(() => resolveStrings(strings), [strings]);
   // One per screen: a new store is a new screen, with no messages shown yet.
@@ -78,6 +88,8 @@ export function OmniRenderer({
       tools,
       catalog,
       assets,
+      picture: (name) => (name === undefined ? undefined : Object.hasOwn(assets, name) ? assets[name] : resolvePicture?.(name)),
+      views: components,
       locale,
       strings: words,
       onMutation,
@@ -87,7 +99,7 @@ export function OmniRenderer({
       askConfirmation: confirmations.ask,
       root,
     }),
-    [store, tools, catalog, assets, locale, words, onMutation, onEvent, fields, confirm, confirmations],
+    [store, tools, catalog, assets, resolvePicture, components, locale, words, onMutation, onEvent, fields, confirm, confirmations],
   );
   return (
     <OmniContext.Provider value={value}>
@@ -204,14 +216,14 @@ const MemoNode = memo(function Node({
   const ctx = useOmni();
   const props = resolveProps(node.props, keys, values);
   const children: ReactNode = node.children.map((child) => <NodeSlot key={child} id={child} />);
+  if (node.type === "App") return <AppComponentNode node={node} props={props} children={children} />;
   // One cast: the node's type picks its catalog entry, and the props match that type by construction.
   const Component = ctx.catalog[node.type] as ReactComponentType<Record<string, unknown>>;
   const base = { id: node.id, props, children, locale: ctx.locale, strings: ctx.strings };
 
   if (node.type === "Image" || node.type === "ListItem") {
     const name = node.type === "Image" ? node.props.asset : node.props.image;
-    const picture = name !== undefined && Object.hasOwn(ctx.assets, name) ? ctx.assets[name] : undefined;
-    return <Component {...base} picture={picture} />;
+    return <Component {...base} picture={ctx.picture(name)} />;
   }
 
   if (isField(node)) {
@@ -261,12 +273,30 @@ const MemoNode = memo(function Node({
  * A field's checks ([8.1]–[8.5]): its problem, in the renderer's own words, once the person has left
  * the field or a press has read it. Subscribes to its own visibility only.
  */
+/**
+ * An app's own component (Step 20): drawn by the app's view, or the renderer's fallback where the app
+ * gave none. A component that edits a `$state` changes it through the renderer, and a field gets the
+ * same messages as the catalog's fields.
+ */
+function AppComponentNode({ node, props, children }: { node: AppNode; props: Record<string, unknown>; children: ReactNode }) {
+  const ctx = useOmni();
+  const View = Object.hasOwn(ctx.views, node.name) ? ctx.views[node.name] : undefined;
+  if (View === undefined) return <NodeFallback id={node.id} reason="unsupported" />;
+  const base = { id: node.id, name: node.name, props, children, locale: ctx.locale, strings: ctx.strings, picture: ctx.picture };
+  const key = editedKey(node);
+  if (key === undefined || node.holds === undefined) return <View {...base} />;
+  const value = (props.value ?? null) as Primitive;
+  const onChange = (next: Primitive) => runHandler(ctx.report, node.id, () => ctx.store.setState(key, next));
+  if (!isField(node)) return <View {...base} field={{ value, onChange }} />;
+  return <FieldNode node={node} value={value}>{(feedback) => <View {...base} field={{ value, onChange, ...feedback }} />}</FieldNode>;
+}
+
 function FieldNode({
   node,
   value,
   children,
 }: {
-  node: Extract<OmniNode, { type: FieldType }>;
+  node: Extract<OmniNode, { type: FieldType }> | AppNode;
   value: Primitive;
   children: (feedback: { error: string | undefined; errorId: string; onBlur: () => void }) => ReactNode;
 }) {

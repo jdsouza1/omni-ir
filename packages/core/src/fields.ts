@@ -3,7 +3,7 @@
 // The checks only read the props the stream declared and the person's value: there is no logic in
 // the stream, and the server still checks every action's params against the tool's own schema.
 import type { OmniDocument } from "./store.js";
-import type { MutationStatement, OmniNode, Primitive } from "./schema.js";
+import { editedKey, type AppNode, type MutationStatement, type OmniNode, type Primitive } from "./schema.js";
 
 /** The renderer's own words for a field problem (keys of its strings, SPEC.md section 8). */
 export const FIELD_MESSAGES = [
@@ -48,9 +48,12 @@ const codePoints = (text: string) => [...text].length;
  * The first problem with a field's value, or null when it passes ([8.2]–[8.4]). `props` are the
  * field's props as the stream declared them; `value` is its state's current value.
  */
-export function checkField(type: FieldType, props: Readonly<Record<string, unknown>>, value: Primitive | undefined): FieldProblem | null {
+export function checkField(type: FieldType | "App", props: Readonly<Record<string, unknown>>, value: Primitive | undefined): FieldProblem | null {
   const required = props.required === true;
   switch (type) {
+    case "App":
+      // An app component that is a field ([8.2]): required means a value that isn't empty.
+      return required && (value === undefined || value === null || value === false || (typeof value === "string" && value.trim() === "")) ? { message: "required" } : null;
     case "Switch":
       return required && value !== true ? { message: "turnOn" } : null;
     case "Select": {
@@ -82,13 +85,13 @@ export function checkField(type: FieldType, props: Readonly<Record<string, unkno
 }
 
 /** True for the components that edit a value the checks apply to. */
-export function isField(node: OmniNode): node is Extract<OmniNode, { type: FieldType }> {
-  return (FIELD_TYPES as readonly string[]).includes(node.type);
+export function isField(node: OmniNode): node is Extract<OmniNode, { type: FieldType }> | (AppNode & { field: true }) {
+  return node.type === "App" ? node.field === true && editedKey(node) !== undefined : (FIELD_TYPES as readonly string[]).includes(node.type);
 }
 
 /** The `$key` a field edits. */
-export function fieldKey(node: Extract<OmniNode, { type: FieldType }>): string {
-  return node.props.value.key;
+export function fieldKey(node: Extract<OmniNode, { type: FieldType }> | AppNode): string {
+  return node.type === "App" ? (editedKey(node) ?? "") : node.props.value.key;
 }
 
 /**

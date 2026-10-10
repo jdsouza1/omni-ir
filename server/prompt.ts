@@ -5,14 +5,19 @@ import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { z } from "zod";
 import { ASSETS, type AssetRegistry } from "../app/assets";
+import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
-import { describeComponent, describeValue, type JsonSchema } from "@omni-ir/core";
+import { describeAppComponent, describeComponent, describeValue, type AppComponents, type JsonSchema, type PicturePattern } from "@omni-ir/core";
 import { COMPONENT_TYPES, type ToolRegistry } from "@omni-ir/core";
 
 export interface PromptOptions {
   tools?: ToolRegistry;
   /** Images the model may name; defaults to the shared registry. */
   assets?: AssetRegistry;
+  /** The app's own components (Step 20); defaults to the demo app's. */
+  components?: AppComponents;
+  /** Families of picture names the app looks up (Step 20); defaults to the demo app's. */
+  pictures?: readonly PicturePattern[];
   fixturesDir?: string;
   /** Fixture names used as examples, in order. */
   examples?: string[];
@@ -23,6 +28,8 @@ const DEFAULT_EXAMPLES = ["payment-confirmation", "sign-in", "order-status"];
 export function buildSystemPrompt(options: PromptOptions = {}): string {
   const tools = options.tools ?? TOOLS;
   const assets = options.assets ?? ASSETS;
+  const appComponents = Object.values(options.components ?? APP_COMPONENTS);
+  const patterns = options.pictures ?? PICTURES;
   const dir = options.fixturesDir ?? resolve("fixtures");
   const examples = (options.examples ?? DEFAULT_EXAMPLES).map((name) =>
     readFileSync(join(dir, `${name}.omni`), "utf8")
@@ -77,14 +84,19 @@ McpMutation(target, tool=…, [params=…])
   target: id of the Button it governs
   tool: one of the tools below
   params: {name: value or $state, …}
+${appComponents.length > 0 ? `
+## This app's components
+The app adds these components of its own. Use them like the ones above when they fit the request; they follow the same grammar and rules. None has an action of its own: put a Button with an McpMutation next to it or among its children. One whose first argument is a $state edits it, like an Input; declare the state first.
 
+${appComponents.map(appComponentBlock).join("\n\n")}
+` : ""}
 ## Tools
 ${Object.entries(tools)
   .map(([name, schema]) => describeTool(name, schema))
   .join("\n")}
 
 ## Images
-${Object.keys(assets).length ? Object.keys(assets).map((name) => `- ${name}`).join("\n") : "(none: don't use Image)"}
+${Object.keys(assets).length || patterns.length ? [...Object.keys(assets).map((name) => `- ${name}`), ...patterns.map(patternLine)].join("\n") : "(none: don't use Image)"}
 
 ## Examples
 ${examples.map((example) => `<example>\n${example}\n</example>`).join("\n\n")}
@@ -101,6 +113,17 @@ export function examplesIn(prompt: string): string[] {
 function componentBlock(type: (typeof COMPONENT_TYPES)[number]): string {
   const shape = describeComponent(type);
   return [shape.signature, ...shape.props.map((p) => `  ${p.name}: ${p.summary}`)].join("\n");
+}
+
+function appComponentBlock(component: AppComponents[string]): string {
+  const shape = describeAppComponent(component);
+  return [`${shape.signature}: ${shape.description}`, ...shape.props.map((p) => `  ${p.name}: ${p.summary}`)].join("\n");
+}
+
+/** A family of picture names: usable only with an id the request gives, never an invented one. */
+export function patternLine(p: PicturePattern): string {
+  const example = p.id === "digits" ? "1042" : "a1b2";
+  return `- ${p.prefix}{id}, where {id} is ${p.id === "digits" ? "digits" : "lowercase letters and digits"} (for example ${p.prefix}${example}); use it only with an id the request gives`;
 }
 
 function describeTool(name: string, schema: z.ZodType): string {

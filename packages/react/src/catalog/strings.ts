@@ -13,6 +13,8 @@ export const ENGLISH = {
   failedToLoad: "Component failed to load",
   /** In place of a part of the screen that failed to draw. */
   failedToRender: "Component failed to render",
+  /** An app component this app has no view for (Step 20). */
+  unsupported: "This part of the screen can't be shown here.",
   /** A Rating, for screen readers. {value} and {max} are numbers. */
   rating: "Rated {value} out of {max}",
   /** Who sent a Message, for screen readers. */

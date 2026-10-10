@@ -107,6 +107,14 @@ export const HANDLERS: Readonly<Record<string, ToolHandler>> = {
     },
   },
 
+  // The demo shop has no stock or prices to check, so the reference server only acknowledges it.
+  "cart.add": {
+    access: "signed-in",
+    async run({ productId, quantity }) {
+      return { stub: true, added: { productId, quantity } };
+    },
+  },
+
   "settings.update": {
     access: "signed-in",
     async run({ language, orderUpdates, promotions }, { user, store }) {

@@ -26,7 +26,7 @@ An app can add a component Omni-IR doesn't have (a product card, a quantity pick
 const components = defineComponents({
   ProductCard: {
     description: "A product with its picture, name and price; children are its buttons.",
-    positional: ["name"],
+    positional: ["name", "children"],
     props: {
       name: text({ maxLength: 80 }),
       price: number({ minimum: 0 }),
@@ -47,7 +47,7 @@ const components = defineComponents({
 It compiles to the subset of JSON Schema that `conformance/schema.json` already uses, so the Swift and Kotlin parsers check it with the code they already have. A stream then writes:
 ```
 $qty = 1
-card = ProductCard("Canvas tote", price=24, currency="USD", picture="product-1042", [add])
+card = ProductCard("Canvas tote", [add], price=24, currency="USD", picture="product-1042")
 qty = QuantityPicker($qty, label="How many", min=1, max=5)
 add = Button("Add to bag", action="addM")
 addM = McpMutation(add, tool="cart.add", params={productId: "1042", quantity: $qty})

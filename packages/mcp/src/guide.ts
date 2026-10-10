@@ -3,7 +3,7 @@
 // so it can never describe something the parser rejects. Hosts send it with every request in a
 // conversation, so it is kept under 1,500 tokens (a test measures it).
 import { z } from "zod";
-import { COMPONENT_TYPES, describeComponent, describeValue, type JsonSchema, type ToolRegistry } from "@omni-ir/core";
+import { COMPONENT_TYPES, describeAppComponent, describeComponent, describeValue, type AppComponents, type JsonSchema, type PicturePattern, type ToolRegistry } from "@omni-ir/core";
 
 /** A picture the app provides: the same shape as an asset registry entry. */
 export interface Picture {
@@ -22,7 +22,19 @@ guests = Select($size, label="Guests", options=["2", "4", "6"])
 actions = Stack([cancel], direction="row")
 cancel = Button("Cancel", variant="secondary")`;
 
-export function buildGuide({ tools, assets }: { tools: ToolRegistry; assets: Readonly<Record<string, Picture>> }): string {
+export function buildGuide({
+  tools,
+  assets,
+  components: appComponents = {},
+  pictures: patterns = [],
+}: {
+  tools: ToolRegistry;
+  assets: Readonly<Record<string, Picture>>;
+  /** The app's own components (Step 20). */
+  components?: AppComponents;
+  /** Families of picture names the app looks up (Step 20). */
+  pictures?: readonly PicturePattern[];
+}): string {
   const components = COMPONENT_TYPES.map((type) => {
     const shape = describeComponent(type);
     const props = shape.props.filter((p) => p.summary !== "[id, …]").map((p) => `${p.name}: ${p.summary}`);
@@ -33,7 +45,12 @@ export function buildGuide({ tools, assets }: { tools: ToolRegistry; assets: Rea
     const params = Object.entries(json.properties ?? {}).map(([param, def]) => `${param}: ${describeValue(def)}`);
     return `- ${name} {${params.join("; ")}}`;
   });
-  const pictures = Object.keys(assets);
+  const pictures = [...Object.keys(assets), ...patterns.map((p) => `${p.prefix}{id} (${p.id === "digits" ? "digits" : "a-z, 0-9"}; only an id the request gives)`)];
+  const appLines = Object.values(appComponents).map((component) => {
+    const shape = describeAppComponent(component);
+    const props = shape.props.filter((p) => p.summary !== "[id, …]").map((p) => `${p.name}: ${p.summary}`);
+    return `${shape.signature}: ${props.join("; ")} (${shape.description})`;
+  });
 
   return `Shows the person a screen, drawn by the app's components. Write it in Omni-IR: one statement per line, no prose, Markdown, HTML or code.
 - \`id = Component(args)\` defines a component; \`$name = value\` declares state; \`# …\` is a comment. Write \`root = …\` first.
@@ -51,7 +68,7 @@ export function buildGuide({ tools, assets }: { tools: ToolRegistry; assets: Rea
 
 Components:
 ${components.join("\n")}
-${toolLines.length > 0 ? `McpMutation(target, tool=…, [params={name: value or $state}])\n\nTools:\n${toolLines.join("\n")}` : ""}
+${appLines.length > 0 ? `\nThis app's own components (same rules; no action of their own: put a Button next to them):\n${appLines.join("\n")}\n` : ""}${toolLines.length > 0 ? `McpMutation(target, tool=…, [params={name: value or $state}])\n\nTools:\n${toolLines.join("\n")}` : ""}
 
 Pictures (by name, for Image and ListItem image): ${pictures.length > 0 ? pictures.join(", ") : "no pictures: don't use Image"}
 

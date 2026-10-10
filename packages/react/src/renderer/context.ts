@@ -1,6 +1,6 @@
 import type { OmniStrings } from "../catalog/strings.js";
 import { createContext, useContext, useRef, useSyncExternalStore } from "react";
-import type { Catalog, Picture } from "../catalog/types.js";
+import type { AppViews, Catalog, Picture } from "../catalog/types.js";
 import type { Primitive, ToolRegistry } from "@omni-ir/core";
 import type { OmniStore } from "@omni-ir/core";
 import type { Issue } from "@omni-ir/core";
@@ -26,6 +26,10 @@ export interface OmniContextValue {
   catalog: Catalog;
   /** The app's image asset registry; streams can only show pictures named here. */
   assets: Readonly<Record<string, Picture>>;
+  /** A picture by name: registered, then the app's lookup (Step 20). */
+  picture: (name: string | undefined) => Picture | undefined;
+  /** The app's views for its own components (Step 20). */
+  views: AppViews;
   locale: string;
   /** The renderer's own words: the app's, or English. */
   strings: OmniStrings;

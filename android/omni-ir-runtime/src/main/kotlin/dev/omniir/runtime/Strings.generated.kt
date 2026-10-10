@@ -12,6 +12,7 @@ public data class OmniStrings(
   public val loading: String = "Loading",
   public val failedToLoad: String = "Component failed to load",
   public val failedToRender: String = "Component failed to render",
+  public val unsupported: String = "This part of the screen can't be shown here.",
   public val rating: String = "Rated {value} out of {max}",
   public val user: String = "You",
   public val assistant: String = "Assistant",

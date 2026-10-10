@@ -3,6 +3,8 @@ import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 import { createParser, type ParserEvent } from "@omni-ir/core";
 import { COMPONENTS, COMPONENT_TYPES, describeComponent } from "@omni-ir/core";
+import { encoding_for_model } from "tiktoken";
+import { APP_COMPONENTS } from "../app/components";
 import { buildSystemPrompt, examplesIn } from "../server/prompt";
 
 describe("buildSystemPrompt", () => {
@@ -17,6 +19,19 @@ describe("buildSystemPrompt", () => {
     vi.useRealTimers();
     expect(a).toBe(b);
     expect(a).toBe(prompt);
+  });
+
+  // Decision 8 of Step 20: the app's own components are measured, not chosen per request (yet).
+  it("adds at most 150 tokens per app component, heading included, and names each with its description", () => {
+    const encoder = encoding_for_model("gpt-5" as Parameters<typeof encoding_for_model>[0]);
+    const without = buildSystemPrompt({ components: {} });
+    const extra = encoder.encode(prompt).length - encoder.encode(without).length;
+    expect(extra).toBeLessThanOrEqual(150 * Object.keys(APP_COMPONENTS).length);
+    for (const component of Object.values(APP_COMPONENTS)) {
+      expect(prompt).toContain(`${component.name}(`);
+      expect(prompt).toContain(component.declaration.description);
+    }
+    expect(without).not.toContain("This app's components");
   });
 
   it("describes every component, prop and enum value in the schema", () => {

@@ -177,6 +177,25 @@ McpMutation(target, tool=…, [params=…])
   tool: one of the tools below
   params: {name: value or $state, …}
 
+## This app's components
+The app adds these components of its own. Use them like the ones above when they fit the request; they follow the same grammar and rules. None has an action of its own: put a Button with an McpMutation next to it or among its children. One whose first argument is a $state edits it, like an Input; declare the state first.
+
+ProductCard(name, [children], price=…, [currency=…], [picture=…], [rating=…], [badges=…]): A product with its picture, name and price. Its children are the product's buttons.
+  name: text | $state
+  price: number | $state
+  currency: "USD" | "EUR" | "GBP"
+  picture: image name
+  rating: number 0-5 | $state
+  badges: [text, …]
+  children: [id, …]
+
+QuantityPicker(value, label=…, min=…, max=…, [required=…]): Choose how many, from min to max, with minus and plus buttons. Edits a number $state.
+  value: $state
+  label: text | $state
+  min: whole number
+  max: whole number 1-99
+  required: true | false
+
 ## Tools
 - payments.confirm: params {amount: number > 0; note: text (max 500)}
 - auth.sendMagicLink: params {email: email address}
@@ -185,12 +204,14 @@ McpMutation(target, tool=…, [params=…])
 - support.createTicket: params {subject: text (min 1, max 120); message: text (min 1, max 2000)}
 - bookings.reserve: params {checkIn: date "YYYY-MM-DD"; checkOut: date "YYYY-MM-DD"}
 - assistant.ask: params {question: text (min 1, max 500)}
+- cart.add: params {productId: text (matching /^[0-9]{1,8}$/); quantity: whole number 1-99}
 - settings.update: params {language: text (min 1, max 40); orderUpdates: true | false; promotions: true | false}
 
 ## Images
 - cabin-pines
 - shirt
 - tote
+- product-{id}, where {id} is digits (for example product-1042); use it only with an id the request gives
 
 ## Examples
 <example>
