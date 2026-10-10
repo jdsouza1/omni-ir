@@ -90,7 +90,8 @@ private fun ProductCardView(p: AppViewProps) {
             }
           }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { p.children() }
+        // Buttons stack: the catalog's Buttons fill their width, so a Row would squeeze the second to nothing.
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) { p.children() }
       }
     }
   }
