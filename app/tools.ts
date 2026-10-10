@@ -42,3 +42,12 @@ export const TOOLS: ToolRegistry = {
     promotions: z.boolean(),
   }),
 };
+
+/**
+ * The tools whose actions need the person's confirmation, in the app's own words (SPEC.md section 9,
+ * Confirmations). Application code, like the registry: a stream can't skip, change or add one. The
+ * iOS and Android demo apps use the same sentence.
+ */
+export const CONFIRMATIONS: Readonly<Record<string, string>> = {
+  "payments.confirm": "Pay {amount} USD?",
+};

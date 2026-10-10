@@ -4,11 +4,19 @@ import { afterEach, describe, expect, it } from "vitest";
 import { Client } from "@modelcontextprotocol/client";
 import { InMemoryTransport } from "@modelcontextprotocol/server";
 import { createOmniMcpServer, IDEMPOTENCY_META_KEY, SCREEN_TOOL, VIEW_URI, type ActionCall, type OmniMcpEvent, type OmniMcpOptions } from "@omni-ir/mcp";
+import { createParser, describeScreen } from "@omni-ir/core";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
 
 const VIEW = "<!doctype html><html><head><!--omni-ir-config--></head><body><div id=root></div></body></html>";
 const GOOD = 'root = Card([title, pay])\ntitle = Heading("Pay")\npay = Button("Pay", action="go")\ngo = McpMutation(pay, tool="payments.confirm", params={amount: 5, note: ""})\n';
+
+function parseScreen(screen: string) {
+  const parser = createParser({ tools: TOOLS, assets: ASSETS });
+  parser.write(screen);
+  parser.end();
+  return parser.getSnapshot();
+}
 
 let client: Client | undefined;
 afterEach(async () => {
@@ -95,6 +103,16 @@ describe("the bridge's MCP server", () => {
     expect((bad.content as { text: string }[])[0]!.text).toMatch(/line 5.*unknown_component/s);
     expect(events.filter((e) => e.type === "screen")).toHaveLength(2);
     expect(events.at(-1)).toMatchObject({ type: "screen", components: 3, rejected: 2 });
+  });
+
+  it("gives the screen as text too, for hosts that can't draw it, without what anyone typed (PLAN-FORMS.md C.2)", async () => {
+    const { client } = await connect();
+    const result = await client.callTool({ name: SCREEN_TOOL, arguments: { screen: GOOD } });
+    const text = (result.content as { type: string; text: string }[])[0]!.text;
+    const outline = describeScreen(parseScreen(GOOD));
+    expect(outline.length).toBeGreaterThan(0);
+    expect(text).toContain(outline);
+    expect(result.structuredContent).toMatchObject({ outline });
   });
 
   it("runs an action only after checking it against the tool's schema, with the view's idempotency key [10.28]", async () => {

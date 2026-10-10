@@ -5,8 +5,10 @@ package dev.omniir.demo
 import android.content.Intent
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -16,7 +18,6 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.compose.ui.test.onLast
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Rule

@@ -1,7 +1,7 @@
 // The server's side of the transport (SPEC.md section 10), for the Express app and the in-browser API
 // the hosted playground uses: framing, the terminal event, the version marker, the requested version,
 // error bodies, and rate limits behind a proxy. The client's side is in transport.conformance.test.ts.
-import { versionMarker } from "@omni-ir/core";
+import { isNewerMarker, versionMarker } from "@omni-ir/core";
 import { createInBrowserApi } from "../server/inBrowser";
 import { ConfigError, loadConfig } from "../server/config";
 import { MockModel } from "../server/models/mock";
@@ -75,6 +75,22 @@ describe("the requested version [10.1] [10.12] [10.2]", () => {
           error: { code: "unsupported_version", message: expect.stringContaining("0.8"), retryable: false },
         });
       }
+    }
+  });
+
+  it("still reaches an app on format 0.5 (releases 0.8.0 to 0.10.x) through its retry, which then shows the update notice", async () => {
+    // Those apps ask for 0.5, are refused, and retry once without a version (CHANGELOG 0.8.0). Their
+    // parser then reads the 0.8 marker as newer ([3.9]): the update notice shows, and a line using a
+    // prop it doesn't know becomes a fallback, while the rest of the screen shows.
+    for (const [where, call] of await apis()) {
+      const refused = await call("/api/generate?version=0.5", { ...json, body: prompt });
+      expect(refused.status, where).toBe(400);
+      await refused.text();
+      const retry = await call("/api/generate", { ...json, body: prompt });
+      expect(retry.status, where).toBe(200);
+      const firstLine = textOf((await readSse(retry)).events).split("\n")[0]!;
+      expect(isNewerMarker(firstLine, "0.5"), where).toBe(true);
+      expect(isNewerMarker(firstLine), where).toBe(false);
     }
   });
 

@@ -39,6 +39,7 @@ export default withMermaid(
             { text: "Use with AG-UI", link: "/guide/ag-ui" },
             { text: "In Claude and ChatGPT (MCP Apps)", link: "/guide/mcp" },
             { text: "Running real actions", link: "/guide/actions" },
+            { text: "Forms and confirmations", link: "/guide/forms" },
             { text: "Themes and wording", link: "/guide/themes" },
             { text: "Checking the model", link: "/guide/model-check" },
           ],

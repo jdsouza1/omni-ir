@@ -87,12 +87,17 @@ jobs:
             -destination "id=$UDID" -derivedDataPath build -only-testing:OmniIRDemoUITests/ScreenshotTests \
             -resultBundlePath build/Screenshots.xcresult -quiet
 
+      - name: Fields and confirmations
+        run: |
+          xcodebuild test-without-building -project swift/Demo/OmniIRDemo.xcodeproj -scheme OmniIRDemo             -destination "id=$UDID" -derivedDataPath build -only-testing:OmniIRDemoUITests/FormTests             -resultBundlePath build/Forms.xcresult -quiet
+
       - name: Collect the screenshots
         if: always()
         run: |
           mkdir -p review/screenshots
           xcrun xcresulttool export attachments --path build/Screenshots.xcresult --output-path review/screenshots || true
           xcrun xcresulttool export attachments --path build/Server.xcresult --output-path review/server || true
+          xcrun xcresulttool export attachments --path build/Forms.xcresult --output-path review/forms || true
           cp server.log review/ || true
           ls -la review review/screenshots || true
 

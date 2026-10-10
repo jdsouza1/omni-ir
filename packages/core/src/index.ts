@@ -9,3 +9,4 @@ export * from "./parser.js";
 export * from "./describe.js";
 export * from "./version.js";
 export * from "./fields.js";
+export * from "./screenText.js";

@@ -58,6 +58,16 @@ const parser = createParser({ tools, assets });
 // <OmniRenderer store={parser.store} tools={tools} assets={assets} onMutation={…} />
 ```
 
+### Fields and confirmations
+
+Fields can declare `required`, `format`, `minLength` and `maxLength`; the renderer checks the fields an action reads before it runs, and shows its own message under each one that fails. For actions that need the person's say-so, give a sentence per tool:
+
+```tsx
+<OmniRenderer store={parser.store} tools={tools} confirm={{ "payments.confirm": "Pay {amount}?" }} onMutation={…} />
+```
+
+The action runs only after the person confirms in the renderer's dialog. Nothing in a stream can skip or change it.
+
 ### Your own components
 
 `catalog` replaces the built-in components with your own (trusted) ones. It must provide every component type; start from `DEFAULT_CATALOG`:

@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { McpServer } from "@modelcontextprotocol/server";
 import { registerAppResource, registerAppTool, RESOURCE_MIME_TYPE } from "@modelcontextprotocol/ext-apps/server";
 import { z } from "zod";
-import { createParser, type ToolRegistry } from "@omni-ir/core";
+import { createParser, describeScreen, type ToolRegistry } from "@omni-ir/core";
 import { injectConfig, viewConfig } from "./config.js";
 import { IDEMPOTENCY_META_KEY, SCREEN_TOOL, VIEW_URI } from "./constants.js";
 import { buildGuide, type Picture } from "./guide.js";
@@ -85,15 +85,19 @@ export function createOmniMcpServer(options: OmniMcpOptions = {}): McpServer {
       });
       parser.write(screen);
       parser.end();
-      const components = parser.getSnapshot().nodes.size;
+      const document = parser.getSnapshot();
+      const components = document.nodes.size;
       onEvent({ type: "screen", components, rejected: rejected.length });
+      // The screen as text, for hosts that can't draw the view (no typed values: nothing is typed yet).
+      const outline = describeScreen(document);
       const shown = `Shown: ${components} ${components === 1 ? "component" : "components"}.`;
       const text =
-        rejected.length === 0
+        (rejected.length === 0
           ? shown
           : `${shown} These lines were rejected; call ${SCREEN_TOOL} again with the whole screen, fixed:\n` +
-            rejected.map((r) => `- ${r.line === null ? "at the end" : `line ${r.line}`}: ${r.code}: ${r.message}`).join("\n");
-      return { content: [{ type: "text", text }], structuredContent: { components, rejected } };
+            rejected.map((r) => `- ${r.line === null ? "at the end" : `line ${r.line}`}: ${r.code}: ${r.message}`).join("\n")) +
+        `\n\nThe screen as text:\n${outline}`;
+      return { content: [{ type: "text", text }], structuredContent: { components, rejected, outline } };
     },
   );
 
