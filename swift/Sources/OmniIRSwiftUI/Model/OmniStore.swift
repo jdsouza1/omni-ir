@@ -147,6 +147,24 @@ public final class OmniStore {
     return result
   }
 
+  /// What to say after the last update ([8.8]): the title and text of each Notice it added or changed,
+  /// politely, and nothing else; empty when there is nothing to say.
+  public var updateAnnouncement: String {
+    let doc = document
+    guard let assigned = doc.lastUpdate.map({ Set($0.assigned) }) else { return "" }
+    var words: [String] = []
+    for id in doc.order {
+      guard let n = doc.nodes[id], n.type == .notice else { continue }
+      let reads = n.props.values.contains { if case .state(let key) = $0 { assigned.contains(key) } else { false } }
+      guard assigned.contains(id) || reads else { continue }
+      for prop in ["title", "text"] {
+        let said = text(n.props[prop])
+        if !said.isEmpty { words.append(said) }
+      }
+    }
+    return words.joined(separator: ". ")
+  }
+
   private func sync() {
     revision &+= 1
   }

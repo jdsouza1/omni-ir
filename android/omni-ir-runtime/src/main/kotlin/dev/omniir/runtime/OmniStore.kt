@@ -156,6 +156,20 @@ public class OmniStore(
     result
   }
 
+  /**
+   * What to say after the last update ([8.8]): the title and text of each Notice it added or changed,
+   * politely, and nothing else; empty when there is nothing to say.
+   */
+  public fun updateAnnouncement(doc: OmniDocument = document.value): String {
+    val assigned = doc.lastUpdate?.assigned?.toSet() ?: return ""
+    return doc.nodes.values
+      .filter { it.type == ComponentType.NOTICE }
+      .filter { n -> n.id in assigned || n.props.values.any { (it as? PropValue.State)?.key in assigned } }
+      .flatMap { n -> listOf(text(n.props["title"], doc), text(n.props["text"], doc)) }
+      .filter { it.isNotEmpty() }
+      .joinToString(". ")
+  }
+
   private fun sync() {
     documentFlow.value = parser.document
     issuesFlow.value = parser.issues

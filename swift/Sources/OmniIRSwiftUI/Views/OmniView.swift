@@ -59,6 +59,12 @@ public struct OmniView: View {
       }
     }
     .environment(\.omniContext, context)
+    // [8.8]: after an update, read out what changed Notices say, politely; nothing moves focus.
+    .onChange(of: store.document.lastUpdate) { _, update in
+      guard update != nil else { return }
+      let said = store.updateAnnouncement
+      if !said.isEmpty { AccessibilityNotification.Announcement(said).post() }
+    }
     // [9.1]: the app's sentence, Cancel and Confirm. Only the buttons answer, so a dismissal can't
     // be taken for a confirmation.
     .alert(Text(verbatim: ui.question ?? ""), isPresented: Binding(get: { ui.question != nil }, set: { _ in })) {

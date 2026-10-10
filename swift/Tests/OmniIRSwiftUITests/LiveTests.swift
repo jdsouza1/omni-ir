@@ -37,5 +37,9 @@ struct LiveTests {
     let rejected = store.update("order_status = Nope()\n")
     #expect(!rejected.applied)
     #expect(rejected.issues.map(\.code) == [.unknownComponent])
+    // [8.8]: only the Notices an update adds or changes are read out.
+    #expect(store.updateAnnouncement == "Return requested")
+    store.update("order_status = Badge(\"Out again\")\n")
+    #expect(store.updateAnnouncement == "")
   }
 }

@@ -128,5 +128,9 @@ class LiveClientTest {
     assertTrue("\"button\":\"ret\"" in mutateBodies.last())
     assertEquals("Notice", store.document.value.nodes["ret"]?.type?.wireName)
     assertTrue("ret" !in store.document.value.mutations)
+    // [8.8]: only the Notices an update adds or changes are read out.
+    assertEquals("Return requested", store.updateAnnouncement())
+    store.update("order_status = Badge(\"Out again\")\n")
+    assertEquals("", store.updateAnnouncement())
   }
 }
