@@ -105,7 +105,7 @@ Work on branch `wip/forms`. Each part starts with failing tests (constraint 4).
 - [x] A.1 The new props in the schema (`required`, `format`, `minLength`, `maxLength`), with cross-prop rules (for example `minLength` ≤ `maxLength`); conformance cases; `schema.json`, Swift and Kotlin generated schemas
 - [x] A.2 One shared definition of each check and its message key, with the renderer's new English words (`required`, `invalidEmail`, …) in `strings.ts`, generated into `OmniStrings`
 - [x] A.3 Web: messages under fields, governed buttons blocked by the fields their params read, announced to screen readers
-- [ ] A.4 iOS and Android: the same, on CI; the demo apps' UI tests cover a blocked and an unblocked button
+- [x] A.4 iOS and Android: the same, on CI; the demo apps' UI tests cover a blocked and an unblocked button
 
 **B. Confirmations** *(tests first)*
 - [x] B.1 The `confirm` option and its plain-text template on all three renderers; the action runs only on Confirm
@@ -121,8 +121,8 @@ Work on branch `wip/forms`. Each part starts with failing tests (constraint 4).
 - [x] D.3 The decision log: this step's entry and decisions
 
 **E. Review and release** *(checkpoint: you review)*
-- [ ] E.1 A short review page with screenshots on web, iPhone and Android (CI)
-- [ ] E.2 Merge with your approval
+- [x] E.1 A short review page with screenshots on web, iPhone and Android (CI)
+- [x] E.2 Merge with your approval
 - [ ] E.3 Release: a separate go-ahead from you
 
 ## What I need from you
