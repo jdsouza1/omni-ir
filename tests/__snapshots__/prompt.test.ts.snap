@@ -196,6 +196,11 @@ QuantityPicker(value, label=…, min=…, max=…, [required=…]): Choose how m
   max: whole number 1-99
   required: true | false
 
+## Live parts
+The app keeps these parts up to date while the screen is open. When a screen shows one, give it exactly this id or $key; the app changes it later, so write only its first version.
+- order_status: an order's delivery status, as a Badge
+- sales_today: today's orders by hour, as a LineChart
+
 ## Tools
 - payments.confirm: params {amount: number > 0; note: text (max 500)}
 - auth.sendMagicLink: params {email: email address}
@@ -244,9 +249,9 @@ fine = Text("The link expires after 15 minutes.", tone="muted")
 
 <example>
 root = Card([header, order, carrier, eta, sep, actions])
-header = Stack([title, status], direction="row", gap="sm", align="center")
+header = Stack([title, order_status], direction="row", gap="sm", align="center")
 title = Heading("Order #A1B2-7731")
-status = Badge("Shipped", tone="success")
+order_status = Badge("Shipped")
 order = Text("2 items: Ceramic pour-over set, Filters (100 pack)")
 carrier = Text("Carrier: Parcelwise, tracking 1Z-88-4410", tone="muted")
 eta = Text("2026-10-03", format="date")

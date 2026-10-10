@@ -13,6 +13,8 @@ public enum ParserEvent: Sendable, Equatable {
   case error(Issue)
   /// End of stream, with the end-of-stream issues.
   case end([Issue])
+  /// An update after the stream ended ([10.29]), applied whole or not at all; its issues count lines from 1 in the update.
+  case update(UpdateResult)
 }
 
 public final class OmniParser {
@@ -33,6 +35,8 @@ public final class OmniParser {
   private var index = DocumentIndex()
   private var lineOf: [String: Int] = [:]
   private var endIssues: [Issue]?
+  private var screenIssues: [Issue] = []
+  private let maxLineLength: Int
 
   /// The app's own components (Step 20).
   public let components: AppComponents
@@ -48,6 +52,7 @@ public final class OmniParser {
     self.components = components
     self.pictures = pictures
     self.buffer = LineBuffer(maxLineLength: maxLineLength)
+    self.maxLineLength = maxLineLength
   }
 
   /// Write text as it arrives; it may end anywhere, even in the middle of a line. Ignored after `end()`.
@@ -74,6 +79,7 @@ public final class OmniParser {
       return issue
     }
     endIssues = found
+    screenIssues = validateDocument(accepted, complete: true)
     document.finish()
     onChange?(document)
     for issue in found {
@@ -82,6 +88,55 @@ public final class OmniParser {
     }
     onEvent?(.end(found))
     return found
+  }
+
+  /// Apply an update from the app's own code to the ended screen (SPEC.md [10.29]-[10.34]): the same lines
+  /// as a stream, where an id or `$key` the screen has is replaced. Applied whole or not at all. Never pass
+  /// text a model wrote. Before `end()`, it changes nothing and says why.
+  @discardableResult
+  public func update(_ text: String) -> UpdateResult {
+    guard endIssues != nil else {
+      return UpdateResult(applied: false, issues: [Issue(code: .updateTooLarge, message: "updates change an ended screen: end() the stream first")])
+    }
+    let context = ValidationContext(tools: tools, assets: assets, components: components, pictures: pictures)
+    let result: UpdateResult
+    switch planUpdate(current: accepted, baseline: screenIssues, text: text, context: context, maxLineLength: maxLineLength) {
+    case .rejected(let found):
+      result = UpdateResult(applied: false, issues: found)
+    case .applied(let found, let statements, let assigned, let documentIssues):
+      let kept = Set(statements.map(\.definedId))
+      for s in accepted where !kept.contains(s.definedId) {
+        switch s {
+        case .node(let n):
+          document.nodes[n.id] = nil
+          document.order.removeAll { $0 == n.id }
+        case .mutation(let m):
+          if document.mutations[m.target]?.id == m.id { document.mutations[m.target] = nil }
+        case .state:
+          break
+        }
+      }
+      for s in assigned {
+        switch s {
+        case .state(let key, let value):
+          document.state[key] = value
+        case .node(let n):
+          if document.nodes.updateValue(n, forKey: n.id) == nil { document.order.append(n.id) }
+        case .mutation(let m):
+          // A replaced McpMutation may govern another Button now.
+          for (target, old) in document.mutations where old.id == m.id { document.mutations[target] = nil }
+          document.mutations[m.target] = m
+        }
+      }
+      accepted = statements
+      screenIssues = documentIssues
+      document.missing = missingReferences(statements)
+      document.lastUpdate = LastUpdate(count: (document.lastUpdate?.count ?? 0) + 1, assigned: assigned.map(\.definedId))
+      onChange?(document)
+      result = UpdateResult(applied: true, issues: found)
+    }
+    onEvent?(.update(result))
+    return result
   }
 
   /// A local state edit from an Input or DateInput (R1). The key must already be declared by the stream.

@@ -1,0 +1,1159 @@
+{
+  "area": "live",
+  "cases": [
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-replace-component",
+      "rules": [
+        "10.29",
+        "10.30"
+      ],
+      "description": "After the stream ends, an update's line for an id the screen has replaces that component.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "status = Badge(\"Out for delivery\", tone=\"success\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "status",
+              "eta",
+              "ret"
+            ]
+          },
+          "status": {
+            "type": "Badge",
+            "props": {
+              "text": "Out for delivery",
+              "tone": "success"
+            },
+            "children": []
+          },
+          "eta": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$eta"
+              }
+            },
+            "children": []
+          },
+          "ret": {
+            "type": "Button",
+            "props": {
+              "label": "Request a return",
+              "action": "requestReturn"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-set-state",
+      "rules": [
+        "10.30"
+      ],
+      "description": "An update's line for a $key the screen has sets that value.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "$eta = \"Today by 6 pm\"\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "state": {
+          "$eta": "Today by 6 pm"
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-add-components",
+      "rules": [
+        "10.30",
+        "10.31"
+      ],
+      "description": "New ids are added, in either order: a child before the parent that lists it, or after.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "note = Notice(\"Signature needed\")\nroot = Card([note, status, eta, ret, map], title=\"Order 1042\")\nmap = Text(\"Two stops away\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "note",
+              "status",
+              "eta",
+              "ret",
+              "map"
+            ]
+          },
+          "note": {
+            "type": "Notice",
+            "props": {
+              "text": "Signature needed"
+            },
+            "children": []
+          },
+          "status": {
+            "type": "Badge",
+            "props": {
+              "text": "Shipped"
+            },
+            "children": []
+          },
+          "eta": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$eta"
+              }
+            },
+            "children": []
+          },
+          "ret": {
+            "type": "Button",
+            "props": {
+              "label": "Request a return",
+              "action": "requestReturn"
+            },
+            "children": []
+          },
+          "map": {
+            "type": "Text",
+            "props": {
+              "text": "Two stops away"
+            },
+            "children": []
+          }
+        },
+        "mutations": {
+          "ret": {
+            "id": "m",
+            "tool": "orders.requestReturn",
+            "params": {
+              "order": "1042"
+            }
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-remove-by-omission",
+      "rules": [
+        "10.31"
+      ],
+      "description": "A component leaves when its parent's new line stops listing it, with what it governs: the Button's McpMutation goes too. Its $key stays.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "root = Card([status, done], title=\"Order 1042\")\ndone = Notice(\"Return requested\", tone=\"success\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "status",
+              "done"
+            ]
+          },
+          "status": {
+            "type": "Badge",
+            "props": {
+              "text": "Shipped"
+            },
+            "children": []
+          },
+          "done": {
+            "type": "Notice",
+            "props": {
+              "text": "Return requested",
+              "tone": "success"
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$eta": "Friday"
+        },
+        "mutations": {}
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-button-done",
+      "rules": [
+        "10.31"
+      ],
+      "description": "A Button replaced in place by a Notice loses its McpMutation: an action's result can say it's done where the Button was.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "ret = Notice(\"Return requested\", tone=\"success\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "status",
+              "eta",
+              "ret"
+            ]
+          },
+          "status": {
+            "type": "Badge",
+            "props": {
+              "text": "Shipped"
+            },
+            "children": []
+          },
+          "eta": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$eta"
+              }
+            },
+            "children": []
+          },
+          "ret": {
+            "type": "Notice",
+            "props": {
+              "text": "Return requested",
+              "tone": "success"
+            },
+            "children": []
+          }
+        },
+        "mutations": {}
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-unlisted-not-kept",
+      "rules": [
+        "10.31"
+      ],
+      "description": "A component the update adds without listing it anywhere is not kept; the rest of the update applies.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "stray = Text(\"Nobody lists me\")\nstatus = Badge(\"Delivered\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "status",
+              "eta",
+              "ret"
+            ]
+          },
+          "status": {
+            "type": "Badge",
+            "props": {
+              "text": "Delivered"
+            },
+            "children": []
+          },
+          "eta": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$eta"
+              }
+            },
+            "children": []
+          },
+          "ret": {
+            "type": "Button",
+            "props": {
+              "label": "Request a return",
+              "action": "requestReturn"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-whole-or-nothing",
+      "rules": [
+        "10.32",
+        "10.33",
+        "10.30"
+      ],
+      "description": "One failing line rejects the whole update: the good lines before and after it change nothing. Line numbers count from 1 in the update, comments included.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "# the courier's update\nstatus = Badge(\"Delivered\")\neta = Banner(\"Now\")\n$eta = \"Delivered\"\n",
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": 3,
+                "code": "unknown_component"
+              }
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "status",
+              "eta",
+              "ret"
+            ]
+          },
+          "status": {
+            "type": "Badge",
+            "props": {
+              "text": "Shipped"
+            },
+            "children": []
+          },
+          "eta": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$eta"
+              }
+            },
+            "children": []
+          },
+          "ret": {
+            "type": "Button",
+            "props": {
+              "label": "Request a return",
+              "action": "requestReturn"
+            },
+            "children": []
+          }
+        },
+        "state": {
+          "$eta": "Friday"
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-duplicate-in-update",
+      "rules": [
+        "10.30",
+        "10.33"
+      ],
+      "description": "One update assigns each id and $key at most once: a second is duplicate_id, and nothing in the update applies.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "status = Badge(\"Out for delivery\")\n$eta = \"Today\"\nstatus = Badge(\"Delivered\")\n$eta = \"Now\"\n",
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": 3,
+                "code": "duplicate_id"
+              },
+              {
+                "line": 4,
+                "code": "duplicate_id"
+              }
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "state": {
+          "$eta": "Friday"
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-new-document-error",
+      "rules": [
+        "10.32",
+        "10.33"
+      ],
+      "description": "An update that would leave a new error is rejected whole: here a new Button with an action and no McpMutation, reported on the line that assigned it.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "root = Card([status, eta, ret, pay], title=\"Order 1042\")\npay = Button(\"Pay the duty\", action=\"payDuty\")\n",
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": 2,
+                "code": "ungoverned_mutation"
+              }
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "status",
+              "eta",
+              "ret"
+            ]
+          },
+          "status": {
+            "type": "Badge",
+            "props": {
+              "text": "Shipped"
+            },
+            "children": []
+          },
+          "eta": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$eta"
+              }
+            },
+            "children": []
+          },
+          "ret": {
+            "type": "Button",
+            "props": {
+              "label": "Request a return",
+              "action": "requestReturn"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-governed-addition",
+      "rules": [
+        "10.30",
+        "10.32"
+      ],
+      "description": "The same Button with its McpMutation in the same update is accepted.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "root = Card([status, eta, ret, pay], title=\"Order 1042\")\npay = Button(\"Pay the duty\", action=\"payDuty\")\npm = McpMutation(pay, tool=\"payments.confirm\", params={amount: 4.2})\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "mutations": {
+          "ret": {
+            "id": "m",
+            "tool": "orders.requestReturn",
+            "params": {
+              "order": "1042"
+            }
+          },
+          "pay": {
+            "id": "pm",
+            "tool": "payments.confirm",
+            "params": {
+              "amount": 4.2
+            }
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-tree-rules-in-order",
+      "rules": [
+        "10.32",
+        "10.33"
+      ],
+      "description": "The tree rules are checked on the screen the update would leave, with a replaced line in its old place and new lines after: eta can't belong to both root and the new box, and the error is reported on box, the later of the two.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "root = Card([status, eta, ret, box], title=\"Order 1042\")\nbox = Stack([eta])\n",
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": 2,
+                "code": "multiple_parents"
+              }
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "issues": []
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-chart-mismatch",
+      "rules": [
+        "10.32",
+        "10.33"
+      ],
+      "description": "New labels for a chart without new values for its Series would break [5.23], so the update is rejected; sending both in one update works.",
+      "input": "root = BarChart(\"Sales\", [\"9am\", \"10am\"], [s])\ns = Series(\"Orders\", values=[3, 5])\n",
+      "updates": [
+        {
+          "input": "root = BarChart(\"Sales\", [\"9am\", \"10am\", \"11am\"], [s])\n",
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": null,
+                "code": "chart_mismatch"
+              }
+            ]
+          }
+        },
+        {
+          "input": "root = BarChart(\"Sales\", [\"9am\", \"10am\", \"11am\"], [s])\ns = Series(\"Orders\", values=[3, 5, 8])\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "BarChart",
+            "props": {
+              "title": "Sales",
+              "labels": [
+                "9am",
+                "10am",
+                "11am"
+              ]
+            },
+            "children": [
+              "s"
+            ]
+          },
+          "s": {
+            "type": "Series",
+            "props": {
+              "name": "Orders",
+              "values": [
+                3,
+                5,
+                8
+              ]
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-existing-errors-tolerated",
+      "rules": [
+        "10.33"
+      ],
+      "description": "Errors the screen already had don't stop an update: root still lists ghost, which never arrived, and the update applies. If the update supplies ghost, it is no longer missing.",
+      "input": "root = Stack([a, ghost])\na = Text(\"Before\")\n",
+      "updates": [
+        {
+          "input": "a = Text(\"After\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        },
+        {
+          "input": "ghost = Text(\"Here now\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [
+          {
+            "line": 1,
+            "code": "dangling_ref"
+          }
+        ],
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "a",
+              "ghost"
+            ]
+          },
+          "a": {
+            "type": "Text",
+            "props": {
+              "text": "After"
+            },
+            "children": []
+          },
+          "ghost": {
+            "type": "Text",
+            "props": {
+              "text": "Here now"
+            },
+            "children": []
+          }
+        },
+        "missing": []
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-field-conflict",
+      "rules": [
+        "10.34"
+      ],
+      "description": "An update can't set a $key a field reads: live_field_conflict, and nothing applies.",
+      "input": "root = Stack([email, tip])\n$email = \"\"\nemail = Input($email, label=\"Email\")\ntip = Text(\"Shipped\")\n",
+      "updates": [
+        {
+          "input": "tip = Text(\"Out for delivery\")\n$email = \"someone@example.com\"\n",
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": 2,
+                "code": "live_field_conflict"
+              }
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "state": {
+          "$email": ""
+        },
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "email",
+              "tip"
+            ]
+          },
+          "email": {
+            "type": "Input",
+            "props": {
+              "label": "Email",
+              "value": {
+                "state": "$email"
+              }
+            },
+            "children": []
+          },
+          "tip": {
+            "type": "Text",
+            "props": {
+              "text": "Shipped"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-field-conflict-after",
+      "rules": [
+        "10.34"
+      ],
+      "description": "Nor a $key that a field would read after the update: here the update turns the status text into an Input bound to it.",
+      "input": "root = Stack([s])\n$status = \"Shipped\"\ns = Text($status)\n",
+      "updates": [
+        {
+          "input": "s = Input($status, label=\"Status\")\n$status = \"Delivered\"\n",
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": 2,
+                "code": "live_field_conflict"
+              }
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "state": {
+          "$status": "Shipped"
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-new-field",
+      "rules": [
+        "10.34"
+      ],
+      "description": "A new $key for a new field is allowed, and a field's own line can be replaced (its label changes, what the person entered stays in its $key).",
+      "input": "root = Stack([email])\n$email = \"\"\nemail = Input($email, label=\"Email\")\n",
+      "updates": [
+        {
+          "input": "root = Stack([email, note])\nemail = Input($email, label=\"Email for the courier\")\n$note = \"\"\nnote = Input($note, label=\"Note\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "state": {
+          "$email": "",
+          "$note": ""
+        },
+        "nodes": {
+          "root": {
+            "type": "Stack",
+            "props": {},
+            "children": [
+              "email",
+              "note"
+            ]
+          },
+          "email": {
+            "type": "Input",
+            "props": {
+              "label": "Email for the courier",
+              "value": {
+                "state": "$email"
+              }
+            },
+            "children": []
+          },
+          "note": {
+            "type": "Input",
+            "props": {
+              "label": "Note",
+              "value": {
+                "state": "$note"
+              }
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-replace-mutation",
+      "rules": [
+        "10.30"
+      ],
+      "description": "An update can replace an McpMutation, checked as any line is: its tool must be registered.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "m = McpMutation(ret, tool=\"orders.cancel\", params={order: \"1042\"})\n",
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": 1,
+                "code": "unknown_tool"
+              }
+            ]
+          }
+        },
+        {
+          "input": "m = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\", reason: \"late\"})\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "mutations": {
+          "ret": {
+            "id": "m",
+            "tool": "orders.requestReturn",
+            "params": {
+              "order": "1042",
+              "reason": "late"
+            }
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-type-change",
+      "rules": [
+        "10.30"
+      ],
+      "description": "A replaced line may name another component: the status Badge becomes a Notice.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "status = Notice(\"Delivered to your door\", tone=\"success\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "status",
+              "eta",
+              "ret"
+            ]
+          },
+          "status": {
+            "type": "Notice",
+            "props": {
+              "text": "Delivered to your door",
+              "tone": "success"
+            },
+            "children": []
+          },
+          "eta": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$eta"
+              }
+            },
+            "children": []
+          },
+          "ret": {
+            "type": "Button",
+            "props": {
+              "label": "Request a return",
+              "action": "requestReturn"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-version-marker-is-comment",
+      "rules": [
+        "10.30"
+      ],
+      "description": "A version marker means nothing in an update: no newer_version warning, and the update applies.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": "# omni-ir 99.0\nstatus = Badge(\"Delivered\")\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "status",
+              "eta",
+              "ret"
+            ]
+          },
+          "status": {
+            "type": "Badge",
+            "props": {
+              "text": "Delivered"
+            },
+            "children": []
+          },
+          "eta": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$eta"
+              }
+            },
+            "children": []
+          },
+          "ret": {
+            "type": "Button",
+            "props": {
+              "label": "Request a return",
+              "action": "requestReturn"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-too-large",
+      "rules": [
+        "10.30"
+      ],
+      "description": "An update holds at most 2,000 lines, blank and comment lines included; a longer one is update_too_large and changes nothing.",
+      "input": "root = Card([status, eta, ret], title=\"Order 1042\")\nstatus = Badge(\"Shipped\")\n$eta = \"Friday\"\neta = Text($eta)\nret = Button(\"Request a return\", action=\"requestReturn\")\nm = McpMutation(ret, tool=\"orders.requestReturn\", params={order: \"1042\"})\n",
+      "updates": [
+        {
+          "input": [
+            "status = Badge(\"Delivered\")\n",
+            {
+              "repeat": "# pad\n",
+              "times": 2000
+            }
+          ],
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": null,
+                "code": "update_too_large"
+              }
+            ]
+          }
+        }
+      ],
+      "expect": {
+        "issues": [],
+        "nodes": {
+          "root": {
+            "type": "Card",
+            "props": {
+              "title": "Order 1042"
+            },
+            "children": [
+              "status",
+              "eta",
+              "ret"
+            ]
+          },
+          "status": {
+            "type": "Badge",
+            "props": {
+              "text": "Shipped"
+            },
+            "children": []
+          },
+          "eta": {
+            "type": "Text",
+            "props": {
+              "text": {
+                "state": "$eta"
+              }
+            },
+            "children": []
+          },
+          "ret": {
+            "type": "Button",
+            "props": {
+              "label": "Request a return",
+              "action": "requestReturn"
+            },
+            "children": []
+          }
+        }
+      }
+    },
+    {
+      "tools": [
+        "payments.confirm",
+        "orders.requestReturn"
+      ],
+      "id": "live-limits",
+      "rules": [
+        "10.32",
+        "5.25"
+      ],
+      "description": "The document limits apply to the screen an update would leave: with 1,000 $keys, a new one is document_too_large, while setting an existing one is fine.",
+      "input": "root = Divider()\n$k0 = 1\n$k1 = 1\n$k2 = 1\n$k3 = 1\n$k4 = 1\n$k5 = 1\n$k6 = 1\n$k7 = 1\n$k8 = 1\n$k9 = 1\n$k10 = 1\n$k11 = 1\n$k12 = 1\n$k13 = 1\n$k14 = 1\n$k15 = 1\n$k16 = 1\n$k17 = 1\n$k18 = 1\n$k19 = 1\n$k20 = 1\n$k21 = 1\n$k22 = 1\n$k23 = 1\n$k24 = 1\n$k25 = 1\n$k26 = 1\n$k27 = 1\n$k28 = 1\n$k29 = 1\n$k30 = 1\n$k31 = 1\n$k32 = 1\n$k33 = 1\n$k34 = 1\n$k35 = 1\n$k36 = 1\n$k37 = 1\n$k38 = 1\n$k39 = 1\n$k40 = 1\n$k41 = 1\n$k42 = 1\n$k43 = 1\n$k44 = 1\n$k45 = 1\n$k46 = 1\n$k47 = 1\n$k48 = 1\n$k49 = 1\n$k50 = 1\n$k51 = 1\n$k52 = 1\n$k53 = 1\n$k54 = 1\n$k55 = 1\n$k56 = 1\n$k57 = 1\n$k58 = 1\n$k59 = 1\n$k60 = 1\n$k61 = 1\n$k62 = 1\n$k63 = 1\n$k64 = 1\n$k65 = 1\n$k66 = 1\n$k67 = 1\n$k68 = 1\n$k69 = 1\n$k70 = 1\n$k71 = 1\n$k72 = 1\n$k73 = 1\n$k74 = 1\n$k75 = 1\n$k76 = 1\n$k77 = 1\n$k78 = 1\n$k79 = 1\n$k80 = 1\n$k81 = 1\n$k82 = 1\n$k83 = 1\n$k84 = 1\n$k85 = 1\n$k86 = 1\n$k87 = 1\n$k88 = 1\n$k89 = 1\n$k90 = 1\n$k91 = 1\n$k92 = 1\n$k93 = 1\n$k94 = 1\n$k95 = 1\n$k96 = 1\n$k97 = 1\n$k98 = 1\n$k99 = 1\n$k100 = 1\n$k101 = 1\n$k102 = 1\n$k103 = 1\n$k104 = 1\n$k105 = 1\n$k106 = 1\n$k107 = 1\n$k108 = 1\n$k109 = 1\n$k110 = 1\n$k111 = 1\n$k112 = 1\n$k113 = 1\n$k114 = 1\n$k115 = 1\n$k116 = 1\n$k117 = 1\n$k118 = 1\n$k119 = 1\n$k120 = 1\n$k121 = 1\n$k122 = 1\n$k123 = 1\n$k124 = 1\n$k125 = 1\n$k126 = 1\n$k127 = 1\n$k128 = 1\n$k129 = 1\n$k130 = 1\n$k131 = 1\n$k132 = 1\n$k133 = 1\n$k134 = 1\n$k135 = 1\n$k136 = 1\n$k137 = 1\n$k138 = 1\n$k139 = 1\n$k140 = 1\n$k141 = 1\n$k142 = 1\n$k143 = 1\n$k144 = 1\n$k145 = 1\n$k146 = 1\n$k147 = 1\n$k148 = 1\n$k149 = 1\n$k150 = 1\n$k151 = 1\n$k152 = 1\n$k153 = 1\n$k154 = 1\n$k155 = 1\n$k156 = 1\n$k157 = 1\n$k158 = 1\n$k159 = 1\n$k160 = 1\n$k161 = 1\n$k162 = 1\n$k163 = 1\n$k164 = 1\n$k165 = 1\n$k166 = 1\n$k167 = 1\n$k168 = 1\n$k169 = 1\n$k170 = 1\n$k171 = 1\n$k172 = 1\n$k173 = 1\n$k174 = 1\n$k175 = 1\n$k176 = 1\n$k177 = 1\n$k178 = 1\n$k179 = 1\n$k180 = 1\n$k181 = 1\n$k182 = 1\n$k183 = 1\n$k184 = 1\n$k185 = 1\n$k186 = 1\n$k187 = 1\n$k188 = 1\n$k189 = 1\n$k190 = 1\n$k191 = 1\n$k192 = 1\n$k193 = 1\n$k194 = 1\n$k195 = 1\n$k196 = 1\n$k197 = 1\n$k198 = 1\n$k199 = 1\n$k200 = 1\n$k201 = 1\n$k202 = 1\n$k203 = 1\n$k204 = 1\n$k205 = 1\n$k206 = 1\n$k207 = 1\n$k208 = 1\n$k209 = 1\n$k210 = 1\n$k211 = 1\n$k212 = 1\n$k213 = 1\n$k214 = 1\n$k215 = 1\n$k216 = 1\n$k217 = 1\n$k218 = 1\n$k219 = 1\n$k220 = 1\n$k221 = 1\n$k222 = 1\n$k223 = 1\n$k224 = 1\n$k225 = 1\n$k226 = 1\n$k227 = 1\n$k228 = 1\n$k229 = 1\n$k230 = 1\n$k231 = 1\n$k232 = 1\n$k233 = 1\n$k234 = 1\n$k235 = 1\n$k236 = 1\n$k237 = 1\n$k238 = 1\n$k239 = 1\n$k240 = 1\n$k241 = 1\n$k242 = 1\n$k243 = 1\n$k244 = 1\n$k245 = 1\n$k246 = 1\n$k247 = 1\n$k248 = 1\n$k249 = 1\n$k250 = 1\n$k251 = 1\n$k252 = 1\n$k253 = 1\n$k254 = 1\n$k255 = 1\n$k256 = 1\n$k257 = 1\n$k258 = 1\n$k259 = 1\n$k260 = 1\n$k261 = 1\n$k262 = 1\n$k263 = 1\n$k264 = 1\n$k265 = 1\n$k266 = 1\n$k267 = 1\n$k268 = 1\n$k269 = 1\n$k270 = 1\n$k271 = 1\n$k272 = 1\n$k273 = 1\n$k274 = 1\n$k275 = 1\n$k276 = 1\n$k277 = 1\n$k278 = 1\n$k279 = 1\n$k280 = 1\n$k281 = 1\n$k282 = 1\n$k283 = 1\n$k284 = 1\n$k285 = 1\n$k286 = 1\n$k287 = 1\n$k288 = 1\n$k289 = 1\n$k290 = 1\n$k291 = 1\n$k292 = 1\n$k293 = 1\n$k294 = 1\n$k295 = 1\n$k296 = 1\n$k297 = 1\n$k298 = 1\n$k299 = 1\n$k300 = 1\n$k301 = 1\n$k302 = 1\n$k303 = 1\n$k304 = 1\n$k305 = 1\n$k306 = 1\n$k307 = 1\n$k308 = 1\n$k309 = 1\n$k310 = 1\n$k311 = 1\n$k312 = 1\n$k313 = 1\n$k314 = 1\n$k315 = 1\n$k316 = 1\n$k317 = 1\n$k318 = 1\n$k319 = 1\n$k320 = 1\n$k321 = 1\n$k322 = 1\n$k323 = 1\n$k324 = 1\n$k325 = 1\n$k326 = 1\n$k327 = 1\n$k328 = 1\n$k329 = 1\n$k330 = 1\n$k331 = 1\n$k332 = 1\n$k333 = 1\n$k334 = 1\n$k335 = 1\n$k336 = 1\n$k337 = 1\n$k338 = 1\n$k339 = 1\n$k340 = 1\n$k341 = 1\n$k342 = 1\n$k343 = 1\n$k344 = 1\n$k345 = 1\n$k346 = 1\n$k347 = 1\n$k348 = 1\n$k349 = 1\n$k350 = 1\n$k351 = 1\n$k352 = 1\n$k353 = 1\n$k354 = 1\n$k355 = 1\n$k356 = 1\n$k357 = 1\n$k358 = 1\n$k359 = 1\n$k360 = 1\n$k361 = 1\n$k362 = 1\n$k363 = 1\n$k364 = 1\n$k365 = 1\n$k366 = 1\n$k367 = 1\n$k368 = 1\n$k369 = 1\n$k370 = 1\n$k371 = 1\n$k372 = 1\n$k373 = 1\n$k374 = 1\n$k375 = 1\n$k376 = 1\n$k377 = 1\n$k378 = 1\n$k379 = 1\n$k380 = 1\n$k381 = 1\n$k382 = 1\n$k383 = 1\n$k384 = 1\n$k385 = 1\n$k386 = 1\n$k387 = 1\n$k388 = 1\n$k389 = 1\n$k390 = 1\n$k391 = 1\n$k392 = 1\n$k393 = 1\n$k394 = 1\n$k395 = 1\n$k396 = 1\n$k397 = 1\n$k398 = 1\n$k399 = 1\n$k400 = 1\n$k401 = 1\n$k402 = 1\n$k403 = 1\n$k404 = 1\n$k405 = 1\n$k406 = 1\n$k407 = 1\n$k408 = 1\n$k409 = 1\n$k410 = 1\n$k411 = 1\n$k412 = 1\n$k413 = 1\n$k414 = 1\n$k415 = 1\n$k416 = 1\n$k417 = 1\n$k418 = 1\n$k419 = 1\n$k420 = 1\n$k421 = 1\n$k422 = 1\n$k423 = 1\n$k424 = 1\n$k425 = 1\n$k426 = 1\n$k427 = 1\n$k428 = 1\n$k429 = 1\n$k430 = 1\n$k431 = 1\n$k432 = 1\n$k433 = 1\n$k434 = 1\n$k435 = 1\n$k436 = 1\n$k437 = 1\n$k438 = 1\n$k439 = 1\n$k440 = 1\n$k441 = 1\n$k442 = 1\n$k443 = 1\n$k444 = 1\n$k445 = 1\n$k446 = 1\n$k447 = 1\n$k448 = 1\n$k449 = 1\n$k450 = 1\n$k451 = 1\n$k452 = 1\n$k453 = 1\n$k454 = 1\n$k455 = 1\n$k456 = 1\n$k457 = 1\n$k458 = 1\n$k459 = 1\n$k460 = 1\n$k461 = 1\n$k462 = 1\n$k463 = 1\n$k464 = 1\n$k465 = 1\n$k466 = 1\n$k467 = 1\n$k468 = 1\n$k469 = 1\n$k470 = 1\n$k471 = 1\n$k472 = 1\n$k473 = 1\n$k474 = 1\n$k475 = 1\n$k476 = 1\n$k477 = 1\n$k478 = 1\n$k479 = 1\n$k480 = 1\n$k481 = 1\n$k482 = 1\n$k483 = 1\n$k484 = 1\n$k485 = 1\n$k486 = 1\n$k487 = 1\n$k488 = 1\n$k489 = 1\n$k490 = 1\n$k491 = 1\n$k492 = 1\n$k493 = 1\n$k494 = 1\n$k495 = 1\n$k496 = 1\n$k497 = 1\n$k498 = 1\n$k499 = 1\n$k500 = 1\n$k501 = 1\n$k502 = 1\n$k503 = 1\n$k504 = 1\n$k505 = 1\n$k506 = 1\n$k507 = 1\n$k508 = 1\n$k509 = 1\n$k510 = 1\n$k511 = 1\n$k512 = 1\n$k513 = 1\n$k514 = 1\n$k515 = 1\n$k516 = 1\n$k517 = 1\n$k518 = 1\n$k519 = 1\n$k520 = 1\n$k521 = 1\n$k522 = 1\n$k523 = 1\n$k524 = 1\n$k525 = 1\n$k526 = 1\n$k527 = 1\n$k528 = 1\n$k529 = 1\n$k530 = 1\n$k531 = 1\n$k532 = 1\n$k533 = 1\n$k534 = 1\n$k535 = 1\n$k536 = 1\n$k537 = 1\n$k538 = 1\n$k539 = 1\n$k540 = 1\n$k541 = 1\n$k542 = 1\n$k543 = 1\n$k544 = 1\n$k545 = 1\n$k546 = 1\n$k547 = 1\n$k548 = 1\n$k549 = 1\n$k550 = 1\n$k551 = 1\n$k552 = 1\n$k553 = 1\n$k554 = 1\n$k555 = 1\n$k556 = 1\n$k557 = 1\n$k558 = 1\n$k559 = 1\n$k560 = 1\n$k561 = 1\n$k562 = 1\n$k563 = 1\n$k564 = 1\n$k565 = 1\n$k566 = 1\n$k567 = 1\n$k568 = 1\n$k569 = 1\n$k570 = 1\n$k571 = 1\n$k572 = 1\n$k573 = 1\n$k574 = 1\n$k575 = 1\n$k576 = 1\n$k577 = 1\n$k578 = 1\n$k579 = 1\n$k580 = 1\n$k581 = 1\n$k582 = 1\n$k583 = 1\n$k584 = 1\n$k585 = 1\n$k586 = 1\n$k587 = 1\n$k588 = 1\n$k589 = 1\n$k590 = 1\n$k591 = 1\n$k592 = 1\n$k593 = 1\n$k594 = 1\n$k595 = 1\n$k596 = 1\n$k597 = 1\n$k598 = 1\n$k599 = 1\n$k600 = 1\n$k601 = 1\n$k602 = 1\n$k603 = 1\n$k604 = 1\n$k605 = 1\n$k606 = 1\n$k607 = 1\n$k608 = 1\n$k609 = 1\n$k610 = 1\n$k611 = 1\n$k612 = 1\n$k613 = 1\n$k614 = 1\n$k615 = 1\n$k616 = 1\n$k617 = 1\n$k618 = 1\n$k619 = 1\n$k620 = 1\n$k621 = 1\n$k622 = 1\n$k623 = 1\n$k624 = 1\n$k625 = 1\n$k626 = 1\n$k627 = 1\n$k628 = 1\n$k629 = 1\n$k630 = 1\n$k631 = 1\n$k632 = 1\n$k633 = 1\n$k634 = 1\n$k635 = 1\n$k636 = 1\n$k637 = 1\n$k638 = 1\n$k639 = 1\n$k640 = 1\n$k641 = 1\n$k642 = 1\n$k643 = 1\n$k644 = 1\n$k645 = 1\n$k646 = 1\n$k647 = 1\n$k648 = 1\n$k649 = 1\n$k650 = 1\n$k651 = 1\n$k652 = 1\n$k653 = 1\n$k654 = 1\n$k655 = 1\n$k656 = 1\n$k657 = 1\n$k658 = 1\n$k659 = 1\n$k660 = 1\n$k661 = 1\n$k662 = 1\n$k663 = 1\n$k664 = 1\n$k665 = 1\n$k666 = 1\n$k667 = 1\n$k668 = 1\n$k669 = 1\n$k670 = 1\n$k671 = 1\n$k672 = 1\n$k673 = 1\n$k674 = 1\n$k675 = 1\n$k676 = 1\n$k677 = 1\n$k678 = 1\n$k679 = 1\n$k680 = 1\n$k681 = 1\n$k682 = 1\n$k683 = 1\n$k684 = 1\n$k685 = 1\n$k686 = 1\n$k687 = 1\n$k688 = 1\n$k689 = 1\n$k690 = 1\n$k691 = 1\n$k692 = 1\n$k693 = 1\n$k694 = 1\n$k695 = 1\n$k696 = 1\n$k697 = 1\n$k698 = 1\n$k699 = 1\n$k700 = 1\n$k701 = 1\n$k702 = 1\n$k703 = 1\n$k704 = 1\n$k705 = 1\n$k706 = 1\n$k707 = 1\n$k708 = 1\n$k709 = 1\n$k710 = 1\n$k711 = 1\n$k712 = 1\n$k713 = 1\n$k714 = 1\n$k715 = 1\n$k716 = 1\n$k717 = 1\n$k718 = 1\n$k719 = 1\n$k720 = 1\n$k721 = 1\n$k722 = 1\n$k723 = 1\n$k724 = 1\n$k725 = 1\n$k726 = 1\n$k727 = 1\n$k728 = 1\n$k729 = 1\n$k730 = 1\n$k731 = 1\n$k732 = 1\n$k733 = 1\n$k734 = 1\n$k735 = 1\n$k736 = 1\n$k737 = 1\n$k738 = 1\n$k739 = 1\n$k740 = 1\n$k741 = 1\n$k742 = 1\n$k743 = 1\n$k744 = 1\n$k745 = 1\n$k746 = 1\n$k747 = 1\n$k748 = 1\n$k749 = 1\n$k750 = 1\n$k751 = 1\n$k752 = 1\n$k753 = 1\n$k754 = 1\n$k755 = 1\n$k756 = 1\n$k757 = 1\n$k758 = 1\n$k759 = 1\n$k760 = 1\n$k761 = 1\n$k762 = 1\n$k763 = 1\n$k764 = 1\n$k765 = 1\n$k766 = 1\n$k767 = 1\n$k768 = 1\n$k769 = 1\n$k770 = 1\n$k771 = 1\n$k772 = 1\n$k773 = 1\n$k774 = 1\n$k775 = 1\n$k776 = 1\n$k777 = 1\n$k778 = 1\n$k779 = 1\n$k780 = 1\n$k781 = 1\n$k782 = 1\n$k783 = 1\n$k784 = 1\n$k785 = 1\n$k786 = 1\n$k787 = 1\n$k788 = 1\n$k789 = 1\n$k790 = 1\n$k791 = 1\n$k792 = 1\n$k793 = 1\n$k794 = 1\n$k795 = 1\n$k796 = 1\n$k797 = 1\n$k798 = 1\n$k799 = 1\n$k800 = 1\n$k801 = 1\n$k802 = 1\n$k803 = 1\n$k804 = 1\n$k805 = 1\n$k806 = 1\n$k807 = 1\n$k808 = 1\n$k809 = 1\n$k810 = 1\n$k811 = 1\n$k812 = 1\n$k813 = 1\n$k814 = 1\n$k815 = 1\n$k816 = 1\n$k817 = 1\n$k818 = 1\n$k819 = 1\n$k820 = 1\n$k821 = 1\n$k822 = 1\n$k823 = 1\n$k824 = 1\n$k825 = 1\n$k826 = 1\n$k827 = 1\n$k828 = 1\n$k829 = 1\n$k830 = 1\n$k831 = 1\n$k832 = 1\n$k833 = 1\n$k834 = 1\n$k835 = 1\n$k836 = 1\n$k837 = 1\n$k838 = 1\n$k839 = 1\n$k840 = 1\n$k841 = 1\n$k842 = 1\n$k843 = 1\n$k844 = 1\n$k845 = 1\n$k846 = 1\n$k847 = 1\n$k848 = 1\n$k849 = 1\n$k850 = 1\n$k851 = 1\n$k852 = 1\n$k853 = 1\n$k854 = 1\n$k855 = 1\n$k856 = 1\n$k857 = 1\n$k858 = 1\n$k859 = 1\n$k860 = 1\n$k861 = 1\n$k862 = 1\n$k863 = 1\n$k864 = 1\n$k865 = 1\n$k866 = 1\n$k867 = 1\n$k868 = 1\n$k869 = 1\n$k870 = 1\n$k871 = 1\n$k872 = 1\n$k873 = 1\n$k874 = 1\n$k875 = 1\n$k876 = 1\n$k877 = 1\n$k878 = 1\n$k879 = 1\n$k880 = 1\n$k881 = 1\n$k882 = 1\n$k883 = 1\n$k884 = 1\n$k885 = 1\n$k886 = 1\n$k887 = 1\n$k888 = 1\n$k889 = 1\n$k890 = 1\n$k891 = 1\n$k892 = 1\n$k893 = 1\n$k894 = 1\n$k895 = 1\n$k896 = 1\n$k897 = 1\n$k898 = 1\n$k899 = 1\n$k900 = 1\n$k901 = 1\n$k902 = 1\n$k903 = 1\n$k904 = 1\n$k905 = 1\n$k906 = 1\n$k907 = 1\n$k908 = 1\n$k909 = 1\n$k910 = 1\n$k911 = 1\n$k912 = 1\n$k913 = 1\n$k914 = 1\n$k915 = 1\n$k916 = 1\n$k917 = 1\n$k918 = 1\n$k919 = 1\n$k920 = 1\n$k921 = 1\n$k922 = 1\n$k923 = 1\n$k924 = 1\n$k925 = 1\n$k926 = 1\n$k927 = 1\n$k928 = 1\n$k929 = 1\n$k930 = 1\n$k931 = 1\n$k932 = 1\n$k933 = 1\n$k934 = 1\n$k935 = 1\n$k936 = 1\n$k937 = 1\n$k938 = 1\n$k939 = 1\n$k940 = 1\n$k941 = 1\n$k942 = 1\n$k943 = 1\n$k944 = 1\n$k945 = 1\n$k946 = 1\n$k947 = 1\n$k948 = 1\n$k949 = 1\n$k950 = 1\n$k951 = 1\n$k952 = 1\n$k953 = 1\n$k954 = 1\n$k955 = 1\n$k956 = 1\n$k957 = 1\n$k958 = 1\n$k959 = 1\n$k960 = 1\n$k961 = 1\n$k962 = 1\n$k963 = 1\n$k964 = 1\n$k965 = 1\n$k966 = 1\n$k967 = 1\n$k968 = 1\n$k969 = 1\n$k970 = 1\n$k971 = 1\n$k972 = 1\n$k973 = 1\n$k974 = 1\n$k975 = 1\n$k976 = 1\n$k977 = 1\n$k978 = 1\n$k979 = 1\n$k980 = 1\n$k981 = 1\n$k982 = 1\n$k983 = 1\n$k984 = 1\n$k985 = 1\n$k986 = 1\n$k987 = 1\n$k988 = 1\n$k989 = 1\n$k990 = 1\n$k991 = 1\n$k992 = 1\n$k993 = 1\n$k994 = 1\n$k995 = 1\n$k996 = 1\n$k997 = 1\n$k998 = 1\n$k999 = 1\n",
+      "updates": [
+        {
+          "input": "$extra = 1\n",
+          "expect": {
+            "applied": false,
+            "issues": [
+              {
+                "line": 1,
+                "code": "document_too_large"
+              }
+            ]
+          }
+        },
+        {
+          "input": "$k0 = 2\n",
+          "expect": {
+            "applied": true,
+            "issues": []
+          }
+        }
+      ],
+      "expect": {
+        "issues": []
+      }
+    }
+  ]
+}

@@ -74,6 +74,8 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
   case handlerFailed = "handler_failed"
   case unknownEscape = "unknown_escape"
   case newerVersion = "newer_version"
+  case liveFieldConflict = "live_field_conflict"
+  case updateTooLarge = "update_too_large"
 
   public var severity: IssueSeverity {
     switch self {
@@ -109,6 +111,8 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .handlerFailed: .error
     case .unknownEscape: .warning
     case .newerVersion: .warning
+    case .liveFieldConflict: .error
+    case .updateTooLarge: .error
     }
   }
 
@@ -146,6 +150,8 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .handlerFailed: .renderer
     case .unknownEscape: .line
     case .newerVersion: .line
+    case .liveFieldConflict: .update
+    case .updateTooLarge: .update
     }
   }
 
@@ -184,6 +190,8 @@ public enum IssueCode: String, Sendable, CaseIterable, Hashable {
     case .handlerFailed: "An action's handler failed or the server refused it."
     case .unknownEscape: "A backslash sequence other than \\\", \\\\ or \\n was kept as literal text. The line is still accepted."
     case .newerVersion: "The version marker on line 1 names a newer Omni-IR version than the parser's. The rest of the stream is processed as usual."
+    case .liveFieldConflict: "An update assigns a $key that a field reads, before or after the update. What the person enters belongs to them."
+    case .updateTooLarge: "An update holds more than 2,000 lines."
     }
   }
 }

@@ -67,7 +67,7 @@ jobs:
           working-directory: android
           script: |
             ./gradlew :demo:connectedDebugAndroidTest --console=plain -Pandroid.testInstrumentationRunnerArguments.server=http://10.0.2.2:8787
-            bash scripts/review.sh
+            OMNI_SERVER=http://10.0.2.2:8787 bash scripts/review.sh
 
       - name: Collect the review files
         if: always()

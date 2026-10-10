@@ -61,6 +61,34 @@ tap_text "Pay now"
 adb exec-out screencap -p > review/screenshots/forms-confirmation.png
 echo "screenshot forms-confirmation"
 
+# Live screens (Step 22): the order from the server moves on by itself, then a return updates its Button.
+# adb shell joins its arguments into one command line, so a value with spaces is quoted again inside.
+if [ -n "${OMNI_SERVER:-}" ]; then
+  # Each screenshot waits until its status is on screen (up to 40 s), not a fixed time: a slow emulator
+  # takes longer to open the app and to get each update.
+  wait_text() {
+    for _ in $(seq 1 40); do
+      adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
+      adb pull /sdcard/ui.xml review/ui.xml >/dev/null 2>&1 || true
+      if grep -q "text=\"$1\"" review/ui.xml 2>/dev/null; then return 0; fi
+      sleep 1
+    done
+    echo "$1 never appeared"
+  }
+  adb shell am force-stop "$APP"
+  adb shell am start -W -n "$APP/.MainActivity" --es server "$OMNI_SERVER" --es prompt "'where is my order?'" --es appearance light >/dev/null
+  wait_text "Shipped"
+  adb exec-out screencap -p > review/screenshots/live-1-shipped.png
+  wait_text "Out for delivery"
+  adb exec-out screencap -p > review/screenshots/live-2-out-for-delivery.png
+  wait_text "Delivered"
+  adb exec-out screencap -p > review/screenshots/live-3-delivered.png
+  tap_text "Request a return"
+  wait_text "Return requested. We'll email you a label."
+  adb exec-out screencap -p > review/screenshots/live-4-return-requested.png
+  echo "screenshots live-1 to live-4"
+fi
+
 # Recording: the booking screen streams in, then Reserve is tapped (found through the accessibility tree).
 adb shell am force-stop "$APP"
 adb shell screenrecord --time-limit 30 /sdcard/streaming.mp4 &

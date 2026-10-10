@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.Constraints
@@ -90,6 +92,12 @@ public fun OmniView(
     }
   }
   asking?.let { ConfirmDialog(it, strings) }
+  // [8.8]: after an update, read out what changed Notices say, politely; nothing moves focus.
+  val view = LocalView.current
+  LaunchedEffect(document.lastUpdate) {
+    val said = store.updateAnnouncement(document)
+    if (said.isNotEmpty()) view.announceForAccessibility(said)
+  }
   CompositionLocalProvider(LocalRender provides context, LocalOmniStrings provides strings) {
     // The marker is line 1, so the notice appears before anything else and never moves the screen.
     if (document.newerVersion) {

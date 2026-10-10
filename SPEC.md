@@ -539,6 +539,8 @@ An McpMutation isn't displayed. It only approves one action for its Button.
 | `handler_failed` | error | in the renderer | An action's handler failed or the server refused it. |
 | `unknown_escape` | warning | when the line arrives | A backslash sequence other than \", \\ or \n was kept as literal text. The line is still accepted. |
 | `newer_version` | warning | when the line arrives | The version marker on line 1 names a newer Omni-IR version than the parser's. The rest of the stream is processed as usual. |
+| `live_field_conflict` | error | when an update arrives (nothing in it applies) | An update assigns a $key that a field reads, before or after the update. What the person enters belongs to them. |
+| `update_too_large` | error | when an update arrives (nothing in it applies) | An update holds more than 2,000 lines. |
 <!-- /generated:issues -->
 
 ## 8. Renderer requirements
@@ -598,6 +600,10 @@ A field is an Input, DateInput, Select or Switch. Its constraints ([5.26]) let t
 **App components**
 - **[8.7]** A renderer MUST draw an app component ([5.27]) only with the app's own view for that name, giving it the component's checked props with each `$key` replaced by its current value, its children in order, pictures by name ([5.30]), and, for a component that edits a `$state`, a way to change that state through the renderer. A component declared as a field gets the field's message as [8.5] says, and a press checks it as [8.6] says. Where the app has no view for a declared component, the renderer MUST show its own fallback in that place and draw the rest of the screen.
 - *Tested by:* `tests/renderer.app.test.tsx`; Swift and Kotlin in their store and demo tests.
+
+**Updates**
+- **[8.8]** When an update ([10.29]) is applied, a renderer MUST keep each component still on the screen in its place, with its identity, as while streaming, so focus, scrolling, an open Tab and what the person is entering stay as they were; it MUST NOT move focus because of an update. It SHOULD announce to assistive technology, politely, the text of each Notice the update adds or changes, and nothing else, so a busy screen doesn't talk all the time: an app puts what the person must hear in a Notice.
+- *Tested by:* `tests/live.renderer.test.tsx`; Swift and Kotlin in their store tests.
 
 **Themes and the renderer's own words**
 - Colours, fonts and shapes come only from the app: the renderer's defaults, or design tokens the app sets. Nothing in the stream chooses them, beyond picking among the catalog's own styles through enum props such as `tone`. The reference renderers share one list of tokens with light and dark defaults (`conformance/theme.json`).
@@ -660,7 +666,7 @@ Sections 3 to 7 define the text. This section defines how a server sends that te
 - **[10.8]** The first terminal event decides the outcome. A client MUST ignore every event after it.
 - **[10.9]** When the response ends, for any reason, the client MUST end the parser ([3.4]), so anything still pending becomes a fallback ([7.3]) instead of loading forever. If no terminal event arrived, the outcome is `connection_lost`, retryable. A client cancelled by the app reports that it was cancelled, and still ends the parser.
 - **[10.10]** While it has no event to send, a server MUST send a comment line (`: ping`) at least every 15 seconds. A client SHOULD treat 45 seconds without any bytes as `connection_lost`, and close the response.
-- **[10.11]** A stream can't be resumed. A server doesn't send event ids, and a client doesn't reconnect by itself. Retrying means a new request and a new parser.
+- **[10.11]** A stream can't be resumed. A server doesn't send event ids, and a client doesn't reconnect by itself. Retrying means a new request and a new parser. (A screen's live feed can be followed again, [10.39].)
 
 **Versions**
 - **[10.12]** A server MUST answer `unsupported_version` ([10.2]), before streaming, only when the client asked for an older format than the one it writes (comparing as in [3.9], including its substitution of 0.6 and 0.7); a client reads its own format and every older one, because formats only add (section 12). A client that gets `unsupported_version` MAY ask once more without a `version`, since servers 0.6 and 0.7 refused any number but their own; the version marker then tells it whether the stream is newer than it reads.
@@ -710,6 +716,30 @@ A server MAY check that a model writes good Omni-IR before it serves that model'
 - **[10.27]** The tool's result MUST tell the model which lines were rejected, with their line numbers and issue codes, so it can call the tool again with a corrected screen. The parts that were accepted are still shown.
 - **[10.28]** Each tool in the app's registry is offered as an MCP tool with `visibility: ["app"]`, so the model can't call it and only the view can. A pressed button sends `tools/call` through the host with the params, and a new idempotency key in `_meta["io.omni-ir/idempotency-key"]`. The server MUST check the call as [10.14] requires (the tool's schema, who is calling, the key) before running anything: nothing from the view is trusted. A refusal comes back as an error result with `structuredContent` `{"code": "…", "message": "…"}`, which the view shows as a failed action.
 
+**Updates** (optional for servers and clients)
+
+An **update** changes a screen after its stream has ended: a delivery status moves on, a chart gets this hour's numbers, a pressed button's result shows on the screen it was pressed on. It is Omni-IR text written by the app's own code, never by the model, and it arrives as an action's result ([10.35]) or on a live feed ([10.36]). Updates don't change the stream format (section 12): a stream is read exactly as before, and a client that doesn't apply updates never receives any.
+- **[10.29]** A client MUST apply an update only to a screen whose stream has ended ([3.4]), and only an update from its app's server. Inside a stream a second assignment stays a `duplicate_id` error ([5.3]), so a model can't change what it, or the app, has already shown.
+- **[10.30]** An update is lines of the flat grammar (section 4), read as a stream's lines are ([3.2], [3.5]–[3.7]; a version marker is an ordinary comment), with line numbers counting from 1 in each update. A line for an id the screen has replaces that component or McpMutation; a line for a `$key` the screen has sets that value; any other line adds, as in a stream. One update MUST assign each id and `$key` at most once (`duplicate_id`), and MAY hold at most 2,000 lines; a longer one is an `update_too_large` error.
+- **[10.31]** After its lines, the screen keeps only the components it can reach from `root` through children lists, and the McpMutations whose targets it keeps as Buttons with an `action`; `$key`s all stay. So a component leaves the screen, with everything inside it, when its parent's new line stops listing it; a component the update adds without listing it anywhere is not kept; and a Button replaced by something without an action (a Notice saying it's done, say) loses its McpMutation with it.
+- **[10.32]** Each line MUST pass the checks a stream's line gets on its own: grammar, catalog, props, tools and pictures (sections 4 to 6). The screen the update would leave is then checked with every rule of section 5, as at the end of a stream ([5.25] included). For this check, the screen's lines keep their order, a replaced line keeping its place and new lines following in the update's order.
+- **[10.33]** An update is applied whole or not at all. If any line fails, or the screen it would leave has an error (by code and the id it concerns) that the screen didn't have before, nothing changes, and the client reports every issue, each with the line of the update that assigned the id it concerns, if any. Errors the screen already had, such as a reference that never arrived, don't stop an update. A rejected update is a bug in the app's code, so it is reported to the app, never to the person.
+- **[10.34]** An update MUST NOT assign a `$key` the screen already has when a field (an Input, DateInput, Select or Switch, or an app component that edits a `$key`, [5.28]) reads it, before or after the update: that is a `live_field_conflict` error. What the person enters belongs to them. A new `$key`, for a new field, is allowed.
+
+**Action results**
+- **[10.35]** An action's result MAY carry an update: `{"ok": true, "tool": "…", "result": {…}, "update": "…"}` from the mutate endpoint ([10.14]), or an `update` string in an MCP tool result's `structuredContent` ([10.28]). A client that applies updates MUST apply it to the screen whose Button was pressed, after the action succeeds, and MUST ignore an `update` that isn't a string. So that the update can name that Button, a client MAY add its id to the request, as `"button": "…"` in the mutate body or `_meta["io.omni-ir/button"]` in the MCP call. The server MUST NOT trust it for anything but writing the update, which the client checks like any other.
+
+**The live feed**
+- **[10.36]** A server that keeps a screen current sends a `live` event before the stream's terminal event: `{"screen": "…"}`, an id it chose for this screen, with at least 128 random bits, and tied to the person when the screen is theirs. A client that doesn't follow screens skips it ([10.7]).
+- **[10.37]** After the screen's stream ends with `done`, a client MAY follow it with a `GET` to the server's live endpoint (`/api/live` in the reference server), with the query parameters `screen` and `after`, the `seq` of the last update it applied (`0` at first), `Accept: text/event-stream` and the person's credentials. The server answers with an error as [10.2] says, `404` `not_found` for a screen it doesn't know, has stopped following or that isn't the person's, or `200` with Server-Sent Events, written and read as [10.4] and [10.6] say:
+  - `update` · `{"seq": 1, "text": "…"}`: the next update; `seq` counts from 1 for each screen.
+  - `end` · `{}`: the screen won't change again; the server then closes the response.
+
+  While it has nothing to send, the server sends pings ([10.10]).
+- **[10.38]** A client MUST apply updates in the order they arrive, and MUST skip an update whose `seq` isn't greater than the last one it received. A rejected update ([10.33]) still counts as received. Its updates come only from the app's code: a server MUST NOT send text a model wrote as an update, and SHOULD check each update against its own copy of the screen before sending it.
+- **[10.39]** When the response ends without `end`, a client SHOULD follow again, at least one second later and waiting longer after each failure, up to a minute, with `after` set to the last `seq` it received. The server sends every update after that one, in order. If it no longer has them all, it sends one update instead, numbered as its latest, holding the latest line of each id and `$key` its updates assigned that the screen still has, except `$key`s a field reads, so the client's screen catches up instead of going back. A client stops following on `end`, on an error that isn't retryable, and when the app closes the screen.
+- **[10.40]** A server SHOULD send no more than 10 updates a second for one screen, and SHOULD stop following a screen nobody has followed for an hour. The reference server follows a screen only while the app's code has something to say about it (the demo's order and sales screens).
+
 ## 11. Security considerations
 
 What the format prevents:
@@ -736,6 +766,8 @@ This is specification 0.10, a draft, describing **stream format 0.8**. The two n
 Until 1.0, a new format version only adds: new components, props, allowed values, issue codes or rules that accept more. It never removes or changes the meaning of something an older format had, so a parser reads its own format and every older one, and a server can serve any client that reads its format or a newer one ([10.12]). Format **0.8** added field constraints ([5.26]); it followed 0.5 directly, because the release numbers 0.6 and 0.7 name format 0.5 ([3.9]). The next format is numbered **0.9**.
 
 Adding to the catalog is a format change. Because the catalog is strict ([5.9]), a parser built for an older format rejects a new component (`unknown_component`), a new prop or a new allowed value (`invalid_props`), and its renderer shows a fallback in that place. A server SHOULD therefore ask a model only for what its clients' format accepts. The reference server generates its system prompt from its own schema.
+
+Updates ([10.29]–[10.40]) don't change the format version either: a stream is read exactly as before, and an update is the app's own text, sent only to clients that follow a screen or run its actions. Their two issue codes, `live_field_conflict` and `update_too_large`, are never reported for a stream.
 
 An app's own components ([5.27]) and picture families ([5.30]) don't change the format version: like its tools, they are agreed between an app and its own server, which describes them to the model. A parser without the app's declarations reports such a line as `unknown_component`, and its renderer shows a fallback there.
 
@@ -827,5 +859,4 @@ Issues reported:
 ## Not yet specified
 
 - Data-driven lists. A List's items are written out one by one; there are no loops or bindings to collections.
-- A way to update or remove a component after its line has arrived. In format 0.8 an id can't be reassigned ([5.3]).
-- Renderers other than the web reference renderer.
+- Changes the model asks for after a screen is shown. Only the app's code updates a screen ([10.29]); a model that wants a different screen writes a new one.

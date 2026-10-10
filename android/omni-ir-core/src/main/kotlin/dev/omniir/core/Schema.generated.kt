@@ -88,6 +88,8 @@ public enum class IssueCode(
   HANDLER_FAILED("handler_failed", IssueSeverity.ERROR, IssueStage.RENDERER, "An action's handler failed or the server refused it."),
   UNKNOWN_ESCAPE("unknown_escape", IssueSeverity.WARNING, IssueStage.LINE, "A backslash sequence other than \\\", \\\\ or \\n was kept as literal text. The line is still accepted."),
   NEWER_VERSION("newer_version", IssueSeverity.WARNING, IssueStage.LINE, "The version marker on line 1 names a newer Omni-IR version than the parser's. The rest of the stream is processed as usual."),
+  LIVE_FIELD_CONFLICT("live_field_conflict", IssueSeverity.ERROR, IssueStage.UPDATE, "An update assigns a \$key that a field reads, before or after the update. What the person enters belongs to them."),
+  UPDATE_TOO_LARGE("update_too_large", IssueSeverity.ERROR, IssueStage.UPDATE, "An update holds more than 2,000 lines."),
 }
 
 /** Size limits of the protocol. */

@@ -2,6 +2,7 @@
 // handlers. Actions go through runMutation, like POST /api/mutate, so they get the same access rules,
 // ownership checks, idempotency keys and audit trail. Counts of screens shown and actions run, for
 // the log and /api/health (B.5): never a screen's text or an action's params.
+import { ACTION_UPDATES } from "../app/live";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -74,10 +75,10 @@ export function referenceMcp({ tools, assets, components, pictures, handlers, co
       viewHtml,
       user,
       onEvent,
-      onAction: async ({ tool, params, idempotencyKey }): Promise<ActionResult> => {
-        const answer = await runMutation({ tool, params, user, idempotencyKey }, { tools, handlers, ctx: context() });
-        const body = answer.body as { result?: Record<string, unknown>; error?: { code?: string; message?: string } };
-        if (answer.status < 400) return { ok: true, result: body.result ?? {} };
+      onAction: async ({ tool, params, idempotencyKey, button }): Promise<ActionResult> => {
+        const answer = await runMutation({ tool, params, user, idempotencyKey, button }, { tools, handlers, ctx: context(), updates: ACTION_UPDATES });
+        const body = answer.body as { result?: Record<string, unknown>; update?: string; error?: { code?: string; message?: string } };
+        if (answer.status < 400) return { ok: true, result: body.result ?? {}, ...(body.update === undefined ? {} : { update: body.update }) };
         return { ok: false, code: body.error?.code ?? answer.outcome, message: body.error?.message ?? "The action could not be completed." };
       },
     });

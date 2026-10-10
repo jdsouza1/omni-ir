@@ -1,6 +1,12 @@
 # Omni-IR — Step 22: live screens
 
-Status: **DRAFT for approval (2026-10-10).** Free: no paid API; the live demo's updates come from the reference server's own code and the mock model. Nothing here is built until you approve it.
+Status: **Approved 2026-10-10 with the recommendations (all eight decisions); built, reviewed and merged 2026-10-10; not yet released.** Free: no paid API; the live demo's updates come from the reference server's own code and the mock model.
+
+**Decided while building** (within the approved decisions):
+- *How the model knows what the app will update:* the system prompt lists the app's **live parts** (`LIVE_PARTS`, `app/live.ts`), the ids and `$keys` it keeps current, so a model's screen uses them (decision 2 needed it: only the app writes updates, so it must know the ids).
+- *A Button replaced by something without an action loses its McpMutation* ([10.31]), and the client sends the pressed Button's id with the action, so a result can say it's done where the Button was (decision 3).
+- *Updates are rules in section 10*, not section 5, with two issue codes reported only for updates, so the stream format stays 0.8 (decision 7).
+- *AG-UI needs nothing new:* its actions already go through `/api/mutate` ([10.20]), which carries updates; a live feed isn't offered over MCP, whose views have no network.
 
 ## Goal
 
@@ -96,23 +102,23 @@ Each update is checked like a screen: catalog, props, types, tree rules and gove
 ## Checklist
 
 **A. Updates in the parser** *(tests first)*
-- [ ] A.1 SPEC.md: what an update may do (replace, set, add, remove by omission), what it may not (fields, the model's stream), and its limits; conformance cases with updates
-- [ ] A.2 TypeScript, Swift and Kotlin apply updates with the incremental checks; fuzz streams with updates
+- [x] A.1 SPEC.md: what an update may do (replace, set, add, remove by omission), what it may not (fields, the model's stream), and its limits; conformance cases with updates
+- [x] A.2 TypeScript, Swift and Kotlin apply updates with the incremental checks; fuzz streams with updates
 
 **B. Channels**
-- [ ] B.1 Action results with updates: `/api/mutate`, the MCP bridge, AG-UI; the clients apply them
-- [ ] B.2 The live feed: `GET /api/live`, sequence numbers, resume, limits; the web, Swift and Kotlin clients; the in-browser API for the hosted playground
+- [x] B.1 Action results with updates: `/api/mutate`, the MCP bridge, AG-UI; the clients apply them
+- [x] B.2 The live feed: `GET /api/live`, sequence numbers, resume, limits; the web, Swift and Kotlin clients; the in-browser API for the hosted playground
 
 **C. Renderers**
-- [ ] C.1 React and `<omni-screen>`: replaced components keep their place and focus; Notices announced
-- [ ] C.2 SwiftUI and Compose: the same (CI on a `wip/**` branch)
+- [x] C.1 React and `<omni-screen>`: replaced components keep their place and focus; Notices announced
+- [x] C.2 SwiftUI and Compose: the same (CI on a `wip/**` branch)
 
 **D. Demo and docs**
-- [ ] D.1 The order moving and the chart updating in the playground and both demo apps; a returned item updating its screen
-- [ ] D.2 A guide, CHANGELOG, the decision log; "Not yet specified" updated
+- [x] D.1 The order moving and the chart updating in the playground and both demo apps; a returned item updating its screen
+- [x] D.2 A guide, CHANGELOG, the decision log; "Not yet specified" updated
 
 **E. Review**
-- [ ] E.1 A review page with screenshots and a recording on web, iPhone and Android
-- [ ] E.2 Merge with your approval
+- [x] E.1 A review page with screenshots and a recording on web, iPhone and Android
+- [x] E.2 Merge with your approval
 - [ ] E.3 Release: a separate go-ahead from you
 - [ ] E.4 A retrospective through every step (1 to 22), like the earlier one in the decision log: what worked, what didn't, lessons, and proposed fixes for your approval

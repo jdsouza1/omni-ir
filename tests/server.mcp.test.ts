@@ -102,6 +102,9 @@ describe("the reference server over MCP", () => {
     const client = await connect();
     const done = await client.callTool({ name: "orders.requestReturn", arguments: { orderId: "A1B2-7731" } });
     expect(done.isError).toBeFalsy();
+    // With the pressed Button's id, the result carries the app's update for it [10.35].
+    const named = await client.callTool({ name: "orders.requestReturn", arguments: { orderId: "A1B2-7731" }, _meta: { "io.omni-ir/button": "returnItem" } });
+    expect((named.structuredContent as { update?: string }).update).toBe(`returnItem = Notice("Return requested. We'll email you a label.", tone="success")\n`);
   });
 
   it("counts screens shown and actions run, per tool, in the log and /api/health [B.5]", async () => {

@@ -230,3 +230,48 @@ describe("app components in <omni-screen> [8.7]", () => {
     expect(() => (el.components = { Card: { description: "x", props: {}, tag: "x-card" } })).toThrow();
   });
 });
+
+describe("updates in <omni-screen> [10.29] [10.35] [10.37]", () => {
+  const ORDER_TOOLS = { "orders.requestReturn": { type: "object", properties: { orderId: { type: "string" } }, required: ["orderId"] } };
+  const text = (el: OmniScreenElement) => shadow(el).textContent ?? "";
+
+  it("follows a screen the server keeps current, and an action's result updates where its Button was", async () => {
+    const steps: (() => void)[] = [];
+    const api = createInBrowserApi({ model: new MockModel({ speed: "instant", seed: 1 }), schedule: (fn) => (steps.push(fn), () => {}) });
+    const updates: boolean[] = [];
+    const el = mount((e) => {
+      e.tools = ORDER_TOOLS;
+      e.fetch = (input: RequestInfo | URL, init?: RequestInit) => api(String(input), init ?? {});
+      e.addEventListener("omni-update", (ev) => updates.push((ev as CustomEvent).detail.applied));
+    });
+    await act(async () => {
+      expect(await el.generate("where is my order?")).toMatchObject({ status: "done", screen: expect.any(String) });
+    });
+    await flush();
+    expect(text(el)).toContain("Shipped");
+    await act(async () => steps.shift()?.());
+    await flush();
+    expect(text(el)).toContain("Out for delivery");
+
+    await act(async () => button(el, "Request a return")!.click());
+    await flush();
+    expect(text(el)).toContain("Return requested.");
+    expect(button(el, "Request a return")).toBeUndefined();
+    expect(updates).toEqual([true, true]);
+  });
+
+  it("applies the app's own updates with update(), whole or not at all", async () => {
+    const el = mount((e) => (e.tools = PAY_TOOLS));
+    await act(async () => {
+      el.write(PAY);
+      el.end();
+    });
+    await flush();
+    let result: { applied: boolean } | undefined;
+    await act(async () => void (result = el.update('title = Heading("Paid")\n')));
+    await flush();
+    expect(result?.applied).toBe(true);
+    expect(shadow(el).querySelector("h2, h1, h3")?.textContent).toBe("Paid");
+    expect(el.update('title = Nope("x")\n').applied).toBe(false);
+  });
+});

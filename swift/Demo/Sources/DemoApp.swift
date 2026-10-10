@@ -140,7 +140,9 @@ struct ScreenView: View {
     case .fixture:
       return { call in log.append("Sent \(call.tool) \(describe(call.params)): stub result, nothing left the device") }
     case .server(let url, _):
-      let send = OmniClient(baseURL: url).mutationHandler { call, result in
+      // An action's result may update the screen where its Button was (SPEC.md [10.35]).
+      let store = store
+      let send = OmniClient(baseURL: url).mutationHandler(onUpdate: { text, _ in _ = store.update(text) }) { call, result in
         log.append("Sent \(call.tool) \(describe(call.params)). Server result: \(String(decoding: result, as: UTF8.self))")
       }
       return send
@@ -152,9 +154,16 @@ struct ScreenView: View {
     switch source {
     case .fixture(let fixture): await streamFixture(fixture)
     case .server(let url, let prompt):
-      let outcome = await OmniClient(baseURL: url).generate(prompt, into: store)
+      let client = OmniClient(baseURL: url)
+      let outcome = await client.generate(prompt, into: store)
       if case .error(let code, let message, _) = outcome { log.append("\(code): \(message)") }
       done = true
+      // A screen the server keeps current (the order moving on): follow it while this view is shown ([10.37]).
+      if case .done(_, _, _, let screen?) = outcome {
+        _ = await client.follow(screen, into: store) { result, _ in
+          if !result.applied { log.append("Update rejected: \(result.issues.map(\.code.rawValue).joined(separator: ", "))") }
+        }
+      }
     }
   }
 

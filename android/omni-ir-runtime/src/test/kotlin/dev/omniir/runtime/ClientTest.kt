@@ -88,7 +88,7 @@ class ClientTest {
         exchange.responseBody.use { out ->
           out.write("event: chunk\ndata: ${Json.obj(mapOf("text" to "root = Divider()\n"))}\n\n".toByteArray())
           out.flush()
-          Thread.sleep(1500)
+          Thread.sleep(3000)
         }
         return@createContext
       }
@@ -148,7 +148,7 @@ class ClientTest {
   @Test
   fun `no bytes for the idle timeout is a lost connection, and the store is still ended (10_10)`() = runBlocking {
     val store = store()
-    val impatient = OmniClient("http://127.0.0.1:${server.address.port}", idleTimeoutMillis = 200)
+    val impatient = OmniClient("http://127.0.0.1:${server.address.port}", idleTimeoutMillis = 1000)
     assertEquals(CONNECTION_LOST, impatient.generate("stall", store))
     assertTrue(store.document.value.complete)
     assertEquals(setOf("root"), store.document.value.nodes.keys)

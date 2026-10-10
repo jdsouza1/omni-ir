@@ -19,6 +19,9 @@ public sealed interface ParserEvent {
 
   /** End of stream, with the end-of-stream issues. */
   public data class End(val issues: List<Issue>) : ParserEvent
+
+  /** An update after the stream ended ([10.29]), applied whole or not at all; its issues count lines from 1 in the update. */
+  public data class Update(val result: UpdateResult) : ParserEvent
 }
 
 public class OmniParser(
@@ -45,8 +48,10 @@ public class OmniParser(
   public var onChange: ((OmniDocument) -> Unit)? = null
 
   private val reported = mutableListOf<Issue>()
+  private val maxLineLength = maxLineLength
   private val buffer = LineBuffer(maxLineLength)
-  private val accepted = mutableListOf<Statement>()
+  private var accepted = mutableListOf<Statement>()
+  private var screenIssues: List<Issue> = emptyList()
   private val index = DocumentIndex()
   private val lineOf = mutableMapOf<String, Int>()
 
@@ -81,6 +86,7 @@ public class OmniParser(
       if (line != null) issue.copy(line = line) else issue
     }
     endIssues = found
+    screenIssues = validateDocument(accepted, complete = true)
     if (!document.complete) {
       document = document.copy(missing = pending.toSet(), pending = emptySet(), complete = true, revision = document.revision + 1)
     }
@@ -91,6 +97,59 @@ public class OmniParser(
     }
     onEvent?.invoke(ParserEvent.End(found))
     return found
+  }
+
+  /**
+   * Apply an update from the app's own code to the ended screen (SPEC.md [10.29]-[10.34]): the same lines
+   * as a stream, where an id or `$key` the screen has is replaced. Applied whole or not at all. Never pass
+   * text a model wrote. Before `end()`, it changes nothing and reports why.
+   */
+  public fun update(text: String): UpdateResult {
+    if (endIssues == null) {
+      return UpdateResult(false, listOf(Issue(IssueCode.UPDATE_TOO_LARGE, "updates change an ended screen: end() the stream first")))
+    }
+    val result = when (val plan = planUpdate(accepted, screenIssues, text, tools, assets, components, pictures, maxLineLength)) {
+      is UpdatePlan.Rejected -> UpdateResult(false, plan.issues)
+      is UpdatePlan.Applied -> {
+        val kept = plan.statements.map { it.definedId }.toSet()
+        for (s in accepted) {
+          if (s.definedId in kept) continue
+          when (s) {
+            is Statement.Node -> nodes.remove(s.node.id)
+            is Statement.MutationStatement -> if (mutations[s.mutation.target]?.id == s.mutation.id) mutations.remove(s.mutation.target)
+            is Statement.State -> {}
+          }
+        }
+        var newState: LinkedHashMap<String, Primitive>? = null
+        for (s in plan.assigned) {
+          when (s) {
+            is Statement.State -> (newState ?: LinkedHashMap(state).also { newState = it })[s.key] = s.value
+            is Statement.Node -> nodes[s.node.id] = s.node
+            is Statement.MutationStatement -> {
+              // A replaced McpMutation may govern another Button now.
+              mutations.entries.removeAll { it.value.id == s.mutation.id }
+              mutations[s.mutation.target] = s.mutation
+            }
+          }
+        }
+        newState?.let { state = it }
+        accepted = plan.statements.toMutableList()
+        screenIssues = plan.documentIssues
+        val count = (document.lastUpdate?.count ?: 0) + 1
+        document = document.copy(
+          nodes = nodes,
+          mutations = mutations,
+          state = state,
+          missing = missingReferences(plan.statements),
+          revision = document.revision + 1,
+          lastUpdate = LastUpdate(count, plan.assigned.map { it.definedId }),
+        )
+        onChange?.invoke(document)
+        UpdateResult(true, plan.issues)
+      }
+    }
+    onEvent?.invoke(ParserEvent.Update(result))
+    return result
   }
 
   /** A local state edit from an Input or DateInput (R1). The key must already be declared by the stream. */

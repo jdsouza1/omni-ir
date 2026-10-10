@@ -7,6 +7,7 @@ import { z } from "zod";
 import { ASSETS, type AssetRegistry } from "../app/assets";
 import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
+import { LIVE_PARTS } from "../app/live";
 import { describeAppComponent, describeComponent, describeValue, type AppComponents, type JsonSchema, type PicturePattern } from "@omni-ir/core";
 import { COMPONENT_TYPES, type ToolRegistry } from "@omni-ir/core";
 
@@ -18,6 +19,8 @@ export interface PromptOptions {
   components?: AppComponents;
   /** Families of picture names the app looks up (Step 20); defaults to the demo app's. */
   pictures?: readonly PicturePattern[];
+  /** Parts of a screen the app keeps current (Step 22), by id or $key; defaults to the demo app's. */
+  live?: Readonly<Record<string, string>>;
   fixturesDir?: string;
   /** Fixture names used as examples, in order. */
   examples?: string[];
@@ -30,6 +33,7 @@ export function buildSystemPrompt(options: PromptOptions = {}): string {
   const assets = options.assets ?? ASSETS;
   const appComponents = Object.values(options.components ?? APP_COMPONENTS);
   const patterns = options.pictures ?? PICTURES;
+  const live = Object.entries(options.live ?? LIVE_PARTS);
   const dir = options.fixturesDir ?? resolve("fixtures");
   const examples = (options.examples ?? DEFAULT_EXAMPLES).map((name) =>
     readFileSync(join(dir, `${name}.omni`), "utf8")
@@ -90,7 +94,11 @@ The app adds these components of its own. Use them like the ones above when they
 
 ${appComponents.map(appComponentBlock).join("\n\n")}
 ` : ""}
-## Tools
+${live.length > 0 ? `## Live parts
+The app keeps these parts up to date while the screen is open. When a screen shows one, give it exactly this id or $key; the app changes it later, so write only its first version.
+${live.map(([name, what]) => `- ${name}: ${what}`).join("\n")}
+
+` : ""}## Tools
 ${Object.entries(tools)
   .map(([name, schema]) => describeTool(name, schema))
   .join("\n")}

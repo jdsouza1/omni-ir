@@ -873,7 +873,7 @@ function inputStateIssue(node: OmniNode, value: Primitive | undefined): Issue | 
 }
 
 /** The `$state` a field or an editing app component is bound to, if any. */
-function boundKey(node: OmniNode): string | undefined {
+export function boundKey(node: OmniNode): string | undefined {
   if (node.type === "App") return node.holds === undefined ? undefined : editedKey(node);
   if (node.type === "Input" || node.type === "DateInput" || node.type === "Select" || node.type === "Switch") return node.props.value.key;
   return undefined;

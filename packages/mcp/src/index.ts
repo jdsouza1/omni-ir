@@ -2,7 +2,7 @@
 // createOmniMcpServer gives an MCP server whose show_screen tool takes Omni-IR from the host's model,
 // a view that draws it with the Trusted Catalog, and the app's tools as actions only that view can
 // call, each checked here again. See SPEC.md [10.25]–[10.28].
-export { CONFIG_ELEMENT_ID, CONFIG_PLACEHOLDER, IDEMPOTENCY_META_KEY, SCREEN_TOOL, VIEW_URI } from "./constants.js";
+export { BUTTON_META_KEY, CONFIG_ELEMENT_ID, CONFIG_PLACEHOLDER, IDEMPOTENCY_META_KEY, SCREEN_TOOL, VIEW_URI } from "./constants.js";
 export {
   createOmniMcpServer,
   MAX_SCREEN_CHARS,

@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { App } from "@modelcontextprotocol/ext-apps";
 import { AppBridge } from "@modelcontextprotocol/ext-apps/app-bridge";
 import { InMemoryTransport } from "@modelcontextprotocol/server";
-import { IDEMPOTENCY_META_KEY, viewConfig } from "@omni-ir/mcp";
+import { BUTTON_META_KEY, IDEMPOTENCY_META_KEY, viewConfig } from "@omni-ir/mcp";
 import { createViewController, OmniMcpView } from "../packages/mcp/src/view/View";
 import { ASSETS } from "../app/assets";
 import { TOOLS } from "../app/tools";
@@ -75,6 +75,20 @@ describe("the bridge's view [10.26]", () => {
     expect(calls).toHaveLength(1);
     expect(calls[0]).toMatchObject({ name: "payments.confirm", arguments: { amount: 5, note: "Thanks" } });
     expect((calls[0]!._meta as Record<string, string>)[IDEMPOTENCY_META_KEY]).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it("applies the update an action's result carries where its Button was, and names the Button in the call [10.35]", async () => {
+    const { bridge, calls, setAnswer } = await host();
+    setAnswer(() => ({ content: [{ type: "text", text: "Done." }], structuredContent: { returnId: "ret_1", update: 'ret = Notice("Return requested", tone="success")\n' } }));
+    await bridge.sendToolInput({
+      arguments: { screen: 'root = Card([ret])\nret = Button("Request a return", action="go")\ngo = McpMutation(ret, tool="orders.requestReturn", params={orderId: "A1B2-7731"})\n' },
+    });
+    await settle();
+    await userEvent.click(screen.getByRole("button", { name: "Request a return" }));
+    await settle();
+    expect((calls[0]!._meta as Record<string, string>)[BUTTON_META_KEY]).toBe("ret");
+    expect(screen.getByRole("note").textContent).toContain("Return requested");
+    expect(screen.queryByRole("button", { name: "Request a return" })).toBeNull();
   });
 
   it("shows the server's refusal as a failed action, in the renderer's own words", async () => {

@@ -122,3 +122,35 @@ export const FUZZ_ASSETS = ["cabin-pines", "shirt", "tote"] as const;
 /** The demo app's own components and picture patterns (Step 20), as plain JSON. */
 export const FUZZ_COMPONENTS = componentDeclarations(APP_COMPONENTS);
 export const FUZZ_PICTURES = PICTURES;
+
+/**
+ * A screen and updates for it (SPEC.md [10.29]-[10.34]): a real fixture, then updates made of its own
+ * lines with edits (new text, a dropped child), unchanged lines and junk, so some apply and some are
+ * rejected.
+ */
+export function screenWithUpdates(fixtures: readonly string[]): fc.Arbitrary<{ screen: string; updates: string[] }> {
+  return fc.constantFrom(...fixtures).chain((screen) => {
+    const own = screen.split("\n").filter((l) => /^\s*\$?\w+\s*=/.test(l));
+    const edited = fc.tuple(fc.constantFrom(...own), fc.nat(), fc.constantFrom("Updated", "Out for delivery", "", "x".repeat(2100))).map(([l, n, text]) => {
+      const quotes = [...l.matchAll(/"(?:[^"\\]|\\.)*"/g)];
+      if (quotes.length === 0) return l;
+      const q = quotes[n % quotes.length]!;
+      return l.slice(0, q.index) + JSON.stringify(text) + l.slice(q.index + q[0].length);
+    });
+    const droppedChild = fc.tuple(fc.constantFrom(...own), fc.nat()).map(([l, n]) => {
+      const list = /\[([^\]]*)\]/.exec(l);
+      if (list === null) return l;
+      const items = list[1]!.split(",").map((s) => s.trim()).filter(Boolean);
+      items.splice(n % Math.max(1, items.length), 1);
+      return l.replace(list[0], `[${items.join(", ")}]`);
+    });
+    const updateLine = fc.oneof(
+      { weight: 4, arbitrary: edited },
+      { weight: 2, arbitrary: droppedChild },
+      { weight: 2, arbitrary: fc.constantFrom(...own) },
+      { weight: 1, arbitrary: line },
+    );
+    const update = fc.array(updateLine, { minLength: 1, maxLength: 6 }).map((ls) => ls.join("\n") + "\n");
+    return fc.array(update, { minLength: 1, maxLength: 4 }).map((updates) => ({ screen, updates }));
+  });
+}

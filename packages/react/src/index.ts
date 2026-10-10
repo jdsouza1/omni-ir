@@ -6,5 +6,6 @@ export type { AppViewProps, AppViews, Catalog, CatalogProps, InteractionProps, P
 export { missingViews } from "./renderer/appViews.js";
 export { generate, type GenerateClientOptions, type GenerateOutcome } from "./client/generate.js";
 export { createMutationHandler, MutationRejectedError, type MutationClientOptions } from "./client/mutate.js";
+export { followScreen, type FollowOptions, type FollowOutcome } from "./client/live.js";
 export { ENGLISH, fillTemplate, resolveStrings, type OmniStrings, type StringKey } from "./catalog/strings.js";
 export { COLOR_TOKENS, CONTRAST_PAIRS, DARK, LIGHT, SHAPE, contrast, cssVariable, type ColorToken, type Palette } from "./catalog/theme.js";

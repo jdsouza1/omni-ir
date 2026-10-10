@@ -1657,6 +1657,16 @@
       "severity": "warning",
       "stage": "line",
       "meaning": "The version marker on line 1 names a newer Omni-IR version than the parser's. The rest of the stream is processed as usual."
+    },
+    "live_field_conflict": {
+      "severity": "error",
+      "stage": "update",
+      "meaning": "An update assigns a $key that a field reads, before or after the update. What the person enters belongs to them."
+    },
+    "update_too_large": {
+      "severity": "error",
+      "stage": "update",
+      "meaning": "An update holds more than 2,000 lines."
     }
   }
 }

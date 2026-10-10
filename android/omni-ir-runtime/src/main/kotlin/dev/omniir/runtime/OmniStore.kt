@@ -2,6 +2,7 @@
 // isn't drawing (resolving $state, governance, actions). Port of swift/Sources/OmniIRSwiftUI/Model.
 package dev.omniir.runtime
 
+import dev.omniir.core.UpdateResult
 import dev.omniir.core.AppComponents
 import dev.omniir.core.ComponentType
 import dev.omniir.core.PicturePattern
@@ -143,6 +144,30 @@ public class OmniStore(
     val found = parser.end()
     sync()
     found
+  }
+
+  /**
+   * Apply an update from the app's own code to the ended screen (SPEC.md [10.29]): the same lines, where an
+   * id or `$key` the screen has is replaced. Applied whole or not at all. Never pass text a model wrote.
+   */
+  public fun update(text: String): UpdateResult = synchronized(lock) {
+    val result = parser.update(text)
+    sync()
+    result
+  }
+
+  /**
+   * What to say after the last update ([8.8]): the title and text of each Notice it added or changed,
+   * politely, and nothing else; empty when there is nothing to say.
+   */
+  public fun updateAnnouncement(doc: OmniDocument = document.value): String {
+    val assigned = doc.lastUpdate?.assigned?.toSet() ?: return ""
+    return doc.nodes.values
+      .filter { it.type == ComponentType.NOTICE }
+      .filter { n -> n.id in assigned || n.props.values.any { (it as? PropValue.State)?.key in assigned } }
+      .flatMap { n -> listOf(text(n.props["title"], doc), text(n.props["text"], doc)) }
+      .filter { it.isNotEmpty() }
+      .joinToString(". ")
   }
 
   private fun sync() {

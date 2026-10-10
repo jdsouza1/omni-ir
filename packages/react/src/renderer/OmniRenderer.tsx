@@ -106,6 +106,7 @@ export function OmniRenderer({
       <div className="omni-root" data-theme={theme} ref={root}>
         <VersionNotice />
         <NodeSlot id={ROOT_ID} />
+        <UpdateAnnouncer />
         <ConfirmDialog confirmations={confirmations} />
       </div>
     </OmniContext.Provider>
@@ -168,6 +169,36 @@ function VersionNotice() {
     <p className="omni-version-notice" role="status">
       {strings.newerVersion}
     </p>
+  );
+}
+
+/**
+ * After an update ([10.29]), say politely what each Notice it added or changed now says, and nothing
+ * else ([8.8]): the app puts what the person must hear in a Notice. Nothing moves focus.
+ */
+function UpdateAnnouncer() {
+  const { store } = useOmni();
+  const getLast = () => store.getSnapshot().lastUpdate;
+  const last = useSyncExternalStore(store.subscribe, getLast, getLast);
+  const [said, setSaid] = useState("");
+  useEffect(() => {
+    if (last === undefined) return;
+    const doc = store.getSnapshot();
+    const assigned = new Set(last.assigned);
+    const shown = (v: unknown) => (v !== null && typeof v === "object" ? doc.state[(v as { key: string }).key] : v);
+    const words: string[] = [];
+    for (const node of doc.nodes.values()) {
+      if (node.type !== "Notice") continue;
+      const changed = assigned.has(node.id) || stateKeysOf(node).some((key) => assigned.has(key));
+      if (!changed) continue;
+      for (const v of [shown(node.props.title), shown(node.props.text)]) if (typeof v === "string" && v !== "") words.push(v);
+    }
+    setSaid(words.join(". "));
+  }, [last, store]);
+  return (
+    <div className="omni-visually-hidden" aria-live="polite" data-omni-announcer="">
+      {said}
+    </div>
   );
 }
 

@@ -5,27 +5,45 @@ package dev.omniir.runtime
 
 import dev.omniir.core.FORMAT_VERSION
 import dev.omniir.core.Primitive
+import dev.omniir.core.UpdateResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.job
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URI
+import java.net.URLEncoder
 import java.util.UUID
 
 /** How a `generate` call ended. */
 public sealed interface GenerateOutcome {
-  /** The stream finished. `stopReason` is "end_turn", "max_tokens" or "refusal". */
-  public data class Done(val stopReason: String, val model: String, val milliseconds: Double) : GenerateOutcome
+  /**
+   * The stream finished. `stopReason` is "end_turn", "max_tokens" or "refusal". `screen`: the server keeps
+   * this screen current; pass it to `follow` (SPEC.md [10.36]).
+   */
+  public data class Done(val stopReason: String, val model: String, val milliseconds: Double, val screen: String? = null) : GenerateOutcome
 
   /** The server or the connection failed; `retryable` says whether trying again may help. */
   public data class Failed(val code: String, val message: String, val retryable: Boolean) : GenerateOutcome
 
   /** The caller cancelled. */
   public data object Aborted : GenerateOutcome
+}
+
+/** How following a screen ended (SPEC.md [10.37]-[10.39]). */
+public sealed interface FollowOutcome {
+  /** The server sent `end`: the screen won't change again. */
+  public data object Ended : FollowOutcome
+
+  /** The caller cancelled. */
+  public data object Aborted : FollowOutcome
+
+  /** The server refused for good: `not_found`, or another error that isn't retryable. */
+  public data class Failed(val code: String, val message: String) : FollowOutcome
 }
 
 /** The server refused an action, with its message. */
@@ -100,10 +118,20 @@ public class OmniClient(
    * the tool and params again. A refusal throws `MutationRejectedException`, which the renderer reports
    * as `handler_failed`. `onResult` gets the server's result as JSON text.
    */
-  public fun mutationHandler(onResult: ((MutationCall, String) -> Unit)? = null): suspend (MutationCall) -> Unit = { call ->
+  public fun mutationHandler(
+    /**
+     * Called with the update a successful action's result carries ([10.35]), to apply to the screen the
+     * Button was pressed on: usually `{ text, _ -> store.update(text) }`. The pressed Button's id is sent so
+     * the server can write the update for it. (First, so a trailing lambda is still `onResult`.)
+     */
+    onUpdate: ((String, MutationCall) -> Unit)? = null,
+    onResult: ((MutationCall, String) -> Unit)? = null,
+  ): suspend (MutationCall) -> Unit = { call ->
     // One key per press, kept for the retry, so a server that honours keys never runs it twice.
     val key = UUID.randomUUID().toString()
-    val request = Json.obj(mapOf("tool" to call.tool, "params" to call.params.mapValues { Json.primitive(it.value) }))
+    val fields = mutableMapOf<String, Any?>("tool" to call.tool, "params" to call.params.mapValues { Json.primitive(it.value) })
+    if (onUpdate != null) fields["button"] = call.target
+    val request = Json.obj(fields)
     val send = {
       val connection = open("api/mutate", request, headers = mapOf("Idempotency-Key" to key))
       val status = connection.responseCode
@@ -123,6 +151,76 @@ public class OmniClient(
       throw MutationRejectedException(message ?: "The action failed ($status).")
     }
     onResult?.invoke(call, json?.get("result")?.let(Json::write) ?: "{}")
+    (json?.get("update") as? String)?.let { onUpdate?.invoke(it, call) }
+  }
+
+  /**
+   * Follows a screen the server keeps current ([10.37]-[10.39]): applies each update to `store`, in order,
+   * until the server says the screen won't change again or the coroutine is cancelled. A dropped
+   * connection is followed again from the last update received, waiting longer each time, up to a minute.
+   * `onUpdate` gets each result; a rejected update is a bug in the app's code.
+   */
+  public suspend fun follow(screen: String, store: OmniStore, retryMillis: Long = 1000, onUpdate: ((UpdateResult, Int) -> Unit)? = null): FollowOutcome {
+    var last = 0
+    var failures = 0
+    while (true) {
+      if (isCancelled()) return FollowOutcome.Aborted
+      var gotSomething = false
+      val ended = withContext(Dispatchers.IO) {
+        val path = "api/live?screen=" + URLEncoder.encode(screen, Charsets.UTF_8) + "&after=$last"
+        val connection = try { get(path) } catch (e: IOException) { return@withContext null }
+        val stop = currentCoroutineContext().job.invokeOnCompletion { connection.disconnect() }
+        try {
+          val status = try { connection.responseCode } catch (e: IOException) { return@withContext null }
+          if (status !in 200..299) {
+            val refused = errorResponse(connection, status) as GenerateOutcome.Failed
+            return@withContext if (refused.retryable) null else FollowOutcome.Failed(refused.code, refused.message)
+          }
+          val reader = LiveReader()
+          try {
+            connection.inputStream.use { input ->
+              val buffer = ByteArray(8192)
+              while (true) {
+                currentCoroutineContext().ensureActive()
+                val n = input.read(buffer)
+                if (n < 0) break
+                for (step in reader.feed(buffer.copyOf(n))) {
+                  gotSomething = true
+                  when (step) {
+                    LiveStep.End -> return@withContext FollowOutcome.Ended
+                    is LiveStep.Update -> if (step.seq > last) {
+                      last = step.seq // a rejected update still counts as received ([10.38])
+                      val result = store.update(step.text)
+                      onUpdate?.invoke(result, step.seq)
+                    }
+                  }
+                }
+              }
+            }
+          } catch (e: IOException) {
+            // dropped: follow again below
+          }
+          null
+        } finally {
+          stop.dispose()
+        }
+      }
+      if (ended != null) return ended
+      if (isCancelled()) return FollowOutcome.Aborted
+      failures = if (gotSomething) 0 else failures + 1
+      delay(minOf(60_000L, retryMillis shl minOf(16, maxOf(0, failures - 1))))
+    }
+  }
+
+  private fun get(path: String): HttpURLConnection {
+    val url = URI(baseUrl.trimEnd('/') + "/" + path).toURL()
+    return (url.openConnection() as HttpURLConnection).apply {
+      requestMethod = "GET"
+      connectTimeout = 15_000
+      readTimeout = idleTimeoutMillis
+      setRequestProperty("accept", "text/event-stream")
+      token()?.let { setRequestProperty("Authorization", "Bearer $it") }
+    }
   }
 
   private fun open(path: String, body: String, accept: String = "application/json", headers: Map<String, String> = emptyMap()): HttpURLConnection {
@@ -205,6 +303,8 @@ internal class StreamReader {
   private val decoder = ServerEventDecoder()
   var outcome: GenerateOutcome? = null
     private set
+  /** The id of a screen the server keeps current, from a `live` event ([10.36]). */
+  private var screen: String? = null
 
   fun feed(bytes: ByteArray): List<String> {
     val texts = mutableListOf<String>()
@@ -212,7 +312,8 @@ internal class StreamReader {
       if (outcome != null) break
       when (val step = interpret(event)) {
         is StreamStep.Text -> texts += step.text
-        is StreamStep.Finished -> outcome = step.outcome
+        is StreamStep.Live -> screen = step.screen
+        is StreamStep.Finished -> outcome = (step.outcome as? GenerateOutcome.Done)?.copy(screen = screen) ?: step.outcome
         StreamStep.Ignored -> {}
       }
     }
@@ -233,6 +334,7 @@ internal fun errorResponseOutcome(status: Int, body: String?): GenerateOutcome {
 internal sealed interface StreamStep {
   data class Text(val text: String) : StreamStep
   data class Finished(val outcome: GenerateOutcome) : StreamStep
+  data class Live(val screen: String) : StreamStep
   data object Ignored : StreamStep
 }
 
@@ -248,7 +350,32 @@ internal fun interpret(event: ServerEvent): StreamStep {
       ),
     )
     "error" -> StreamStep.Finished(errorOutcome(payload))
+    "live" -> (payload["screen"] as? String)?.takeIf { it.isNotEmpty() }?.let { StreamStep.Live(it) } ?: StreamStep.Ignored
     else -> StreamStep.Ignored
+  }
+}
+
+/** One step of a live feed ([10.37]). */
+internal sealed interface LiveStep {
+  data class Update(val seq: Int, val text: String) : LiveStep
+  data object End : LiveStep
+}
+
+/** The events of one `GET /api/live` response, read as [10.6] says; anything else is skipped. */
+internal class LiveReader {
+  private val decoder = ServerEventDecoder()
+
+  fun feed(bytes: ByteArray): List<LiveStep> = decoder.feed(bytes).mapNotNull { event ->
+    val payload = Json.parseObject(event.data) ?: return@mapNotNull null
+    when (event.event) {
+      "end" -> LiveStep.End
+      "update" -> {
+        val seq = (payload["seq"] as? Double)?.takeIf { it >= 1 && it == Math.floor(it) && it < Int.MAX_VALUE }?.toInt()
+        val text = payload["text"] as? String
+        if (seq != null && text != null) LiveStep.Update(seq, text) else null
+      }
+      else -> null
+    }
   }
 }
 

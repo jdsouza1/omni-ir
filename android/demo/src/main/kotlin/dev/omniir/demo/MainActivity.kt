@@ -178,8 +178,15 @@ private fun ScreenView(source: Source, instant: Boolean, read: (String) -> Strin
         store.end()
       }
       is Source.Server -> {
-        val outcome = OmniClient(source.url).generate(source.prompt, store)
+        val client = OmniClient(source.url)
+        val outcome = client.generate(source.prompt, store)
         if (outcome is GenerateOutcome.Failed) log += "${outcome.code}: ${outcome.message}"
+        // A screen the server keeps current (the order moving on): follow it while this screen is shown ([10.37]).
+        val screen = (outcome as? GenerateOutcome.Done)?.screen
+        if (screen != null) {
+          done = true
+          client.follow(screen, store) { result, _ -> if (!result.applied) log += "Update rejected: ${result.issues.joinToString { it.code.wireName }}" }
+        }
       }
     }
     done = true
@@ -187,7 +194,8 @@ private fun ScreenView(source: Source, instant: Boolean, read: (String) -> Strin
 
   val onMutation: suspend (dev.omniir.runtime.MutationCall) -> Unit = when (source) {
     is Source.Fixture -> { call -> log += "Sent ${call.tool} ${describe(call.params)}: stub result, nothing left the device" }
-    is Source.Server -> OmniClient(source.url).mutationHandler { call, result -> log += "Sent ${call.tool} ${describe(call.params)}. Server result: $result" }
+    // An action's result may update the screen where its Button was (SPEC.md [10.35]).
+    is Source.Server -> OmniClient(source.url).mutationHandler(onUpdate = { text, _ -> store.update(text) }) { call, result -> log += "Sent ${call.tool} ${describe(call.params)}. Server result: $result" }
   }
 
   Column(Modifier.verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {

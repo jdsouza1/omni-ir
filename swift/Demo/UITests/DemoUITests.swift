@@ -156,4 +156,28 @@ final class ServerTests: XCTestCase {
     attachment.lifetime = .keepAlways
     add(attachment)
   }
+
+  /// Live screens (Step 22): the server keeps the order current, and the return's result updates its Button.
+  func testOrderMovesOnThenReturn() {
+    let app = XCUIApplication()
+    app.launchArguments = ["-server", "http://localhost:8787", "-prompt", "where is my order?", "-appearance", "light"]
+    app.launch()
+    waitUntilDone(app, self, timeout: 60)
+    func shot(_ name: String) {
+      let attachment = XCTAttachment(screenshot: app.screenshot())
+      attachment.name = name
+      attachment.lifetime = .keepAlways
+      add(attachment)
+    }
+    XCTAssertTrue(app.staticTexts["Shipped"].waitForExistence(timeout: 5), "the order arrived as shipped")
+    shot("live-1-shipped")
+    XCTAssertTrue(app.staticTexts["Out for delivery"].waitForExistence(timeout: 20), "the server's first update arrived")
+    shot("live-2-out-for-delivery")
+    XCTAssertTrue(app.staticTexts["Delivered"].waitForExistence(timeout: 20), "the server's second update arrived")
+    shot("live-3-delivered")
+    app.buttons["Request a return"].tap()
+    let done = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Return requested")).firstMatch
+    XCTAssertTrue(done.waitForExistence(timeout: 10), "the action's result replaced the Button")
+    shot("live-4-return-requested")
+  }
 }

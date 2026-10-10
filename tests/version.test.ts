@@ -11,6 +11,9 @@ import { FORMAT_VERSION, OMNI_IR_VERSION, canRead, formatOf, majorMinor, version
  */
 function fingerprint(): string {
   const schema = JSON.parse(readFileSync("conformance/schema.json", "utf8")) as Record<string, unknown>;
+  // Issues reported only for updates ([10.29]-[10.34]) never decide whether a stream is valid (SPEC.md section 12).
+  const codes = schema.issueCodes as Record<string, { stage: string }>;
+  schema.issueCodes = Object.fromEntries(Object.entries(codes).filter(([, info]) => info.stage !== "update"));
   const strip = (v: unknown): unknown => {
     if (Array.isArray(v)) return v.map(strip);
     if (v && typeof v === "object") {

@@ -5,9 +5,9 @@ public enum IssueSeverity: String, Sendable, Hashable {
   case error, warning
 }
 
-/// When an issue is found: on its own line, at the end of the stream, or while rendering.
+/// When an issue is found: on its own line, at the end of the stream, while rendering, or in an update after the stream.
 public enum IssueStage: String, Sendable, Hashable {
-  case line, end, renderer
+  case line, end, renderer, update
 }
 
 public struct Issue: Sendable, Hashable, CustomStringConvertible {
@@ -114,6 +114,8 @@ public struct OmniDocument: Sendable {
   public var complete = false
   /// Line 1 was a version marker for a newer Omni-IR version than this one (SPEC.md [3.9]).
   public var newerVersion = false
+  /// The last update applied after the stream ended ([10.29]), if any.
+  public var lastUpdate: LastUpdate?
 
   public init() {}
 }
