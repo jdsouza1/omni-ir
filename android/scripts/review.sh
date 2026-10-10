@@ -62,9 +62,10 @@ adb exec-out screencap -p > review/screenshots/forms-confirmation.png
 echo "screenshot forms-confirmation"
 
 # Live screens (Step 22): the order from the server moves on by itself, then a return updates its Button.
+# adb shell joins its arguments into one command line, so a value with spaces is quoted again inside.
 if [ -n "${OMNI_SERVER:-}" ]; then
   adb shell am force-stop "$APP"
-  adb shell am start -W -n "$APP/.MainActivity" --es server "$OMNI_SERVER" --es prompt "where is my order?" --es appearance light >/dev/null
+  adb shell am start -W -n "$APP/.MainActivity" --es server "$OMNI_SERVER" --es prompt "'where is my order?'" --es appearance light >/dev/null
   sleep 3
   adb exec-out screencap -p > review/screenshots/live-1-shipped.png
   sleep 4
