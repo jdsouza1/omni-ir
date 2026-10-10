@@ -2,7 +2,7 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
-## Unreleased
+## 0.12.0 (2026-10-10)
 
 App-defined components (Step 20, PLAN-APPCOMPONENTS.md). The stream format stays 0.8.
 
