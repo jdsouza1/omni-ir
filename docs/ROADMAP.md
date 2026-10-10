@@ -1,6 +1,6 @@
 # Omni-IR roadmap
 
-Updated 2026-10-07. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
+Updated 2026-10-09. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
 
 ## Done
 
@@ -60,18 +60,34 @@ Phases 1, 2 and 3 are complete: the iOS and Android renderers came in well ahead
 
 Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free work that lets outsiders find, try and trust Omni-IR comes first; the larger protocol steps follow. Each step starts with its own plan and checklist for the owner's approval, opening with its goal, how it fits this roadmap and who benefits, then the pros, cons and trade-offs of each decision.
 
-1. **Step 19 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
+1. **Step 19 · Forms, confirmations and screens as text.** Three small additions that people ask competitors for and that fit Omni-IR's design: field validation declared in the stream, confirmations the app requires and the stream can't skip, and a plain-text version of any screen. From a review of 487 public feature requests to CopilotKit, AG-UI, A2UI, json-render, OpenUI, Tambo, assistant-ui and MCP Apps (2026-10-09).
+   - *Goal:* forms catch mistakes before anything is sent, risky actions always ask the person first in the renderer's own words, and every screen can also be read as text.
+   - *Fit:* strengthens what sets Omni-IR apart (checked, governed screens) at little cost; no logic enters the stream, and the format only gains optional props, so it stays a format addition within `0.x`.
+   - *Who benefits:* developers get validated forms and safe confirmations without writing them; the people using their apps get clear errors and a confirmation they can trust before a payment or a deletion; organisations get a guarantee that chosen actions are always confirmed, and readable records of what was shown.
+   - [ ] Field validation: `required`, `format` (for example email) and length limits on Input, declared in the stream and checked by the renderer before the action can run; the server still checks the tool's schema (asked of [A2UI](https://github.com/a2ui-project/a2ui/issues/316), [OpenUI](https://github.com/thesysdev/openui/issues/391), [Tambo](https://github.com/tambo-ai/tambo/issues/2374))
+   - [ ] Confirmations: the app marks tools that need one, and the renderer shows its own confirmation with the action and its params before sending; the stream can neither remove nor imitate it (asked of [A2UI](https://github.com/a2ui-project/a2ui/issues/1958))
+   - [ ] Screens as text: a plain-text description of any document, for hosts that can't draw views, logs, screen-reader summaries and telling a model what is on screen (asked of [json-render](https://github.com/vercel-labs/json-render/issues/298), [OpenUI](https://github.com/thesysdev/openui/issues/681), [A2UI](https://github.com/a2ui-project/a2ui/issues/2055))
+2. **Step 20 · App-defined components.** An app registers its own components, each with its own schema, the way it registers tools, so a model can use them while every line is still checked and governed. This answers "the catalog isn't enough" without leaving Omni-IR.
    - *Goal:* an app can add a component Omni-IR doesn't have (a seat map, a product card, a signature pad) and still get every guarantee: each line checked, actions governed, nothing drawn that the app didn't write.
-   - *Fit:* builds on Step 16's tokens (an app's components can use the same colours) and Step 15's governed actions, Step 17's check (app components join its challenges) and Step 18's bridge (app components reach MCP hosts through it); comes before live screens because live data is most useful in the app's own components.
+   - *Fit:* builds on Step 16's tokens (an app's components can use the same colours) and Step 15's governed actions, Step 17's check (app components join its challenges), Step 18's bridge (app components reach MCP hosts through it) and Step 19's validation (app components' fields can use it); comes before live screens because live data is most useful in the app's own components.
    - *Who benefits:* developers stop hitting the catalog's limit, the most likely reason to drop Omni-IR after a trial; the people using their apps get screens that fit the task; organisations keep one checked format instead of a second, unchecked path for "special" screens.
    - [ ] Pictures looked up by the app when the screen is drawn (for example `product-123`), for shops and user pictures that can't all be registered in advance; the model still never writes a URL
    - [ ] Keep the system prompt small as the catalog grows: send only the components a request is likely to need, and measure the cost and the time to the first line
-2. **Step 20 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
+3. **Step 21 · A Web Components renderer.** One `<omni-screen>` element that draws Omni-IR in any web framework, Vue, Svelte, Angular or plain HTML, instead of one renderer per framework. The most requested feature in the review: Vue, Svelte, Angular and web components were asked of [json-render](https://github.com/vercel-labs/json-render/issues/34), [Tambo](https://github.com/tambo-ai/tambo/issues/1721), [OpenUI](https://github.com/thesysdev/openui/issues/318) and others.
+   - *Goal:* a developer using any web framework can render Omni-IR screens with one element, with the same catalog, checks and governance as the React renderer.
+   - *Fit:* the conformance suite already defines what any renderer must do, and the design tokens (Step 16) style it the same way; a fourth renderer after React, SwiftUI and Compose, covering every other web framework at once.
+   - *Who benefits:* developers who don't use React, the largest group the project can't serve today; the people using their apps get the same accessible catalog; organisations with several front-end stacks can standardise on one format.
+4. **Step 22 · Live screens.** Screens are snapshots today: a component can't change after its line arrives. Specify updating and removing components, and live data in charts and tables, without adding logic to the stream (listed under "Not yet specified" in SPEC.md).
    - *Goal:* a screen can change after it arrives (a delivery status moves on, a chart gets this hour's numbers) while the stream still has no logic and every change is checked like a new line.
    - *Fit:* the last open item in the spec's "Not yet specified"; builds on Step 14's transport (updates travel the same way) and Step 15's backend (the data comes from the app's own handlers, never the model).
    - *Who benefits:* developers can use Omni-IR for dashboards and status pages, not only one-off screens; the people using their apps see current information; and the person's real data reaches the screen from the app without being sent to the model.
 
 ## Later
+
+- **From the feature request review (2026-10-09)**, when there is demand:
+  - [ ] File upload: a `FileInput` whose file goes only to a registered tool, with size and type limits the app sets (asked of [A2UI](https://github.com/a2ui-project/a2ui/issues/287))
+  - [ ] Restore a screen after a reload with what the person had typed, so chat history reopens screens as they were left (asked of MCP Apps and CopilotKit)
+  - [ ] Smoother streaming: a renderer option that paces how fast arriving lines appear (asked of [OpenUI](https://github.com/thesysdev/openui/issues/751))
 
 - **Running the reference server for real**, for teams that self-host:
   - [ ] Model adapters beyond Claude: OpenAI, Gemini, and any OpenAI-compatible endpoint (which covers open models), each with a fake client for tests

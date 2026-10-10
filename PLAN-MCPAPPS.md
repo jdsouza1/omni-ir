@@ -10,7 +10,7 @@ A screen written in Omni-IR shows up, rendered by the Trusted Catalog, inside th
 
 - **It's a transport, like AG-UI (Step 14).** MCP Apps already carries interfaces to millions of people, but as HTML that a server's own code builds. Omni-IR adds what that lacks when a *model* builds the interface: a fixed catalog, no code from the model, and governed actions. The bridge is one HTML view (our parser and renderer) and one MCP server; the format doesn't change.
 - **It builds on what's done:** the parser and React catalog, the tool registry and handlers with their access rules (Step 15), the themes and tokens (Step 16) for matching the host's look, and SPEC section 10's transport rules.
-- **It comes before app-defined components** (now Step 19): a place where people see Omni-IR screens is worth more than more kinds of screens, and app components will reach those hosts through the same bridge.
+- **It comes before app-defined components** (now Step 20): a place where people see Omni-IR screens is worth more than more kinds of screens, and app components will reach those hosts through the same bridge.
 
 ## Who benefits
 
