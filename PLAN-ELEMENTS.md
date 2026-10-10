@@ -116,6 +116,6 @@ A developer using any web framework, or none, can draw Omni-IR screens with one 
 - [x] D.1 A guide, “Any web framework”; README; SPEC.md's renderer list; CHANGELOG; the decision log
 
 **E. Review**
-- [ ] E.1 A review page with screenshots from the four examples
-- [ ] E.2 Merge with your approval
+- [x] E.1 A review page with screenshots from the four examples
+- [x] E.2 Merge with your approval
 - [ ] E.3 Release: a separate go-ahead from you, and the first publish of `@omni-ir/elements` by hand by you
