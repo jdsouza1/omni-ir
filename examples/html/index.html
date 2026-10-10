@@ -58,7 +58,8 @@
       };
       screen.onMutation = async (call) => {
         sent.push(call.tool);
-        log.textContent = `Sent ${call.tool} ${JSON.stringify(call.params)}`;
+        // What the person sees: a plain sentence, never the action's raw data.
+        log.textContent = `Paid ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(call.params.amount))}. This is a demo: nothing was charged.`;
       };
 
       // A screen as a model would stream it (here, written at once).

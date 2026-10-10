@@ -10,7 +10,8 @@
     screen.tools = { "payments.confirm": { type: "object", properties: { amount: { type: "number", exclusiveMinimum: 0 } }, required: ["amount"] } };
     screen.onMutation = async (call) => {
       sent.push(call.tool);
-      log = `Sent ${call.tool} ${JSON.stringify(call.params)}`;
+      // What the person sees: a plain sentence, never the action's raw data.
+      log = `Paid ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(call.params.amount))}. This is a demo: nothing was charged.`;
     };
     screen.write(
       [
@@ -38,11 +39,19 @@
       });
     }
   });
+
+  // Blocked actions and failed handlers: tell the person plainly; the details are for the app's logs.
+  function onEvent(event) {
+    if (event.detail.type === "error") {
+      console.warn(event.detail.issue);
+      log = "That didn't go through. Please try again.";
+    }
+  }
 </script>
 
 <main style="max-width: 520px; margin: 0 auto; display: grid; gap: 16px">
   <h1>Svelte</h1>
-  <omni-screen bind:this={screen} theme="light" onomni-event={(e) => (log = e.detail.type)}></omni-screen>
+  <omni-screen bind:this={screen} theme="light" onomni-event={onEvent}></omni-screen>
   <p aria-live="polite">{log}</p>
   <pre id="omni-check" hidden></pre>
 </main>

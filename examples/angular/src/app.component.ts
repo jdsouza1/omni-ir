@@ -25,7 +25,8 @@ export class AppComponent implements AfterViewInit {
     screen.tools = { "payments.confirm": { type: "object", properties: { amount: { type: "number", exclusiveMinimum: 0 } }, required: ["amount"] } };
     screen.onMutation = async (call: MutationCall) => {
       this.sent.push(call.tool);
-      this.log.set(`Sent ${call.tool} ${JSON.stringify(call.params)}`);
+      // What the person sees: a plain sentence, never the action's raw data.
+      this.log.set(`Paid ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(call.params.amount))}. This is a demo: nothing was charged.`);
     };
     screen.write(
       [
@@ -51,7 +52,12 @@ export class AppComponent implements AfterViewInit {
     }
   }
 
+  // Blocked actions and failed handlers: tell the person plainly; the details are for the app's logs.
   onEvent(event: Event): void {
-    this.log.set((event as CustomEvent<RendererEvent>).detail.type);
+    const detail = (event as CustomEvent<RendererEvent>).detail;
+    if (detail.type === "error") {
+      console.warn(detail.issue);
+      this.log.set("That didn't go through. Please try again.");
+    }
   }
 }
