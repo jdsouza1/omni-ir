@@ -62,12 +62,34 @@ export const STEP11_REQUESTS = [
   { id: "styled-chart", text: "A bar chart of sales where the bars are red, animated, and show a custom tooltip with each region manager's name.", probe: "Asks for styling a chart can't have. A good reply draws the plain chart and says colours, animation and custom tooltips aren't available." },
 ];
 
-export async function renderPage(requests: readonly { id: string; text: string; probe?: string }[] = REQUESTS): Promise<string> {
+/**
+ * Step 22 (PLAN-LIVE.md): does a real model use the app's live parts (app/live.ts)? `live` names the part
+ * and the component it should be; `noLive` marks a request where none belongs. `-- --step22`.
+ */
+export const STEP22_REQUESTS = [
+  { id: "order-live", text: "Where is my order A1B2-7731? It shipped yesterday and should arrive Friday.", live: { order_status: "Badge" } },
+  { id: "order-return", text: "The status of order A1B2-7731, which has shipped, with an option to return it.", live: { order_status: "Badge" } },
+  { id: "parcel", text: "Track my parcel: show its delivery status, the carrier and the tracking number.", live: { order_status: "Badge" } },
+  { id: "sales-today", text: "Today's orders so far, hour by hour.", live: { sales_today: "LineChart" } },
+  { id: "dashboard", text: "A sales dashboard with this month's revenue and today's orders by hour.", live: { sales_today: "LineChart" } },
+  { id: "profile", text: "A screen to edit my name and bio.", noLive: true, probe: "Live parts don't belong here. A good reply doesn't use order_status or sales_today." },
+  {
+    id: "self-updating",
+    text: "Show my order status and make it refresh every minute with the latest tracking.",
+    live: { order_status: "Badge" },
+    probe: "Asks the model to do the updating. A good reply writes the status once, as the live part, with no timers, code or invented tools: the app keeps it current.",
+  },
+];
+
+type CheckRequest = { id: string; text: string; probe?: string; live?: Record<string, string>; noLive?: boolean };
+
+export async function renderPage(requests: readonly CheckRequest[] = REQUESTS, title = "Omni-IR Model Check"): Promise<string> {
   const { js, css } = await bundle();
   const firstMessage = `${buildSystemPrompt()}\n\n---\nThose are your instructions for this chat. I'll send screen requests next, one per message. For this first message, reply with just this comment line:\n# ready`;
   const data = JSON.stringify({ firstMessage, requests });
   // Replacement functions, not strings: the bundle contains "$'" and similar, which a string would expand.
-  return PAGE.replace("/*OMNI_CSS*/", () => css.replace(/<\/(style)/gi, "<\\/$1"))
+  return PAGE.replace("<title>Omni-IR Model Check</title>", () => `<title>${title}</title>`)
+    .replace("/*OMNI_CSS*/", () => css.replace(/<\/(style)/gi, "<\\/$1"))
     .replace("/*OMNI_DATA*/", () => escapeScript(data))
     .replace("/*OMNI_CHECK*/", () => escapeScript(js));
 }
@@ -124,6 +146,7 @@ const PAGE = String.raw`<meta charset="utf-8">
   .issues { margin: 0; padding-left: 1.1rem; font: .8rem/1.5 var(--mono); }
   .issues .warning { color: var(--warn); }
   .issues .error { color: var(--bad); }
+  .issues .ok { color: var(--ok); }
   .stage { border-radius: 12px; border: 1px solid var(--line); background: #f8fafc; color: #1f2329; padding: 1rem; overflow-x: auto; color-scheme: light; }
   .stage:empty { display: none; }
   .summary { font: 500 .9rem/1.5 var(--mono); }
@@ -212,6 +235,20 @@ const PAGE = String.raw`<meta charset="utf-8">
       const add = (cls, f) => { const li = document.createElement("li"); li.className = cls; li.textContent = (f.line ? "line " + f.line + ": " : "end: ") + f.code + " — " + f.message; issues.append(li); };
       r.errors.forEach((f) => add("error", f));
       r.warnings.forEach((f) => add("warning", f));
+      // Live parts (Step 22): the id the app keeps current, as the component it expects.
+      const liveNotes = [];
+      for (const [part, type] of Object.entries(req.live || {})) {
+        const got = r.live[part];
+        const ok = got === type;
+        liveNotes.push({ ok, text: ok ? "uses the live part " + part + " as a " + type : got ? "writes " + part + " as a " + got + ", not a " + type : "doesn't use the live part " + part + " (the app can't keep this screen current)" });
+      }
+      if (req.noLive) {
+        const used = Object.keys(r.live);
+        liveNotes.push({ ok: !used.length, text: used.length ? "uses live parts where none belong: " + used.join(", ") : "uses no live parts, as it should" });
+      }
+      for (const n of liveNotes) { const li = document.createElement("li"); li.className = n.ok ? "ok" : "error"; li.textContent = n.text; issues.append(li); }
+      results[req.id].liveOk = liveNotes.every((n) => n.ok);
+      results[req.id].liveNotes = liveNotes.map((n) => (n.ok ? "ok: " : "MISS: ") + n.text);
       if (r.codeFences) { const li = document.createElement("li"); li.className = "warning"; li.textContent = "The reply is wrapped in Markdown code fences (three backticks); the prompt asks for Omni-IR lines only."; issues.append(li); }
       summarize();
     };
@@ -224,7 +261,9 @@ const PAGE = String.raw`<meta charset="utf-8">
   function summarize() {
     const done = Object.values(results);
     const valid = done.filter((r) => !r.errors.length).length;
-    document.getElementById("summary").textContent = done.length ? valid + " of " + done.length + " replies valid, of " + data.requests.length + " requests." : "No replies yet.";
+    const live = done.filter((r) => r.liveNotes && r.liveNotes.length);
+    const liveOk = live.filter((r) => r.liveOk).length;
+    document.getElementById("summary").textContent = done.length ? valid + " of " + done.length + " replies valid, of " + data.requests.length + " requests." + (live.length ? " Live parts right in " + liveOk + " of " + live.length + "." : "") : "No replies yet.";
   }
 
   document.getElementById("copy-results").onclick = () => {
@@ -234,6 +273,7 @@ const PAGE = String.raw`<meta charset="utf-8">
       lines.push("## " + req.id + ": " + req.text);
       if (!r) { lines.push("(no reply)", ""); continue; }
       lines.push("valid: " + !r.errors.length + " · components: " + r.components + " · governed buttons: " + r.governed + " · code fences: " + r.codeFences);
+      for (const n of r.liveNotes || []) lines.push("- live: " + n);
       for (const f of [...r.errors, ...r.warnings]) lines.push("- " + (f.line ? "line " + f.line : "end") + ": " + f.code + ": " + f.message);
       lines.push("reply:", r.reply.trim(), "");
     }
@@ -244,7 +284,7 @@ const PAGE = String.raw`<meta charset="utf-8">
 
 if (process.argv[1]?.endsWith("model-check-page.ts")) {
   const out = process.argv[2] ?? "model-check.html";
-  const requests = process.argv.includes("--step11") ? STEP11_REQUESTS : process.argv.includes("--step10") ? STEP10_REQUESTS : REQUESTS;
-  writeFileSync(out, await renderPage(requests));
+  const requests = process.argv.includes("--step22") ? STEP22_REQUESTS : process.argv.includes("--step11") ? STEP11_REQUESTS : process.argv.includes("--step10") ? STEP10_REQUESTS : REQUESTS;
+  writeFileSync(out, await renderPage(requests, process.argv.includes("--step22") ? "Live Parts Model Check" : undefined));
   console.log(`wrote ${out}`);
 }
