@@ -70,10 +70,10 @@ export function Landing() {
             <span className="pill-dot" aria-hidden="true" />
             An open standard · v0.10 preview
           </span>
-          <h1 id="hero-title">The Universal Blueprint for AI Software.</h1>
+          <h1 id="hero-title">AI writes the screen. Your app draws it.</h1>
           <p>
-            Omni-IR is a simple, shared language that lets any AI describe an app — and any tool build it. Write it once. Render it on the web,
-            iPhone and Android today, and inside Claude and ChatGPT.
+            Omni-IR is an open format for AI-generated screens. The model writes a few plain lines; your own components draw them on the web,
+            iPhone and Android, and inside Claude and ChatGPT. Every action goes through your server’s checks.
           </p>
           <div className="buttons">
             <a className="btn btn-dark" href={LINKS.playground}>
