@@ -15,9 +15,11 @@ import {
   type OmniParser,
   type PicturePattern,
   type ToolRegistry,
+  type UpdateResult,
 } from "@omni-ir/core";
 import {
   createMutationHandler,
+  followScreen,
   generate,
   OmniRenderer,
   type AppViewProps,
@@ -201,7 +203,31 @@ export class OmniScreenElement extends HTMLElement {
       ...(this.fetch ? { fetch: this.fetch } : {}),
     });
     this.dispatchEvent(new CustomEvent("omni-done", { detail: outcome }));
+    // A screen the server keeps current: follow it until it ends or this screen is replaced ([10.37]).
+    if (outcome.status === "done" && outcome.screen !== undefined && !controller.signal.aborted) {
+      const parser = this.#ensureParser();
+      void followScreen(outcome.screen, {
+        parser,
+        signal: controller.signal,
+        baseUrl: this.getAttribute("endpoint") ?? "",
+        ...(this.fetch ? { fetch: this.fetch } : {}),
+        onUpdate: (result) => this.#updated(result),
+      });
+    }
     return outcome;
+  }
+
+  /**
+   * Apply an update from the app's own code to the ended screen (SPEC.md [10.29]): the same lines, where
+   * an id or $key the screen has is replaced. Never pass text a model wrote. Dispatches `omni-update`.
+   */
+  update(text: string): UpdateResult {
+    return this.#updated(this.#ensureParser().update(text));
+  }
+
+  #updated(result: UpdateResult): UpdateResult {
+    this.dispatchEvent(new CustomEvent("omni-update", { detail: result }));
+    return result;
   }
 
   /** The screen as plain text, one component per line; what the person typed stays out unless asked. */
@@ -232,8 +258,10 @@ export class OmniScreenElement extends HTMLElement {
     if (parser === null || this.#root === null) return;
     const theme = this.getAttribute("theme");
     const endpoint = this.getAttribute("endpoint") ?? "";
+    // An action's result may update the screen its Button was on ([10.35]).
     const onMutation =
-      this.onMutation ?? createMutationHandler({ baseUrl: endpoint, ...(this.fetch ? { fetch: this.fetch } : {}) });
+      this.onMutation ??
+      createMutationHandler({ baseUrl: endpoint, ...(this.fetch ? { fetch: this.fetch } : {}), onUpdate: (text) => this.#updated(parser.update(text)) });
     this.#root.render(
       createElement(OmniRenderer, {
         // A new screen mounts a fresh renderer (new field and confirmation state).

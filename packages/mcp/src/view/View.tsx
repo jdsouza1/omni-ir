@@ -5,10 +5,10 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { z } from "zod";
 import type { App } from "@modelcontextprotocol/ext-apps";
-import { createParser, defineComponents, type Issue, type OmniStore, type ToolRegistry } from "@omni-ir/core";
+import { createParser, defineComponents, type Issue, type OmniParser, type OmniStore, type ToolRegistry } from "@omni-ir/core";
 import { MutationRejectedError, OmniRenderer, type MutationCall, type RendererEvent } from "@omni-ir/react";
 import type { ViewConfig } from "../config.js";
-import { IDEMPOTENCY_META_KEY } from "../constants.js";
+import { BUTTON_META_KEY, IDEMPOTENCY_META_KEY } from "../constants.js";
 import { createInputWriter } from "./stream.js";
 import { hostTheme, type HostContextLike, type HostTheme } from "./theme.js";
 
@@ -50,8 +50,10 @@ export function createViewController(app: App, config: ViewConfig): ViewControll
     update({ look: hostTheme(context) });
   };
 
+  let current: OmniParser | null = null;
   const writer = createInputWriter(() => {
     const parser = createParser({ tools, assets: config.assets, components, pictures: config.pictures ?? [] });
+    current = parser;
     parser.subscribe((event) => {
       if (event.type === "error") addIssue(event.issue);
     });
@@ -82,13 +84,20 @@ export function createViewController(app: App, config: ViewConfig): ViewControll
       const result = await app.callServerTool({
         name: call.tool,
         arguments: call.params,
-        _meta: { [IDEMPOTENCY_META_KEY]: globalThis.crypto.randomUUID() },
+        _meta: { [IDEMPOTENCY_META_KEY]: globalThis.crypto.randomUUID(), [BUTTON_META_KEY]: call.target },
       });
+      const screen = current;
       if (result.isError) {
         const detail = (result.structuredContent ?? {}) as { code?: unknown; message?: unknown };
         const text = result.content.find((c) => c.type === "text");
         const message = typeof detail.message === "string" ? detail.message : text && "text" in text ? text.text : "The action failed.";
         throw new MutationRejectedError(message, typeof detail.code === "string" ? detail.code : undefined);
+      }
+      // The app's update for the screen the Button was on ([10.35]); a rejected one is the app's bug.
+      const update = (result.structuredContent as { update?: unknown } | undefined)?.update;
+      if (typeof update === "string" && screen !== null && screen === current) {
+        const applied = screen.update(update);
+        for (const issue of applied.issues) if (!applied.applied) addIssue(issue);
       }
     },
     onEvent(event) {

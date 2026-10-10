@@ -27,12 +27,19 @@ export type RendererEvent =
   | { type: "error"; issue: { code: string; message: string; id?: string; line?: number } }
   | { type: "press"; id: string };
 
+/** Whether an update applied (all or nothing, SPEC.md [10.33]), with its issues; lines count from 1 in the update. */
+export interface UpdateResult {
+  applied: boolean;
+  issues: { code: string; message: string; id?: string; line?: number }[];
+}
+
 /** The app's confirmation for a tool: a sentence with `{param}` placeholders, or a function of the params. */
 export type Confirmation = string | ((params: Readonly<Record<string, unknown>>) => string);
 
 /** How a generate() ended. */
 export type GenerateOutcome =
-  | { status: "done"; stopReason: "end_turn" | "max_tokens" | "refusal"; model: string; ms: number }
+  /** `screen`: the server keeps this screen current, and the element follows it. */
+  | { status: "done"; stopReason: "end_turn" | "max_tokens" | "refusal"; model: string; ms: number; screen?: string }
   | { status: "aborted" }
   | { status: "error"; code: string; message: string; retryable: boolean };
 
@@ -119,8 +126,10 @@ export declare class OmniScreenElement extends HTMLElement {
   end(): void;
   /** Start a new, empty screen. */
   reset(): void;
-  /** Ask an Omni-IR server for a screen and stream it in; dispatches `omni-done`. */
+  /** Ask an Omni-IR server for a screen and stream it in; dispatches `omni-done`, then follows the screen if the server keeps it current. */
   generate(prompt: string): Promise<GenerateOutcome>;
+  /** Apply an update from the app's own code to the ended screen; dispatches `omni-update`. Never pass text a model wrote. */
+  update(text: string): UpdateResult;
   /** The screen as plain text. */
   describe(options?: DescribeScreenOptions): string;
 }
@@ -135,5 +144,7 @@ declare global {
   interface HTMLElementEventMap {
     "omni-event": CustomEvent<RendererEvent>;
     "omni-done": CustomEvent<GenerateOutcome>;
+    /** Each update applied or rejected; a rejected one is a bug in the app's code. */
+    "omni-update": CustomEvent<UpdateResult>;
   }
 }

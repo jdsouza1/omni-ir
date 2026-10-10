@@ -8,7 +8,7 @@ import { registerAppResource, registerAppTool, RESOURCE_MIME_TYPE } from "@model
 import { z } from "zod";
 import { createParser, describeScreen, type AppComponents, type PicturePattern, type ToolRegistry } from "@omni-ir/core";
 import { injectConfig, viewConfig } from "./config.js";
-import { IDEMPOTENCY_META_KEY, SCREEN_TOOL, VIEW_URI } from "./constants.js";
+import { BUTTON_META_KEY, IDEMPOTENCY_META_KEY, SCREEN_TOOL, VIEW_URI } from "./constants.js";
 import { buildGuide, type Picture } from "./guide.js";
 
 const IDEMPOTENCY_KEY = /^[A-Za-z0-9_\-:.]{1,200}$/;
@@ -22,10 +22,13 @@ export interface ActionCall {
   idempotencyKey: string | null;
   /** Who is calling, as the app identified them (OmniMcpOptions.user), or null. */
   user: unknown;
+  /** The pressed Button's id, if the view sent it ([10.35]); trusted for nothing but writing `update`. */
+  button?: string;
 }
 
 export type ActionResult =
-  | { ok: true; result?: Record<string, unknown>; message?: string }
+  /** `update`: Omni-IR lines from the app's code that change the screen the Button was on ([10.35]). */
+  | { ok: true; result?: Record<string, unknown>; message?: string; update?: string }
   | { ok: false; code: string; message: string };
 
 /** For logs and counts ([B.5]): never the screen's text or an action's params. */
@@ -131,11 +134,13 @@ export function createOmniMcpServer(options: OmniMcpOptions = {}): McpServer {
           return failure("invalid_params", "The action's details are not valid.", { issues });
         }
         const key = ctx.mcpReq._meta?.[IDEMPOTENCY_META_KEY];
+        const button = ctx.mcpReq._meta?.[BUTTON_META_KEY];
         const call: ActionCall = {
           tool: name,
           params: parsed.data as Record<string, unknown>,
           idempotencyKey: typeof key === "string" && IDEMPOTENCY_KEY.test(key) ? key : null,
           user,
+          ...(typeof button === "string" && button.length <= 64 ? { button } : {}),
         };
         let result: ActionResult;
         try {
@@ -146,7 +151,8 @@ export function createOmniMcpServer(options: OmniMcpOptions = {}): McpServer {
         }
         report(result.ok ? "ok" : result.code);
         if (!result.ok) return failure(result.code, result.message);
-        return { content: [{ type: "text", text: result.message ?? "Done." }], structuredContent: result.result ?? {} };
+        const structured = { ...(result.result ?? {}), ...(typeof result.update === "string" ? { update: result.update } : {}) };
+        return { content: [{ type: "text", text: result.message ?? "Done." }], structuredContent: structured };
       },
     );
   }
