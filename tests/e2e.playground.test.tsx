@@ -25,6 +25,7 @@ const FIXTURE_FOR: Record<string, string> = {
   "book a stay": "landing/booking",
   "my shopping bag": "landing/checkout",
   "a trip assistant": "landing/assistant",
+  "a product page": "product",
 };
 
 const status = () => screen.getByRole("status").textContent ?? "";

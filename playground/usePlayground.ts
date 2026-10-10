@@ -3,6 +3,7 @@
 // an older run (e.g. a cancelled one finishing late) are ignored.
 import { useCallback, useMemo, useReducer, useRef } from "react";
 import { ASSETS } from "../app/assets";
+import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
 import { generate as defaultGenerate, type GenerateClientOptions, type GenerateOutcome } from "@omni-ir/react";
 import { createMutationHandler } from "@omni-ir/react";
@@ -178,7 +179,7 @@ export function usePlayground(deps: PlaygroundDeps = {}) {
     const runId = ++runRef.current.id;
     const started = performance.now();
     runRef.current.started = started;
-    const inner = createParser({ tools: TOOLS, assets: ASSETS });
+    const inner = createParser({ tools: TOOLS, assets: ASSETS, components: APP_COMPONENTS, pictures: PICTURES });
     inner.subscribe((event) => dispatch({ type: "parser", runId, event, ms: Math.round(performance.now() - started) }));
     // Record the raw text exactly as it arrives, then parse it.
     const parser: OmniParser = {

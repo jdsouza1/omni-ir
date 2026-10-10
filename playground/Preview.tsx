@@ -4,6 +4,7 @@
 import { useEffect, useRef } from "react";
 import { ASSETS } from "../app/assets";
 import { CONFIRMATIONS, TOOLS } from "../app/tools";
+import { APP_VIEWS, resolvePicture } from "../app/views";
 import type { OmniStore } from "@omni-ir/core";
 import { OmniRenderer } from "@omni-ir/react";
 import type { MutationCall, RendererEvent } from "@omni-ir/react";
@@ -51,7 +52,7 @@ export function Preview({ runId, store, onMutation, onEvent, highlightedId, onHi
       onFocus={(e) => onHighlight(idAt(e.target))}
       onBlur={() => onHighlight(null)}
     >
-      <OmniRenderer key={runId} store={store} tools={TOOLS} assets={ASSETS} confirm={CONFIRMATIONS} onMutation={onMutation} onEvent={onEvent} theme={pageTheme()} />
+      <OmniRenderer key={runId} store={store} tools={TOOLS} assets={ASSETS} components={APP_VIEWS} resolvePicture={resolvePicture} confirm={CONFIRMATIONS} onMutation={onMutation} onEvent={onEvent} theme={pageTheme()} />
     </div>
   );
 }

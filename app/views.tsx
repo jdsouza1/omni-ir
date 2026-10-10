@@ -99,9 +99,9 @@ function QuantityPicker({ id, props, field }: AppViewProps) {
         <button type="button" aria-label="Fewer" style={stepper} disabled={current !== null && current <= min} onClick={() => set((current ?? min) - 1)}>
           −
         </button>
-        <output aria-live="polite" style={{ minWidth: "2ch", textAlign: "center", fontSize: "1.125rem", fontVariantNumeric: "tabular-nums" }}>
+        <span aria-live="polite" style={{ minWidth: "2ch", textAlign: "center", fontSize: "1.125rem", fontVariantNumeric: "tabular-nums" }}>
           {current ?? "–"}
-        </output>
+        </span>
         <button type="button" aria-label="More" style={stepper} disabled={current !== null && current >= max} onClick={() => set(current === null ? min : current + 1)}>
           +
         </button>
