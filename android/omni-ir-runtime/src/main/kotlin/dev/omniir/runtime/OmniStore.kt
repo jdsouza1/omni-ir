@@ -2,6 +2,7 @@
 // isn't drawing (resolving $state, governance, actions). Port of swift/Sources/OmniIRSwiftUI/Model.
 package dev.omniir.runtime
 
+import dev.omniir.core.UpdateResult
 import dev.omniir.core.AppComponents
 import dev.omniir.core.ComponentType
 import dev.omniir.core.PicturePattern
@@ -143,6 +144,16 @@ public class OmniStore(
     val found = parser.end()
     sync()
     found
+  }
+
+  /**
+   * Apply an update from the app's own code to the ended screen (SPEC.md [10.29]): the same lines, where an
+   * id or `$key` the screen has is replaced. Applied whole or not at all. Never pass text a model wrote.
+   */
+  public fun update(text: String): UpdateResult = synchronized(lock) {
+    val result = parser.update(text)
+    sync()
+    result
   }
 
   private fun sync() {
