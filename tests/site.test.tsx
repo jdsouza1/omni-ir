@@ -118,3 +118,14 @@ describe("link previews", () => {
     expect(parser.getSnapshot().mutations.size).toBe(1);
   });
 });
+
+describe("the playground's spec link", () => {
+  it("goes to the site's own spec page in the hosted playground, and to GitHub when run locally", async () => {
+    const { specLink } = await import("../playground/Playground");
+    expect(specLink("static")).toEqual({ href: "../docs/spec.html" });
+    // From /omni-ir/playground/ that is /omni-ir/docs/spec.html, a page the docs build produces.
+    expect(new URL(specLink("static").href, "https://jdsouza1.github.io/omni-ir/playground/").pathname).toBe("/omni-ir/docs/spec.html");
+    expect(Object.values(PAGES)).toContain("spec.md");
+    expect(specLink("development").href).toBe("https://github.com/jdsouza1/omni-ir/blob/main/SPEC.md");
+  });
+});

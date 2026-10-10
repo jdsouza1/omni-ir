@@ -26,6 +26,17 @@ export const ERROR_DEMOS = [
   "demo: model error",
 ];
 
+/**
+ * The hosted playground (built with --mode static) lives inside the site, next to the docs, so it links
+ * to the site's own spec page like the landing page does. Run locally there is no docs site: GitHub.
+ */
+export function specLink(mode: string): { href: string; target?: string; rel?: string } {
+  return mode === "static"
+    ? { href: "../docs/spec.html" }
+    : { href: "https://github.com/jdsouza1/omni-ir/blob/main/SPEC.md", target: "_blank", rel: "noopener noreferrer" };
+}
+const SPEC_LINK = specLink(import.meta.env.MODE);
+
 const PASTE_STARTER = `root = Card([title, body])
 title = Heading("Hello")
 body = Text("Edit these lines and press Render.")`;
@@ -78,7 +89,7 @@ export function Playground(deps: PlaygroundDeps) {
         <span className="pg-badge" title="Which model the server is using">
           {apiModel === null ? "connecting…" : apiModel === "mock" ? "mock model · free" : apiModel}
         </span>
-        <a className="pg-header-link" href="https://github.com/jdsouza1/omni-ir/blob/main/SPEC.md" target="_blank" rel="noopener noreferrer">
+        <a className="pg-header-link" {...SPEC_LINK}>
           Read the spec
         </a>
       </header>
