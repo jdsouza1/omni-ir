@@ -16,6 +16,7 @@ const LINKS = {
   getStarted: "docs/guide/getting-started.html",
   spec: "docs/spec.html",
   governance: "docs/project/governance.html",
+  mcp: "docs/guide/mcp.html",
   comparison: "docs/project/comparison.html",
   playground: "playground/",
   community: "https://github.com/jdsouza1/omni-ir/discussions",
@@ -72,7 +73,7 @@ export function Landing() {
           <h1 id="hero-title">The Universal Blueprint for AI Software.</h1>
           <p>
             Omni-IR is a simple, shared language that lets any AI describe an app — and any tool build it. Write it once. Render it on the web,
-            iPhone and Android today.
+            iPhone and Android today, and inside Claude and ChatGPT.
           </p>
           <div className="buttons">
             <a className="btn btn-dark" href={LINKS.playground}>
@@ -140,7 +141,7 @@ export function Landing() {
                 </svg>
               </span>
               <h3>Vendor-neutral</h3>
-              <p>Not tied to any model, framework or company. Screens stream over plain HTTP or AG-UI, the protocol many agent frameworks speak.</p>
+              <p>Not tied to any model, framework or company. Screens stream over plain HTTP, AG-UI or MCP, the protocols agent frameworks and AI assistants speak.</p>
             </div>
             <div className="principle">
               <span className="icon green" aria-hidden="true">
@@ -151,6 +152,19 @@ export function Landing() {
               </span>
               <h3>Accessible building blocks</h3>
               <p>Every input needs a label. Focus and contrast are set by the app’s own components, never by the model.</p>
+            </div>
+            <div className="principle">
+              <span className="icon indigo" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+                  <path d="M8 12h.01M12 12h.01M16 12h.01" />
+                </svg>
+              </span>
+              <h3>Inside AI assistants</h3>
+              <p>
+                In Claude, ChatGPT, VS Code and Cursor, the assistant writes the screen and your components draw it, through MCP Apps. Every button
+                still goes to your server’s checks. <a href={LINKS.mcp}>See how</a>
+              </p>
             </div>
           </div>
         </section>

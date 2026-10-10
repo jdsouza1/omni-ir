@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<!-- The site's link-preview image (site/landing/public/og.png), rendered by scripts/og/render.mjs at 1200x630.
+     The code must stay valid Omni-IR, one statement per line (checked with npm run validate). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body { background: #f8fafc; font-family: "Plus Jakarta Sans", system-ui, sans-serif; color: #0f172a; padding: 56px 72px; display: flex; flex-direction: column; justify-content: center; gap: 26px; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 30px; letter-spacing: -0.02em; }
+  .logo { width: 52px; height: 52px; border-radius: 15px; background: #4f46e5; display: grid; place-items: center; }
+  .pill { padding: 8px 18px; border-radius: 999px; background: #eef2ff; color: #3730a3; font-size: 19px; font-weight: 700; }
+  h1 { margin: 0; font-size: 48px; line-height: 1.05; letter-spacing: -0.035em; font-weight: 800; }
+  h1 em { font-style: normal; color: #4f46e5; }
+  .code { background: #fff; border: 1px solid #eef2f7; border-radius: 20px; padding: 20px 26px; box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 18px 40px -16px rgba(15,23,42,.16); font-family: "JetBrains Mono", monospace; font-size: 17px; line-height: 1.72; color: #1e293b; white-space: pre; }
+  .code b { color: #4f46e5; font-weight: 500; } .code i { font-style: normal; color: #0f766e; } .code s { text-decoration: none; color: #94a3b8; }
+  .where { font-size: 22px; color: #475569; font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="brand"><span class="logo"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg></span>Omni-IR</div>
+    <span class="pill">Open standard · Apache 2.0</span>
+  </div>
+  <h1>AI writes the screen.<br /><em>Your app draws it, and checks every action.</em></h1>
+  <div class="code"><s>1</s>  root = <b>Card</b>([title, pay])
+<s>2</s>  title = <b>Heading</b>(<i>"Cabin in the Pines"</i>)
+<s>3</s>  $in = <i>"2026-10-14"</i>
+<s>4</s>  $out = <i>"2026-10-17"</i>
+<s>5</s>  pay = <b>Button</b>(<i>"Reserve · $642"</i>, action=<i>"go"</i>)
+<s>6</s>  go = <b>McpMutation</b>(pay, tool=<i>"bookings.reserve"</i>, params={checkIn: $in, checkOut: $out})</div>
+  <div class="where">On the web, iPhone and Android, and inside Claude and ChatGPT.</div>
+</body>
+</html>

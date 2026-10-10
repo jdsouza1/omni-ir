@@ -7,6 +7,9 @@ import userEvent from "@testing-library/user-event";
 import { existsSync, readFileSync } from "node:fs";
 import { loadLandingTabs } from "../scripts/landing-examples";
 import { componentsPage, PAGES, rewriteLinks } from "../scripts/docs";
+import { createParser } from "@omni-ir/core";
+import { ASSETS } from "../app/assets";
+import { TOOLS } from "../app/tools";
 
 afterEach(cleanup);
 
@@ -86,5 +89,32 @@ describe("landing page", () => {
       expect(docsPages.has(href), `${a.textContent}: ${href}`).toBe(true);
     }
     expect(screen.getByRole("link", { name: "Join the community" }).getAttribute("href")).toBe("https://github.com/jdsouza1/omni-ir/discussions");
+  });
+});
+
+describe("link previews", () => {
+  it("the landing page has preview tags pointing at the committed 1200x630 image", () => {
+    const html = readFileSync("site/landing/index.html", "utf8");
+    for (const tag of ["og:title", "og:description", "og:url", "og:image", "og:image:alt"]) expect(html, tag).toContain(`property="${tag}"`);
+    expect(html).toContain('name="twitter:card" content="summary_large_image"');
+    expect(html).toContain('content="https://jdsouza1.github.io/omni-ir/og.png"');
+    const png = readFileSync("site/landing/public/og.png");
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
+  });
+
+  it("the image's code is valid Omni-IR, one statement per line", () => {
+    const card = readFileSync("scripts/og/card.html", "utf8");
+    const block = card.slice(card.indexOf('<div class="code">') + '<div class="code">'.length, card.indexOf("</div>", card.indexOf('<div class="code">')));
+    const code = block
+      .replace(/<s>[^<]*<\/s> {2}/g, "")
+      .replace(/<\/?[bi]>/g, "")
+      .replaceAll("&quot;", '"');
+    const parser = createParser({ tools: TOOLS, assets: ASSETS });
+    const errors: string[] = [];
+    parser.subscribe((e) => e.type === "error" && errors.push(`${e.issue.code}: ${e.issue.message}`));
+    parser.write(code + "\n");
+    parser.end();
+    expect(errors).toEqual([]);
+    expect(parser.getSnapshot().mutations.size).toBe(1);
   });
 });
