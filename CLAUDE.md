@@ -65,7 +65,7 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - Vite runs with `--configLoader runner` (in the npm scripts and the dev-server test); without it Vite warns about extensionless imports in the config. On Windows, `timeout`/stopping a background task can leave `node.exe` servers running: check and stop leftovers before `npm ci`.
 
 ## Open core (owner's decision, 2026-10-04)
-This repository is public and is the open standard. Business material (go-to-market strategy, pricing, client work, delivery tooling, the hosted service) lives in a separate private repository and must never be written here: not in docs, plans, commit messages or examples.
+This repository is public and is the open standard. Business material (go-to-market strategy, pricing, client work, delivery tooling, the hosted service) lives in a separate private repository and must never be written here: not in docs, plans, commit messages or examples. One exception, the owner's decision of 2026-10-09: the landing page's Pricing section may say that the standard is free and complete, and that a hosted version is planned, with a link to register interest. No prices, tiers, plan names or strategy, until there is something to buy.
 
 ## License
 Apache-2.0.

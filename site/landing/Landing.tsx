@@ -20,6 +20,8 @@ const LINKS = {
   comparison: "docs/project/comparison.html",
   playground: "playground/",
   community: "https://github.com/jdsouza1/omni-ir/discussions",
+  // A new discussion in Ideas, titled for the visitor: nothing is collected on this page.
+  hostedInterest: "https://github.com/jdsouza1/omni-ir/discussions/new?category=ideas&title=Hosted%20Omni-IR%3A%20what%20I%27d%20need",
   github: "https://github.com/jdsouza1/omni-ir",
 };
 
@@ -54,6 +56,7 @@ export function Landing() {
         <nav className="nav" aria-label="Primary">
           <a href="#how">How it works</a>
           <a href="#principles">Principles</a>
+          <a href="#pricing">Pricing</a>
           <a href={LINKS.docs}>Docs</a>
           <a className="star" href={LINKS.github} target="_blank" rel="noopener noreferrer">
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -165,6 +168,47 @@ export function Landing() {
                 In Claude, ChatGPT, VS Code and Cursor, the assistant writes the screen and your components draw it, through MCP Apps. Every button
                 still goes to your server’s checks. <a href={LINKS.mcp}>See how</a>
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="pricing" className="wrap section" aria-labelledby="pricing-title">
+          <h2 id="pricing-title" className="section-title">
+            Free and open. Hosted later.
+          </h2>
+          <p className="section-lede">Everything that exists today is open source and costs nothing. A hosted version is planned for teams who would rather not run it themselves.</p>
+          <div className="pricing">
+            <div className="plan">
+              <div className="plan-head">
+                <h3>Open source</h3>
+                <span className="plan-tag">Available now</span>
+              </div>
+              <p className="plan-price">
+                Free<span>, forever</span>
+              </p>
+              <p>The complete standard under Apache 2.0, with nothing held back for a paid version:</p>
+              <ul>
+                <li>The spec and conformance suite</li>
+                <li>Parsers and renderers for web, iPhone and Android</li>
+                <li>A reference server with governed actions and an audit trail</li>
+                <li>The model check and the bridge to Claude and ChatGPT</li>
+              </ul>
+              <a className="btn btn-dark" href={LINKS.getStarted}>
+                Get started
+                <Arrow />
+              </a>
+            </div>
+            <div className="plan">
+              <div className="plan-head">
+                <h3>Hosted</h3>
+                <span className="plan-tag soon">Planned</span>
+              </div>
+              <p className="plan-price">Not available yet</p>
+              <p>For teams who want Omni-IR run for them: the same open standard, with hosting, records of every action and model check kept for them, and support. No prices yet: we're asking teams what they need first.</p>
+              <a className="btn btn-light" href={LINKS.hostedInterest} target="_blank" rel="noopener noreferrer">
+                Tell us what you'd need
+                <Arrow />
+              </a>
             </div>
           </div>
         </section>
