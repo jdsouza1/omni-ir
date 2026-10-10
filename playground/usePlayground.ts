@@ -1,7 +1,7 @@
 // Playground state: one "run" per prompt or paste. Each run owns a fresh parser, the raw source
 // text as it arrived, per-line issues, which line defined each node, and an event log. Updates from
 // an older run (e.g. a cancelled one finishing late) are ignored.
-import { useCallback, useMemo, useReducer, useRef } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { ASSETS } from "../app/assets";
 import { APP_COMPONENTS, PICTURES } from "../app/components";
 import { TOOLS } from "../app/tools";
@@ -242,6 +242,8 @@ export function usePlayground(deps: PlaygroundDeps = {}) {
   );
 
   const cancel = useCallback(() => runRef.current.controller?.abort(), []);
+  // Leaving the playground stops the run and any screen it follows.
+  useEffect(() => () => runRef.current.controller?.abort(), []);
 
   const retry = useCallback(() => run(state.lastPrompt), [run, state.lastPrompt]);
 

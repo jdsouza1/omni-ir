@@ -55,7 +55,8 @@ describe("Actions panel", () => {
     const entry = await actions().findByText("Sent");
     expect(entry.closest("li")!.textContent).toContain("rcpt_1234");
     expect(entry.closest("li")!.textContent).toContain("payments.confirm");
-    expect(server.posted).toEqual([{ tool: "payments.confirm", params: { amount: 42.5, note: "Table 4" } }]);
+    // The pressed Button is named, so the result can update it ([10.35]).
+    expect(server.posted).toEqual([{ tool: "payments.confirm", params: { amount: 42.5, note: "Table 4" }, button: "confirm" }]);
   });
 
   it("shows a server refusal", async () => {

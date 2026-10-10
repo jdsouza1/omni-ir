@@ -33,7 +33,7 @@ export interface LiveScreens {
    * unknown, dropped or not this person's ([10.37]): the same answer for each.
    */
   follow(screen: string, owner: string | null, after: number, sink: LiveSink): (() => void) | null;
-  /** Stop every feed (when the server stops). */
+  /** Stop every feed and end every follower's response (when the server stops). */
   close(): void;
   readonly size: number;
 }
@@ -170,7 +170,11 @@ export function createLiveScreens({ feeds, keep = 50, idleMs = 60 * 60 * 1000, n
     },
 
     close() {
-      for (const s of screens.values()) for (const cancel of s.cancel) cancel();
+      // Stopping: no more updates, so every follower hears `end` and its response closes.
+      for (const s of screens.values()) {
+        for (const cancel of s.cancel) cancel();
+        if (!s.ended) finish(s);
+      }
       screens.clear();
     },
 
