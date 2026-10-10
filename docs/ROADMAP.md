@@ -84,18 +84,20 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
 
 ## Later
 
+Ideas worth keeping, with no step number, no date and no plan yet. When one is needed (a user or buyer asks, or the owner decides), it becomes a numbered step under Next and gets a plan for approval. Nothing here is being worked on.
+
 - **From the feature request review (2026-10-09)**, when there is demand:
-  - [ ] File upload: a `FileInput` whose file goes only to a registered tool, with size and type limits the app sets (asked of [A2UI](https://github.com/a2ui-project/a2ui/issues/287))
-  - [ ] Restore a screen after a reload with what the person had typed, so chat history reopens screens as they were left (asked of MCP Apps and CopilotKit)
-  - [ ] Smoother streaming: a renderer option that paces how fast arriving lines appear (asked of [OpenUI](https://github.com/thesysdev/openui/issues/751))
+  - File upload: a `FileInput` whose file goes only to a registered tool, with size and type limits the app sets (asked of [A2UI](https://github.com/a2ui-project/a2ui/issues/287))
+  - Restore a screen after a reload with what the person had typed, so chat history reopens screens as they were left (asked of MCP Apps and CopilotKit)
+  - Smoother streaming: a renderer option that paces how fast arriving lines appear (asked of [OpenUI](https://github.com/thesysdev/openui/issues/751))
 
 - **Running the reference server for real**, for teams that self-host:
-  - [ ] Model adapters beyond Claude: OpenAI, Gemini, and any OpenAI-compatible endpoint (which covers open models), each with a fake client for tests
-  - [ ] Challenge sets for the model check as a file per app, not only code in `app/challenges.ts`
-  - [ ] Export (JSON, CSV) and a retention setting for the audit trail and model check records
-  - [ ] A Docker image and a guide for running the server in your own cloud
-  - [ ] API keys per app, with counts of screens and actions per key
-  - [ ] Single sign-on (OIDC) beside the emailed link
+  - Model adapters beyond Claude: OpenAI, Gemini, and any OpenAI-compatible endpoint (which covers open models), each with a fake client for tests
+  - Challenge sets for the model check as a file per app, not only code in `app/challenges.ts`
+  - Export (JSON, CSV) and a retention setting for the audit trail and model check records
+  - A Docker image and a guide for running the server in your own cloud
+  - API keys per app, with counts of screens and actions per key
+  - Single sign-on (OIDC) beside the emailed link
 
 - **Built-in translations** of the renderers' own words, when apps in other languages ask (Step 16 makes each language just another table).
 - **A theming setting on iOS and Android** (`OmniTheme`) for apps that want Omni-IR screens to differ from their system or Material look; the token names are already fixed.
