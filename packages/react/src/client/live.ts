@@ -53,7 +53,9 @@ export async function followScreen(screen: string, options: FollowOptions): Prom
           // In order, each once; a rejected update still counts as received ([10.38]).
           if (event !== "update" || typeof data.text !== "string" || typeof data.seq !== "number" || !(data.seq > last)) continue;
           last = data.seq;
-          onUpdate?.(parser.update(data.text), last);
+          // Applied whether or not the app listens (an optional call would skip its argument).
+          const result = parser.update(data.text);
+          onUpdate?.(result, last);
         }
       }
     } catch {

@@ -4,6 +4,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import type { OmniParser } from "@omni-ir/core";
 import { generate, type GenerateOutcome } from "@omni-ir/react";
 import { renderTransportFiles, TRANSPORT_CASES, type TransportCase } from "../conformance/transport";
+import { CASES } from "../conformance/build";
 
 const dir = "conformance/transport";
 const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
@@ -87,11 +88,13 @@ describe("transport conformance suite", () => {
     const citedByTests = new Set([...tests.matchAll(/\[(10\.\d+)\]/g)].map((m) => m[1]!));
     // WebSockets are specified, not built (PLAN-TRANSPORT.md, decision 4): no endpoint to test yet.
     const specOnly = new Set(["10.16", "10.17"]);
-    const covered = new Set([...TRANSPORT_CASES.flatMap((c) => c.rules), ...citedByTests, ...specOnly]);
+    // The update rules ([10.29]-[10.34]) are parser rules, covered by conformance/cases/live.json.
+    const liveCases = CASES.live!.flatMap((c) => c.rules);
+    const covered = new Set([...TRANSPORT_CASES.flatMap((c) => c.rules), ...liveCases, ...citedByTests, ...specOnly]);
     expect([...specRules].filter((r) => !covered.has(r)), "rules without a case or test").toEqual([]);
     const cited = TRANSPORT_CASES.flatMap((c) => c.rules).filter((r) => r.startsWith("10."));
     expect(cited.filter((r) => !specRules.has(r)), "cases citing unknown rules").toEqual([]);
-    expect(specRules.size).toBe(28);
+    expect(specRules.size).toBe(40);
   });
 
   it("asks for a screen as [10.1] says: POST, JSON body, event-stream, and the version in the query", async () => {

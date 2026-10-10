@@ -56,7 +56,7 @@ describe("following a screen [10.36]-[10.38]", () => {
     const outcome = await generate("where is my order?", { parser, fetch: api });
     const asked: string[] = [];
     let drops = 1;
-    // The first connection drops right after its first update.
+    // The first connection drops right after its first update. No onUpdate: updates apply without one.
     const flaky: typeof fetch = async (input, init) => {
       const url = String(input);
       asked.push(new URL(url, "http://x").searchParams.get("after")!);
@@ -76,8 +76,9 @@ describe("following a screen [10.36]-[10.38]", () => {
     };
     const following = followScreen((outcome as { screen: string }).screen, { parser, fetch: flaky, retryMs: 5 });
     await step();
-    await vi.waitFor(() => expect(status(parser)).toBe("Out for delivery"));
-    await vi.waitFor(() => expect(asked).toEqual(["0", "1"]));
+    await new Promise((r) => setTimeout(r, 100)); // the drop, and following again after it
+    expect(status(parser)).toBe("Out for delivery");
+    expect(asked).toEqual(["0", "1"]);
     await step();
     expect(await following).toEqual({ status: "ended" });
     expect(status(parser)).toBe("Delivered");
