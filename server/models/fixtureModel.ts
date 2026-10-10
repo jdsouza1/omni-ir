@@ -18,6 +18,8 @@ export interface FixtureModelOptions {
 const SCREENS: { id: string; keywords: string[] }[] = [
   { id: "payment-confirmation", keywords: ["pay", "payment", "payments", "checkout", "purchase", "confirm", "confirmation", "billing"] },
   { id: "sign-in", keywords: ["login", "log", "signin", "sign", "auth", "authenticate"] },
+  // The demo video's last scene (PLAN-VIDEO.md): the app has no tool for this, so its button stays off.
+  { id: "variants/delete-account", keywords: ["delete", "deletes", "deleting"] },
   { id: "profile-settings", keywords: ["profile", "settings", "account", "preferences"] },
   { id: "sales-dashboard", keywords: ["sales", "revenue", "analytics", "chart", "charts", "trend", "visitors"] },
   { id: "order-breakdown", keywords: ["breakdown", "pie", "share", "channel", "channels", "split"] },

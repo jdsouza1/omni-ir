@@ -4,7 +4,8 @@
 // Launch options (used by the UI tests): `-fixture landing/booking` opens a screen directly,
 // `-appearance dark` forces dark mode, `-instant YES` writes the whole screen at once, and
 // `-server http://localhost:8787 -prompt "book a stay"` streams from a running Omni-IR server
-// (`npm run server`, free mock model) instead of a fixture.
+// (`npm run server`, free mock model) instead of a fixture. `-video YES` is the demo video's recording
+// mode (PLAN-VIDEO.md): only the screen shows, without the developer log or issue codes.
 import OmniIRSwiftUI
 import SwiftUI
 
@@ -89,6 +90,7 @@ struct ScreenView: View {
   )
   @State private var log: [String] = []
   @State private var done = false
+  private let video = UserDefaults.standard.bool(forKey: "video")
 
   var body: some View {
     ScrollView {
@@ -106,16 +108,17 @@ struct ScreenView: View {
           appViews: demoAppViews,
           resolvePicture: { name in DemoComponentRegistry.bundled.productPictures[name].map { Image($0) } }
         )
-        if !log.isEmpty {
+        if !video && !log.isEmpty {
           section("Actions", lines: log)
         }
-        if !store.issues.isEmpty {
+        if !video && !store.issues.isEmpty {
           section("Issues", lines: store.issues.map { "\($0.line.map { "Line \($0)" } ?? "End"): \($0.code.rawValue)" })
         }
         Text(done ? "Done" : "Streaming…")
           .font(.footnote)
           .foregroundStyle(.secondary)
           .accessibilityIdentifier("status")
+          .opacity(video ? 0 : 1)  // still there for the tests in recording mode, but not seen
       }
       .padding()
     }

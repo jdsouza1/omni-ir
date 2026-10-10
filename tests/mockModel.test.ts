@@ -66,6 +66,7 @@ describe("MockModel routing", () => {
     ["my order history", "order-history"],
     ["a sales dashboard with charts", "sales-dashboard"],
     ["orders by channel as a pie", "order-breakdown"],
+    ["a button that deletes my account", "variants/delete-account"],
     ["", "demo-mode"],
   ])("%j → %s", (prompt, screen) => {
     expect(model.route(prompt)).toBe(screen);

@@ -20,3 +20,4 @@ android/review/
 # Docs site: pages assembled by scripts/docs.ts, VitePress cache
 .docs/
 site/docs/.vitepress/cache/
+video-out/

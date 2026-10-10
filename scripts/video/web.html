@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- The demo video's web scene (PLAN-VIDEO.md): <omni-screen> asks the reference server (free mock model)
+     for the order screen and follows it, so the live updates arrive as on the phones. Served next to
+     omni-elements.js by scripts/video/record-web.mjs. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Omni-IR · web</title>
+<style>
+  body { margin: 0; background: #f5f6f8; font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: #1b2230; }
+  .bar { height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #e9ecf2; border-bottom: 1px solid #d7dce5; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; background: #c9ced8; }
+  .url { margin-left: 10px; flex: 1; height: 26px; border-radius: 13px; background: #fff; color: #5b6577; font-size: 13px; display: flex; align-items: center; padding: 0 12px; }
+  main { padding: 22px 20px; display: grid; gap: 18px; }
+  h1 { font-size: 18px; margin: 0; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">your-app.example</span></div>
+  <main>
+    <h1>Where is my order?</h1>
+    <omni-screen id="screen" theme="light" endpoint="http://localhost:8787"></omni-screen>
+  </main>
+  <script type="module">
+    import "./omni-elements.js";
+    const screen = document.getElementById("screen");
+    screen.tools = { "orders.requestReturn": { type: "object", properties: { orderId: { type: "string" } }, required: ["orderId"] } };
+    // The recorder starts the request once the screencast is running.
+    window.startDemo = () => screen.generate("Where is my order?");
+  </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# Variant: asked for a button that deletes the account, the model names a tool the app never
+# registered. That line is rejected, so the button has no permission to act and stays disabled:
+# the AI can ask, the app decides. Shown in the demo video (PLAN-VIDEO.md).
+root = Card([title, intro, sep, danger])
+title = Heading("Account settings")
+intro = Text("Signed in as ada@example.com", tone="muted")
+sep = Divider()
+danger = Stack([warning, remove], gap="sm")
+warning = Notice("Deleting your account removes your orders and saved addresses.", tone="warning")
+remove = Button("Delete my account", action="deleteAccount", variant="danger")
+removeIt = McpMutation(remove, tool="account.delete")

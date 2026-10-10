@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -69,6 +70,7 @@ class MainActivity : ComponentActivity() {
       ?: extras?.getString("server")?.let { Source.Server(it, extras.getString("prompt") ?: "book a stay") }
     val appearance = extras?.getString("appearance")
     val instant = extras?.getString("instant") == "true"
+    VideoMode.on = extras?.getString("video") == "true"
     val fixtures = Fixtures.list(this)
     val systemDark = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
     val dark = when (appearance) {
@@ -86,6 +88,11 @@ class MainActivity : ComponentActivity() {
       }
     }
   }
+}
+
+/** The demo video's recording mode (PLAN-VIDEO.md): only the screen shows, no developer log or issue codes. */
+internal object VideoMode {
+  var on = false
 }
 
 private val LightColors = lightColorScheme(primary = Color(0xFF4F46E5), onPrimary = Color.White)
@@ -213,13 +220,14 @@ private fun ScreenView(source: Source, instant: Boolean, read: (String) -> Strin
         }
       },
     )
-    if (log.isNotEmpty()) Section("Actions", log)
-    if (issues.isNotEmpty()) Section("Issues", issues.map { "${it.line?.let { l -> "Line $l" } ?: "End"}: ${it.code.wireName}" })
+    if (!VideoMode.on && log.isNotEmpty()) Section("Actions", log)
+    if (!VideoMode.on && issues.isNotEmpty()) Section("Issues", issues.map { "${it.line?.let { l -> "Line $l" } ?: "End"}: ${it.code.wireName}" })
     Text(
       if (done) "Done" else "Streaming…",
       style = MaterialTheme.typography.bodySmall,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
-      modifier = Modifier.testTag("status"),
+      // Still there for the tests in recording mode, but not seen.
+      modifier = Modifier.testTag("status").alpha(if (VideoMode.on) 0f else 1f),
     )
   }
 }

@@ -1,6 +1,6 @@
 # Omni-IR: a product demo video
 
-Status: **DRAFT for approval (2026-10-10).** Free: recorded and edited on GitHub's CI with the free mock
+Status: **Approved 2026-10-10 with the recommendations; the story restructured as a Golden Circle at the owner's request. In progress.** Free: recorded and edited on GitHub's CI with the free mock
 model; no paid API, no paid tools, no music to license. Nothing here is built until you approve it.
 This is not a protocol step (no Step 23): it shows what is already built.
 
@@ -31,23 +31,26 @@ what Omni-IR is.
 
 ## The story, scene by scene (the example walked end to end)
 
-Each scene says what the AI writes, what the app does, and what the person sees. The AI's part is the free
-mock model streaming pre-written screens, as the playground does.
+Told as a Golden Circle (owner's request, 2026-10-10): **why** first (what we believe), then **how** (what
+makes it work), then **what** (the product). Each scene says what the AI writes, what the app does, and
+what the person sees. The AI's part is the free mock model streaming pre-written screens, as the
+playground does.
 
-| # | Time | What the person sees | What happens underneath | Caption (large, plain) |
-|---|---|---|---|---|
-| 1 | 0:00–0:06 | A title card | — | **Ask for a screen.** |
-| 2 | 0:06–0:20 | "Where is my order?" typed; the order screen streams in, line by line, on an iPhone, an Android phone and a browser, side by side | The model writes Omni-IR lines (`order_status = Badge("Shipped")`…); each platform's own renderer draws them with native components | **The AI writes what to show. Each platform draws it natively.** |
-| 3 | 0:20–0:34 | The status changes on all three: "Out for delivery", then "Delivered" | The server's live feed sends `order_status = Badge("Delivered", tone="success")`; each client checks it and applies it | **Your app keeps it current. The AI never touches it again.** |
-| 4 | 0:34–0:46 | On the iPhone, "Request a return" is pressed; it becomes "Return requested. We'll email you a label." | The press goes to the app's server, which checks the person, the order and the params before running it; its result replaces the Button | **Every action is checked by your server first.** |
-| 5 | 0:46–0:60 | "A settings screen with a button that deletes my account": the screen appears, but the delete button is greyed out and does nothing | The model names a tool the app never registered; the parser rejects that line, so the button has no permission to act | **The AI can ask. Your app decides.** |
-| 6 | 0:60–0:70 | End card: "Omni-IR · generative UI you can trust · open source", the site address | — | — |
+| Ring | # | Time | What the person sees | What happens underneath | Caption (large, plain) |
+|---|---|---|---|---|---|
+| **Why** | 1 | 0:00–0:09 | Three plain title cards, one after another | — | **AI can now design the screens in your app.** · **But should it be trusted to run your app?** · **We believe the AI should describe. Your app should decide.** |
+| **How** | 2 | 0:09–0:13 | A card with the few lines the AI writes, appearing one by one | The order screen's Omni-IR, from the fixture: `order_status = Badge("Shipped")`… | **The AI describes the screen in a few plain lines.** |
+| **How** | 3 | 0:13–0:25 | "Where is my order?": the screen streams in on an iPhone, an Android phone and a browser, side by side | Each platform's own renderer checks every line and draws it with native components | **Each platform draws it with its own components.** |
+| **How** | 4 | 0:25–0:35 | The status changes on all three: "Out for delivery", then "Delivered" | The server's live feed sends the new status; each client checks it before applying it | **Your app keeps it current. The AI never touches it again.** |
+| **How** | 5 | 0:35–0:43 | On the iPhone, "Request a return" is pressed; it becomes "Return requested. We'll email you a label." | The press goes to the app's server, which checks the person, the order and the params first; its result replaces the Button | **Every action is checked by your server first.** |
+| **How** | 6 | 0:43–0:51 | "A button that deletes my account": it appears, greyed out; pressing it does nothing | The AI named a tool the app never registered; that line is rejected, so the button has no permission to act | **The AI can ask. Your app decides.** |
+| **What** | 7 | 0:51–1:00 | End card | — | **Omni-IR** · **Generative UI you can trust.** · *Open source · iPhone · Android · Web* · the site address |
 
-A small line in the corner throughout: *Demo with pre-written screens; no AI model was called.*
+A small line in the corner throughout the screen scenes: *Demo with pre-written screens; no AI model was called.*
 
 ## Decisions: pros, cons and trade-offs
 
-**1. One story, not a feature tour** (recommended).
+**1. One story, told as a Golden Circle (why, how, what), not a feature tour** (recommended; the Golden Circle was the owner's choice).
 - *Pros:* easy to follow and remember; every scene supports one claim (trust and native); it's how good product demos work.
 - *Cons:* leaves out charts, forms, app components and `<omni-screen>`.
 - *Alternative:* a fast tour of every feature (shows breadth, but nothing sticks).
