@@ -13,5 +13,10 @@ export default defineConfig({
   base: "./",
   resolve: { alias: WORKSPACE_ALIASES },
   define: { __LANDING_TABS__: readFileSync(resolve(EXAMPLES_JSON), "utf8") },
-  build: { outDir: resolve("dist/site"), emptyOutDir: false },
+  // Two pages: the landing page and the comparison page (PLAN-COMPARE-PAGE.md), at compare/.
+  build: {
+    outDir: resolve("dist/site"),
+    emptyOutDir: false,
+    rollupOptions: { input: { main: resolve("site/landing/index.html"), compare: resolve("site/landing/compare/index.html") } },
+  },
 });

@@ -232,6 +232,7 @@ main > section:nth-of-type(even) { background: var(--wash); box-shadow: 0 0 0 10
 .plan p { margin: 0; color: var(--text); line-height: 1.6; }
 .plan ul { margin: 0; padding-left: 1.2em; color: var(--ink-2); line-height: 1.7; }
 .plan .btn { margin-top: auto; align-self: flex-start; }
+.compare-cta { margin-top: 28px; }
 .cta { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 24px; }
 
 /* Footer */

@@ -1048,7 +1048,7 @@
      },
      {
       "text": "MCP Apps shows HTML in a sandboxed frame",
-      "plain": "Yes: it's what MCP Apps uses"
+      "plain": "Yes: chat apps can show web pages in a safe frame"
      },
      {
       "text": "Not directly",
@@ -1078,7 +1078,7 @@
      },
      {
       "text": "Documentation and types",
-      "plain": "Documentation",
+      "plain": "Documentation, not a full rulebook",
       "source": "sources/json-render/README.md"
      },
      {

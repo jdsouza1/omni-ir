@@ -20,6 +20,8 @@ const LINKS = {
   governance: "docs/project/governance.html",
   mcp: "docs/guide/mcp.html",
   comparison: "docs/project/comparison.html",
+  // The interactive comparison, in plain words (PLAN-COMPARE-PAGE.md).
+  compare: "compare/",
   playground: "playground/",
   community: "https://github.com/jdsouza1/omni-ir/discussions",
   // A new discussion in Ideas, titled for the visitor: nothing is collected on this page.
@@ -57,6 +59,7 @@ export function Landing() {
         </a>
         <nav className="nav" aria-label="Primary">
           <a href="#how">How it works</a>
+          <a href={LINKS.compare}>Compare</a>
           <a href="#principles">Principles</a>
           <a href="#pricing">Pricing</a>
           <a href={LINKS.docs}>Docs</a>
@@ -131,8 +134,15 @@ export function Landing() {
           </ul>
           <p className="footnote">
             OpenUI Lang is 4–10% smaller still, and its catalog is larger. Omni-IR trades a little size for no logic in the stream, pictures only from
-            your app and governed actions. <a href={LINKS.comparison}>Read the full comparison</a>
+            your app and governed actions. <a href={LINKS.compare}>See the comparison, in plain words</a> or{" "}
+            <a href={LINKS.comparison}>read the full write-up</a>
           </p>
+          <div className="buttons compare-cta">
+            <a className="btn btn-light" href={LINKS.compare}>
+              Compare them side by side
+              <Arrow />
+            </a>
+          </div>
         </section>
 
         <section id="principles" className="wrap section" aria-labelledby="pr-title">

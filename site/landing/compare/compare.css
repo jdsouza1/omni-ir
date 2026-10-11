@@ -1,0 +1,95 @@
+/* The comparison page (PLAN-COMPARE-PAGE.md), on the landing page's design and tokens (landing.css).
+   Light only, like the landing page. Omni-IR's rows are marked with the brand colour. */
+.cmp-hero { padding-block: 56px 40px; }
+.cmp-hero h1 { font-size: clamp(36px, 5vw, 56px); }
+.cmp-dates { font-size: 14px !important; color: var(--muted) !important; margin-top: 16px !important; }
+.compare main > section:not(.hero) { padding-block: 72px; }
+.compare main > section:nth-of-type(even) { background: var(--wash); box-shadow: 0 0 0 100vmax var(--wash); clip-path: inset(0 -100vmax); }
+
+.cmp-section { display: grid; gap: 0; }
+.cmp-card {
+  margin-top: 32px; background: var(--card); border: 1px solid var(--line-soft); border-radius: 20px; box-shadow: var(--shadow-card);
+  padding: clamp(18px, 3vw, 32px); display: grid; gap: 18px; min-width: 0;
+}
+.cmp-h3 { margin: 0; font-size: 17px; font-weight: 700; }
+.cmp-small { margin: 0; color: var(--text); font-size: 15px; line-height: 1.55; }
+.cmp-note { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.cmp-link { background: none; border: 0; padding: 0; color: var(--brand); font: inherit; font-weight: 600; cursor: pointer; justify-self: start; }
+
+/* The six formats */
+.cmp-formats { list-style: none; margin: 32px 0 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.cmp-format { display: grid; gap: 4px; padding: 16px 18px; background: var(--card); border: 1px solid var(--line-soft); border-radius: 16px; }
+.cmp-format span { color: var(--text); font-size: 15px; line-height: 1.5; }
+.cmp-format[data-ours] { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+
+/* Screen picker */
+.cmp-picker { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-weight: 600; }
+.cmp-picker select {
+  font: inherit; font-weight: 500; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  max-width: 100%;
+}
+
+/* Size bars and race lanes */
+.cmp-bars, .cmp-race { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.cmp-bar, .cmp-lane { display: grid; grid-template-columns: minmax(110px, 180px) 1fr auto; align-items: center; gap: 12px; }
+.cmp-bar-name { font-size: 15px; font-weight: 600; }
+.cmp-bar-track { height: 14px; background: var(--wash); border-radius: 999px; overflow: hidden; }
+.cmp-bar-fill { display: block; height: 100%; background: var(--faint); border-radius: 999px; }
+.cmp-bar[data-ours] .cmp-bar-fill, .cmp-lane[data-ours] .cmp-lane-fill { background: var(--brand); }
+.cmp-bar[data-ours] .cmp-bar-name, .cmp-lane[data-ours] .cmp-bar-name { color: var(--brand); }
+.cmp-bar-value { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 4ch; text-align: right; }
+.cmp-lane { grid-template-columns: minmax(110px, 180px) 1fr minmax(120px, 170px); }
+.cmp-lane > .cmp-lane-track { position: relative; height: 14px; background: var(--wash); border-radius: 999px; }
+.cmp-lane-fill { position: absolute; inset: 0 auto 0 0; background: var(--faint); border-radius: 999px; }
+.cmp-lane-mark { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); border-radius: 2px; }
+.cmp-lane-status { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cmp-lane-status[data-seen] { color: #047857; font-weight: 600; }
+.cmp-race-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.cmp-race-screen { display: grid; gap: 12px; }
+
+/* Text and the drawn screen */
+.cmp-split { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.cmp-split-text, .cmp-split-screen { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.cmp-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.cmp-chip {
+  font: inherit; font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card);
+  color: var(--ink); cursor: pointer;
+}
+.cmp-chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.cmp-code {
+  margin: 0; max-height: 360px; overflow: auto; padding: 14px; border-radius: 12px; background: var(--wash); border: 1px solid var(--line-soft);
+  font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre; color: var(--ink-2);
+}
+.cmp-drawn { padding: 16px; border-radius: 16px; border: 1px dashed var(--line); background: var(--page); min-width: 0; overflow-x: auto; }
+
+/* What each one lets the AI do */
+.cmp-rows { margin-top: 32px; display: grid; gap: 16px; }
+.cmp-row { background: var(--card); border: 1px solid var(--line-soft); border-radius: 20px; padding: clamp(16px, 3vw, 24px); display: grid; gap: 8px; }
+.cmp-row-q { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+.cmp-row-why { margin: 0; color: var(--text); font-size: 15px; line-height: 1.5; }
+.cmp-answers { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.cmp-answer details { border-radius: 12px; border: 1px solid var(--line-soft); background: var(--page); padding: 10px 12px; height: 100%; }
+.cmp-answer[data-ours] details { border-color: var(--brand); background: var(--brand-soft); }
+.cmp-answer summary { cursor: pointer; display: grid; gap: 2px; list-style: none; }
+.cmp-answer summary::-webkit-details-marker { display: none; }
+.cmp-answer-name { font-size: 13px; font-weight: 600; color: var(--muted); }
+.cmp-answer[data-ours] .cmp-answer-name { color: var(--brand-ink); }
+.cmp-answer-plain { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.4; }
+.cmp-answer-detail, .cmp-answer-source { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--text); overflow-wrap: anywhere; }
+.cmp-answer-source { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+
+/* The account-deletion story */
+.cmp-story { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); }
+.cmp-story .cmp-card { align-content: start; }
+.cmp-story + .cmp-note { margin-top: 16px; text-align: center; }
+
+/* Where Omni-IR loses */
+.cmp-loses { margin: 32px auto 0; max-width: 760px; padding-left: 20px; display: grid; gap: 12px; color: var(--text); font-size: 16px; line-height: 1.6; }
+.cmp-loses strong { color: var(--ink); }
+.cmp-cta { margin-top: 32px; justify-content: center; }
+
+@media (max-width: 600px) {
+  .cmp-bar, .cmp-lane { grid-template-columns: 1fr auto; }
+  .cmp-bar-track, .cmp-lane > .cmp-lane-track { grid-column: 1 / -1; grid-row: 2; }
+  .cmp-lane-status { grid-row: 1; grid-column: 2; text-align: right; }
+}
