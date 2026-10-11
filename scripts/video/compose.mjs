@@ -109,14 +109,46 @@ segments.push(card("how-lines", 4.5, [
 ]));
 
 // How, 2 and 3: the three platforms side by side, from just before the request to "Delivered".
+/**
+ * The moment a clip first shows "Delivered", found by what's on screen: its green success badge is the
+ * only green in the order scene, on every platform. The clock is only a first guess: the iPhone
+ * simulator's recorder runs a few seconds off it. Null when the badge isn't found (the clock is used).
+ */
+function deliveredAt(clip) {
+  const guess = at(clip, clip.E + 9);
+  const from = Math.max(0, guess - 12);
+  const seconds = 24;
+  const [w, fps] = [180, 5];
+  const probe = execFileSync("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "csv=p=0", ...(clip.concat ? ["-f", "concat", "-safe", "0"] : []), clip.file]).toString().trim().split(/\r?\n/)[0].split(",").map(Number);
+  const h = Math.round((probe[1] / probe[0]) * w / 2) * 2;
+  const raw = execFileSync("ffmpeg", ["-loglevel", "error", ...input(clip, from, seconds), "-vf", `fps=${fps},scale=${w}:${h}`, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], { maxBuffer: 1 << 28 });
+  const frame = w * h * 3;
+  for (let f = 0; f * frame < raw.length; f++) {
+    let green = 0;
+    for (let i = f * frame; i < (f + 1) * frame; i += 3) {
+      const [r, g, b] = [raw[i], raw[i + 1], raw[i + 2]];
+      if (g - r > 40 && g - b > 25) green++;
+    }
+    if (green >= 4) return from + f / fps;
+  }
+  return null;
+}
+
 const stream = Math.max(...[ios, android, web].map((c) => c.E - c.G));
+// Each clip starts so that its "Delivered" lands at the same moment in the scene.
+const deliveredInScene = 0.5 + stream + 9;
+for (const clip of [ios, android, web]) {
+  const found = deliveredAt(clip);
+  clip.sceneStart = Math.max(0, found === null ? at(clip, clip.G - 0.5) : found - deliveredInScene);
+  console.log(`${clip.file}: Delivered ${found === null ? "not found, using the clock" : `at ${found.toFixed(2)} s`}; scene from ${clip.sceneStart.toFixed(2)} s`);
+}
 const sideBy = stream + 0.5 + 10.5;
 const captionSwitch = 0.5 + stream + 3.5; // the first update comes 4 s after the stream ends
 const PANEL_H = 780;
 {
   const file = join(work, "how-platforms.mp4");
   const clips = [ios, android, web];
-  const args = clips.flatMap((c) => input(c, Math.max(0, at(c, c.G - 0.5)), sideBy));
+  const args = clips.flatMap((c) => input(c, c.sceneStart, sideBy));
   const scaled = clips.map((_, i) => `[${i}:v]fps=30,scale=-2:${PANEL_H},setpts=PTS-STARTPTS[p${i}]`).join(";");
   const widths = [367, 351, 468]; // iPhone 1206x2622, Android 1080x2400, web 600x1000, at 780 high
   const gap = 90;
