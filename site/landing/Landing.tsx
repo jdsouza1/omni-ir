@@ -14,6 +14,8 @@ const TABS = __LANDING_TABS__;
 const LINKS = {
   docs: "docs/",
   getStarted: "docs/guide/getting-started.html",
+  // The no-code path (PLAN-QUICKSTART.md): the playground's "Use your own AI" tab.
+  ownAi: "playground/#own-ai",
   spec: "docs/spec.html",
   governance: "docs/project/governance.html",
   mcp: "docs/guide/mcp.html",
@@ -58,6 +60,7 @@ export function Landing() {
           <a href="#principles">Principles</a>
           <a href="#pricing">Pricing</a>
           <a href={LINKS.docs}>Docs</a>
+          <a href={LINKS.spec}>Spec</a>
           <a className="star" href={LINKS.github} target="_blank" rel="noopener noreferrer">
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -79,12 +82,12 @@ export function Landing() {
             iPhone and Android, and inside Claude and ChatGPT. Every action goes through your server’s checks.
           </p>
           <div className="buttons">
-            <a className="btn btn-dark" href={LINKS.playground}>
-              Try the playground
+            <a className="btn btn-dark" href={LINKS.ownAi}>
+              Get started
               <Arrow />
             </a>
-            <a className="btn btn-light" href={LINKS.spec}>
-              Read the spec
+            <a className="btn btn-light" href={LINKS.playground}>
+              Try the playground
             </a>
           </div>
         </section>
@@ -220,7 +223,7 @@ export function Landing() {
             Start building with Omni-IR.
           </h2>
           <div className="buttons">
-            <a className="btn btn-brand" href={LINKS.getStarted}>
+            <a className="btn btn-brand" href={LINKS.ownAi}>
               Get started
               <Arrow />
             </a>

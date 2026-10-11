@@ -21,3 +21,4 @@ android/review/
 .docs/
 site/docs/.vitepress/cache/
 video-out/
+tests/.quickstart/
