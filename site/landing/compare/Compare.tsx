@@ -1,7 +1,7 @@
 // The comparison page (PLAN-COMPARE-PAGE.md), written for someone who has never seen code: every
 // section opens with a plain sentence, code only appears on request, and every claim has a source.
 // All numbers come from data.json, written by `npm run bench`.
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createParser, type OmniParser } from "@omni-ir/core";
 import { OmniRenderer } from "@omni-ir/react";
 import { ASSETS } from "../../../app/assets";
@@ -31,6 +31,19 @@ const formatsOf = (screen: Screen) => data.formats.filter((f) => screen.tokens[f
 
 export function Compare() {
   const [screenName, setScreenName] = useState("booking");
+  // Screens differ in height (OpenUI's examples aren't drawn), so changing one moves everything below
+  // it. Right after the change is drawn, and before it's painted, keep the picker that was used where
+  // it was on screen, or the page seems to jump or reload (owner's review).
+  const anchor = useRef<{ picker: HTMLElement; top: number } | null>(null);
+  useLayoutEffect(() => {
+    const a = anchor.current;
+    anchor.current = null;
+    if (a) window.scrollBy(0, a.picker.getBoundingClientRect().top - a.top);
+  }, [screenName]);
+  const chooseScreen = (name: string, picker: HTMLElement) => {
+    anchor.current = { picker, top: picker.getBoundingClientRect().top };
+    setScreenName(name);
+  };
   const screen = data.screens.find((s) => s.name === screenName) ?? data.screens[0]!;
   return (
     <div className="page compare">
@@ -69,8 +82,8 @@ export function Compare() {
         </section>
 
         <Formats />
-        <Sizes screen={screen} onScreen={setScreenName} />
-        <Race screen={screen} onScreen={setScreenName} />
+        <Sizes screen={screen} onScreen={chooseScreen} />
+        <Race screen={screen} onScreen={chooseScreen} />
         <Capabilities />
         <Story />
         <Loses />
@@ -113,12 +126,18 @@ function Formats() {
   );
 }
 
-function ScreenPicker({ screen, onScreen }: { screen: Screen; onScreen: (name: string) => void }) {
+function ScreenPicker({ screen, onScreen }: { screen: Screen; onScreen: (name: string, picker: HTMLElement) => void }) {
   const id = useId();
   return (
     <div className="cmp-picker">
       <label htmlFor={id}>Choose a screen to compare</label>
-      <select id={id} value={screen.name} onChange={(e) => onScreen(e.target.value)}>
+      <select
+        id={id}
+        value={screen.name}
+        onChange={(e) => {
+          onScreen(e.currentTarget.value, e.currentTarget);
+        }}
+      >
         <optgroup label="Written by an AI in our model check">
           {data.screens
             .filter((s) => s.set === "omni")
@@ -142,7 +161,7 @@ function ScreenPicker({ screen, onScreen }: { screen: Screen; onScreen: (name: s
   );
 }
 
-function Sizes({ screen, onScreen }: { screen: Screen; onScreen: (name: string) => void }) {
+function Sizes({ screen, onScreen }: { screen: Screen; onScreen: (name: string, picker: HTMLElement) => void }) {
   const formats = formatsOf(screen);
   const max = Math.max(...formats.map((f) => screen.tokens[f.id as FormatId] ?? 0));
   const [shown, setShown] = useState<string | null>(null);
@@ -241,7 +260,7 @@ function Drawn({ text, parser: given }: { text?: string; parser?: OmniParser }) 
   );
 }
 
-function Race({ screen, onScreen }: { screen: Screen; onScreen: (name: string) => void }) {
+function Race({ screen, onScreen }: { screen: Screen; onScreen: (name: string, picker: HTMLElement) => void }) {
   const formats = formatsOf(screen);
   const total = Math.max(...formats.map((f) => screen.tokens[f.id as FormatId] ?? 0));
   const [progress, setProgress] = useState(0);
