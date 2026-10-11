@@ -7,6 +7,7 @@ import { dirname, join, relative } from "node:path";
 import { pathToFileURL } from "node:url";
 import { A2UI_BATCHED, A2UI_STREAMED, JSON_RENDER, JSX, OMNI, OPENUI, jsonRenderOpenUIStyle, type Format } from "./src/emit";
 import { NO_COUNTERPART } from "./capabilities";
+import { PAGE_DATA, pageData } from "./pageData";
 import { fillSections, renderSections } from "./report";
 import { HTML } from "./src/html";
 import { freeEncoder, round, streaming, tokens, type Streaming } from "./src/measure";
@@ -96,6 +97,8 @@ export function run(): { results: Results; files: Map<string, string> } {
   // docs/COMPARISON.md's tables are generated from the results.
   const doc = join(BENCH_DIR, "../docs/COMPARISON.md");
   if (existsSync(doc)) files.set("../docs/COMPARISON.md", fillSections(readFileSync(doc, "utf8"), renderSections(results)));
+  // The comparison page's data (PLAN-COMPARE-PAGE.md).
+  files.set(PAGE_DATA, pageData(results, files));
   return { results, files };
 }
 
