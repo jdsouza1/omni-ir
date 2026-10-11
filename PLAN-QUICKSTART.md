@@ -1,6 +1,6 @@
 # Omni-IR: getting started without friction
 
-Status: **For the owner's approval (2026-10-11), second draft.** Rewritten after the owner's review:
+Status: **Approved 2026-10-11 with the recommendations (second draft). A.1–A.5 built; review next.** Rewritten after the owner's review:
 "think of a non-technical user going through this and click the button". Not a protocol step: the
 stream format doesn't change. Free: nothing here calls a paid API; visitors use their own AI chat.
 
@@ -155,11 +155,11 @@ in the browser.
 
 ## Checklist
 
-- [ ] A.1 `buildSystemPrompt` in `@omni-ir/core`, tests first; the server and playground use it, prompt unchanged
-- [ ] A.2 The "Use your own AI" tab: three steps, reply tidying, plain-sentence summary, phone layout
-- [ ] A.3 Share links
-- [ ] A.4 Landing page buttons
-- [ ] A.5 The developer guide rewritten as steps, its code tested
+- [x] A.1 `buildSystemPrompt` in `@omni-ir/core`, tests first; the server and playground use it, prompt unchanged
+- [x] A.2 The "Use your own AI" tab: three steps, reply tidying, plain-sentence summary, phone layout
+- [x] A.3 Share links
+- [x] A.4 Landing page buttons
+- [x] A.5 The developer guide rewritten as steps, its code tested
 - [ ] B.1 Owner: one free model check run in ChatGPT's free plan
 - [ ] B.2 I go through both tracks in the browser and check every screen and sentence
 - [ ] B.3 Your review, then merge with your approval (Track 1 goes live with the site)
