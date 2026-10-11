@@ -1,6 +1,6 @@
 # Omni-IR roadmap
 
-Updated 2026-10-09. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
+Updated 2026-10-11. Planned dates for the remaining work are kept from the original phased rollout; the work already finished came in ahead of that plan.
 
 ## Done
 
@@ -38,6 +38,11 @@ Updated 2026-10-09. Planned dates for the remaining work are kept from the origi
 | Release | `v0.9.0` (2026-10-07): the model check, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
 | Since then | The MCP Apps bridge: Omni-IR screens inside Claude, ChatGPT, VS Code, Cursor and other MCP Apps hosts. The host's model writes Omni-IR as a tool's argument; a self-contained view with the parser and catalog draws it as it streams, in the host's theme; actions go through app-only tools that the server checks again. Checked in Claude desktop | [PLAN-MCPAPPS.md](../PLAN-MCPAPPS.md), [`@omni-ir/mcp`](../packages/mcp/README.md) |
 | Release | `v0.10.1` (2026-10-07): `@omni-ir/mcp` for the first time, with `@omni-ir/core` and `@omni-ir/react`, on npm and Swift Package Manager | [CHANGELOG.md](../CHANGELOG.md) |
+| Release | `v0.11.0` (2026-10-09): forms, confirmations and screens as text (Step 19) | [PLAN-FORMS.md](../PLAN-FORMS.md) |
+| Release | `v0.12.0` (2026-10-10): app-defined components (Step 20) | [PLAN-APPCOMPONENTS.md](../PLAN-APPCOMPONENTS.md) |
+| Release | `v0.13.0` (2026-10-10): `<omni-screen>` for Vue, Svelte, Angular and plain HTML, the new `@omni-ir/elements` (Step 21) | [PLAN-ELEMENTS.md](../PLAN-ELEMENTS.md) |
+| Release | `v0.14.0` (2026-10-10): live screens, updated by the app after the stream ends (Step 22) | [PLAN-LIVE.md](../PLAN-LIVE.md) |
+| Since then | A product demo video of about 50 seconds: one order screen on iPhone, Android and the web, kept current by the app, with a checked return and a button the app never allowed. On the landing page and in the README | [PLAN-VIDEO.md](../PLAN-VIDEO.md), [watch it](https://jdsouza1.github.io/omni-ir/#demo) |
 
 ## Planned
 
@@ -82,7 +87,7 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - *Goal:* a screen can change after it arrives (a delivery status moves on, a chart gets this hour's numbers) while the stream still has no logic and every change is checked like a new line.
    - *Fit:* the last open item in the spec's "Not yet specified"; builds on Step 14's transport (updates travel the same way) and Step 15's backend (the data comes from the app's own handlers, never the model).
    - *Who benefits:* developers can use Omni-IR for dashboards and status pages, not only one-off screens; the people using their apps see current information; and the person's real data reaches the screen from the app without being sent to the model.
-5. **A product demo video** (plan for approval: [PLAN-VIDEO.md](../PLAN-VIDEO.md)). Not a protocol step: it shows what is already built, in one story of about 70 seconds. An order streams in natively on iPhone, Android and the web, the app keeps it current, a return is checked by the server, and a button the app never allowed stays off. Recorded and captioned automatically on CI with the free mock model, and rebuilt with one click when the product changes.
+5. **A product demo video** (plan approved 2026-10-10: [PLAN-VIDEO.md](../PLAN-VIDEO.md); done 2026-10-11, [on the landing page](https://jdsouza1.github.io/omni-ir/#demo) and in the README). Not a protocol step: it shows what is already built, in one story of about 50 seconds. An order streams in natively on iPhone, Android and the web, the app keeps it current, a return is checked by the server, and a button the app never allowed stays off. Recorded and captioned automatically on CI with the free mock model, and rebuilt with one click when the product changes.
    - *Goal:* anyone who watches it can say what Omni-IR is and why it's different, in about a minute.
    - *Fit:* everything it shows is built (Steps 6, 7, 15, 19 and 22); what's missing is a quick way to show it. It reuses the iOS and Android demo recordings and the playground's pre-written screens.
    - *Who benefits:* developers see all three platforms at once without installing anything; people deciding whether to adopt it see the trust story without reading the spec; the project gets a link to share on the site, the README and in conversations.

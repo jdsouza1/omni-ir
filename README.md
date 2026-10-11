@@ -2,7 +2,7 @@
 
 **A line-oriented streaming protocol for generative UI.** An AI model describes a screen in short, flat lines of Omni-IR; a trusted client parses each line as it streams in and renders it with its own components. The model never writes HTML, CSS or code, and can only trigger backend actions the app has explicitly allowed.
 
-> **Status: early (v0.10).** The parser, schema, streaming server and playground work and are tested, with renderers for the web (React), iPhone and iPad (SwiftUI) and Android (Jetpack Compose). The format is defined in [SPEC.md](SPEC.md), with a [conformance suite](conformance/README.md) that all three parsers pass. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+> **Status: early (v0.14).** The parser, schema, streaming server and playground work and are tested, with renderers for the web (React), iPhone and iPad (SwiftUI) and Android (Jetpack Compose). The format is defined in [SPEC.md](SPEC.md), with a [conformance suite](conformance/README.md) that all three parsers pass. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ```
 root = Card([title, amount, note, actions])
@@ -18,6 +18,10 @@ cancel = Button("Cancel", variant="secondary")
 ```
 
 `root` comes first, so the card appears immediately and its parts fill in as their lines arrive. `confirm` has an `action`, so it only becomes clickable once its `McpMutation` line names a permitted tool. `cancel` has none, so it can never reach the server.
+
+[![The same order screen drawn natively on an iPhone, an Android phone and a web page, then updated by the app on all three at once](docs/media/omni-ir-demo.gif)](https://jdsouza1.github.io/omni-ir/#demo)
+
+One description, drawn natively on iPhone, Android and the web, and kept current by the app. [Watch the 50-second demo](https://jdsouza1.github.io/omni-ir/#demo) (pre-written screens; no AI model was called).
 
 **Website:** [jdsouza1.github.io/omni-ir](https://jdsouza1.github.io/omni-ir/) · [Try the playground](https://jdsouza1.github.io/omni-ir/playground/) (runs in your browser, free) · [Docs](https://jdsouza1.github.io/omni-ir/docs/) · [Discussions](https://github.com/jdsouza1/omni-ir/discussions)
 

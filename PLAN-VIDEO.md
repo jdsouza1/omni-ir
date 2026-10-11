@@ -1,7 +1,9 @@
 # Omni-IR: a product demo video
 
-Status: **Approved 2026-10-10 with the recommendations; the story restructured as a Golden Circle at the owner's request. In progress.** Free: recorded and edited on GitHub's CI with the free mock
-model; no paid API, no paid tools, no music to license. Nothing here is built until you approve it.
+Status: **Done 2026-10-11.** Approved 2026-10-10 with the recommendations; the story restructured as a Golden Circle, then led
+with the universal-language message (option D), at the owner's request. Free: recorded and edited on GitHub's CI with the free mock
+model; no paid API, no paid tools. Music, the owner's later choice: "Inspiring Minimal Piano" by 331music (Pixabay Content License,
+allowed inside a video, not as a file on its own), mixed locally; the track itself is kept out of this repository.
 This is not a protocol step (no Step 23): it shows what is already built.
 
 ## Goal
@@ -124,10 +126,10 @@ A small line in the corner throughout the screen scenes: *Demo with pre-written 
 
 ## Checklist
 
-- [ ] A.1 The "delete my account" screen and its mock prompt, with a test that the button stays disabled
-- [ ] A.2 A recording mode in the iOS and Android demo apps, and the web recording in headless Chrome
-- [ ] B.1 The `video` workflow: record, join side by side, captions and corner note, MP4 + 15-second cut + GIF
-- [ ] B.2 I check frames from every scene before showing you
-- [ ] C.1 Your review of the video
-- [ ] C.2 The landing page demo section and the README GIF, after your approval
-- [ ] C.3 Merge with your approval (no release needed: the site deploys from main)
+- [x] A.1 The "delete my account" screen and its mock prompt, with a test that the button stays disabled
+- [x] A.2 A recording mode in the iOS and Android demo apps, and the web recording in headless Chrome
+- [x] B.1 The `video` workflow: record, join side by side, captions and corner note, MP4 + 15-second cut + GIF
+- [x] B.2 I check frames from every scene before showing you
+- [x] C.1 Your review of the video
+- [x] C.2 The landing page demo section (with the music, the owner's choice) and the README GIF (`docs/media/omni-ir-demo.gif`), after your approval
+- [x] C.3 Merge with your approval (no release needed: the site deploys from main)
