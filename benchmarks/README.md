@@ -40,9 +40,9 @@ Offline and free: no model or API is called. Tokens are counted with `tiktoken`'
 
 | Folder | What | Version | Licence |
 |---|---|---|---|
-| `sources/openui/` | OpenUI's benchmark samples, `schema.json` and system prompt | thesysdev/openui `97e8335` | MIT |
-| `sources/a2ui/` | A2UI v0.9.1 spec (message schema, common types, basic catalog, examples) | a2ui-project/a2ui `5cd37f4` | Apache-2.0 |
-| `sources/json-render/` | json-render README and core types, for its spec and patch format | vercel-labs/json-render `fc2a696` | Apache-2.0 |
+| `sources/openui/` | OpenUI's benchmark samples, `schema.json`, system prompt and language spec; the repository README of 2026-10-11 | thesysdev/openui `97e8335`, README `9c5c43e` | MIT |
+| `sources/a2ui/` | A2UI v0.9.1 spec (message schema, common types, basic catalog, examples); the repository and conformance READMEs of 2026-10-11 | a2ui-project/a2ui `5cd37f4`, READMEs `ce03d00` | Apache-2.0 |
+| `sources/json-render/` | json-render README, core types and core package README, for its spec, patch format and features | vercel-labs/json-render `fc2a696` | Apache-2.0 |
 
 Each folder keeps the project's licence and a `COMMIT` file. These files are only read by the benchmark, never shipped.
 

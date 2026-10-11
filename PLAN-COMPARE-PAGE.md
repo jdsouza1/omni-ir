@@ -1,6 +1,6 @@
 # Omni-IR: an interactive comparison page
 
-Status: **For the owner's approval (2026-10-11).** Not a protocol step: nothing in the format changes.
+Status: **Approved 2026-10-11 with the recommendations.** Not a protocol step: nothing in the format changes.
 Free: offline measurements (`npm run bench`), public documentation, no paid API.
 
 ## Goal
@@ -10,6 +10,14 @@ table, how Omni-IR differs from the other ways an AI can describe a screen: how 
 in each format, when each can start drawing, what each lets the AI do, and what happened when a model
 was asked for something the app doesn't allow. Every number and claim is current, sourced, and
 regenerated from the benchmark, so the page can't drift.
+
+**Written for someone who has never seen code** (the owner's requirement, 2026-10-11). Every section
+opens with one plain sentence saying what it shows and why it matters, before any number or code.
+Format names are introduced in a few words each ("A2UI: Google's format, written as JSON"). Code is
+only ever shown on request, behind a tap. "Tokens" is explained once, in everyday terms (roughly, how
+much the AI has to write: fewer means faster and cheaper). Table answers are short sentences, not
+jargon; technical detail and sources sit behind a tap. Before review I read the page as that visitor
+would and rewrite anything that needs a developer to understand it.
 
 ## Why now
 
