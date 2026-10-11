@@ -42,6 +42,7 @@ Updated 2026-10-11. Planned dates for the remaining work are kept from the origi
 | Release | `v0.12.0` (2026-10-10): app-defined components (Step 20) | [PLAN-APPCOMPONENTS.md](../PLAN-APPCOMPONENTS.md) |
 | Release | `v0.13.0` (2026-10-10): `<omni-screen>` for Vue, Svelte, Angular and plain HTML, the new `@omni-ir/elements` (Step 21) | [PLAN-ELEMENTS.md](../PLAN-ELEMENTS.md) |
 | Release | `v0.14.0` (2026-10-10): live screens, updated by the app after the stream ends (Step 22) | [PLAN-LIVE.md](../PLAN-LIVE.md) |
+| Release | `v0.15.0` (2026-10-11): getting started without friction: "Use your own AI" in the playground (the landing page's Get started), the developer guide as five tested steps, and `buildSystemPrompt` in `@omni-ir/core` | [PLAN-QUICKSTART.md](../PLAN-QUICKSTART.md) |
 | Since then | A product demo video of about 50 seconds: one order screen on iPhone, Android and the web, kept current by the app, with a checked return and a button the app never allowed. On the landing page and in the README | [PLAN-VIDEO.md](../PLAN-VIDEO.md), [watch it](https://jdsouza1.github.io/omni-ir/#demo) |
 
 ## Planned
@@ -91,6 +92,9 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - *Goal:* anyone who watches it can say what Omni-IR is and why it's different, in about a minute.
    - *Fit:* everything it shows is built (Steps 6, 7, 15, 19 and 22); what's missing is a quick way to show it. It reuses the iOS and Android demo recordings and the playground's pre-written screens.
    - *Who benefits:* developers see all three platforms at once without installing anything; people deciding whether to adopt it see the trust story without reading the spec; the project gets a link to share on the site, the README and in conversations.
+6. **Getting started without friction** (plan approved 2026-10-11: [PLAN-QUICKSTART.md](../PLAN-QUICKSTART.md); released as `v0.15.0` on 2026-10-11). Not a protocol step. The landing page's Get started opens "Use your own AI" in the playground: copy the instructions into ChatGPT, Claude or Gemini, paste the reply, see it drawn and share it, with nothing to install. Developers get five tested steps, and `buildSystemPrompt` in `@omni-ir/core` connects any model. Checked with Claude (46 of 46 lines) and ChatGPT (36 of 36, after a fix for replies copied as formatted text).
+   - *Goal:* anyone who clicks Get started sees a screen their own AI wrote within about three minutes; a developer has one in their app within about ten.
+   - *Who benefits:* the people the LinkedIn post and the video bring in, most of them not developers and on phones; developers, who can now connect any model with the published packages.
 
 ## Later
 
