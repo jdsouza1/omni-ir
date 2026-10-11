@@ -47,25 +47,67 @@ export function playgroundPrompt(): string {
 
 /** What the visitor copies into their AI chat: the instructions, then their request. */
 export function instructionsFor(request: string): string {
-  return `${playgroundPrompt()}\nScreen to build: ${request.trim()}\n`;
+  // Chat apps show code fences as a code block with its own copy button, which copies the lines
+  // exactly; formatted text gets Markdown's backslashes. The playground removes the fences again.
+  return `${playgroundPrompt()}
+You're answering in a chat app: this time, put all the lines in one code block (between \`\`\` lines), with nothing before or after it, so they can be copied exactly.
+
+Screen to build: ${request.trim()}
+`;
 }
 
 // A statement (`id = …`, `$key = …`) or a comment. Anything else in a chat reply is the AI talking.
 const STATEMENT = /^(#|\$?[A-Za-z_][A-Za-z0-9_]*\s*=)/;
+// A number a chat app or code viewer put in front of a line: "1. ", "2 ", "3) ".
+const LINE_NUMBER = /^\d+[.):]?\s+(?=[$#A-Za-z_])/;
+// Markdown's backslash before punctuation, added when formatted chat text is copied. Omni-IR's own
+// escapes are \" \\ and \n, so a backslash before any of these is never valid Omni-IR.
+const MARKDOWN_ESCAPE = /(?<!\\)\\([[\]_*#\-.!(){}<>~`|+])/g;
+const STARTS_STATEMENT = /^(\$?[A-Za-z_][A-Za-z0-9_]*)\s*=(?!=)/;
+
+/** Splits statements that arrived joined on one line: at a name and `=` outside text and brackets. */
+function splitJoined(line: string): string[] {
+  const out: string[] = [];
+  let start = 0;
+  let depth = 0;
+  let inText = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (inText) {
+      if (c === "\\") i++;
+      else if (c === '"') inText = false;
+      continue;
+    }
+    if (c === '"') inText = true;
+    else if (c === "(" || c === "[" || c === "{") depth++;
+    else if (c === ")" || c === "]" || c === "}") depth = Math.max(0, depth - 1);
+    else if (depth === 0 && /\s/.test(c!) && line.slice(start, i).includes("=") && STARTS_STATEMENT.test(line.slice(i + 1))) {
+      out.push(line.slice(start, i).trim());
+      start = i + 1;
+    }
+  }
+  out.push(line.slice(start).trim());
+  return out.filter((s) => s !== "");
+}
 
 /**
- * Chat apps wrap a reply in a friendly sentence and code fences. Keep the Omni-IR lines (broken ones
- * too, so the parser can explain them) and count what was dropped. This is the playground being kind;
- * the parser itself stays strict.
+ * Chat apps wrap a reply in a friendly sentence and code fences, and copying formatted text adds
+ * Markdown's backslashes and can join the lines. Keep the Omni-IR lines (broken ones too, so the
+ * parser can explain them) and count what was dropped. This is the playground being kind; the parser
+ * itself stays strict.
  */
 export function tidyReply(reply: string): { source: string; dropped: number } {
   const kept: string[] = [];
   let dropped = 0;
   for (const raw of reply.split(/\r?\n/)) {
-    const line = raw.trim();
+    const line = raw.trim().replace(LINE_NUMBER, "");
     if (line === "") continue;
-    if (STATEMENT.test(line)) kept.push(line);
-    else dropped++;
+    if (!STATEMENT.test(line)) {
+      dropped++;
+      continue;
+    }
+    if (line.startsWith("#")) kept.push(line);
+    else kept.push(...splitJoined(line.replace(MARKDOWN_ESCAPE, "$1")));
   }
   return { source: kept.join("\n"), dropped };
 }

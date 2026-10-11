@@ -80,3 +80,34 @@ describe("summarize", () => {
     ]);
   });
 });
+
+// From the owner's ChatGPT test (2026-10-11): ChatGPT answered without a code block, so copying its
+// formatted reply escaped every "[" as "\[", and the lines can arrive joined into one.
+describe("tidyReply, for replies copied from formatted chat text", () => {
+  it("removes Markdown's backslashes, which are never valid Omni-IR, and keeps Omni-IR's own escapes", () => {
+    const reply = String.raw`root = Stack(\[a, b\], gap="md")
+a = Text("say \"hi\" \_now\_ \\[x\]")
+b = Text("C:\\data\*")`;
+    expect(tidyReply(reply).source).toBe(String.raw`root = Stack([a, b], gap="md")
+a = Text("say \"hi\" _now_ \\[x]")
+b = Text("C:\\data*")`);
+  });
+
+  it("splits statements that arrived on one line, never inside text", () => {
+    const reply = String.raw`root = Stack(\[t, n\]) t = Heading("Price = 5") $n = "a b = c" n = Input($n, label="Note")`;
+    expect(tidyReply(reply)).toEqual({
+      source: 'root = Stack([t, n])\nt = Heading("Price = 5")\n$n = "a b = c"\nn = Input($n, label="Note")',
+      dropped: 0,
+    });
+  });
+
+  it("removes line numbers a chat app or code viewer added", () => {
+    expect(tidyReply('1. root = Card([t])\n2 t = Heading("Hi")\n 3) $x = 4').source).toBe('root = Card([t])\nt = Heading("Hi")\n$x = 4');
+  });
+});
+
+describe("instructionsFor, in a chat app", () => {
+  it("asks for one code block, so the reply can be copied exactly", () => {
+    expect(instructionsFor("a sign-in page")).toContain("put all the lines in one code block");
+  });
+});

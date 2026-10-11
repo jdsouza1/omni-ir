@@ -68,6 +68,20 @@ export function Playground(deps: PlaygroundDeps) {
   const { state } = pg;
   const [linked] = useState(linkedMode);
   const [mode, setMode] = useState<Mode>(linked.mode);
+  // A link to #own-ai or a shared screen while the playground is already open switches to it too.
+  useEffect(() => {
+    const onHash = () => {
+      const next = linkedMode();
+      if (next.mode !== "own") return;
+      setMode("own");
+      if (next.shared !== undefined) {
+        setReply(next.shared);
+        showReply(next.shared);
+      }
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  });
   const [reply, setReply] = useState(linked.shared ?? "");
   const [dropped, setDropped] = useState(0);
   const [ownShown, setOwnShown] = useState(false);

@@ -86,7 +86,7 @@ export function OwnAi({ reply, onReplyChange, onShow, summary, problems, onShare
         <li className="pg-step">
           <h2 className="pg-step-title">Ask your AI</h2>
           <p className="pg-step-text">
-            Copy the instructions, paste them into a new chat with your AI and send. A free account works. Then copy the AI's whole reply.
+            Copy the instructions, paste them into a new chat with your AI and send. A free account works. Then copy its reply: the copy button on its code block works best.
           </p>
           <div className="pg-row pg-row--wrap">
             <button

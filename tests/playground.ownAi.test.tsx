@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // The "Use your own AI" tab walked the way a visitor would (PLAN-QUICKSTART.md, Track 1): pick an idea,
 // copy the instructions, paste a chat app's reply, see the screen and the plain-sentence summary, share it.
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Playground } from "../playground/Playground";
 
@@ -106,6 +106,18 @@ describe("Use your own AI", () => {
     expect(within(screen.getByLabelText("Rendered screen")).getByText("Book a groom")).toBeTruthy();
     expect((screen.getByLabelText("Paste its reply") as HTMLTextAreaElement).value).toContain('title = Heading("Book a groom")');
     expect(screen.getByText(/^Someone shared this screen with you/)).toBeTruthy();
+  });
+
+  it("switches to the tab when #own-ai is opened in a playground that's already open", async () => {
+    window.history.replaceState(null, "", "/");
+    render(<Playground fetch={healthFetch} />);
+    await screen.findByText("mock model · free");
+    expect(screen.getByRole("tab", { name: "Describe a screen" }).getAttribute("aria-selected")).toBe("true");
+    await act(async () => {
+      window.history.replaceState(null, "", "/#own-ai");
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    expect(screen.getByRole("tab", { name: "Use your own AI" }).getAttribute("aria-selected")).toBe("true");
   });
 
   it("draws a reply a line at a time, like a stream", async () => {
