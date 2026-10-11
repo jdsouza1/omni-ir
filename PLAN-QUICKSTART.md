@@ -1,6 +1,6 @@
 # Omni-IR: getting started without friction
 
-Status: **Approved 2026-10-11 with the recommendations (second draft). A.1–A.5 built; review next.** Rewritten after the owner's review:
+Status: **Done, released as `v0.15.0` on 2026-10-11.** Approved 2026-10-11 with the recommendations (second draft). Rewritten after the owner's review:
 "think of a non-technical user going through this and click the button". Not a protocol step: the
 stream format doesn't change. Free: nothing here calls a paid API; visitors use their own AI chat.
 
@@ -162,5 +162,5 @@ in the browser.
 - [x] A.5 The developer guide rewritten as steps, its code tested
 - [x] B.1 Owner: one free model check run in ChatGPT's free plan (2026-10-11: first try failed on copied formatted text, fixed; then 36 of 36 lines drawn; Claude 46 of 46)
 - [x] B.2 I go through both tracks in the browser and check every screen and sentence
-- [ ] B.3 Your review, then merge with your approval (Track 1 goes live with the site)
-- [ ] B.4 Release 0.15.0 with your separate go-ahead (Track 2's step 4)
+- [x] B.3 Your review, then merge with your approval (Track 1 goes live with the site)
+- [x] B.4 Release 0.15.0 with your separate go-ahead (Track 2's step 4)
