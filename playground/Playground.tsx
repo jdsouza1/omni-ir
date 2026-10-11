@@ -1,6 +1,8 @@
 // The Omni-IR playground page. State lives in usePlayground; this file is presentation only, so the
 // UX design (Task G) can restyle or rearrange it without touching behaviour.
 import { useEffect, useId, useState } from "react";
+import { OwnAi, copyText } from "./OwnAiTab";
+import { readShareLink, shareLink, summarize, tidyReply } from "./ownAi";
 import { ActionsPanel, EventLog } from "./Panels";
 import { Preview } from "./Preview";
 import { SourceView } from "./SourceView";
@@ -38,6 +40,25 @@ export function specLink(mode: string): { href: string; target?: string; rel?: s
 }
 const SPEC_LINK = specLink(import.meta.env.MODE);
 
+/** The step-by-step developer guide: the site's own page when hosted, GitHub when run locally. */
+export function guideLink(mode: string): { href: string; target?: string; rel?: string } {
+  return mode === "static"
+    ? { href: "../docs/guide/getting-started.html" }
+    : { href: "https://github.com/jdsouza1/omni-ir/blob/main/site/docs/guide/getting-started.md", target: "_blank", rel: "noopener noreferrer" };
+}
+const GUIDE_LINK = guideLink(import.meta.env.MODE);
+
+type Mode = "own" | "prompt" | "paste";
+const MODE_LABELS: Record<Mode, string> = { own: "Use your own AI", prompt: "Describe a screen", paste: "Paste Omni-IR" };
+
+/** `#own-ai` (the landing page's Get started) or a share link opens the "Use your own AI" tab. */
+function linkedMode(): { mode: Mode; shared?: string } {
+  if (typeof window === "undefined") return { mode: "prompt" };
+  const shared = readShareLink(window.location.hash);
+  if (shared !== undefined) return { mode: "own", shared };
+  return { mode: window.location.hash === "#own-ai" ? "own" : "prompt" };
+}
+
 const PASTE_STARTER = `root = Card([title, body])
 title = Heading("Hello")
 body = Text("Edit these lines and press Render.")`;
@@ -45,7 +66,12 @@ body = Text("Edit these lines and press Render.")`;
 export function Playground(deps: PlaygroundDeps) {
   const pg = usePlayground(deps);
   const { state } = pg;
-  const [mode, setMode] = useState<"prompt" | "paste">("prompt");
+  const [linked] = useState(linkedMode);
+  const [mode, setMode] = useState<Mode>(linked.mode);
+  const [reply, setReply] = useState(linked.shared ?? "");
+  const [dropped, setDropped] = useState(0);
+  const [ownShown, setOwnShown] = useState(false);
+  const [frame, setFrame] = useState<"web" | "phone">("web");
   const [prompt, setPrompt] = useState("");
   const [pasted, setPasted] = useState(PASTE_STARTER);
   const [apiModel, setApiModel] = useState<string | null>(null);
@@ -64,6 +90,29 @@ export function Playground(deps: PlaygroundDeps) {
       live = false;
     };
   }, [deps.baseUrl, deps.fetch]);
+
+  const showReply = (text: string) => {
+    const tidy = tidyReply(text);
+    setDropped(tidy.dropped);
+    setOwnShown(true);
+    pg.renderSource(tidy.source, { paced: true });
+  };
+
+  // A share link shows its screen straight away.
+  useEffect(() => {
+    if (linked.shared !== undefined) showReply(linked.shared);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const own = mode === "own";
+  const ownDone = own && ownShown && state.status.kind === "done";
+  const sourceLines = state.source.split("\n").filter((l) => l.trim() !== "").length;
+  const problems = state.issues.filter((i) => i.severity === "error" && !["unknown_tool", "ungoverned_mutation", "mutation_blocked", "mutation_target_not_interactive"].includes(i.code));
+
+  // Show what was checked, with the screen under it, as soon as it's drawn.
+  useEffect(() => {
+    if (ownDone) document.querySelector(".pg-own-result")?.scrollIntoView?.({ behavior: "smooth", block: "start" });
+  }, [ownDone, state.runId]);
 
   // A new run starts with nothing highlighted.
   useEffect(() => setHighlighted(null), [state.runId]);
@@ -96,7 +145,7 @@ export function Playground(deps: PlaygroundDeps) {
       </header>
 
       <div className="pg-tabs" role="tablist" aria-label="Input mode">
-        {(["prompt", "paste"] as const).map((m) => (
+        {(["own", "prompt", "paste"] as const).map((m) => (
           <button
             key={m}
             type="button"
@@ -105,12 +154,28 @@ export function Playground(deps: PlaygroundDeps) {
             className="pg-tab"
             onClick={() => setMode(m)}
           >
-            {m === "prompt" ? "Describe a screen" : "Paste Omni-IR"}
+            {MODE_LABELS[m]}
           </button>
         ))}
       </div>
 
-      {mode === "prompt" ? (
+      {own ? (
+        <OwnAi
+          reply={reply}
+          onReplyChange={setReply}
+          onShow={() => showReply(reply)}
+          summary={ownDone ? summarize({ lines: sourceLines, issues: state.issues, dropped }) : null}
+          problems={problems}
+          busy={streaming}
+          guideLink={GUIDE_LINK}
+          onShare={async () => {
+            const link = shareLink(window.location.href, tidyReply(reply).source);
+            if (await copyText(link)) return true;
+            window.history.replaceState(null, "", link);
+            return false;
+          }}
+        />
+      ) : mode === "prompt" ? (
         <section className="pg-controls" aria-label="Prompt controls">
           <form
             className="pg-prompt"
@@ -166,6 +231,8 @@ export function Playground(deps: PlaygroundDeps) {
         </section>
       )}
 
+      {(!own || ownShown) && (
+      <>
       <p className="pg-status" role="status" aria-live="polite" data-status={state.status.kind}>
         <span className="pg-status-dot" aria-hidden="true" />
         {statusText(state.status, state.source)}
@@ -176,7 +243,7 @@ export function Playground(deps: PlaygroundDeps) {
         )}
       </p>
 
-      <div className="pg-panels pg-workspace">
+      <div className="pg-panels pg-workspace" data-own={own ? "true" : undefined}>
         <section className="pg-panel" aria-label="Omni-IR source">
           <h2 className="pg-panel-title">Source</h2>
           <SourceView
@@ -196,8 +263,20 @@ export function Playground(deps: PlaygroundDeps) {
           </p>
         </section>
         <section className="pg-panel pg-preview" aria-label="Rendered screen">
-          <h2 className="pg-panel-title">Preview</h2>
+          <div className="pg-panel-head">
+            <h2 className="pg-panel-title">Preview</h2>
+            {own && (
+              <div className="pg-frame-toggle" role="group" aria-label="Show the screen">
+                {(["web", "phone"] as const).map((f) => (
+                  <button key={f} type="button" className="pg-chip" aria-pressed={frame === f} onClick={() => setFrame(f)}>
+                    {f === "web" ? "Web" : "Phone"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <Preview
+            frame={own ? frame : "web"}
             runId={state.runId}
             store={state.parser?.store ?? null}
             onMutation={pg.onMutation}
@@ -211,8 +290,10 @@ export function Playground(deps: PlaygroundDeps) {
 
       <div className="pg-panels">
         <ActionsPanel actions={state.actions} />
-        <EventLog log={state.log} />
+        {!own && <EventLog log={state.log} />}
       </div>
+      </>
+      )}
     </main>
   );
 }

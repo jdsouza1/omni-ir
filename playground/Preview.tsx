@@ -18,6 +18,8 @@ export interface PreviewProps {
   onHighlight: (id: string | null) => void;
   /** Changes whenever new content may have rendered, so the highlight is re-applied. */
   revision: unknown;
+  /** "phone" draws the screen at a phone's width, in a phone-shaped frame. */
+  frame?: "web" | "phone";
 }
 
 const HIGHLIGHT = "data-pg-highlight";
@@ -28,7 +30,7 @@ function pageTheme(): "light" | "dark" | "system" {
   return chosen === "light" || chosen === "dark" ? chosen : "system";
 }
 
-export function Preview({ runId, store, onMutation, onEvent, highlightedId, onHighlight, revision }: PreviewProps) {
+export function Preview({ runId, store, onMutation, onEvent, highlightedId, onHighlight, revision, frame = "web" }: PreviewProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,6 +49,7 @@ export function Preview({ runId, store, onMutation, onEvent, highlightedId, onHi
     <div
       ref={ref}
       className="pg-preview-canvas"
+      data-frame={frame}
       onMouseOver={(e) => onHighlight(idAt(e.target))}
       onMouseLeave={() => onHighlight(null)}
       onFocus={(e) => onHighlight(idAt(e.target))}

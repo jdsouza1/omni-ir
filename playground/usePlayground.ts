@@ -62,6 +62,8 @@ type Action =
   | { type: "result"; runId: number; call: MutationCall; result: Record<string, unknown> };
 
 const LOG_LIMIT = 500;
+/** Milliseconds between lines when pasted Omni-IR is drawn as if it were streaming. */
+export const PACE_MS = 70;
 
 export const INITIAL_STATE: PlaygroundState = {
   runId: 0,
@@ -231,12 +233,28 @@ export function usePlayground(deps: PlaygroundDeps = {}) {
     [beginRun, generateFn, baseUrl, deps.fetch],
   );
 
+  /** Draws pasted Omni-IR; `paced` writes it a line at a time, the way a model's reply streams in. */
   const renderSource = useCallback(
-    (text: string) => {
+    (text: string, options: { paced?: boolean } = {}) => {
       const { runId, parser } = beginRun("paste");
-      parser.write(text);
-      parser.end();
-      dispatch({ type: "outcome", runId, outcome: { status: "done", stopReason: "end_turn", model: "paste", ms: 0 } });
+      const finish = () => {
+        parser.end();
+        dispatch({ type: "outcome", runId, outcome: { status: "done", stopReason: "end_turn", model: "paste", ms: 0 } });
+      };
+      if (!options.paced) {
+        parser.write(text);
+        finish();
+        return;
+      }
+      const lines = text.split("\n");
+      let next = 0;
+      const step = () => {
+        if (runRef.current.id !== runId) return; // a newer run took over
+        if (next >= lines.length) return finish();
+        parser.write(lines[next++] + "\n");
+        setTimeout(step, PACE_MS);
+      };
+      step();
     },
     [beginRun],
   );
