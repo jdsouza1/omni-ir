@@ -32,6 +32,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run site:build
+      # The pages at phone, tablet and desktop widths in headless Chrome: nothing may stick out of its
+      # card or the screen, or the site isn't deployed (scripts/layout-check.mjs).
+      - run: npm run layout:check
       - uses: actions/upload-artifact@v7
         with:
           name: site
