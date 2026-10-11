@@ -16,6 +16,8 @@ export interface OwnAiProps {
   onShare: () => Promise<boolean>;
   guideLink: { href: string; target?: string; rel?: string };
   busy: boolean;
+  /** Opened from someone's share link. */
+  shared?: boolean;
 }
 
 /** Copies text, or resolves false where the browser refuses (the visitor can still select it). */
@@ -28,7 +30,7 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-export function OwnAi({ reply, onReplyChange, onShow, summary, problems, onShare, guideLink, busy }: OwnAiProps) {
+export function OwnAi({ reply, onReplyChange, onShow, summary, problems, onShare, guideLink, busy, shared: fromLink = false }: OwnAiProps) {
   const [request, setRequest] = useState("");
   const [copied, setCopied] = useState<"yes" | "no" | null>(null);
   const [shared, setShared] = useState<"yes" | "no" | null>(null);
@@ -43,7 +45,9 @@ export function OwnAi({ reply, onReplyChange, onShow, summary, problems, onShare
   return (
     <section className="pg-own" aria-label="Use your own AI">
       <p className="pg-own-intro">
-        See a screen your own AI writes in Omni-IR, in about three minutes. Nothing to install, and nothing you type is sent to us.
+        {fromLink
+          ? "Someone shared this screen with you: an AI wrote it in Omni-IR, and it's drawn below. Make your own in three steps, in about three minutes. Nothing to install, and nothing you type is sent to us."
+          : "See a screen your own AI writes in Omni-IR, in about three minutes. Nothing to install, and nothing you type is sent to us."}
       </p>
       <ol className="pg-steps">
         <li className="pg-step">

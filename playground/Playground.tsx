@@ -167,6 +167,7 @@ export function Playground(deps: PlaygroundDeps) {
           summary={ownDone ? summarize({ lines: sourceLines, issues: state.issues, dropped }) : null}
           problems={problems}
           busy={streaming}
+          shared={linked.shared !== undefined}
           guideLink={GUIDE_LINK}
           onShare={async () => {
             const link = shareLink(window.location.href, tidyReply(reply).source);
@@ -235,7 +236,7 @@ export function Playground(deps: PlaygroundDeps) {
       <>
       <p className="pg-status" role="status" aria-live="polite" data-status={state.status.kind}>
         <span className="pg-status-dot" aria-hidden="true" />
-        {statusText(state.status, state.source)}
+        {statusText(state.status, state.source, state.mode)}
         {state.status.kind === "error" && state.status.retryable && (
           <button type="button" className="pg-link" onClick={() => void pg.retry()}>
             Retry
@@ -311,13 +312,14 @@ function Chips({ label, prompts, disabled, onPick }: { label: string; prompts: s
   );
 }
 
-export function statusText(status: RunStatus, source: string): string {
+export function statusText(status: RunStatus, source: string, mode: "prompt" | "paste" = "prompt"): string {
   switch (status.kind) {
     case "idle":
       return "Describe a screen, pick an example, or paste Omni-IR.";
     case "streaming": {
       const lines = source === "" ? 0 : source.split("\n").length - (source.endsWith("\n") ? 1 : 0);
-      return `Generating… ${lines} line${lines === 1 ? "" : "s"} so far`;
+      // Pasted lines are drawn a line at a time; no model is running.
+      return `${mode === "paste" ? "Drawing" : "Generating"}… ${lines} line${lines === 1 ? "" : "s"} so far`;
     }
     case "done":
       if (status.model === "paste") return "Rendered.";

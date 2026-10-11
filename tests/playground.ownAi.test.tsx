@@ -105,13 +105,14 @@ describe("Use your own AI", () => {
     await screen.findByRole("region", { name: "What we checked" }, { timeout: 3000 });
     expect(within(screen.getByLabelText("Rendered screen")).getByText("Book a groom")).toBeTruthy();
     expect((screen.getByLabelText("Paste its reply") as HTMLTextAreaElement).value).toContain('title = Heading("Book a groom")');
+    expect(screen.getByText(/^Someone shared this screen with you/)).toBeTruthy();
   });
 
   it("draws a reply a line at a time, like a stream", async () => {
     const user = await openOwnAi();
     fireEvent.change(screen.getByLabelText("Paste its reply"), { target: { value: REPLY } });
     await user.click(screen.getByRole("button", { name: "Show my screen" }));
-    expect(document.querySelector(".pg-status")?.textContent ?? "").toMatch(/Generating/);
+    expect(document.querySelector(".pg-status")?.textContent ?? "").toMatch(/^Drawing… \d+ lines? so far$/);
     await screen.findByRole("region", { name: "What we checked" }, { timeout: 3000 });
   });
 });
