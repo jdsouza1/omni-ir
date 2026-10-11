@@ -1,7 +1,7 @@
 // The comparison page (PLAN-COMPARE-PAGE.md), written for someone who has never seen code: every
 // section opens with a plain sentence, code only appears on request, and every claim has a source.
 // All numbers come from data.json, written by `npm run bench`.
-import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { Component, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createParser, type OmniParser } from "@omni-ir/core";
 import { OmniRenderer } from "@omni-ir/react";
 import { ASSETS } from "../../../app/assets";
@@ -81,12 +81,24 @@ export function Compare() {
           </p>
         </section>
 
-        <Formats />
-        <Sizes screen={screen} onScreen={chooseScreen} />
-        <Race screen={screen} onScreen={chooseScreen} />
-        <Capabilities />
-        <Story />
-        <Loses />
+        <Guard>
+          <Formats />
+        </Guard>
+        <Guard>
+          <Sizes screen={screen} onScreen={chooseScreen} />
+        </Guard>
+        <Guard>
+          <Race screen={screen} onScreen={chooseScreen} />
+        </Guard>
+        <Guard>
+          <Capabilities />
+        </Guard>
+        <Guard>
+          <Story />
+        </Guard>
+        <Guard>
+          <Loses />
+        </Guard>
       </main>
 
       <footer className="footer">
@@ -105,6 +117,24 @@ export function Compare() {
       </footer>
     </div>
   );
+}
+
+/** If a section ever fails, only that section says so; the rest of the page stays (owner's report). */
+class Guard extends Component<{ children: ReactNode }, { failed: boolean }> {
+  override state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  override render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <section className="wrap section cmp-section">
+        <p className="cmp-note cmp-failed" role="alert">
+          Something went wrong in this part of the page. Reload the page to try again.
+        </p>
+      </section>
+    );
+  }
 }
 
 function Formats() {
@@ -265,8 +295,12 @@ function Race({ screen, onScreen }: { screen: Screen; onScreen: (name: string, p
   const total = Math.max(...formats.map((f) => screen.tokens[f.id as FormatId] ?? 0));
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [parser, setParser] = useState<OmniParser | null>(null);
+  // The screen being drawn, tied to the screen it was started for: a replay only ever writes its own
+  // screen's text, once, and never after it has ended (writing then throws, which blanked the page).
+  const [run, setRun] = useState<{ screen: string; parser: OmniParser } | null>(null);
   const written = useRef(0);
+  const ended = useRef(false);
+  const parser = run?.screen === screen.name ? run.parser : null;
   const omniText = screen.texts["omni-ir"] ?? "";
   const omniTokens = screen.tokens["omni-ir"] ?? 1;
 
@@ -274,7 +308,7 @@ function Race({ screen, onScreen }: { screen: Screen; onScreen: (name: string, p
   useEffect(() => {
     setProgress(0);
     setPlaying(false);
-    setParser(null);
+    setRun(null);
   }, [screen.name]);
 
   useEffect(() => {
@@ -297,18 +331,22 @@ function Race({ screen, onScreen }: { screen: Screen; onScreen: (name: string, p
 
   // Omni-IR's screen is drawn from the part of its text that would have arrived by now.
   useEffect(() => {
-    if (!parser) return;
+    if (!parser || ended.current) return;
     const upTo = Math.floor(omniText.length * Math.min(1, progress / omniTokens));
     if (upTo > written.current) {
       parser.write(omniText.slice(written.current, upTo));
       written.current = upTo;
-      if (upTo >= omniText.length) parser.end();
+      if (upTo >= omniText.length) {
+        parser.end();
+        ended.current = true;
+      }
     }
   }, [progress, parser, omniText, omniTokens]);
 
   const play = () => {
     written.current = 0;
-    setParser(screen.drawable ? createParser({ tools: TOOLS, assets: ASSETS, components: APP_COMPONENTS, pictures: PICTURES }) : null);
+    ended.current = false;
+    setRun(screen.drawable ? { screen: screen.name, parser: createParser({ tools: TOOLS, assets: ASSETS, components: APP_COMPONENTS, pictures: PICTURES }) } : null);
     setProgress(0);
     setPlaying(true);
   };

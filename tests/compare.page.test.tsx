@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // The comparison page (PLAN-COMPARE-PAGE.md A.4): its sections, numbers from the generated data, and
 // links to pages that exist.
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Compare } from "../site/landing/compare/Compare";
 import data from "../site/landing/compare/data.json";
@@ -38,6 +38,38 @@ describe("the comparison page", () => {
   it("draws the account-deletion reply, with the button left off and the reason said", () => {
     render(<Compare />);
     expect(screen.getByText("Account deletion isn't available here.")).toBeTruthy();
+  });
+
+  // The owner's report (2026-10-11): shopping bag, Play, then the contact form and Play left a blank
+  // page. The finished replay wrote the new screen's text into the old, ended parser, which throws.
+  it("survives changing the screen after a replay has finished, and replays the new one", async () => {
+    let now = 0;
+    const frames: FrameRequestCallback[] = [];
+    vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => frames.push(cb));
+    vi.stubGlobal("cancelAnimationFrame", () => {});
+    vi.spyOn(performance, "now").mockImplementation(() => now);
+    const runFrames = async (seconds: number) => {
+      for (let i = 0; i < seconds * 10; i++) {
+        now += 100;
+        await act(async () => {
+          for (const cb of frames.splice(0)) cb(now);
+        });
+      }
+    };
+    render(<Compare />);
+    const user = userEvent.setup();
+    const [, racePicker] = screen.getAllByLabelText("Choose a screen to compare");
+    await user.selectOptions(racePicker!, "bag");
+    await user.click(screen.getByRole("button", { name: "Play" }));
+    await runFrames(15);
+    expect(screen.getByRole("button", { name: "Play again" })).toBeTruthy();
+    await user.selectOptions(racePicker!, "contact-form");
+    await user.click(screen.getByRole("button", { name: "Play" }));
+    await runFrames(20);
+    expect(document.querySelectorAll("h2.section-title")).toHaveLength(6);
+    expect(screen.getByRole("button", { name: "Play again" })).toBeTruthy();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it("links only to the site's own pages and GitHub", () => {
