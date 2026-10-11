@@ -1,6 +1,6 @@
 # Omni-IR: an interactive comparison page
 
-Status: **Approved 2026-10-11 with the recommendations.** Not a protocol step: nothing in the format changes.
+Status: **Done 2026-10-11** (approved with the recommendations; merged at the owner's go-ahead). Not a protocol step: nothing in the format changes.
 Free: offline measurements (`npm run bench`), public documentation, no paid API.
 
 ## Goal
@@ -142,10 +142,10 @@ No phone test: a web page only. It's checked at phone width in the browser.
 
 ## Checklist
 
-- [ ] A.1 Your go-ahead to fetch and pin the current public docs of A2UI, OpenUI and json-render
-- [ ] A.2 Capabilities brought up to date: Omni-IR's cells from the repo, new rows, other formats re-checked with sources; `docs/COMPARISON.md` regenerated
-- [ ] A.3 `npm run bench` writes the page's data, tests first
-- [ ] A.4 The page: sizes, the race, capabilities, the account-deletion story, where Omni-IR loses
-- [ ] A.5 Links from the landing page's comparison section and top bar
-- [ ] B.1 I check every screen and sentence at desktop and phone width, light and dark
-- [ ] B.2 Your review, then merge with your approval (no release: the site deploys from main)
+- [x] A.1 Your go-ahead to fetch and pin the current public docs of A2UI, OpenUI and json-render
+- [x] A.2 Capabilities brought up to date: Omni-IR's cells from the repo, new rows, other formats re-checked with sources; `docs/COMPARISON.md` regenerated
+- [x] A.3 `npm run bench` writes the page's data, tests first
+- [x] A.4 The page: sizes, the race, capabilities, the account-deletion story, where Omni-IR loses
+- [x] A.5 Links from the landing page's comparison section and top bar
+- [x] B.1 I check every screen and sentence at desktop and phone width, light and dark
+- [x] B.2 Your review, then merge with your approval (no release: the site deploys from main)
