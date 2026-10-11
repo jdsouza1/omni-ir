@@ -2,6 +2,18 @@
 
 All notable changes to Omni-IR: the protocol (SPEC.md), the npm packages `@omni-ir/core` and `@omni-ir/react`, the Swift package and the Kotlin modules. One version number covers them all.
 
+## 0.15.0 (2026-10-11)
+
+Getting started without friction (PLAN-QUICKSTART.md). Not a protocol step: the stream format stays 0.8, and the reference server's system prompt is unchanged.
+
+### Added
+- **`buildSystemPrompt` in `@omni-ir/core`:** the instructions that teach any model Omni-IR, generated from the schema and the app's own tools, pictures, components and live parts, so they never describe something the parser rejects. No file access, so it runs in a browser too; `DEFAULT_PROMPT_EXAMPLES` uses only the catalog. Connect your own model in a few lines (Getting started, step 4).
+- **"Use your own AI" in the playground** (the landing page's Get started): copy the instructions into ChatGPT, Claude or Gemini, paste the reply back and see it drawn, with what was checked in plain sentences, problems to copy back to the AI, and a share link that carries the screen after `#` (nothing is stored). Chat apps' sentences, code fences, Markdown backslashes, line numbers and joined lines are tidied before the strict parser reads the reply.
+- **Getting started as five steps** for a React app, each ending with what you should see; tests run its code exactly as written, with a fake model client.
+
+### Changed
+- The reference server's `buildSystemPrompt` (`server/prompt.ts`) calls the one in `@omni-ir/core` with the demo app's registries; its output is byte-for-byte the same (tested).
+
 ## 0.14.0 (2026-10-10)
 
 Live screens (Step 22, PLAN-LIVE.md). The stream format stays 0.8: a stream is read exactly as before.
