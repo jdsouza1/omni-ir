@@ -85,10 +85,17 @@ describe("landing page", () => {
     docsPages.add("docs/");
     for (const a of document.querySelectorAll("a")) {
       const href = a.getAttribute("href")!;
-      if (href.startsWith("#") || href.startsWith("https://") || href === "./" || href === "playground/") continue;
+      if (href.startsWith("#") || href.startsWith("https://") || href === "./" || href === "playground/" || href === "playground/#own-ai") continue;
       expect(docsPages.has(href), `${a.textContent}: ${href}`).toBe(true);
     }
     expect(screen.getByRole("link", { name: "Join the community" }).getAttribute("href")).toBe("https://github.com/jdsouza1/omni-ir/discussions");
+  });
+
+  // PLAN-QUICKSTART.md: Get started opens the no-code path; the open-source plan's opens the developer guide.
+  it("Get started opens the playground's \"Use your own AI\" tab, and the developer guide from Pricing", async () => {
+    await open();
+    const hrefs = screen.getAllByRole("link", { name: /Get started/ }).map((a) => a.getAttribute("href"));
+    expect(hrefs).toEqual(["playground/#own-ai", "docs/guide/getting-started.html", "playground/#own-ai"]);
   });
 });
 
