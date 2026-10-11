@@ -63,7 +63,9 @@ function coverageTable(results: Results): string {
 function capabilityTable(): string {
   const head = `| | ${CAPABILITY_FORMATS.join(" | ")} |`;
   const rule = `|---|${CAPABILITY_FORMATS.map(() => "---").join("|")}|`;
-  const rows = CAPABILITIES.map((r) => `| **${r.question}** | ${r.cells.map((c) => c.text.replace(/\|/g, "\\|") + (c.source ? ` <sub>${c.source}</sub>` : "")).join(" | ")} |`);
+  // Cell text is shown as text: "<omni-screen>" would otherwise be read as an HTML tag (the docs site fails on it).
+  const cell = (text: string) => text.replace(/\|/g, "\\|").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const rows = CAPABILITIES.map((r) => `| **${r.question}** | ${r.cells.map((c) => cell(c.text) + (c.source ? ` <sub>${c.source}</sub>` : "")).join(" | ")} |`);
   return [head, rule, ...rows].join("\n");
 }
 
