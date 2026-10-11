@@ -467,7 +467,7 @@ function Item({ image, title, detail, price, style }: { image: string; title: st
 
 /**
  * The product demo video (PLAN-VIDEO.md): made by the `video` workflow from the real renderers. No
- * autoplay and no sound by default; the transcript says the same in words.
+ * autoplay; the music plays only when someone presses play. The transcript says the same in words.
  */
 function DemoVideo() {
   const base = import.meta.env.BASE_URL;
@@ -479,7 +479,6 @@ function DemoVideo() {
       <video
         className="demo-video"
         controls
-        muted
         playsInline
         preload="metadata"
         poster={`${base}demo/omni-ir-demo-poster.jpg`}
@@ -488,7 +487,8 @@ function DemoVideo() {
         <source src={`${base}demo/omni-ir-demo.mp4`} type="video/mp4" />
       </video>
       <p id="demo-note" className="demo-note">
-        50 seconds, no sound. A demo with pre-written screens: no AI model was called.
+        50 seconds, with music. A demo with pre-written screens: no AI model was called. Music:
+        "Inspiring Minimal Piano" by 331music, from Pixabay.
       </p>
       <details className="demo-transcript">
         <summary>Read what the video shows</summary>
