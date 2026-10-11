@@ -27,7 +27,11 @@ describe("the comparison page", () => {
     const bars = within(screen.getByRole("list", { name: "Tokens for “Booking a cabin”" }));
     const booking = data.screens.find((s) => s.name === "booking")!;
     expect(bars.getByText(String(booking.tokens["omni-ir"]))).toBeTruthy();
-    await userEvent.setup().selectOptions(screen.getByLabelText("Screen"), "order");
+    // The picker is in both the size and the race sections; either changes both.
+    const pickers = screen.getAllByLabelText("Choose a screen to compare");
+    expect(pickers).toHaveLength(2);
+    await userEvent.setup().selectOptions(pickers[1]!, "order");
+    expect((pickers[0] as HTMLSelectElement).value).toBe("order");
     expect(screen.getByRole("list", { name: "Tokens for “Where is my order?”" })).toBeTruthy();
   });
 

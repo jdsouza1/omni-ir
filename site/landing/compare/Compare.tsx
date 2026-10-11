@@ -70,7 +70,7 @@ export function Compare() {
 
         <Formats />
         <Sizes screen={screen} onScreen={setScreenName} />
-        <Race screen={screen} />
+        <Race screen={screen} onScreen={setScreenName} />
         <Capabilities />
         <Story />
         <Loses />
@@ -117,7 +117,7 @@ function ScreenPicker({ screen, onScreen }: { screen: Screen; onScreen: (name: s
   const id = useId();
   return (
     <div className="cmp-picker">
-      <label htmlFor={id}>Screen</label>
+      <label htmlFor={id}>Choose a screen to compare</label>
       <select id={id} value={screen.name} onChange={(e) => onScreen(e.target.value)}>
         <optgroup label="Written by an AI in our model check">
           {data.screens
@@ -241,7 +241,7 @@ function Drawn({ text, parser: given }: { text?: string; parser?: OmniParser }) 
   );
 }
 
-function Race({ screen }: { screen: Screen }) {
+function Race({ screen, onScreen }: { screen: Screen; onScreen: (name: string) => void }) {
   const formats = formatsOf(screen);
   const total = Math.max(...formats.map((f) => screen.tokens[f.id as FormatId] ?? 0));
   const [progress, setProgress] = useState(0);
@@ -306,9 +306,7 @@ function Race({ screen }: { screen: Screen }) {
       </p>
       <div className="cmp-card">
         <div className="cmp-race-head">
-          <p className="cmp-small">
-            Screen: <strong>{screen.title}</strong> (change it above)
-          </p>
+          <ScreenPicker screen={screen} onScreen={onScreen} />
           <button type="button" className="btn btn-brand" onClick={play} disabled={playing}>
             {progress > 0 && !playing ? "Play again" : playing ? "Playing…" : "Play"}
           </button>

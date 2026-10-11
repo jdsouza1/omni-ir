@@ -23,11 +23,21 @@
 .cmp-format[data-ours] { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
 
 /* Screen picker */
-.cmp-picker { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-weight: 600; }
-.cmp-picker select {
-  font: inherit; font-weight: 500; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink);
-  max-width: 100%;
+/* The screen picker stands out: a 2px brand border (well over 3:1 against white), a tinted fill, a large
+   brand arrow and a clear focus ring, so nobody misses it (the owner's review, 2026-10-11). */
+.cmp-picker {
+  display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; padding: 14px 16px; border-radius: 16px;
+  background: var(--brand-soft);
 }
+.cmp-picker label { font-size: 17px; font-weight: 700; color: var(--brand-ink); }
+.cmp-picker select {
+  appearance: none; -webkit-appearance: none; font: inherit; font-size: 17px; font-weight: 600; color: var(--ink); cursor: pointer;
+  min-height: 48px; padding: 10px 52px 10px 16px; border-radius: 12px; border: 2px solid var(--brand); background-color: var(--card);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center; max-width: 100%; box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+.cmp-picker select:hover { border-color: var(--brand-dark); }
+.cmp-picker select:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 
 /* Size bars and race lanes */
 .cmp-bars, .cmp-race { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
