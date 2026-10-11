@@ -1,126 +1,166 @@
-# Omni-IR: a step-by-step quickstart
+# Omni-IR: getting started without friction
 
-Status: **For the owner's approval (2026-10-11).** Not a protocol step: the stream format doesn't change.
-Free: no paid API in the guide's tests (a fake model client), and nothing here calls a model.
+Status: **For the owner's approval (2026-10-11), second draft.** Rewritten after the owner's review:
+"think of a non-technical user going through this and click the button". Not a protocol step: the
+stream format doesn't change. Free: nothing here calls a paid API; visitors use their own AI chat.
 
 ## Goal
 
-Someone who clicks **Get started** on the landing page has a working Omni-IR screen in their own app
-within about 10 minutes, by following numbered steps, each ending with something they can see.
+Anyone who clicks **Get started**, with no code, no install and no account with us, sees a screen their
+own AI wrote, drawn by Omni-IR, within about three minutes, on a phone or a computer. Developers get
+a second path: the same result inside their own app in about ten minutes.
 
 ## Why now
 
-- The owner's review (2026-10-11): "Get started" leads to a page that reads like the documentation. It
-  explains the format, then shows fragments for three platforms; nothing walks from nothing to a
-  working screen. The hero's second button, "Read the spec", is for people writing a parser, not for
-  people building an app.
-- A gap behind it: **a developer can't connect their own model with our npm packages.** The system
-  prompt that teaches a model Omni-IR is built by `server/prompt.ts`, which isn't published. Today
-  they'd have to clone the repository or copy a prompt by hand.
-- The LinkedIn post went out today: new visitors should find a path that works.
+- The owner's review (2026-10-11): "Get started" leads to a docs page that reads like documentation,
+  and the hero's other button leads to the spec. Neither lets a visitor *do* anything.
+- The LinkedIn post went out today. Many of its readers aren't developers, and most read LinkedIn on
+  a phone. Installing Node, cloning a repository or reading code loses them at the first step.
+- What they already have is an AI chat (ChatGPT, Claude or Gemini, free plans included). What we
+  already have is a playground that draws pasted Omni-IR in the browser. Nothing joins the two.
+- A gap behind the developer path: the system prompt that teaches a model Omni-IR is built by
+  `server/prompt.ts`, which reads files from disk and isn't published. Neither the browser nor a
+  developer's app can get it today.
 
 ## How it fits
 
 - Distribution work, not a new protocol step, so it fits the pause on new steps (cost-benefit item 1).
-- It's the "migration path, not a rewrite" idea: add one AI screen to an app you already have.
-- Reuses what is built: the parser, the React renderer, the tool registry, the prompt generator.
+- Reuses what is built: the playground, its paste mode, its phone layout, the real parser and catalog,
+  and the prompt generator. The free model check page already proved the "paste into your own chat"
+  idea with the owner.
 
 ## Who benefits
 
-- **Developers** arriving from the post or the landing page: a working screen, not a reading list.
-- **The project:** a visitor who gets something running is far more likely to star, ask or come back.
+- **Non-technical visitors** (product managers, founders, designers, the post's readers): they see
+  what Omni-IR does with their own idea and their own AI, and can pass it to a developer.
+- **Developers:** a numbered guide that ends with a working screen in their app.
+- **The project:** visitors who make something are far more likely to share it, star it or come back.
 
-## The example, walked end to end
+## Track 1, no code: the example walked end to end
 
-A developer has a React app and wants an AI-written order screen with a "Request a return" button.
+Sam, a product manager, taps **Get started** in the LinkedIn post's link, on their phone.
 
-1. **Install:** `npm install @omni-ir/core @omni-ir/react zod`.
-2. **See a screen without a model** (2 minutes): paste the guide's ready-made reply into
-   `parser.write(...)` and render `<OmniRenderer>`. *They see:* an order card with a disabled "Request
-   a return" button, and the guide says why it's disabled (no tool registered yet).
-3. **Allow the action:** register `orders.requestReturn` with a schema for its params. *They see:* the
-   button is enabled; clicking it calls their `onMutation`, which logs the tool and params.
-4. **Connect a model:** on their server, `buildSystemPrompt({ tools })` from `@omni-ir/core` (new),
-   send it with the user's request to their own model (Claude, OpenAI or any other; their key, their
-   bill), and stream the reply text to the browser. *They see:* "Where is my order?" becomes a screen
-   that draws line by line as it streams.
-5. **Check the action on the server:** the same tool schema checks the params again, and their handler
-   checks the person may do it. *They see:* a returned result message on the screen.
-6. **Next steps:** links to other platforms (any web framework, iPhone, Android), their own components,
-   live screens and themes.
+1. **The playground opens on a new tab, "Use your own AI",** with three numbered steps and nothing
+   else to read. Step 1: *"What screen do you want?"* Sam types "a booking form for a dog-grooming
+   salon", or taps one of four ideas.
+2. **Step 2: "Ask your AI."** One button, **Copy instructions**, copies the Omni-IR instructions with
+   Sam's request at the end. Three links open ChatGPT, Claude or Gemini in a new tab (plain links,
+   nothing sent with them). Sam pastes, sends, and copies the AI's whole reply. The page says in one
+   line that a free account works and that nothing is sent to us.
+3. **Step 3: "Paste the reply."** Sam pastes it and taps **Show my screen**. The page drops anything
+   that isn't Omni-IR (a "Here's your screen" sentence, code fences) and says so. The screen draws
+   line by line, as it would while streaming, with a web or phone frame to switch between.
+   Under it, in plain sentences: *"All 16 lines were checked. The Book button is off: this demo app
+   has no booking action. In your app, you choose which actions the AI may use."*
+4. **Next:** **Share this screen** copies a link that opens the same screen for anyone (the lines
+   travel in the link itself; nothing is stored on a server). **Build it into your app** opens the
+   developer guide.
 
-What the model writes in step 4 is ordinary Omni-IR (`root = Card([...])`, `ret = Button("Request a
-return", action="return")`, `retM = McpMutation(ret, tool="orders.requestReturn", params={...})`); what
-the app sends to the model is the generated prompt plus the request; what the person sees is the card.
+What the AI writes is ordinary Omni-IR (`root = Card([...])`, `book = Button("Book", action="book")`).
+What the page sends anywhere: nothing; the copy and paste are Sam's. What Sam sees: the screen, and why
+the button is off.
 
-No phone test: this changes the web guide and a core export. iPhone and Android get the same prompt
-through their own servers; their guides are linked, not rewritten.
+## Track 2, developers: the guide
+
+The docs' "Getting started" page, rewritten as numbered steps for a React app, each ending with what
+you should see: install; render a ready-made reply with no model (the button is off); register a tool
+(the button turns on and calls your code); connect your own model with `buildSystemPrompt({ tools })`
+(the screen streams in); check the action on your server; next steps for other web frameworks,
+iPhone and Android. Step 4 needs the new export, so it goes live with release 0.15.0.
+
+No phone test for this plan: the iOS and Android apps don't change. Track 1 is checked at phone width
+in the browser.
 
 ## Decisions: pros, cons and trade-offs
 
-### 1. Publish the prompt builder in `@omni-ir/core`
+### 1. Where the no-code path lives
 
-Move `buildSystemPrompt` from `server/prompt.ts` into `@omni-ir/core` with no file access and no demo
-defaults: the app passes its own tools, pictures, components and live parts. The reference server
-calls it with the demo app's registries.
+- **Option A (recommended): a third tab in the playground, "Use your own AI",** which "Get started"
+  opens directly. *Pros:* the renderer, the checks, the phone frame and the phone layout already
+  work there; one click from the landing page to step 1. *Cons:* the playground's other tabs and
+  panels sit around it; on this tab they're hidden until a screen is shown.
+- **Option B:** a new page on the landing site. *Pros:* designed from scratch for beginners. *Cons:* a
+  second copy of the renderer setup and the checks to keep in step.
+- **Option C:** a guided wizard over the landing page. *Cons:* the most new code; the landing page gets
+  heavy.
 
-- **Pros:** anyone can connect any model in a few lines; the prompt can never describe something the
-  parser rejects, because it's built from the same schema; one source for server, guide and docs.
-- **Cons:** a new public function to keep stable; needs a release (0.15.0), so the guide's step 4 only
-  works after it (with the owner's separate go-ahead to release).
-- **Alternatives:** a static `prompt.txt` on the site (no release, but it can't include the app's own
-  tools, which is the point of step 3); or `buildGuide` from `@omni-ir/mcp` (a short guide for MCP
-  hosts, not tuned for a model writing whole screens).
-- **Trade-off:** a release for a much shorter path. The demo server's prompt must stay byte-for-byte
-  the same (a test checks it), so no model check is needed: the prompt doesn't change.
-- **Recommendation:** publish it.
+### 2. What the visitor copies
 
-### 2. Where the guide lives
+- **Recommended: the full system prompt plus their request,** generated from the schema with the
+  demo app's tools, so the AI can only describe what the playground can draw. About 10,000 characters
+  (2,600 tokens): fine for free ChatGPT, Claude and Gemini. *Cons:* a long paste on a phone; one
+  button makes it a single tap.
+- **Alternative:** the short MCP guide (under 1,500 tokens). *Pros:* shorter. *Cons:* tuned for an MCP
+  host's tool call, not a whole reply; more mistakes from the AI.
 
-- **Option A (recommended):** rewrite `site/docs/guide/getting-started.md` as the numbered steps above,
-  and move today's "format in one minute" and per-platform fragments to "How it works" and the
-  platform pages. *Pros:* same link, no new navigation, the docs' search and sidebar. *Cons:* still on
-  the docs site, which the owner described as documentation; the page's style must make the steps
-  obvious (numbered, short, a "you should see" line after each).
-- **Option B:** a separate quickstart page on the landing site. *Pros:* designed like the landing page.
-  *Cons:* a second place to keep code in step with the docs; no search.
-- **Recommendation:** A, with a clear step layout.
+### 3. Tidying the AI's reply
 
-### 3. The landing page's buttons
+- **Recommended: the playground drops lines that aren't statements** (prose, code fences) before
+  checking, and says how many it dropped. *Pros:* chat apps wrap replies in fences and a friendly
+  sentence; without this, many first tries would fail on something that isn't the format's fault.
+  *Cons:* it's kinder than the spec; it lives in the playground only, never in the parser, and the
+  page says what it removed.
 
-- Hero: **Try the playground** and **Get started** (replacing "Read the spec"; the spec stays in the
-  top bar and footer). The two lower "Get started" buttons go to the new guide.
-- **Pros:** both hero buttons lead somewhere a builder can act. **Cons:** the spec is less prominent
-  for people writing their own parser; they're few, and it's one click away.
-- **Recommendation:** change it.
+### 4. Which AI chats we point to
 
-### 4. React only, or every platform
+- ChatGPT, Claude and Gemini, the three most used. Claude (the owner's chat) and the Gemini app (5 of 5
+  in Step 13) are checked; **ChatGPT's own app isn't** (GPT was checked through a reseller).
+- **Recommended:** before launch, the owner runs the free model check page once in ChatGPT's free
+  plan (about 10 minutes, no cost). If it does poorly, the page lists ChatGPT last with a note.
 
-- React first (the largest group), with one short section for `<omni-screen>` (any web framework)
-  and links for iPhone and Android.
-- **Pros:** one path that's fully tested; done in a day. **Cons:** native developers get links, not
-  steps. **Recommendation:** React first; native steps later if people ask.
+### 5. Sharing a screen
+
+- **Recommended: a "Share this screen" link** with the lines in the link's fragment (after `#`, which
+  browsers never send to a server). *Pros:* "look what I made" is how this spreads; no storage, no
+  accounts, no cost. *Cons:* long links (a typical screen is 1–2 KB, fine for chat apps); a shared link
+  shows whatever the sender pasted, so the page renders it like any pasted reply (same checks, no
+  actions run, every button off unless its tool is in the demo registry, which only logs).
+
+### 6. The landing page's buttons
+
+- Hero: **Get started** (primary, opens the no-code tab) and **Try the playground** (as today). "Read
+  the spec" moves out of the hero; it stays in the top bar and footer. The Pricing card's "Get started"
+  opens the developer guide; the closing section's opens the no-code tab.
+- *Pros:* every button leads somewhere a visitor can act. *Cons:* the spec is less prominent for
+  people writing a parser; they're few, and it's one click away.
+
+### 7. Publishing the prompt builder in `@omni-ir/core`
+
+- Move `buildSystemPrompt` out of `server/prompt.ts` into `@omni-ir/core`, with no file access and no
+  demo defaults: the caller passes its tools, pictures, components, live parts and examples. The
+  server and the playground call it with the demo app's registries.
+- *Pros:* the browser can build the prompt (Track 1 needs this; the site uses the source, so no
+  release is needed for Track 1); developers can connect any model (Track 2); one source for all.
+- *Cons:* a new public function to keep stable; Track 2's step 4 waits for release 0.15.0 (your
+  separate go-ahead).
+- **The demo server's prompt stays byte-for-byte the same** (a test checks it), so no model check
+  page run is due for the move itself.
 
 ## Checks (per the working rules)
 
-- The guide's code is tested: a test runs steps 2–5 with a fake model client and checks what a person
-  would see (the card, the enabled button, the call to `onMutation`, the server's check).
-- The demo server's system prompt is unchanged (snapshot test), so no model-check page run is due.
-- I read every sentence of the guide and look at it in the browser at desktop and phone width before
-  showing you.
-- `npm run pack:check` and `npm run install:test` with the new export.
+- Tests first: the reply tidying (fences, prose, nothing else changed), the share link (round trip,
+  size, hostile content treated like any paste), the prompt builder (same output as today).
+- A test walks Track 1: copy instructions contain the request, a pasted reply with prose and fences
+  draws the screen, the plain-sentence summary is right.
+- The developer guide's code runs in a test with a fake model client.
+- I go through Track 1 myself in the browser at phone and desktop width, read every sentence a
+  visitor sees, and look at every screenshot before showing you.
 
 ## Cost and risk
 
-- Free: no paid API, no new dependency.
-- **Risk: the guide drifts from the packages.** The tested snippet catches it.
-- **Risk: step 4 before the release.** The guide goes live with the release, not before.
+- Free: no paid API, no new dependency, nothing stored.
+- **Risk: a visitor's AI writes something poor.** The checks say what went wrong in plain sentences,
+  and the page suggests trying again or another AI.
+- **Risk: copy and paste on phones.** One-tap copy buttons; the paste box is large; tested at phone width.
 
 ## Checklist
 
-- [ ] A.1 `buildSystemPrompt` in `@omni-ir/core`, tests first; the server uses it, prompt unchanged
-- [ ] A.2 The guide rewritten as steps 1–6, its code tested with a fake model
-- [ ] A.3 Landing page buttons: "Get started" in the hero
-- [ ] B.1 I check the guide and the landing page in the browser before showing you
-- [ ] B.2 Your review, then merge with your approval
-- [ ] B.3 Release 0.15.0 with your separate go-ahead (the guide's step 4 needs it)
+- [ ] A.1 `buildSystemPrompt` in `@omni-ir/core`, tests first; the server and playground use it, prompt unchanged
+- [ ] A.2 The "Use your own AI" tab: three steps, reply tidying, plain-sentence summary, phone layout
+- [ ] A.3 Share links
+- [ ] A.4 Landing page buttons
+- [ ] A.5 The developer guide rewritten as steps, its code tested
+- [ ] B.1 Owner: one free model check run in ChatGPT's free plan
+- [ ] B.2 I go through both tracks in the browser and check every screen and sentence
+- [ ] B.3 Your review, then merge with your approval (Track 1 goes live with the site)
+- [ ] B.4 Release 0.15.0 with your separate go-ahead (Track 2's step 4)
