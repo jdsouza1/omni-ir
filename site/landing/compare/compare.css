@@ -103,3 +103,24 @@
   .cmp-bar-track, .cmp-lane > .cmp-lane-track { grid-column: 1 / -1; grid-row: 2; }
   .cmp-lane-status { grid-row: 1; grid-column: 2; text-align: right; }
 }
+
+/* Phones (the owner's Pixel, 2026-10-11): a one-column grid sizes its column to its widest item, so
+   the cards' contents ran 41 px past the card. Every single-column grid here shrinks to its box
+   instead, and long words and controls wrap or shrink inside it. */
+.cmp-section, .cmp-card, .cmp-split-text, .cmp-split-screen, .cmp-race-screen, .cmp-row { grid-template-columns: minmax(0, 1fr); }
+.cmp-picker > *, .cmp-picker select { min-width: 0; }
+.cmp-bar > *, .cmp-lane > * { min-width: 0; }
+.cmp-lane-status { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .cmp-card { padding: 16px; gap: 14px; }
+  .cmp-picker { padding: 12px; }
+  .cmp-picker label { font-size: 16px; }
+  .cmp-picker select { width: 100%; font-size: 16px; }
+  .cmp-bar, .cmp-lane { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; }
+  .cmp-lane-status { font-size: 13px; text-align: right; }
+  .cmp-drawn { padding: 8px; }
+  .cmp-race-head .btn { width: 100%; justify-content: center; }
+}
+/* "Play" is a real button: give it the site's button look, not the browser's border and font. */
+button.btn { border: 0; font-family: inherit; cursor: pointer; }
+button.btn:disabled { opacity: 0.7; cursor: default; }
