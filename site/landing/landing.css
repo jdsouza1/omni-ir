@@ -177,6 +177,12 @@ a:hover { color: var(--brand-dark); text-decoration: underline; }
 
 /* Sections */
 .section { padding-bottom: 96px; }
+/* Every section after the hero sits in its own band, and every other band is a shade darker, so a
+   reader can see where one section ends and the next begins (the owner's request, 2026-10-11). The
+   band runs the full width of the window while the content keeps to .wrap: a wide shadow paints the
+   colour sideways and clip-path trims it to the section's own height, so nothing scrolls sideways. */
+main > section:not(.hero) { padding-block: 88px; }
+main > section:nth-of-type(even) { background: var(--wash); box-shadow: 0 0 0 100vmax var(--wash); clip-path: inset(0 -100vmax); }
 /* The demo video (PLAN-VIDEO.md). */
 .demo { display: grid; gap: 20px; justify-items: center; }
 .demo-video { display: block; width: 100%; max-width: 1040px; aspect-ratio: 16 / 9; border-radius: 20px; border: 1px solid var(--line); background: var(--card); box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05); }
