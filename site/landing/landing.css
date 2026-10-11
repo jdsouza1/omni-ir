@@ -177,6 +177,14 @@ a:hover { color: var(--brand-dark); text-decoration: underline; }
 
 /* Sections */
 .section { padding-bottom: 96px; }
+/* The demo video (PLAN-VIDEO.md). */
+.demo { display: grid; gap: 20px; justify-items: center; }
+.demo-video { display: block; width: 100%; max-width: 1040px; aspect-ratio: 16 / 9; border-radius: 20px; border: 1px solid var(--line); background: var(--card); box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05); }
+.demo-note { margin: 0; color: var(--muted); font-size: 14px; text-align: center; }
+.demo-transcript { width: 100%; max-width: 760px; color: var(--muted); font-size: 15px; }
+.demo-transcript summary { cursor: pointer; text-align: center; font-weight: 600; color: var(--ink); }
+.demo-transcript ol { margin: 12px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.demo-transcript code { font-family: var(--mono); font-size: 0.9em; }
 .section-title { margin: 0; font-size: clamp(30px, 4vw, 44px); letter-spacing: -0.03em; font-weight: 800; text-align: center; text-wrap: balance; }
 .section-lede { margin: 16px auto 0; max-width: 640px; text-align: center; font-size: 17px; line-height: 1.55; color: var(--text); text-wrap: pretty; }
 .tiles { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; }
