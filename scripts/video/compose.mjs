@@ -38,7 +38,8 @@ let textN = 0;
 function text(words, { size = 56, color = INK, font = FONT, x = "(w-text_w)/2", y = "(h-text_h)/2", enable } = {}) {
   const file = join(work, `text-${textN++}.txt`);
   writeFileSync(file, words);
-  const esc = (p) => p.replace(/\\/g, "/").replace(/:/g, "\\:");
+  // Quoted, with the colon escaped, so Windows paths (C:/…) work too.
+  const esc = (p) => `'${p.replace(/\\/g, "/").replace(/:/g, "\\:")}'`;
   return `drawtext=fontfile=${esc(font)}:textfile=${esc(file)}:fontsize=${size}:fontcolor=${color}:x=${x}:y=${y}${enable ? `:enable='${enable}'` : ""}`;
 }
 const note = () => text(NOTE, { size: 22, color: MUTED, font: FONT_REGULAR, x: "w-text_w-36", y: "h-text_h-20" });
@@ -72,7 +73,11 @@ const androidLog = log(join(rec, "android", "server.log"));
 const ios = fromEnd({ file: join(rec, "ios", "order.mov"), t0: t0(join(rec, "ios", "order.t0")) }, "order");
 const android = { file: join(rec, "android", "order.mp4"), t0: t0(join(rec, "android", "order.t0")) };
 const webMeta = JSON.parse(readFileSync(join(rec, "android", "web", "meta.json"), "utf8"));
-const web = { file: join(rec, "android", "web", "frames.ffconcat"), t0: webMeta.t0, concat: true };
+// Older web recordings listed a few frames with tiny negative durations (out of order by
+// milliseconds); some ffmpeg builds refuse them, so the list is repaired before use.
+const webList = join(rec, "android", "web", "frames.ffconcat");
+writeFileSync(webList, readFileSync(webList, "utf8").replace(/^duration -[\d.]+$/gm, "duration 0.001"));
+const web = { file: webList, t0: webMeta.t0, concat: true };
 Object.assign(ios, request(iosLog, ios.t0));
 Object.assign(android, request(androidLog, android.t0));
 Object.assign(web, request(androidLog, web.t0)); // the web page asks the Android job's server, before the emulator does
@@ -90,8 +95,12 @@ function card(name, seconds, filters) {
   ffmpeg(["-f", "lavfi", "-i", `color=c=${BG}:s=${W}x${H}:d=${seconds}:r=30`, "-vf", [...filters, `fade=t=in:st=0:d=0.4`].join(","), ...ENCODE, "-t", String(seconds), file]);
   return file;
 }
+// A list of still frames (the web scene) can't be seeked precisely: ffmpeg starts at the beginning of
+// whichever frame holds the moment, up to a second early. So it's read from the start and cut with
+// `cut()` in the filter instead; video files are seeked on input as usual.
 const input = (clip, start, seconds) =>
-  clip.concat ? ["-f", "concat", "-safe", "0", "-ss", String(start), "-t", String(seconds), "-i", clip.file] : ["-ss", String(start), "-t", String(seconds), "-i", clip.file];
+  clip.concat ? ["-f", "concat", "-safe", "0", "-i", clip.file] : ["-ss", String(start), "-t", String(seconds), "-i", clip.file];
+const cut = (clip, start, seconds) => (clip.concat ? `fps=30,trim=start=${start}:duration=${seconds},setpts=PTS-STARTPTS,` : "");
 
 // Why: three cards.
 segments.push(card("why-1", 3, [text("AI writes most of the code now.", { size: 68 })]));
@@ -118,10 +127,10 @@ function deliveredAt(clip) {
   const guess = at(clip, clip.E + 9);
   const from = Math.max(0, guess - 12);
   const seconds = 24;
-  const [w, fps] = [180, 5];
+  const [w, fps] = [420, 5]; // wide enough that the small web badge keeps its green
   const probe = execFileSync("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height", "-of", "csv=p=0", ...(clip.concat ? ["-f", "concat", "-safe", "0"] : []), clip.file]).toString().trim().split(/\r?\n/)[0].split(",").map(Number);
   const h = Math.round((probe[1] / probe[0]) * w / 2) * 2;
-  const raw = execFileSync("ffmpeg", ["-loglevel", "error", ...input(clip, from, seconds), "-vf", `fps=${fps},scale=${w}:${h}`, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], { maxBuffer: 1 << 28 });
+  const raw = execFileSync("ffmpeg", ["-loglevel", "error", ...input(clip, from, seconds), "-vf", `${cut(clip, from, seconds)}fps=${fps},scale=${w}:${h}`, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], { maxBuffer: 1 << 28 });
   const frame = w * h * 3;
   for (let f = 0; f * frame < raw.length; f++) {
     let green = 0;
@@ -149,7 +158,7 @@ const PANEL_H = 780;
   const file = join(work, "how-platforms.mp4");
   const clips = [ios, android, web];
   const args = clips.flatMap((c) => input(c, c.sceneStart, sideBy));
-  const scaled = clips.map((_, i) => `[${i}:v]fps=30,scale=-2:${PANEL_H},setpts=PTS-STARTPTS[p${i}]`).join(";");
+  const scaled = clips.map((c, i) => `[${i}:v]${cut(c, c.sceneStart, sideBy)}fps=30,scale=-2:${PANEL_H},setpts=PTS-STARTPTS[p${i}]`).join(";");
   const widths = [367, 351, 468]; // iPhone 1206x2622, Android 1080x2400, web 600x1000, at 780 high
   const gap = 90;
   const total = widths.reduce((a, b) => a + b) + gap * 2;

@@ -81,11 +81,13 @@ http.close();
 
 // The screencast sends a frame only when the page changes: each frame lasts until the next one.
 const lines = ["ffconcat version 1.0"];
-frames.forEach((t, i) => {
+// Frames can arrive a few milliseconds out of order: list them by their own time, never backwards.
+const order = frames.map((t, i) => ({ t, i })).sort((a, b) => a.t - b.t);
+order.forEach(({ t, i }, n) => {
   lines.push(`file frames/${String(i).padStart(5, "0")}.jpg`);
-  lines.push(`duration ${((frames[i + 1] ?? started + SECONDS) - t).toFixed(3)}`);
+  lines.push(`duration ${Math.max(0.001, (order[n + 1]?.t ?? started + SECONDS) - t).toFixed(3)}`);
 });
-lines.push(`file frames/${String(frames.length - 1).padStart(5, "0")}.jpg`);
+lines.push(`file frames/${String(order.at(-1).i).padStart(5, "0")}.jpg`);
 writeFileSync(join(out, "frames.ffconcat"), lines.join("\n") + "\n");
 writeFileSync(join(out, "meta.json"), JSON.stringify({ t0: frames[0], started, frames: frames.length }, null, 1));
 console.log(`record-web: ${frames.length} frames over ${SECONDS} s → ${out}`);
