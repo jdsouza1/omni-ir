@@ -89,6 +89,8 @@ export function Landing() {
           </div>
         </section>
 
+        <DemoVideo />
+
         <Examples />
 
         <section id="how" className="wrap section" aria-labelledby="how-title">
@@ -460,5 +462,46 @@ function Item({ image, title, detail, price, style }: { image: string; title: st
       </span>
       <span className="item-price">{price}</span>
     </div>
+  );
+}
+
+/**
+ * The product demo video (PLAN-VIDEO.md): made by the `video` workflow from the real renderers. No
+ * autoplay and no sound by default; the transcript says the same in words.
+ */
+function DemoVideo() {
+  const base = import.meta.env.BASE_URL;
+  return (
+    <section id="demo" className="wrap section demo" aria-labelledby="demo-title">
+      <h2 id="demo-title" className="section-title">
+        One description. Every platform.
+      </h2>
+      <video
+        className="demo-video"
+        controls
+        muted
+        playsInline
+        preload="metadata"
+        poster={`${base}demo/omni-ir-demo-poster.jpg`}
+        aria-describedby="demo-note"
+      >
+        <source src={`${base}demo/omni-ir-demo.mp4`} type="video/mp4" />
+      </video>
+      <p id="demo-note" className="demo-note">
+        50 seconds, no sound. A demo with pre-written screens: no AI model was called.
+      </p>
+      <details className="demo-transcript">
+        <summary>Read what the video shows</summary>
+        <ol>
+          <li>AI writes most of the code now. But it still writes every screen three times: React, Swift, Kotlin. What if it wrote the screen once?</li>
+          <li>One description, in a few plain lines, such as <code>order_status = Badge("Shipped")</code>.</li>
+          <li>Every platform draws it natively: the same order screen streams in on an iPhone, an Android phone and a web page, side by side.</li>
+          <li>Your app keeps it current, everywhere at once: the status moves to "Out for delivery", then "Delivered", on all three.</li>
+          <li>Every action is still checked by your server: "Request a return" becomes "Return requested. We'll email you a label."</li>
+          <li>The AI can ask. Your app decides: a "Delete my account" button the app never allowed appears greyed out and does nothing.</li>
+          <li>Omni-IR: a universal UI language for AI. Write the screen once, native on iPhone, Android and the web. Open source.</li>
+        </ol>
+      </details>
+    </section>
   );
 }

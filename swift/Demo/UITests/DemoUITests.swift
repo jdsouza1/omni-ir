@@ -181,3 +181,38 @@ final class ServerTests: XCTestCase {
     shot("live-4-return-requested")
   }
 }
+
+/// The demo video's iPhone scenes (PLAN-VIDEO.md), recorded by the `video` workflow while they run.
+/// Each waits for what the scene shows, then holds it long enough to read. Recording mode (`-video YES`)
+/// shows only the screen.
+final class VideoTests: XCTestCase {
+  private func launch(_ prompt: String) -> XCUIApplication {
+    let app = XCUIApplication()
+    app.launchArguments = ["-server", "http://localhost:8787", "-prompt", prompt, "-appearance", "light", "-video", "YES"]
+    app.launch()
+    return app
+  }
+
+  /// Scenes 2 to 4: the order streams in, moves on by itself, and a return replaces its Button.
+  func testOrderMovesOnThenReturn() {
+    let app = launch("Where is my order?")
+    XCTAssertTrue(app.staticTexts["Shipped"].waitForExistence(timeout: 60), "the order arrived")
+    XCTAssertTrue(app.staticTexts["Delivered"].waitForExistence(timeout: 30), "the updates arrived")
+    Thread.sleep(forTimeInterval: 2)
+    app.buttons["Request a return"].tap()
+    let done = app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "Return requested")).firstMatch
+    XCTAssertTrue(done.waitForExistence(timeout: 10), "the result replaced the Button")
+    Thread.sleep(forTimeInterval: 4)
+  }
+
+  /// Scene 5: a button whose action the app never allowed stays off.
+  func testDeleteButtonStaysOff() {
+    let app = launch("A button that deletes my account")
+    let button = app.buttons["Delete my account"]
+    XCTAssertTrue(button.waitForExistence(timeout: 60), "the screen arrived")
+    Thread.sleep(forTimeInterval: 2)
+    XCTAssertFalse(button.isEnabled, "the app never allowed this action")
+    button.tap()
+    Thread.sleep(forTimeInterval: 4)
+  }
+}
