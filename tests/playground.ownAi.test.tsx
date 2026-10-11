@@ -4,6 +4,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Playground } from "../playground/Playground";
+import { shareLink } from "../playground/ownAi";
 
 const healthFetch: typeof fetch = async (input) => {
   if (String(input).endsWith("/api/health")) return new Response(JSON.stringify({ ok: true, model: "mock" }));
@@ -118,6 +119,14 @@ describe("Use your own AI", () => {
       window.dispatchEvent(new HashChangeEvent("hashchange"));
     });
     expect(screen.getByRole("tab", { name: "Use your own AI" }).getAttribute("aria-selected")).toBe("true");
+
+    // A share link opened the same way draws its screen, and says it was shared.
+    await act(async () => {
+      window.history.replaceState(null, "", shareLink(window.location.href, 'root = Card([t])\nt = Heading("Shared")'));
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    await screen.findByRole("region", { name: "What we checked" }, { timeout: 3000 });
+    expect(screen.getByText(/^Someone shared this screen with you/)).toBeTruthy();
   });
 
   it("draws a reply a line at a time, like a stream", async () => {

@@ -160,7 +160,7 @@ in the browser.
 - [x] A.3 Share links
 - [x] A.4 Landing page buttons
 - [x] A.5 The developer guide rewritten as steps, its code tested
-- [ ] B.1 Owner: one free model check run in ChatGPT's free plan
-- [ ] B.2 I go through both tracks in the browser and check every screen and sentence
+- [x] B.1 Owner: one free model check run in ChatGPT's free plan (2026-10-11: first try failed on copied formatted text, fixed; then 36 of 36 lines drawn; Claude 46 of 46)
+- [x] B.2 I go through both tracks in the browser and check every screen and sentence
 - [ ] B.3 Your review, then merge with your approval (Track 1 goes live with the site)
 - [ ] B.4 Release 0.15.0 with your separate go-ahead (Track 2's step 4)

@@ -75,6 +75,7 @@ export function Playground(deps: PlaygroundDeps) {
       if (next.mode !== "own") return;
       setMode("own");
       if (next.shared !== undefined) {
+        setOpenedShared(true);
         setReply(next.shared);
         showReply(next.shared);
       }
@@ -83,6 +84,7 @@ export function Playground(deps: PlaygroundDeps) {
     return () => window.removeEventListener("hashchange", onHash);
   });
   const [reply, setReply] = useState(linked.shared ?? "");
+  const [openedShared, setOpenedShared] = useState(linked.shared !== undefined);
   const [dropped, setDropped] = useState(0);
   const [ownShown, setOwnShown] = useState(false);
   const [frame, setFrame] = useState<"web" | "phone">("web");
@@ -181,7 +183,7 @@ export function Playground(deps: PlaygroundDeps) {
           summary={ownDone ? summarize({ lines: sourceLines, issues: state.issues, dropped }) : null}
           problems={problems}
           busy={streaming}
-          shared={linked.shared !== undefined}
+          shared={openedShared}
           guideLink={GUIDE_LINK}
           onShare={async () => {
             const link = shareLink(window.location.href, tidyReply(reply).source);
