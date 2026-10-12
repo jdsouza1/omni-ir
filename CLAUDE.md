@@ -57,6 +57,7 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - `npm run prompt:print` — the system prompt; `npm run validate -- reply.omni` — check model output (free manual prompt check).
 - `npm run model-check:page -- out.html` — the free model check page: the system prompt and nine test requests to run in the owner's own Claude.ai chat, with the real parser and catalog bundled in to check pasted replies in the browser. Published as an artifact; the owner pastes results back.
 - `node scripts/og/render.mjs` — re-render the site's link-preview image (`site/landing/public/og.png`, 1200x630) from `scripts/og/card.html` with headless Edge or Chrome; the image is committed, and a test checks its size, the landing page's preview tags, and that its code is valid Omni-IR.
+- `npm run preview -- <dir>` — after `site:build`: the site without the docs, with links adjusted, plus a launcher page and `files.json`, for publishing as a private phone preview (claude.ai artifact) before a merge.
 - `npm run layout:check` — after `site:build`: the landing and comparison pages at 360, 412, 768 and 1280 px in headless Chrome or Edge; fails if anything sticks out of its card or the screen (the Site workflow runs it before deploying).
 - `npm run site:build` — the whole site into `dist/site` (`landing:build`, `playground:static`, `docs:build`); `npm run docs:dev` — the docs with live reload.
 - `npm run landing:examples -- page.html out.html` — regenerate the landing page artifact's example tabs from `fixtures/landing/` (explanations in `landing.json`). Get `page.html` with the Artifact tool's read action; publish `out.html` back to the same URL.
@@ -74,6 +75,11 @@ Nothing may call a paid API by default. Tests, demos and checks use mock data (`
 - **Check review evidence before showing it:** look at every screenshot and read every sentence a person will see before a review page is published. Screenshots wait for what they show, never a fixed time.
 - **After each change to the system prompt**, run the free model check page (`npm run model-check:page`): the owner pastes it into their own Claude.ai chat. No paid API.
 - **Hold pushes while an iOS or Android demo run is in progress** on the same branch, unless the push fixes it: a newer push cancels the run.
+
+## Working rules (owner's decision, 2026-10-11, from the owner's feedback review)
+- **Phone preview before merge:** for any visual change, `npm run site:build` then `npm run preview -- <dir>` and publish `<dir>/index.html` with the files in `<dir>/files.json` to the same private artifact (the Omni-IR Preview link, reused); the owner looks on the phone before "merge it". Run `npm run layout:check` first.
+- **Session start:** bring up the decisions waiting on the owner (memory: decisions-waiting), oldest first, each with a recommendation; agree one or two goals for the session with a clear stop.
+- **Before any launch or post:** walk a visitor's first five minutes on a phone.
 
 ## Open core (owner's decision, 2026-10-04)
 This repository is public and is the open standard. Business material (go-to-market strategy, pricing, client work, delivery tooling, the hosted service) lives in a separate private repository and must never be written here: not in docs, plans, commit messages or examples. One exception, the owner's decision of 2026-10-09: the landing page's Pricing section may say that the standard is free and complete, and that a hosted version is planned, with a link to register interest. No prices, tiers, plan names or strategy, until there is something to buy.

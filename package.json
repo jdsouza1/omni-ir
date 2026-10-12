@@ -58,7 +58,8 @@
     "bench": "tsx benchmarks/run.ts",
     "reliability:page": "tsx scripts/reliability-page.ts",
     "comparison:page": "tsx scripts/comparison-page.ts",
-    "layout:check": "node scripts/layout-check.mjs"
+    "layout:check": "node scripts/layout-check.mjs",
+    "preview": "node scripts/preview.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.130.0",
