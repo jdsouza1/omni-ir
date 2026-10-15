@@ -22,6 +22,7 @@ const LINKS = {
   comparison: "docs/project/comparison.html",
   // The interactive comparison, in plain words (PLAN-COMPARE-PAGE.md).
   compare: "compare/",
+  showcase: "showcase/",
   playground: "playground/",
   community: "https://github.com/jdsouza1/omni-ir/discussions",
   // A new discussion in Ideas, titled for the visitor: nothing is collected on this page.
@@ -60,6 +61,7 @@ export function Landing() {
         <nav className="nav" aria-label="Primary">
           <a href="#how">How it works</a>
           <a href={LINKS.compare}>Compare</a>
+          <a href={LINKS.showcase}>Showcase</a>
           <a href="#principles">Principles</a>
           <a href="#pricing">Pricing</a>
           <a href={LINKS.docs}>Docs</a>
@@ -249,6 +251,7 @@ export function Landing() {
           <span>Omni-IR · Open standard, Apache 2.0</span>
           <nav aria-label="Footer">
             <a href={LINKS.spec}>Spec</a>
+            <a href={LINKS.showcase}>Showcase</a>
             <a href={LINKS.github} target="_blank" rel="noopener noreferrer">
               GitHub
             </a>

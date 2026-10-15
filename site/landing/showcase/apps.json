@@ -1,0 +1,116 @@
+{
+  "apps": [
+    {
+      "id": "shop",
+      "name": "A small shop",
+      "summary": "A product page with the shop's own product card and quantity picker. One stream, drawn by each platform's own renderer, with the shop's own views for its two custom pieces.",
+      "platforms": [
+        "web",
+        "ios",
+        "android"
+      ],
+      "screen": "Product page",
+      "stream": "fixtures/product.omni",
+      "shots": {
+        "web": "shop-web.webp",
+        "ios": "shop-ios.webp",
+        "android": "shop-android.webp"
+      },
+      "source": "https://github.com/jdsouza1/omni-ir/tree/main/app",
+      "features": [
+        "Every action through McpMutation",
+        "A required field, checked before the button works"
+      ]
+    },
+    {
+      "id": "dashboard",
+      "name": "A sales dashboard",
+      "summary": "Sales by month, today's orders and weekly visitors as charts, with a note about the month. The same lines become native charts on each platform.",
+      "platforms": [
+        "web",
+        "ios",
+        "android"
+      ],
+      "screen": "Sales dashboard",
+      "stream": "fixtures/sales-dashboard.omni",
+      "shots": {
+        "web": "dashboard-web.webp",
+        "ios": "dashboard-ios.webp",
+        "android": "dashboard-android.webp"
+      },
+      "source": "https://github.com/jdsouza1/omni-ir/tree/main/fixtures",
+      "features": [
+        "Charts drawn natively, no chart code from the model"
+      ]
+    },
+    {
+      "id": "playground",
+      "name": "The playground",
+      "summary": "Type or paste Omni-IR and see it drawn as you go, or copy the instructions into your own AI chat and paste its reply. Runs in the browser with a free mock model.",
+      "platforms": [
+        "web"
+      ],
+      "screen": "Booking a cabin",
+      "stream": "fixtures/landing/booking.omni",
+      "shots": {
+        "web": "playground-web.webp"
+      },
+      "link": {
+        "label": "Open the playground",
+        "href": "../playground/"
+      },
+      "source": "https://github.com/jdsouza1/omni-ir/tree/main/playground",
+      "features": [
+        "Streams line by line",
+        "Share links that never reach a server"
+      ]
+    },
+    {
+      "id": "elements",
+      "name": "A plain web page",
+      "summary": "The <omni-screen> element in plain HTML, with no build step. The same element works in Vue, Svelte and Angular; each has its own example.",
+      "platforms": [
+        "web"
+      ],
+      "screen": "Confirm a payment",
+      "lines": [
+        "root = Card([title, card, pay])",
+        "title = Heading(\"Confirm payment\")",
+        "card = ProductCard(\"Canvas tote\", price=24)",
+        "pay = Button(\"Pay now\", action=\"go\")",
+        "go = McpMutation(pay, tool=\"payments.confirm\", params={amount: 24})"
+      ],
+      "example": "examples/html/index.html",
+      "shots": {
+        "web": "elements-web.webp"
+      },
+      "link": {
+        "label": "Try it",
+        "href": "../elements/"
+      },
+      "source": "https://github.com/jdsouza1/omni-ir/tree/main/examples",
+      "features": [
+        "One script tag",
+        "The app's own component as a plain custom element"
+      ]
+    },
+    {
+      "id": "chat",
+      "name": "Inside an AI chat",
+      "summary": "The MCP Apps view: when an assistant such as Claude calls show_screen, the screen streams into the chat and its buttons call the app's own tools.",
+      "platforms": [
+        "chat"
+      ],
+      "screen": "Booking a cabin",
+      "stream": "fixtures/landing/booking.omni",
+      "shots": {
+        "chat": "chat-web.webp"
+      },
+      "source": "https://github.com/jdsouza1/omni-ir/tree/main/packages/mcp",
+      "features": [
+        "Streams as the assistant writes",
+        "Buttons call app-only tools, checked against their schemas"
+      ]
+    }
+  ]
+}

@@ -85,7 +85,7 @@ describe("landing page", () => {
     docsPages.add("docs/");
     for (const a of document.querySelectorAll("a")) {
       const href = a.getAttribute("href")!;
-      if (href.startsWith("#") || href.startsWith("https://") || href === "./" || href === "playground/" || href === "playground/#own-ai" || href === "compare/") continue;
+      if (href.startsWith("#") || href.startsWith("https://") || href === "./" || href === "playground/" || href === "playground/#own-ai" || href === "compare/" || href === "showcase/") continue;
       expect(docsPages.has(href), `${a.textContent}: ${href}`).toBe(true);
     }
     expect(screen.getByRole("link", { name: "Join the community" }).getAttribute("href")).toBe("https://github.com/jdsouza1/omni-ir/discussions");

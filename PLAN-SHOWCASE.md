@@ -1,6 +1,6 @@
 # Omni-IR: a "Built with Omni-IR" showcase page
 
-Status: **Plan, waiting for the owner's approval.** Not a protocol step: nothing in the format changes.
+Status: **Approved 2026-10-15 with the recommendations (all five decisions).** Not a protocol step: nothing in the format changes.
 Free: committed screenshots and streams, no paid API, no model called.
 
 ## Goal

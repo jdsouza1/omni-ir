@@ -16,9 +16,10 @@ const WIDTHS = [360, 412, 768, 1280];
 const PAGES = [
   { name: "landing page", path: "" },
   { name: "comparison page", path: "compare/", act: "compare" },
+  { name: "showcase", path: "showcase/", act: "showcase" },
 ];
 // Boxes whose contents must stay inside them.
-const BOXES = [".tile", ".plan", ".principles", ".cmp-card", ".cmp-row", ".cmp-format", ".cmp-picker", ".cmp-answer details", ".demo-video"];
+const BOXES = [".tile", ".plan", ".principles", ".cmp-card", ".cmp-row", ".cmp-format", ".cmp-picker", ".cmp-answer details", ".demo-video", ".sc-app", ".sc-uses > div", ".sc-stream"];
 
 const BROWSERS = [process.env.CHROME_PATH, "/usr/bin/google-chrome", "/usr/bin/chromium", "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe", "C:/Program Files/Google/Chrome/Application/chrome.exe", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"].filter(Boolean);
 const browser = BROWSERS.find((b) => existsSync(b));
@@ -79,6 +80,11 @@ const ACT = {
     document.querySelector(".cmp-race-head button")?.click();
     document.querySelectorAll(".cmp-answer details").forEach((d) => (d.open = true));
     await wait(1500);
+  })()`,
+  // Open every app's stream, so the drawn screens and code are measured too.
+  showcase: `(async () => {
+    document.querySelectorAll(".sc-actions button").forEach((b) => b.click());
+    await new Promise((r) => setTimeout(r, 500));
   })()`,
 };
 

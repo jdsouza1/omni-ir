@@ -7,16 +7,18 @@ import { defineConfig } from "vite";
 import { WORKSPACE_ALIASES } from "../../scripts/workspace-aliases.ts";
 
 export const EXAMPLES_JSON = "dist/landing-examples.json";
+export const SHOWCASE_JSON = "dist/showcase.json";
 
 export default defineConfig({
   root: resolve("site/landing"),
   base: "./",
   resolve: { alias: WORKSPACE_ALIASES },
-  define: { __LANDING_TABS__: readFileSync(resolve(EXAMPLES_JSON), "utf8") },
-  // Two pages: the landing page and the comparison page (PLAN-COMPARE-PAGE.md), at compare/.
+  define: { __LANDING_TABS__: readFileSync(resolve(EXAMPLES_JSON), "utf8"), __SHOWCASE__: readFileSync(resolve(SHOWCASE_JSON), "utf8") },
+  // Three pages: the landing page, the comparison page (PLAN-COMPARE-PAGE.md) at compare/ and the
+  // showcase (PLAN-SHOWCASE.md) at showcase/, whose entries scripts/showcase.ts checks first.
   build: {
     outDir: resolve("dist/site"),
     emptyOutDir: false,
-    rollupOptions: { input: { main: resolve("site/landing/index.html"), compare: resolve("site/landing/compare/index.html") } },
+    rollupOptions: { input: { main: resolve("site/landing/index.html"), compare: resolve("site/landing/compare/index.html"), showcase: resolve("site/landing/showcase/index.html") } },
   },
 });
