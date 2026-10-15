@@ -96,6 +96,12 @@ Reprioritized 2026-10-05 after a review of the project's gaps. The cheap, free w
    - *Goal:* anyone who clicks Get started sees a screen their own AI wrote within about three minutes; a developer has one in their app within about ten.
    - *Who benefits:* the people the LinkedIn post and the video bring in, most of them not developers and on phones; developers, who can now connect any model with the published packages.
 7. **An interactive comparison page** (plan approved 2026-10-11: [PLAN-COMPARE-PAGE.md](../PLAN-COMPARE-PAGE.md); done 2026-10-11, [on the site](https://jdsouza1.github.io/omni-ir/compare/)). Not a protocol step. The comparison with OpenUI Lang, A2UI, json-render, HTML and React, in plain words for readers who don't code: how much the AI writes for the same screen, a replay of when each can first show it, what each lets the AI do (brought up to date with each project's current docs, six new rows), the account-deletion request in two formats, and where Omni-IR loses. Its data is written by `npm run bench`.
+8. **A "Built with Omni-IR" showcase** (plan approved 2026-10-15: [PLAN-SHOWCASE.md](../PLAN-SHOWCASE.md); in progress). Not a protocol step. A page beside the comparison page with apps built with Omni-IR, each on the devices it runs on: the shop and the sales dashboard on the web, iPhone and Android, the playground, `<omni-screen>` in a plain web page, and the MCP view inside an AI chat. Each shows what the app uses and, on request, the lines the AI wrote, drawn by the real renderer. Apps from other people are added only with their written permission, through a Discussion.
+   - *Goal:* a visitor sees in a minute what Omni-IR is good for: one stream, drawn natively on every platform.
+   - *Who benefits:* developers deciding whether their app would fit; visitors who don't code, who see real apps rather than code; people who build with Omni-IR, who get a place to be listed.
+   - [x] The page, its data and the build-time check (every stream parsed, what each app uses read from its stream, images within budget); web and chat screenshots
+   - [ ] iPhone and Android screenshots from the demo apps' review runs
+   - [ ] The Showcase Discussion category (the owner), review and merge
 
 ## Later
 
@@ -105,6 +111,9 @@ Ideas worth keeping, with no step number, no date and no plan yet. When one is n
   - File upload: a `FileInput` whose file goes only to a registered tool, with size and type limits the app sets (asked of [A2UI](https://github.com/a2ui-project/a2ui/issues/287))
   - Restore a screen after a reload with what the person had typed, so chat history reopens screens as they were left (asked of MCP Apps and CopilotKit)
   - Smoother streaming: a renderer option that paces how fast arriving lines appear (asked of [OpenUI](https://github.com/thesysdev/openui/issues/751))
+
+- **Apps of several screens** (raised 2026-10-15): today a stream is one screen, and the app moves between screens itself. A way for an app to describe its screens and how people move between them, with each screen still one checked stream.
+- **A viewer app on the App Store and Google Play** (raised 2026-10-15): one app that opens any Omni-IR app from a link, so new screens and changes reach phones in seconds without a store review. Streams carry no code, so it's built from the existing renderers; an app with its own components would need them built into the viewer.
 
 - **A lighter parser** (from Step 21's size budget): the parser is most of every web bundle (about 107 KB compressed on its own, mostly its schema library). A smaller schema layer would shrink `@omni-ir/react`, `<omni-screen>` and the MCP view together.
 
